@@ -17,7 +17,7 @@ class HTMLField
       $content = $field->info->content;
     }
 
-    $content = wp_kses_post(FieldValueHandler::replaceSmartTagWithValue($content));
+    $content = FieldValueHandler::replaceSmartTagWithValue($content);
 
     return <<<HTMLFIELD
     <div

@@ -19,10 +19,9 @@ final class MigrateForms
     $config = (object) [];
     $config->delete_table = true;
     update_option('bitform_app_config', $config);
-    set_transient('bitforms_v1_form_contents',$newFormContents);
+    set_transient('bitforms_v1_form_contents', $newFormContents);
     return $newFormContents;
   }
-
 
   private static function migratePaypal()
   {

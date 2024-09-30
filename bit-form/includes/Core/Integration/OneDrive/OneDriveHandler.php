@@ -202,7 +202,7 @@ class OneDriveHandler
   public function execute(IntegrationHandler $integrationHandler, $integrationData, $fieldValues, $entryID, $logID)
   {
     $integrationDetails = json_decode($integrationData->integration_details);
-   
+
     if (empty($integrationDetails->tokenDetails->access_token)) {
       (new ApiResponse())->apiResponse($logID, $this->integrationID, ['type' =>  'record', 'type_name' => 'insert'], 'error', 'Not Authorization By OneDrive.');
       return;

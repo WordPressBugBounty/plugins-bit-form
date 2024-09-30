@@ -1,10 +1,10 @@
 === Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder ===
 Plugin Name: Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder
-Version: 2.14.0
-Stable tag: 2.14.0
+Version: 2.15.1
+Stable tag: 2.15.1
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
-Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin, 
+Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin 
 Tags: contact form, form, contact forms, forms, form builder
 Requires at least: 5.0
 Tested up to: 6.6
@@ -93,7 +93,7 @@ A standalone form is a self-contained, independent component on a website or app
 
 ## Signature Fields [Free]
 
-Add a touch of professionalism to your contact forms with our easy-to-use Signature Field feature. Perfect for contracts and official agreements, it offers a secure way for users to sign electronically, ensuring both convenience and legal compliance.
+Add a touch of professionalism to your contact forms with our easy-to-use Signature Field feature. Perfect for contracts and official agreements, ensuring both convenience and legal compliance.
 
 ## Payment / Order / Booking Form [ Paypal, Razorpay, Stripe, Mollie ]
 
@@ -188,6 +188,7 @@ Quickly personalize your WordPress forms using Bit Form's built-in style editor.
 - [PayPal](https://bitapps.pro/docs/bit-form/form-fields/paypal-field/) (Pro)
 - [Razorpay](https://bitapps.pro/docs/bit-form/form-fields/razorpay-field/) (Pro)
 - [Stripe](https://bitapps.pro/docs/bit-form/form-fields/stripe-field/) (Pro)
+- [Mollie](https://bitapps.pro/docs/bit-form/form-fields/setup-mollie-payment-integration/) (Pro) (New)
 - [Advance File Upload Field](https://bitapps.pro/docs/bit-form/form-fields/advanced-file-upload-field/) (Pro)
 - [Title Field](https://bitapps.pro/docs/bit-form/form-fields/title-field/)
 - [Image Field](https://bitapps.pro/docs/bit-form/form-fields/image-field/)
@@ -203,7 +204,7 @@ Quickly personalize your WordPress forms using Bit Form's built-in style editor.
 - [Next Button](https://bitapps.pro/docs/bit-form/form-fields/next-step-field/)
 - [Previous Button](https://bitapps.pro/docs/bit-form/form-fields/previous-step-field/)
 - [Slider(Range) Field](https://bitapps.pro/docs/bit-form/form-fields/slider-range-field/)
-- [Mollie]() (Pro) (New)
+
 
 == Easy WordPress GDPR Compliance ==
 Bit Form enhances WordPress GDPR compliance by not collecting or storing personal data from your forms. Works hand in hand with WordPress's native GDPR features for compliance."
@@ -272,9 +273,9 @@ Bit Form enhances WordPress GDPR compliance by not collecting or storing persona
 
 Discover the ease of form design with Bit Form's unique Multi-Column Layout. This user-centric feature outshines many premium form builders by allowing up to 60 columns per row, transforming complex forms into accessible, compact, and engaging interfaces.
 
-== 💠 Pre Built Contact Form :==
+== 💠 Pre Built Templates :==
 
-Pre built contact form template feature makes Bit Form easy & fastest form builder one can find on WordPress. It saves your time as you can simply click on the template & it is ready to use. You can also add, delete & adjust fields as your preference.
+Bit Form have 24+ pre-built templates to simplify form creation.
 
 == 📩 Email Template: ==
 
@@ -538,11 +539,29 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 6. Response table to view form entries
 
 == Changelog ==
+= 2.15.0 =
+*Release Date: 29 September, 2024*
+*Feature
+    1. Frontent entry view & edit: Added the ability to view and logged in user to edit form entries.
+*Improvement
+    1. Add new admin side bar menu & top bar menu for bit form.
+*Fix
+    1. Resolved html tag filter issue in html field.
+    2. Resolved dubplicate and export/import issue with repeater and section field.
+
+= 2.14.1 = 
+*Release Date: 26 September, 2024*
+*Improvement:
+    1. Added new admin sidebar and top bar menu for Bit Form.
+*Fixes:
+    1. Resolved HTML tag filtering issue in the HTML field.
+    2. Fixed duplicate and export/import issues with the repeater and section fields.
+
 = 2.14.0 =
 *Release Date: 17 September, 2024*
-*Feature
+*Feature:
     1. New Form Templates: Added 24+ new form templates to simplify form creation.
-*Improvement
+*Improvement:
     1. Telegram Integration: Implemented support for sending images or signatures directly to a Telegram channel.
 
 = 2.13.13 =
@@ -594,7 +613,7 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 
 = 2.13.6 =
 *Release Date: 17 July, 2024*
-Improvement:
+*Improvement:
     1. Improve user input sanitization of Bit Form.
 *Fix:
     1. Resolved Google Ads authentication issue.

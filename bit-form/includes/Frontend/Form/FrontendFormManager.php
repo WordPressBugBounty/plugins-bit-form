@@ -276,6 +276,7 @@ final class FrontendFormManager extends FormManager
       if (!empty($regSuccMsg) && isset($saveResponse['dflt_message'])) {
         $saveResponse['message'] = $regSuccMsg;
       }
+
       $saveResponse = IntegrationHandler::maybeSetCronForIntegration($saveResponse, 'create');
       $entryId = $saveResponse['entry_id'];
 
@@ -298,6 +299,7 @@ final class FrontendFormManager extends FormManager
     $validated = apply_filters('bitform_filter_form_validation', $validated, $this->_form_id);
 
     $entryID = $_REQUEST['entryID'];
+    $GLOBALS['bf_entry_id'] = $entryID;
     if (is_null($entryID)) {
       return new WP_Error('empty_form', __('Entries id is invalid', 'bit-form'));
     }

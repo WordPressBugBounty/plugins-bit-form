@@ -1,3 +1,9 @@
+<?php
+if (!defined('ABSPATH') && !defined('BITFORMS_ASSET_URI')) {
+  exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,10 +31,10 @@
   </style>
   <?php
   $baseCSSPath = "/form-styles/bitform-{$formID}.css";
-  $baseConversationalCSSPath = "/form-styles/bitform-conversational-{$formID}.css";
-  $customCSSPath = "/form-styles/bitform-custom-{$formID}.css";
-  $standaloneCSSPath = "/form-styles/bitform-standalone-{$formID}.css";
-  ?>
+$baseConversationalCSSPath = "/form-styles/bitform-conversational-{$formID}.css";
+$customCSSPath = "/form-styles/bitform-custom-{$formID}.css";
+$standaloneCSSPath = "/form-styles/bitform-standalone-{$formID}.css";
+?>
   <link rel="stylesheet" href="<?php echo esc_url(BITFORMS_UPLOAD_BASE_URL . $baseCSSPath) ?>" />
   <link rel="stylesheet" href="<?php echo esc_url(BITFORMS_UPLOAD_BASE_URL . $baseConversationalCSSPath) ?>" />
 
@@ -52,9 +58,9 @@
   <?php echo $formHTML?>
   <script>
   <?php
-  echo $bfGlobals;
-  $jsPath = BITFORMS_UPLOAD_BASE_URL . '/form-scripts/bitform-conversational-' . $formID . '.js';
-  ?>;
+echo $bfGlobals;
+$jsPath = BITFORMS_UPLOAD_BASE_URL . '/form-scripts/bitform-conversational-' . $formID . '.js';
+?>;
   </script>
   <script src="<?php echo esc_url($jsPath) ?>">
   </script>

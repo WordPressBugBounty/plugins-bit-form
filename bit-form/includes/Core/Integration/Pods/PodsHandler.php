@@ -20,7 +20,7 @@ class PodsHandler
   private $_formID;
   private $_wpdb;
 
-  const BIT_FORMS_FILE_TYPE = ['file-up', 'advanced-file-up', 'signature'];
+  public const BIT_FORMS_FILE_TYPE = ['file-up', 'advanced-file-up', 'signature'];
 
   public function __construct($integrationID, $fromID)
   {
@@ -52,7 +52,7 @@ class PodsHandler
     return $specialTagFieldValue;
   }
 
-  private function podMappingField($integrationDetails, $podField, $formFields, $fieldValues, $entryID, $postID)
+  private function podMappingField($integrationDetails, $podField, $fieldValues, $entryID, $postID)
   {
     $string_types = [
       'text',
@@ -74,40 +74,51 @@ class PodsHandler
       'datetime',
       'datetime-local',
       'url',
+      'currency',
     ];
+
+    $fieldValues = IntegrationHandler::formattedRepeaterValue($fieldValues);
+
     $fileUploadHandle = new WpFileHandler($this->_formID);
     $podData = [];
     foreach ($integrationDetails->pod_map as $fieldPair) {
-      foreach ($podField as $pod) {
-        foreach ($formFields as $field) {
-          if (!empty($fieldPair->podFormField) && !empty($fieldPair->formField)) {
-            if ($fieldPair->formField === $field['key'] && in_array($pod['type'], $string_types) && !empty($fieldValues[$fieldPair->formField])) {
-              $podData[$fieldPair->podFormField] = $fieldValues[$fieldPair->formField];
-            } elseif ($fieldPair->formField === $field['key'] && 'decision-box' === $field['type'] && 'boolean' === $pod['type']) {
-              if (1 === (int) $fieldValues[$fieldPair->formField] || 0 === (int) $fieldValues[$fieldPair->formField]) {
-                $podData[$fieldPair->podFormField] = $fieldValues[$fieldPair->formField];
+      if (!empty($fieldPair->podFormField) && !empty($fieldPair->formField)) {
+        $pod = $podField[$fieldPair->podFormField];
+        if (in_array($pod['type'], $string_types) && !empty($fieldValues[$fieldPair->formField])) {
+          if (1 === $pod['is_repeatable'] && is_array($fieldValues[$fieldPair->formField])) {
+            // $repeaterValues = call_user_func_array('array_merge', array_map('array_values', $fieldValues[$fieldPair->formField]));
+            $podData[$fieldPair->podFormField] = $fieldValues[$fieldPair->formField];
+          } else {
+            $podData[$fieldPair->podFormField] = $fieldValues[$fieldPair->formField];
+          }
+        }
+        // elseif (isset($field['mul'], $field) && in_array($pod['type'], $string_types) && 'file-up' !== $field['type']) {
+        //   if (true === $field['mul'] && 'multi' === $pod['pick_format_type'] && !empty($fieldValues[$fieldPair->formField])) {
+        //     $podData[$fieldPair->podFormField] = explode(',', $fieldValues[$fieldPair->formField]);
+        //   } elseif (false === $field['mul'] && 'multi' === $pod['pick_format_type'] && !empty($fieldValues[$fieldPair->formField])) {
+        //     $podData[$fieldPair->podFormField] = $fieldValues[$fieldPair->formField];
+        //   }
+        // }
+        elseif ('file' === $pod['type']) {
+          if (!empty($fieldValues[$fieldPair->formField])) {
+            if ('multi' === $pod['file_format_type']) {
+              $attachmentId = $fileUploadHandle->multiFileMoveWpMedia($entryID, $fieldValues[$fieldPair->formField], $postID);
+              if (!empty($attachmentId)) {
+                update_post_meta($postID, $fieldPair->podFormField, $attachmentId);
+                update_post_meta($postID, '_pods_' . $fieldPair->podFormField, wp_json_encode($attachmentId));
               }
-            } elseif ($fieldPair->formField === $field['key'] && isset($field['mul'], $field) && in_array($pod['type'], $string_types) && !in_array($field['type'], SELF::BIT_FORMS_FILE_TYPE)) {
-              if (true === $field['mul'] && 'multi' === $pod['pick_format_type'] && !empty($fieldValues[$fieldPair->formField])) {
-                $podData[$fieldPair->podFormField] = explode(',', $fieldValues[$fieldPair->formField]);
-              } elseif (false === $field['mul'] && 'multi' === $pod['pick_format_type'] && !empty($fieldValues[$fieldPair->formField])) {
-                $podData[$fieldPair->podFormField] = $fieldValues[$fieldPair->formField];
+            } elseif ('single' === $pod['file_format_type']) {
+              $attachmentData = [];
+              if (!is_array($fieldValues[$fieldPair->formField])) {
+                $fileArr = explode('/', $fieldValues[$fieldPair->formField]);
+                $attachmentData[] = $fileArr[count($fileArr) - 1];
+              } else {
+                $attachmentData = $fieldValues[$fieldPair->formField];
               }
-            } elseif ($fieldPair->formField === $field['key'] && in_array($field['type'], SELF::BIT_FORMS_FILE_TYPE) && 'file' === $pod['type']) {
-              if (!empty($fieldValues[$fieldPair->formField])) {
-                if ('multi' === $pod['file_format_type']) {
-                  $attachmentId = $fileUploadHandle->multiFileMoveWpMedia($entryID, $fieldValues[$fieldPair->formField], $postID);
-                  if (!empty($attachmentId)) {
-                    update_post_meta($postID, $fieldPair->podFormField, $attachmentId);
-                    update_post_meta($postID, '_pods_' . $fieldPair->podFormField, wp_json_encode($attachmentId));
-                  }
-                } elseif ('single' === $pod['file_format_type']) {
-                  $attachmentId = $fileUploadHandle->singleFileMoveWpMedia($entryID, $fieldValues[$fieldPair->formField], $postID);
-                  if (!empty($attachmentId)) {
-                    update_post_meta($postID, $fieldPair->podFormField, $attachmentId);
-                    update_post_meta($postID, '_pods_' . $fieldPair->podFormField, wp_json_encode($attachmentId));
-                  }
-                }
+              $attachmentId = $fileUploadHandle->singleFileMoveWpMedia($entryID, $attachmentData, $postID);
+              if (!empty($attachmentId)) {
+                update_post_meta($postID, $fieldPair->podFormField, $attachmentId);
+                update_post_meta($postID, '_pods_' . $fieldPair->podFormField, wp_json_encode($attachmentId));
               }
             }
           }
@@ -117,6 +128,8 @@ class PodsHandler
     return $podData;
   }
 
+  // formatted field values for repeater field
+
   private function postFieldMapping($fieldData, $post_map, $formFields, $fieldValues, $postID, $entryID)
   {
     $uploadFeatureImg = new WpFileHandler($this->_formID);
@@ -125,7 +138,7 @@ class PodsHandler
         if (!empty($fieldPair->postFormField) && !empty($fieldPair->formField)) {
           if ($fieldPair->formField === $field['key'] && '_thumbnail_id' !== $fieldPair->postFormField) {
             $fieldData[$fieldPair->postFormField] = $fieldValues[$fieldPair->formField];
-          } elseif ($fieldPair->formField === $field['key'] && in_array($field['type'], SELF::BIT_FORMS_FILE_TYPE) && '_thumbnail_id' === $fieldPair->postFormField && !empty($fieldValues[$field['key']])) {
+          } elseif ($fieldPair->formField === $field['key'] && in_array($field['type'], self::BIT_FORMS_FILE_TYPE) && '_thumbnail_id' === $fieldPair->postFormField && !empty($fieldValues[$field['key']])) {
             if (!empty($fieldValues[$field['key']])) {
               $uploadFeatureImg->uploadFeatureImg($fieldValues[$field['key']], $entryID, $postID);
             }
@@ -149,13 +162,17 @@ class PodsHandler
 
     foreach ($allFields->fields as $key => $field) {
       $podField[$key]['type'] = $field['type'];
-      $podField[$key]['pick_format_type'] = $field['options']['pick_format_type'];
-      $podField[$key]['file_format_type'] = $field['options']['file_format_type'];
+      // $podField[$key]['pick_format_type'] = $field['options']['pick_format_type'];
+      // $podField[$key]['file_format_type'] = $field['options']['file_format_type'];
+      $podField[$key]['pick_format_type'] = $field['pick_format_type'];
+      $podField[$key]['file_format_type'] = $field['file_format_type'];
+      $podField[$key]['is_repeatable'] = (int) $field['repeatable'];
     }
 
     $fieldData['comment_status'] = isset($integrationDetails->comment_status) ? $integrationDetails->comment_status : '';
     $fieldData['post_status'] = isset($integrationDetails->post_status) ? $integrationDetails->post_status : '';
     $fieldData['post_type'] = isset($integrationDetails->post_type) ? $integrationDetails->post_type : '';
+
     if (isset($integrationDetails->post_author) && 'logged_in_user' !== $integrationDetails->post_author) {
       $fieldData['post_author'] = $integrationDetails->post_author;
     } else {
@@ -193,17 +210,9 @@ class PodsHandler
 
       $smartTagValue = $this->smartTagMappingValue($integrationDetails->pod_map);
       $updatedPodValues = $fieldValues + $smartTagValue;
-
-      $podData = $this->podMappingField($integrationDetails, $podField, $formFields, $updatedPodValues, $entryID, $post_id);
+      $podData = $this->podMappingField($integrationDetails, $podField, $updatedPodValues, $entryID, $post_id);
       foreach ($podData as $key => $data) {
-        if (is_array($data)) {
-          $count = count($data);
-          for ($i = 0; $i < $count; $i++) {
-            add_post_meta($post_id, $key, $data[$i]);
-          }
-        } else {
-          add_post_meta($post_id, $key, $data);
-        }
+        add_post_meta($post_id, $key, $data);
       }
     } else {
       if (!empty($taxanomyData)) {
@@ -211,20 +220,21 @@ class PodsHandler
           wp_set_post_terms($exist_post_id[0]->meta_value, $taxanomy['value'], $taxanomy['term'], false);
         }
       }
-      $podData = $this->podMappingField($integrationDetails, $podField, $formFields, $fieldValues, $entryID, $exist_post_id[0]->meta_value);
+
+      $podData = $this->podMappingField($integrationDetails, $podField, $fieldValues, $entryID, $exist_post_id[0]->meta_value);
+
       foreach ($podData as $key => $data) {
         if (is_array($data)) {
           $count = count($data);
           for ($i = 0; $i < $count; $i++) {
             delete_post_meta($exist_post_id[0]->meta_value, $key);
           }
-          for ($i = 0; $i < $count; $i++) {
-            add_post_meta($exist_post_id[0]->meta_value, $key, $data[$i]);
-          }
+          add_post_meta($exist_post_id[0]->meta_value, $key, $data);
         } else {
           update_post_meta($exist_post_id[0]->meta_value, $key, $data);
         }
       }
+
       $updateData = $this->postFieldMapping($fieldData, $integrationDetails->post_map, $formFields, $fieldValues, $exist_post_id[0]->meta_value, $entryID);
       $updateData['ID'] = $exist_post_id[0]->meta_value;
       wp_update_post($updateData, true);

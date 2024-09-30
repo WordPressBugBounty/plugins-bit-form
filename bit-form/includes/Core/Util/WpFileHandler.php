@@ -121,17 +121,18 @@ class WpFileHandler
     return $attachMentId;
   }
 
-  public function taxonomyData($formFields, $fieldValues)
+  public function getTaxonomies($formFields, $fieldValues)
   {
-    $taxanomyData = [];
+    $taxonomies = [];
     foreach ($formFields as $fieldKey => $field) {
+      $field = 'object' === gettype($field) ? (array) $field : $field;
       $customType = isset($field['customType']) ? $field['customType'] : null;
-      $customType = (!isset($customType) && 'select' === $field->type && isset($field->customTypeList)) ? $field->customTypeList[0] : $customType;
+      $customType = (!isset($customType) && 'select' === $field['type'] && isset($field['customTypeList'])) ? $field['customTypeList'][0] : $customType;
       if (isset($customType)) {
         if (isset($customType->isTaxonomy) && !empty($fieldValues[$field['key']]) && isset($customType->isHierarchical)) {
           if (true === $customType->isTaxonomy) {
             if (true === $customType->isHierarchical) {
-              $taxanomyData[$fieldKey]['value'] = $fieldValues[$field['key']];
+              $taxonomies[$fieldKey]['value'] = $fieldValues[$field['key']];
             } else {
               $slug = '';
 
@@ -151,13 +152,13 @@ class WpFileHandler
                 }
               }
 
-              $taxanomyData[$fieldKey]['value'] = $slug;
+              $taxonomies[$fieldKey]['value'] = $slug;
             }
-            $taxanomyData[$fieldKey]['term'] = $customType->filter->taxanomy;
+            $taxonomies[$fieldKey]['term'] = $customType->filter->taxanomy;
           }
         }
       }
     }
-    return $taxanomyData;
+    return $taxonomies;
   }
 }

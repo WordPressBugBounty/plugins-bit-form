@@ -1,3 +1,9 @@
+<?php
+if (!defined('ABSPATH') && !defined('BITFORMS_ASSET_URI')) {
+  exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -27,14 +33,14 @@
   </style>
   <?php
   $formUpdateVersion = get_option('bit-form_form_update_version');
-  $bitformCssUrl = BITFORMS_UPLOAD_BASE_URL . '/form-styles/bitform-' . $formID . '.css?bfv=' . $formUpdateVersion;
-  ?>
+$bitformCssUrl = BITFORMS_UPLOAD_BASE_URL . '/form-styles/bitform-' . $formID . '.css?bfv=' . $formUpdateVersion;
+?>
   <link rel="stylesheet" href="<?php echo esc_url($bitformCssUrl) ?>" />
   <?php
-  $customCssSubPath = "/form-styles/bitform-custom-{$formID}.css";
+$customCssSubPath = "/form-styles/bitform-custom-{$formID}.css";
 
-  $customJsPath = BITFORMS_UPLOAD_BASE_URL . $customCssSubPath . '?ver=' . $formUpdateVersion;
-  ?>
+$customJsPath = BITFORMS_UPLOAD_BASE_URL . $customCssSubPath . '?ver=' . $formUpdateVersion;
+?>
   <?php if(file_exists(BITFORMS_CONTENT_DIR . $customCssSubPath)) : ?>
   <link rel="stylesheet" href="<?php echo esc_url($customJsPath) ?>" />
   <?php endif; ?>
@@ -55,7 +61,7 @@
 
   <?php
   $previewJsPath = BITFORMS_UPLOAD_BASE_URL . '/form-scripts/preview-' . $formID . '.js';
-  ?>
+?>
   </script>
   <script src="<?php echo esc_url($previewJsPath) ?>"></script>
 

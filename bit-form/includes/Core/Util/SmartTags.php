@@ -56,6 +56,8 @@ final class SmartTags
       '_bf_query_param',
       '_bf_user_meta_key',
       '_bf_is_user_logged_in',
+      '_bf_entry_id',
+      '_bf_back_view',
     ];
   }
 
@@ -136,8 +138,10 @@ final class SmartTags
   public static function smartTags($data, $key = '', $customValue = '')
   {
     $userDetail = IpTool::getUserDetail();
-
     $device = explode('|', $userDetail['device']);
+
+    global $bf_entry_id;
+    global $wp;
 
     if (is_array($device)) {
       $browser = $device[0];
@@ -195,6 +199,8 @@ final class SmartTags
       '_bf_post_modified_date' => (is_object($data['post']) ? $data['post']->post_modified : ''),
       '_bf_post_url'           => (is_object($data['post']) ? strval(get_permalink($data['post']->ID)) : ''),
       '_bf_is_user_logged_in'  => is_user_logged_in() ? 'logged_in' : 'logged_out',
+      '_bf_entry_id'           => $bf_entry_id ? $bf_entry_id : '',
+      '_bf_back_view'          => home_url($wp->request),
     ];
 
     if (in_array($key, $customSmartKeys)) {

@@ -285,9 +285,9 @@ final class FrontendFormHandler
 
   private function getValuesFromQueryParams()
   {
-    $reqField = $_SERVER['QUERY_STRING'];
     $queryParamsValue = [];
-    if (!empty($reqField)) {
+    if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
+      $reqField = $_SERVER['QUERY_STRING'];
       foreach (explode('&', $reqField) as $keyValue) {
         // $pattern = '/([a-zA-Z0-9])([a-zA-Z])\=+/';
         $pattern = '/([^.]+)=(.*?)([^.]+)/';
@@ -316,6 +316,8 @@ final class FrontendFormHandler
     }
     if (isset($atts['entry_id'])) {
       $entryId = intval($atts['entry_id']);
+    } elseif (isset($_GET['bf_entry_id'])) {
+      $entryId = $_GET['bf_entry_id'];
     } else {
       $entryId = false;
     }
@@ -375,10 +377,18 @@ final class FrontendFormHandler
     $buttons = !empty($formContent->buttons) ? $formContent->buttons : '';
     $additional = $formContent->additional;
 
-    $workFlowRunType = $entryId ? 'edit' : 'create';
-    if ($entryId) {
+    // $workFlowRunType = $entryId ? 'edit' : 'create';
+    if ($entryId && (get_current_user_id() || is_admin())) {
+      // return  sprintf(__('Sorry!, You cannot edit #%s no form.', 'bit-form'), $formID);
+      $workFlowRunType = 'edit';
       $fields = $this->setFieldsValue($fields, $formID, $entryId);
+    } else {
+      $workFlowRunType = 'create';
     }
+
+    // if ($entryId) {
+    //   $fields = $this->setFieldsValue($fields, $formID, $entryId);
+    // }
 
     $fields = apply_filters('bitform_filter_before_workflow_onload_fields', $fields, $formID);
     $fields = $this->triggerWorkflowOnLoad($formID, $shortCodeCounter, $fields, $workFlowRunType);
@@ -679,7 +689,6 @@ BFGLOBALSSCRIPT;
         }
       }
     }
-
     return $fields;
   }
 

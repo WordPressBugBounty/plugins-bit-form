@@ -11,6 +11,7 @@ use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\DateTimeHelper;
 use BitCode\BitForm\Core\Util\FileDownloadProvider;
 use BitCode\BitForm\Core\Util\IpTool;
+use WP_Admin_Bar;
 
 class Admin_Bar
 {
@@ -26,6 +27,8 @@ class Admin_Bar
     add_action('admin_enqueue_scripts', [$this, 'AdminAssets']);
     add_filter('style_loader_tag', [$this, 'linkTagFilter'], 0, 3);
     add_filter('script_loader_tag', [$this, 'scriptTagFilter'], 0, 3);
+    add_action('admin_bar_menu', [$this, 'AdminTopMenu'], 999);
+    add_action('admin_enqueue_scripts', [$this, 'bitforms_enqueue_admin_styles']);
   }
 
   /**
@@ -38,6 +41,7 @@ class Admin_Bar
     global $submenu;
 
     $capability = apply_filters('bitforms_form_access_capability', 'manage_options');
+
     add_menu_page(
       __('Bit Form - Most advanced form builder and database management system', 'bit-form'),
       'Bit Form',
@@ -48,8 +52,13 @@ class Admin_Bar
       56
     );
     if (current_user_can($capability)) {
-      $submenu['bitform'][] = [__('All Forms', 'bit-form'), $capability, 'admin.php?page=bitform#/'];
-      $submenu['bitform'][] = [__('Form Templates', 'bit-form'), $capability, 'admin.php?page=bitform#/form-templates'];
+      $entriesCount = '';
+      if (self::countUnreadEntries()) {
+        $entriesCount = ' <span class="update-plugins">' . self::countUnreadEntries() . '</span>';
+      }
+
+      $submenu['bitform'][] = [__('All Forms' . $entriesCount, 'bit-form'), $capability, 'admin.php?page=bitform#/'];
+      $submenu['bitform'][] = [__('Form Templates <span class="bf-template-new-badge">New</span>', 'bit-form'), $capability, 'admin.php?page=bitform#/form-templates'];
       $submenu['bitform'][] = [__('App Settings', 'bit-form'), $capability, 'admin.php?page=bitform#/app-settings/recaptcha'];
       $submenu['bitform'][] = [__('SMTP', 'bit-form'), $capability, 'admin.php?page=bitform#/app-settings/smtp'];
       $submenu['bitform'][] = [__('PDF Setting', 'bit-form'), $capability, 'admin.php?page=bitform#/app-settings/pdf'];
@@ -58,6 +67,71 @@ class Admin_Bar
       $submenu['bitform'][] = [__('Payments', 'bit-form'), $capability, 'admin.php?page=bitform#/app-settings/payments'];
       $submenu['bitform'][] = [__('Doc & Support', 'bit-form'), $capability, 'admin.php?page=bitform#/doc-support'];
     }
+  }
+
+  public function AdminTopMenu(WP_Admin_Bar $wp_admin_bar)
+  {
+    $indicator = '';
+    if (self::countUnreadEntries()) {
+      $indicator = ' <div class="wp-core-ui wp-ui-notification bf-indicator-badge">' . self::countUnreadEntries() . '</div>';
+    }
+
+    $wp_admin_bar->add_node([
+      'id'    => 'bitform',
+      'title' => 'Bit Form' . $indicator,
+      'href'  => admin_url('admin.php?page=bitform'),
+      'meta'  => [
+        'class' => 'bitform-admin-bar',
+      ],
+    ]);
+    $wp_admin_bar->add_node([
+      'id'     => 'bitform-all-forms',
+      'parent' => 'bitform',
+      'title'  => 'All Forms' . $indicator,
+      'href'   => admin_url('admin.php?page=bitform#/'),
+    ]);
+    $wp_admin_bar->add_node([
+      'id'     => 'bitform-form-templates',
+      'parent' => 'bitform',
+      'title'  => 'Form Templates',
+      'href'   => admin_url('admin.php?page=bitform#/form-templates'),
+    ]);
+    $wp_admin_bar->add_node([
+      'id'     => 'bitform-app-settings',
+      'parent' => 'bitform',
+      'title'  => 'App Settings',
+      'href'   => admin_url('admin.php?page=bitform#/app-settings/recaptcha'),
+    ]);
+    $wp_admin_bar->add_node([
+      'id'     => 'bitform-smtp',
+      'parent' => 'bitform',
+      'title'  => 'SMTP',
+      'href'   => admin_url('admin.php?page=bitform#/app-settings/smtp'),
+    ]);
+    $wp_admin_bar->add_node([
+      'id'     => 'bitform-pdf-setting',
+      'parent' => 'bitform',
+      'title'  => 'PDF Setting',
+      'href'   => admin_url('admin.php?page=bitform#/app-settings/pdf'),
+    ]);
+    $wp_admin_bar->add_node([
+      'id'     => 'bitform-cpt',
+      'parent' => 'bitform',
+      'title'  => 'CPT',
+      'href'   => admin_url('admin.php?page=bitform#/app-settings/cpt'),
+    ]);
+    $wp_admin_bar->add_node([
+      'id'     => 'bitform-api',
+      'parent' => 'bitform',
+      'title'  => 'Bit Form API',
+      'href'   => admin_url('admin.php?page=bitform#/app-settings/api'),
+    ]);
+    $wp_admin_bar->add_node([
+      'id'     => 'bitform-payments',
+      'parent' => 'bitform',
+      'title'  => 'Payments',
+      'href'   => admin_url('admin.php?page=bitform#/app-settings/payments'),
+    ]);
   }
 
   public function getAllPages()
@@ -239,6 +313,7 @@ class Admin_Bar
       'googleRedirectURL'   => get_rest_url() . 'bitform/v1/google',
       'oneDriveRedirectURL' => get_rest_url() . 'bitform/v1/oneDrive',
       'zohoRedirectURL'     => get_rest_url() . 'bitform/v1/zoho',
+      'userRoles'           => get_editable_roles(),
       'downloadedPdfFonts'  => is_array(get_option('bitforms_pdf_fonts')) ? get_option('bitforms_pdf_fonts') : [],
       'permission'          => empty(get_option('bitforms_allow_tracking')) ? false : true,
       'templatePath'        => BITFORMS_ROOT_URI . '/static/templates',
@@ -275,6 +350,17 @@ class Admin_Bar
     // echo !BIT_DEV ? '' : "<script>console.log(window.bits=JSON.parse('" . str_replace("'", '', wp_json_encode($bitforms)) . "'))</script>";
     // if (\function_exists('wp_set_script_translations'))
     // wp_set_script_translations('bitforms-admin-script', 'bitform',  BITFORMS_PLUGIN_DIR_PATH . 'languages');
+  }
+
+  public function bitforms_enqueue_admin_styles()
+  {
+    wp_enqueue_style(
+      'bitforms-admin-styles',
+      BITFORMS_ROOT_URI . '/resources/admin.css',
+      [],
+      BITFORMS_VERSION,
+      'all'
+    );
   }
 
   /**
@@ -336,5 +422,12 @@ class Admin_Bar
       $newTag = preg_replace('/<script /', '<script type="module" ', $newTag);
     }
     return $newTag;
+  }
+
+  private static function countUnreadEntries()
+  {
+    global $wpdb;
+    $unreadEntries = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}bitforms_form_entries WHERE status = 1");
+    return $unreadEntries;
   }
 }

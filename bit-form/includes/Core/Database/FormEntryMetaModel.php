@@ -394,6 +394,30 @@ class FormEntryMetaModel extends Model
     return $resultedEntries;
   }
 
+  public function getSingleEntryMeta($formFields, $entryId)
+  {
+    $entry_table = $this->app_db->prefix . 'bitforms_form_entries';
+    $fieldCount = count($formFields);
+    $getSelectedMetaFldValue = $this->selectedEntryMeta($formFields, $fieldCount);
+    $selectedMeta = $getSelectedMetaFldValue['selected_meta'];
+    $formFieldsNames = $getSelectedMetaFldValue['form_fields_names'];
+    $all_values = $getSelectedMetaFldValue['all_values'];
+    $condition['bitforms_form_entry_id'] = [$entryId];
+    $group = $this->groupedCondition($condition, $all_values, []);
+    $groupedCondition = $group['groupedCondition'];
+    $all_values = $group['all_values'];
+    $orderCondition = $this->orderCondition($formFieldsNames, null);
+    $sql = "SELECT $selectedMeta FROM `$this->table_name` em";
+    $sql .= " INNER JOIN $entry_table e on e.id = em.bitforms_form_entry_id ";
+    $sql .= $groupedCondition . $orderCondition;
+    $result = $this->execute($sql, $all_values)->getResult();
+
+    if (is_wp_error($result)) {
+      return [];
+    }
+    return $result;
+  }
+
   private function csvInjectionPrevent($value)
   {
     $formula = ['=', '-', '+', '@', "\t", "\r"];
@@ -468,7 +492,7 @@ class FormEntryMetaModel extends Model
             `bitforms_form_entry_id` ';
       $all_values = array_merge($all_values, $formattedCondition['values']);
     }
-    $order = $sortBy == 'DESC' ? 'DESC ' : "ASC ";
+    $order = 'DESC' === $sortBy ? 'DESC ' : 'ASC ';
     $orderField = \is_null($sortByField) ? 'bitforms_form_entry_id' : "`$sortByField`";
 
     $orderCondition = "ORDER BY $orderField $order ";

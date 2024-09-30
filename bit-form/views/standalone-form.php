@@ -1,3 +1,9 @@
+<?php
+if (!defined('ABSPATH') && !defined('BITFORMS_ASSET_URI')) {
+  exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,15 +39,15 @@
 
   ._frm-bg-b<?php echo esc_html($formID);
 
-  ?> {
+?> {
     width: 100%;
   }
   </style>
   <?php
-  $baseCSSPath = "/form-styles/bitform-{$formID}.css";
-  $customCSSPath = "/form-styles/bitform-custom-{$formID}.css";
-  $standaloneCSSPath = "/form-styles/bitform-standalone-{$formID}.css";
-  ?>
+$baseCSSPath = "/form-styles/bitform-{$formID}.css";
+$customCSSPath = "/form-styles/bitform-custom-{$formID}.css";
+$standaloneCSSPath = "/form-styles/bitform-standalone-{$formID}.css";
+?>
   <link rel="stylesheet" href="<?php echo esc_url(BITFORMS_UPLOAD_BASE_URL . $baseCSSPath)?>" />
 
   <?php if (file_exists(BITFORMS_CONTENT_DIR . $customCSSPath)) : ?>
@@ -70,8 +76,8 @@
   <script>
   <?php echo $bfGlobals ?>;
   <?php
-    $previewJsPath = BITFORMS_UPLOAD_BASE_URL . '/form-scripts/preview-' . $formID . '.js';
-  ?>
+  $previewJsPath = BITFORMS_UPLOAD_BASE_URL . '/form-scripts/preview-' . $formID . '.js';
+?>
   </script>
   <script src="<?php echo esc_url($previewJsPath) ?>"></script>
   </div>

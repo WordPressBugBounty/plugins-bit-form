@@ -60,7 +60,7 @@ class SendinBlueHandler
         );
       }
 
-      $apiEndpoint = SELF::BREVO_API_ENDPOINT . '/account';
+      $apiEndpoint = self::BREVO_API_ENDPOINT . '/account';
       $authorizationHeader['Accept'] = 'application/json';
       $authorizationHeader['api-key'] = $requestsParams->api_key;
       $apiResponse = HttpHelper::get($apiEndpoint, null, $authorizationHeader);
@@ -107,7 +107,7 @@ class SendinBlueHandler
           400
         );
       }
-      $apiEndpoint = SELF::BREVO_API_ENDPOINT . '/contacts/lists?limit=50&offset=0&sort=desc';
+      $apiEndpoint = self::BREVO_API_ENDPOINT . '/contacts/lists?limit=50&offset=0&sort=desc';
       $authorizationHeader['Accept'] = 'application/json';
       $authorizationHeader['api-key'] = $requestsParams->api_key;
       $sblueResponse = HttpHelper::get($apiEndpoint, null, $authorizationHeader);
@@ -161,7 +161,7 @@ class SendinBlueHandler
           400
         );
       }
-      $apiEndpoint = SELF::BREVO_API_ENDPOINT . '/smtp/templates';
+      $apiEndpoint = self::BREVO_API_ENDPOINT . '/smtp/templates';
       $authorizationHeader['Accept'] = 'application/json';
       $authorizationHeader['api-key'] = $requestsParams->api_key;
       $sblueResponse = HttpHelper::get($apiEndpoint, null, $authorizationHeader);
@@ -216,7 +216,7 @@ class SendinBlueHandler
           400
         );
       }
-      $apiEndpoint = SELF::BREVO_API_ENDPOINT . '/contacts/attributes';
+      $apiEndpoint = self::BREVO_API_ENDPOINT . '/contacts/attributes';
       $authorizationHeader['Accept'] = 'application/json';
       $authorizationHeader['api-key'] = $queryParams->api_key;
       $sblueResponse = HttpHelper::get($apiEndpoint, null, $authorizationHeader);

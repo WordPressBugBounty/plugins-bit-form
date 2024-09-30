@@ -476,12 +476,19 @@ class Model
     return $response;
   }
 
-  // get last entry id
+  /**
+   * Get last inserted id
+   *
+   * @return int
+   */
   public function lastId()
   {
     $sql = "SELECT id FROM {$this->table_name}
     ORDER BY id DESC LIMIT 1";
-    $result = $this->execute($sql)->getResult()[0];
-    return $result->id;
+    $result = $this->execute($sql)->getResult();
+    if (is_wp_error($result)) {
+      return 0;
+    }
+    return $result[0]->id;
   }
 }

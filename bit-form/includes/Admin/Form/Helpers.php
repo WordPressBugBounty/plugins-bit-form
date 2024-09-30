@@ -253,6 +253,21 @@ LOAD_SECRIPT;
     return false;
   }
 
+  public static function validateEormEntryEditPermission($formId, $entryId)
+  {
+    if (is_user_logged_in()) {
+      if(current_user_can('prevent_bitform_entry_edit')){
+        return false;
+      }
+
+      if(current_user_can('manage_bitform')||current_user_can('bitform_entry_edit') || current_user_can('edit_post')){
+        return true;
+      }
+
+    }
+    return false;
+  }
+
   public static function honeypotEncryptedToken($str)
   {
     $token = base64_encode(base64_encode($str));

@@ -28,7 +28,7 @@ class SliderField
     $ac = $fieldHelpers->autocomplete();
     $mx = '';
     $mn = '';
-    $step = '';	
+    $step = '';
     $ph = $fieldHelpers->placeholder();
     $value = $fieldHelpers->value();
     $list = '';
@@ -64,19 +64,17 @@ class SliderField
     $minValue = property_exists($field, 'mn') ? $field->mn : 0;
     $maxValue = property_exists($field, 'mx') ? $field->mx : 100;
 
-    $defaultVal = (($maxValue-$minValue) / 2) + $minValue;
+    $defaultVal = (($maxValue - $minValue) / 2) + $minValue;
     if ($fieldHelpers->property_exists_nested($field, 'val', '', 1)) {
       $defaultVal = $field->val;
     } elseif ($fieldHelpers->property_exists_nested($field, 'defaultValue', '', 1)) {
       $defaultVal = $field->defaultValue;
     }
 
-    
     $lowerTrackPercentage = ($defaultVal - $minValue) / ($maxValue - $minValue) * 100;
 
     $wrpperStyle = "style='--bfv-fld-val: \"{$defaultVal}\";'";
-    $inputStyle =  "style='--bfv-fill-lower-track: {$lowerTrackPercentage}% !important;'";
-    
+    $inputStyle = "style='--bfv-fill-lower-track: {$lowerTrackPercentage}% !important;'";
 
     return <<<TEXTFIELD
     <div 

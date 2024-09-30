@@ -1,3 +1,9 @@
+<?php
+if (!defined('ABSPATH') && !defined('BITFORMS_ASSET_URI')) {
+  exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,19 +28,19 @@
 
   ._frm-bg-b<?php echo esc_html($formID);
 
-  ?> {
+?> {
     width: 960px;
     margin-block: 100px;
   }
   </style>
   <?php
-   $formUpdateVersion = get_option('bit-form_form_update_version');
-  $cssUrl = BITFORMS_UPLOAD_BASE_URL . '/form-styles/bitform-' . $formID . '.css?bfv=' . $formUpdateVersion;
-  ?>
+ $formUpdateVersion = get_option('bit-form_form_update_version');
+$cssUrl = BITFORMS_UPLOAD_BASE_URL . '/form-styles/bitform-' . $formID . '.css?bfv=' . $formUpdateVersion;
+?>
   <link rel="stylesheet" href="<?php echo esc_url($cssUrl) ?>" />
   <?php
-  $customCssSubPath = '/form-styles/bitform-custom-' . $formID . '.css';
-  ?>
+$customCssSubPath = '/form-styles/bitform-custom-' . $formID . '.css';
+?>
   <?php if(file_exists(BITFORMS_CONTENT_DIR . $customCssSubPath)) : ?>
   <link rel="stylesheet" href="<?php echo esc_url(BITFORMS_UPLOAD_BASE_URL . $customCssSubPath) ?>" />
   <?php endif; ?>
@@ -52,9 +58,9 @@
 
   <script>
   <?php
-  echo $bfGlobals;
-  $previewJsUrl = BITFORMS_UPLOAD_BASE_URL . '/form-scripts/preview-' . $formID . '.js?bfv=' . $formUpdateVersion;
-  ?>;
+echo $bfGlobals;
+$previewJsUrl = BITFORMS_UPLOAD_BASE_URL . '/form-scripts/preview-' . $formID . '.js?bfv=' . $formUpdateVersion;
+?>;
   </script>
   <script src="<?php echo esc_url($previewJsUrl) ?>">
   </script>
@@ -68,7 +74,7 @@ function readable_filesize($bytes, $decimals = 2)
   $factor = floor((strlen($bytes) - 1) / 3);
   return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . ' ' . @$sz[$factor];
 }
-  ?>
+?>
     <div>Form ID : <?php echo isset($formID) ? esc_html($formID) : ''; ?></div>
     <div>JS size =
       <?php echo readable_filesize(filesize(BITFORMS_CONTENT_DIR . '/form-scripts/preview-' . $formID . '.js')); ?>

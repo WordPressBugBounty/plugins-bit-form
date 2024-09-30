@@ -28,7 +28,7 @@ class SodiumCompat
     if (!is_string($message)) {
       $message = strval($message);
     }
-    
+
     $nonce = random_bytes(24); // NONCE = Number to be used ONCE, for each message
     $encrypted = \ParagonIE_Sodium_Compat::crypto_aead_xchacha20poly1305_ietf_encrypt(
       $message,
@@ -36,7 +36,7 @@ class SodiumCompat
       $nonce,
       $key
     );
-    
+
     return $nonce . $encrypted;
   }
 

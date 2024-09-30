@@ -314,11 +314,11 @@ final class FileHandler
           'error_type'=> 'file_type_error',
         ];
       }
-      if($fileExtension == 'svg') {
+      if ('svg' === $fileExtension) {
         $svg_sanitizer = new Sanitizer();
         $dirty_svg = file_get_contents($file['tmp_name']);
         $clean_svg = $svg_sanitizer->sanitize($dirty_svg);
-        if($clean_svg === false) {
+        if (false === $clean_svg) {
           return [
             'message'   => __('SVG file is not valid', 'bit-form'),
             'error_type'=> 'file_type_error',

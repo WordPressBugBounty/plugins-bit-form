@@ -64,7 +64,7 @@ final class FrontendAjax
     $form_id = str_replace('bitforms_', '', sanitize_text_field($_POST['bitforms_id']));
     $entryId = sanitize_text_field($_REQUEST['entryID']);
     $entryToken = sanitize_text_field($_REQUEST['entryToken']);
-    if (Helpers::validateEntryTokenAndUser($entryToken, $entryId)) {
+    if (Helpers::validateEntryTokenAndUser($entryToken, $entryId) || Helpers::validateFormEntryEditPermission($form_id, $entryId)) {
       $FrontendFormManager = new FrontendFormManager($form_id);
       $updateStatus = $FrontendFormManager->handleUpdateEntry();
       if (is_wp_error($updateStatus)) {
@@ -74,7 +74,7 @@ final class FrontendAjax
         wp_send_json_success($updateStatus);
       }
     } else {
-      wp_send_json_error('Entry Token is not Authorized', 401);
+      wp_send_json_error('Entry Token or User is not Authorized', 401);
     }
   }
 

@@ -30,5 +30,4 @@ class Cryptography
     }
     return self::getSodiumCompat()->compatDecrypt(base64_decode($message), $key);
   }
-
 }

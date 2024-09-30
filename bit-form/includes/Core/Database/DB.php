@@ -197,7 +197,7 @@ final class DB
                 PRIMARY KEY (`id`),
                 KEY `form_id` (`form_id`),
                 KEY `entry_id` (`entry_id`)
-            ) $collate;",
+            ) $collate;"
     ];
 
     $table_schema_update = [

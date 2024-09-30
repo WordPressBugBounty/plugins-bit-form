@@ -25,7 +25,7 @@ final class FormDuplicateHelper
     $formData->form_id = $newFormId;
     $formData->fields = (object) $data['form_content']['fields'];
     $formData->layout = $data['form_content']['layout'];
-    $formData->nestedLayout = $data['form_content']['nestedLayout'];
+    $formData->nestedLayouts = $data['form_content']['nestedLayout'];
     $formData->form_name = $formName;
     $formData->formInfo = isset($data['form_content']['formInfo']) ? $data['form_content']['formInfo'] : (object)[];
 

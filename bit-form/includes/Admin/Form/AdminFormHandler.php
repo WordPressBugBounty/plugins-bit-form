@@ -238,6 +238,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     $mailTem = $formSettings->mailTem;
     $pdfTem = $formSettings->pdfTem;
     $integrations = $formSettings->integrations;
+    $formPermissions = $formSettings->formPermissions;
 
     $user_details = static::$ipTool->getUserDetail();
     if (empty($fields) || empty($layout)) {
@@ -264,6 +265,10 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     } */
     if (!empty($formSettings->theme)) {
       $form_content = array_merge($form_content, ['theme' => $formSettings->theme]);
+    }
+
+    if (!empty($formSettings->formPermissions)) {
+      $form_content = array_merge($form_content, ['formPermissions' => $formSettings->formPermissions]);
     }
 
     if (!empty($additional)) {
@@ -569,6 +574,10 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     if (!empty($formSettings->theme)) {
       $form_content = array_merge($form_content, ['theme' => $formSettings->theme]);
     }
+
+    if (!empty($formSettings->formPermissions)) {
+      $form_content = array_merge($form_content, ['formPermissions' => $formSettings->formPermissions]);
+    }
     if (!empty($additional)) {
       $form_content = array_merge($form_content, ['additional' => $additional]);
     }
@@ -714,6 +723,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         if ('oninput' === $workFlow->action_type || ('always' === $workFlow->action_type && 'cond' === $workFlow->action_behaviour)) {
           $workFlowExist['oninput'] = true;
         }
+        // $integartionIDForWorkflow = apply_filters('bitform_filter_integration_id', $workFlow, $formID, $index);
         if (empty($workFlow->id)) {
           $savedID = $workFlowHandler->saveworkFlow($workFlow, $integartionIDForWorkflow, $index);
           if (is_wp_error($savedID) && 'result_empty' !== $savedID->get_error_code()) {
@@ -1081,8 +1091,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         }
       }
       $settingsContent = [
-        'formName' => $formManager->getFormName(),
-        'theme'    => isset($form_content->theme) ? $form_content->theme : 'default',
+        'formName'        => $formManager->getFormName(),
+        'theme'           => isset($form_content->theme) ? $form_content->theme : 'default',
+        'formPermissions' => isset($form_content->formPermissions) ? $form_content->formPermissions : (object) [],
         // 'submitBtn' => $form_content->buttons,
       ];
 
@@ -1492,20 +1503,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     $returnedEntries = $formEntryModel->get('id', ['form_id' => $formID]);
     $entries = [];
 
-    if (!is_wp_error($returnedEntries)) {
-      foreach ($returnedEntries as $entryKey => $entryInfo) {
-        $entries[] = $entryInfo->id;
-      }
-      global $wpdb;
-      $prefix = $wpdb->prefix;
-      if (count($entries) > 0) {
-        $deleteEntriesStatus = $formEntryModel->bulkDelete(
-          [
-            "`{$prefix}bitforms_form_entries`.`id`"      => $entries,
-            "`{$prefix}bitforms_form_entries`.`form_id`" => $formID,
-          ]
-        );
-      }
+    // checked namespace exist
+    if (class_exists('\BitCode\BitFormPro\Admin\BfTable\Table')) {
+      \BitCode\BitFormPro\Admin\BfTable\Table::deleteTableByFormId($formID);
     }
 
     $fileHandler = new FileHandler();
@@ -1593,6 +1593,11 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
     $formEntryModel = new FormEntryModel();
     $returnedEntries = $formEntryModel->get('id', ['form_id' => $formID]);
+
+    if (class_exists('\BitCode\BitFormPro\Admin\BfTable\Table')) {
+      \BitCode\BitFormPro\Admin\BfTable\Table::deleteTableByBulkFormId($formID);
+    }
+
     $entries = [];
     foreach ($returnedEntries as $entryKey => $entryInfo) {
       if (!empty($entryInfo->id)) {
@@ -1688,7 +1693,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     $importtedForm = (array)$post->formDetail;
     $importtedForm['form_content']['fields'] = $importtedForm['fields'];
     $importtedForm['form_content']['layout'] = $importtedForm['layout'];
-    $importtedForm['form_content']['nestedLayout'] = $importtedForm['nestedLayout'];
+    $importtedForm['form_content']['nestedLayout'] = $importtedForm['nestedLayouts'];
     $importtedForm['form_content']['formInfo'] = $importtedForm['formInfo'];
     unset($importtedForm['fields'], $importtedForm['layout'], $importtedForm['nestedLayout'], $importtedForm['formInfo']);
     $formData = FormDuplicateHelper::createReplica((array)$importtedForm, $oldFormId, $newFormId);
@@ -1916,6 +1921,26 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     $customFieldHandler = new CustomFieldHandler();
     $formEntries = $customFieldHandler->updatedEntries($formEntries, $fieldDetails);
     return $formEntries;
+  }
+
+  public function getSingleEntry($formId, $entryId)
+  {
+    $formManager = new AdminFormManager($formId);
+    if (!$formManager->isExist()) {
+      return new WP_Error('empty_form', __('Form does not exists', 'bit-form'));
+    }
+
+    $formFields = $formManager->getFieldLabel(true);
+    $fieldDetails = $formManager->getFields();
+    $entryMeta = new FormEntryMetaModel();
+    // $formEntry = new FormEntryModel();
+
+    $entries = $entryMeta->getSingleEntryMeta($formFields, $entryId);
+    return $entries[0];
+
+    // $customFieldHandler = new CustomFieldHandler();
+    // $formEntries = $customFieldHandler->updatedEntries($formEntries, $fieldDetails);
+    // return $formEntries;
   }
 
   public function getEntriesForReport($Request, $post)

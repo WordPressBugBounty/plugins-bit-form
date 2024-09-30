@@ -1661,21 +1661,25 @@ $i18n_strings = array(
 
     'What\'s New' => __('What\'s New', 'bit-form'),
 
-    'What\'s New?' => __('What\'s New?', 'bit-form'),
-
     'For more details,' => __('For more details,', 'bit-form'),
 
     'Click here' => __('Click here', 'bit-form'),
 
     'Note:' => __('Note:', 'bit-form'),
 
-    'Accept and continue to share usage data for improvements, or skip for using the plugin.' => __('Accept and continue to share usage data for improvements, or skip for using the plugin.', 'bit-form'),
+    'Accept and complete to share non-sensitive diagnostic data to help us improve your experience.' => __('Accept and complete to share non-sensitive diagnostic data to help us improve your experience.', 'bit-form'),
+
+    'What we collect?' => __('What we collect?', 'bit-form'),
 
     'Click here to see terms' => __('Click here to see terms', 'bit-form'),
 
     'Skip' => __('Skip', 'bit-form'),
 
     'Accept And Continue' => __('Accept And Continue', 'bit-form'),
+
+    'What\'s New?' => __('What\'s New?', 'bit-form'),
+
+    'Accept and continue to share usage data for improvements, or skip for using the plugin.' => __('Accept and continue to share usage data for improvements, or skip for using the plugin.', 'bit-form'),
 
     'Capture' => __('Capture', 'bit-form'),
 
@@ -2979,6 +2983,8 @@ $i18n_strings = array(
 
     'Add New Step' => __('Add New Step', 'bit-form'),
 
+    'Add Steps' => __('Add Steps', 'bit-form'),
+
     'Multi step settings' => __('Multi step settings', 'bit-form'),
 
     'All fields are required' => __('All fields are required', 'bit-form'),
@@ -3319,8 +3325,6 @@ $i18n_strings = array(
 
     'Go to Payment Settings' => __('Go to Payment Settings', 'bit-form'),
 
-    'All Forms' => __('All Forms', 'bit-form'),
-
     'Search Result' => __('Search Result', 'bit-form'),
 
     'No Template Found' => __('No Template Found', 'bit-form'),
@@ -3371,7 +3375,7 @@ $i18n_strings = array(
 
     'Row Selected' => __('Row Selected', 'bit-form'),
 
-    'Total Response:' => __('Total Response:', 'bit-form'),
+    'Total Entries:' => __('Total Entries:', 'bit-form'),
 
     'Page' => __('Page', 'bit-form'),
 
@@ -3557,7 +3561,11 @@ $i18n_strings = array(
 
     'Edit Form' => __('Edit Form', 'bit-form'),
 
+    'Entries' => __('Entries', 'bit-form'),
+
     'Conditional Logic' => __('Conditional Logic', 'bit-form'),
+
+    'Data Table' => __('Data Table', 'bit-form'),
 
     'Form Deleted Successfully' => __('Form Deleted Successfully', 'bit-form'),
 
@@ -3570,6 +3578,8 @@ $i18n_strings = array(
     'Are you sure to duplicate this form ?' => __('Are you sure to duplicate this form ?', 'bit-form'),
 
     'Are you sure to export this form ?' => __('Are you sure to export this form ?', 'bit-form'),
+
+    'Create a New Form' => __('Create a New Form', 'bit-form'),
 
     'Create Form' => __('Create Form', 'bit-form'),
 
@@ -3587,6 +3597,104 @@ $i18n_strings = array(
 
     'General' => __('General', 'bit-form'),
 
+    'View Name' => __('View Name', 'bit-form'),
+
+    'Edit Table' => __('Edit Table', 'bit-form'),
+
+    'Table Deleted Successfully' => __('Table Deleted Successfully', 'bit-form'),
+
+    'Are you sure to delete this table?' => __('Are you sure to delete this table?', 'bit-form'),
+
+    'Create View' => __('Create View', 'bit-form'),
+
+    'Allow Users to Edit Form Entries' => __('Allow Users to Edit Form Entries', 'bit-form'),
+
+    'Allow Roles to edit won entries' => __('Allow Roles to edit won entries', 'bit-form'),
+
+    'Allow Roles to edit Other\'s entries' => __('Allow Roles to edit Other\'s entries', 'bit-form'),
+
+    'Prevent Roles to edit entries' => __('Prevent Roles to edit entries', 'bit-form'),
+
+    'Prevent Roles to edit Other\'s entries' => __('Prevent Roles to edit Other\'s entries', 'bit-form'),
+
+    'By Roles' => __('By Roles', 'bit-form'),
+
+    'Selected User' => __('Selected User', 'bit-form'),
+
+    'Users' => __('Users', 'bit-form'),
+
+    'Access Setting' => __('Access Setting', 'bit-form'),
+
+    'Entry View' => __('Entry View', 'bit-form'),
+
+    'Entry Edit' => __('Entry Edit', 'bit-form'),
+
+    'Single Entry View' => __('Single Entry View', 'bit-form'),
+
+    'Single Entry Details View' => __('Single Entry Details View', 'bit-form'),
+
+    'All Submitted Response' => __('All Submitted Response', 'bit-form'),
+
+    'Own Submitted Response' => __('Own Submitted Response', 'bit-form'),
+
+    'View List' => __('View List', 'bit-form'),
+
+    'Details Page' => __('Details Page', 'bit-form'),
+
+    'Details Page Styling' => __('Details Page Styling', 'bit-form'),
+
+    'Setting' => __('Setting', 'bit-form'),
+
+    'Table Caption' => __('Table Caption', 'bit-form'),
+
+    'Column Mapping' => __('Column Mapping', 'bit-form'),
+
+    'Column Header' => __('Column Header', 'bit-form'),
+
+    'Column Width' => __('Column Width', 'bit-form'),
+
+    'Form Field' => __('Form Field', 'bit-form'),
+
+    'Action Column' => __('Action Column', 'bit-form'),
+
+    'Column Title' => __('Column Title', 'bit-form'),
+
+    'Edit Button' => __('Edit Button', 'bit-form'),
+
+    'Custom Page' => __('Custom Page', 'bit-form'),
+
+    'View Button' => __('View Button', 'bit-form'),
+
+    'Redirect Link' => __('Redirect Link', 'bit-form'),
+
+    'Caption' => __('Caption', 'bit-form'),
+
+    'Table Even Row' => __('Table Even Row', 'bit-form'),
+
+    'Table Odd Row' => __('Table Odd Row', 'bit-form'),
+
+    'Page Select Box' => __('Page Select Box', 'bit-form'),
+
+    'Pagination Button' => __('Pagination Button', 'bit-form'),
+
+    'Search Box' => __('Search Box', 'bit-form'),
+
+    'Table' => __('Table', 'bit-form'),
+
+    'Table Rows' => __('Table Rows', 'bit-form'),
+
+    'Background color' => __('Background color', 'bit-form'),
+
+    'Font Weight' => __('Font Weight', 'bit-form'),
+
+    'Font Style' => __('Font Style', 'bit-form'),
+
+    'Table Wrapper' => __('Table Wrapper', 'bit-form'),
+
+    'Welcome to Bit Form Views (Beta)' => __('Welcome to Bit Form Views (Beta)', 'bit-form'),
+
+    'Create First View' => __('Create First View', 'bit-form'),
+
     'Lost In Space' => __('Lost In Space', 'bit-form'),
 
     'Redirecting Home in' => __('Redirecting Home in', 'bit-form'),
@@ -3597,11 +3705,13 @@ $i18n_strings = array(
 
     'View Repeater Data' => __('View Repeater Data', 'bit-form'),
 
-    'Response Details #' => __('Response Details #', 'bit-form'),
+    'Entry Details #' => __('Entry Details #', 'bit-form'),
+
+    'Data Views & Edit' => __('Data Views & Edit', 'bit-form'),
 
     'View Analytics Report' => __('View Analytics Report', 'bit-form'),
 
-    'No Response Found.' => __('No Response Found.', 'bit-form'),
+    'No Entry Found.' => __('No Entry Found.', 'bit-form'),
 
     'Form Settings' => __('Form Settings', 'bit-form'),
 
@@ -3610,8 +3720,6 @@ $i18n_strings = array(
     'Landing Form' => __('Landing Form', 'bit-form'),
 
     'WP Auth' => __('WP Auth', 'bit-form'),
-
-    'View Entries' => __('View Entries', 'bit-form'),
 
     'Select Fields for Report:' => __('Select Fields for Report:', 'bit-form'),
 
@@ -3778,6 +3886,8 @@ $i18n_strings = array(
     'Entry Limit' => __('Entry Limit', 'bit-form'),
 
     'Single Entry for each IP' => __('Single Entry for each IP', 'bit-form'),
+
+    'Form Entry Edit' => __('Form Entry Edit', 'bit-form'),
 
     'Honeypot trap' => __('Honeypot trap', 'bit-form'),
 

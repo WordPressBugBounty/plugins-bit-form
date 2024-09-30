@@ -444,7 +444,7 @@ GLOBALOBJ;
         $customFldConfigPaths[$customFldTyp] = (object) [];
       }
     }
-    
+
     $customFldConfigPaths = wp_json_encode($customFldConfigPaths);
     $containers = wp_json_encode($containers);
 
@@ -508,7 +508,7 @@ GLOBALOBJ;
       const allContendIds = formContentId ? [formContentId] : Object.keys(bf_globals);
       allContendIds.forEach((contentId) => {
         const contentData = bf_globals[contentId];
-        const flds = bf_globals[contentId].fields;
+        const flds = bf_globals[contentId]?.fields || {};
         const fldKeys = Object.keys(flds).reverse();
         fldKeys.forEach((fldKey) => {
           const fldData = flds[fldKey];

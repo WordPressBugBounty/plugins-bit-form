@@ -5,7 +5,6 @@ namespace BitCode\BitForm\Core\Form;
 use BitCode\BitForm\Admin\Form\AdminFormHandler;
 use BitCode\BitForm\Core\Capability\Request;
 use  BitCode\BitForm\Frontend\Form\FrontendFormHandler;
-use BitCode\BitForm\Frontend\Payment\PaymentHandler;
 
 final class FormHandler
 {

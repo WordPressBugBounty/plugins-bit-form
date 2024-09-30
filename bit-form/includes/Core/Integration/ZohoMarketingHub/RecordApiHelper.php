@@ -54,7 +54,7 @@ class RecordApiHelper
       }
 
       if (empty($fieldData[$fieldPair->zohoFormField]) && \in_array($fieldPair->zohoFormField, $required)) {
-        $error = new WP_Error('REQ_FIELD_EMPTY', wp_sprintf('%s ',__('is required for zoho marketing hub', 'bit-form'), $fieldPair->zohoFormField));
+        $error = new WP_Error('REQ_FIELD_EMPTY', wp_sprintf('%s ', __('is required for zoho marketing hub', 'bit-form'), $fieldPair->zohoFormField));
         $this->_logResponse->apiResponse($this->_logID, $this->_integrationID, ['type' => 'record', 'type_name' => 'field'], 'validation', $error);
         return $error;
       }

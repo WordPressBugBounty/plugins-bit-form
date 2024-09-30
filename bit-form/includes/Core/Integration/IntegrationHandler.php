@@ -410,4 +410,74 @@ final class IntegrationHandler
     }
     return $responseData;
   }
+
+  public static function repeaterFieldValueFormatter($fieldValues)
+  {
+    $formattedArray = [];
+
+    foreach ($fieldValues as $key => $value) {
+      if (is_array($value)) {
+        foreach ($value as $index => $v) {
+          if (is_array($v)) {
+            foreach ($v as $k1 => $v1) {
+              $formattedArray[$k1][] = $v1;
+            }
+          } else {
+            $formattedArray[$key][] = $v;
+          }
+        }
+      } else {
+        $formattedArray[$key] = $value;
+      }
+    }
+
+    return $formattedArray;
+  }
+
+  /**
+   *
+   * @param mixed $fieldValues
+   * @param mixed $returnRepeaterValue default is array
+   * @return array  and repeater field value as array or string
+   */
+  public static function formattedRepeaterValue($fieldValues, $returnRepeaterValue = '')
+  {
+    // get the repeater field and store it in an array
+    $repeaterField = [];
+    foreach ($fieldValues as $key => $value) {
+      if (!preg_match('/\./', $key)) {
+        continue;
+      }
+      $repeaterField[] = $key;
+    }
+
+    // put the value of the child key to the parent repeater field
+    foreach ($repeaterField as $key) {
+      list($parentKey, $childKey) = explode('.', $key);
+      $repeatValues = $fieldValues[$parentKey];
+
+      if (!is_array($repeatValues)) {
+        continue;
+      }
+
+      foreach ($repeatValues as $value) {
+        if (isset($value[$childKey])) {
+          if (!isset($fieldValues[$key]) || !is_array($fieldValues[$key])) {
+            $fieldValues[$key] = [];
+          }
+          if (!empty($value[$childKey])) {
+            $fieldValues[$key][] = $value[$childKey];
+          }
+        }
+      }
+    }
+
+    // convert the array to string repeater field value
+    if ('string' === $returnRepeaterValue) {
+      foreach ($repeaterField as $key) {
+        $fieldValues[$key] = implode(', ', $fieldValues[$key]);
+      }
+    }
+    return $fieldValues;
+  }
 }

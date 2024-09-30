@@ -577,6 +577,9 @@ class FormManager
     $wpdb->query('START TRANSACTION');
     $entry_id = $this->entryInsert($user_details);
     $log_id = null;
+
+    $GLOBALS['bf_entry_id'] = $entry_id;
+
     if (is_wp_error($entry_id)) {
       return new WP_Error('insert_error', __('Sorry, Error occurred in saving form entry', 'bit-form'));
     }
@@ -590,6 +593,7 @@ class FormManager
     if ($entry_id) {
       $submitted_fields = $this->getFormContentWithValue($submitted_data)->fields;
       $workFlowRunHelper = new WorkFlow($this->form_id);
+
       $workFlowreturnedOnSubmit = $workFlowRunHelper->executeOnSubmit(
         'create',
         $submitted_fields,
@@ -597,6 +601,7 @@ class FormManager
         $entry_id,
         $log_id
       );
+
       if (!empty($workFlowreturnedOnSubmit['fields'])) {
         $submitted_data = $workFlowreturnedOnSubmit['fields'];
       }

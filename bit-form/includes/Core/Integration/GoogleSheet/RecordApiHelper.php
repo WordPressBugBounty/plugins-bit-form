@@ -8,6 +8,7 @@
 namespace BitCode\BitForm\Core\Integration\GoogleSheet;
 
 use BitCode\BitForm\Core\Database\FormEntryLogModel;
+use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\ApiResponse as UtilApiResponse;
 use BitCode\BitForm\Core\Util\HttpHelper;
 
@@ -52,13 +53,14 @@ class RecordApiHelper
   {
     $fieldData = [];
     $allHeaders = $defaultConf->headers->{$spreadsheetId}->{$worksheetName}->{$headerRow};
+    $formattedFieldValues = IntegrationHandler::formattedRepeaterValue($fieldValues, 'string');
 
     foreach ($fieldMap as $fieldPair) {
       if (!empty($fieldPair->googleSheetField)) {
         if ('custom' === $fieldPair->formField && isset($fieldPair->customValue)) {
           $fieldData[$fieldPair->googleSheetField] = $fieldPair->customValue;
         } else {
-          $fieldData[$fieldPair->googleSheetField] = $fieldValues[$fieldPair->formField];
+          $fieldData[$fieldPair->googleSheetField] = $formattedFieldValues[$fieldPair->formField];
         }
       }
     }

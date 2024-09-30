@@ -93,7 +93,7 @@ TEXTFIELD;
     $onClickAttr = '';
     $dateType = ['date', 'datetime-local', 'month', 'time', 'week'];
     //field type check
-    if(in_array($field->typ, $dateType)){
+    if (in_array($field->typ, $dateType)) {
       $onClickAttr = "onclick='this.showPicker();'";
     }
     return $onClickAttr;

@@ -37,13 +37,13 @@ class RecordApiHelper
 
   public function insertRecord($data)
   {
-    $insertRecordEndpoint = SELF::BREVO_API_ENDPOINT . '/contacts';
+    $insertRecordEndpoint = self::BREVO_API_ENDPOINT . '/contacts';
     return HttpHelper::post($insertRecordEndpoint, $data, $this->_defaultHeader);
   }
 
   public function updateRecord($id, $data)
   {
-    $updateRecordEndpoint = SELF::BREVO_API_ENDPOINT . "/contacts/{$id}";
+    $updateRecordEndpoint = self::BREVO_API_ENDPOINT . "/contacts/{$id}";
     return HttpHelper::request($updateRecordEndpoint, 'PUT', $data, $this->_defaultHeader);
   }
 

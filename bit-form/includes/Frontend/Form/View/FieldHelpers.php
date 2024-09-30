@@ -42,7 +42,19 @@ class FieldHelpers
 
   public function renderHTMR($title)
   {
-    return $title;
+    $allowed_html = wp_kses_allowed_html('post');
+
+    $allowed_html['iframe'] = [
+      'src'             => true,
+      'width'           => true,
+      'height'          => true,
+      'frameborder'     => true,
+      'allow'           => true,
+      'allowfullscreen' => true,
+      'title'           => true,
+      'style'           => true,
+    ];
+    return wp_kses($title, $allowed_html);
   }
 
   public function getAtomicCls($element)

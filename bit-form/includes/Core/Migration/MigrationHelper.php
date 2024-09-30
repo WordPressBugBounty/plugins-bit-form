@@ -1,9 +1,7 @@
 <?php
 
-
 namespace BitCode\BitForm\Core\Migration;
 
-use BitCode\BitForm\Core\Migration\BitformDefaultStyle;
 class MigrationHelper
 {
   public static function setNestedProperty(&$rootObj, $properties, $value)
@@ -221,7 +219,8 @@ class MigrationHelper
     self::recursiveDeleteFiles($source);
   }
 
-  public static function getBitformDefaultStyleClass(){
+  public static function getBitformDefaultStyleClass()
+  {
     return self::arrayToCssString(BitformDefaultStyle::commonStyleClasses());
   }
 
@@ -250,39 +249,39 @@ class MigrationHelper
   }
 
   public static function arrayToCssString($array)
-    {
-        $cssString = '';
+  {
+    $cssString = '';
 
-        foreach ($array as $selector => $properties) {
-            $cssString .= $selector . ' {';
+    foreach ($array as $selector => $properties) {
+      $cssString .= $selector . ' {';
 
-            foreach ($properties as $property => $value) {
-                $cssString .= $property . ': ' . $value . '; ';
-            }
+      foreach ($properties as $property => $value) {
+        $cssString .= $property . ': ' . $value . '; ';
+      }
 
-            // Remove the trailing space and add closing brace
-            $cssString = rtrim($cssString, ' ') . '}';
-        }
-
-        return $cssString;
+      // Remove the trailing space and add closing brace
+      $cssString = rtrim($cssString, ' ') . '}';
     }
 
-    public static function formatFormData($formData)
-    {
-        $newFormData = json_decode(wp_json_encode($formData));
+    return $cssString;
+  }
 
-        $formContent = json_decode(wp_json_encode($formData->form_content));
+  public static function formatFormData($formData)
+  {
+    $newFormData = json_decode(wp_json_encode($formData));
 
-        $newFormData->fields = $formContent->fields;
-        $newFormData->layout = $formContent->layout;
-        $newFormData->nestedLayouts = $formContent->nestedLayout;
-        $newFormData->formInfo = $formContent->formInfo;
+    $formContent = json_decode(wp_json_encode($formData->form_content));
 
-        if(is_array($formData->reports) && count($formData->reports) > 0){
-          $newFormData->currentReport = $formData->reports[0];
-          $newFormData->report_id = $formData->reports[0]->id;
-        }
+    $newFormData->fields = $formContent->fields;
+    $newFormData->layout = $formContent->layout;
+    $newFormData->nestedLayouts = $formContent->nestedLayout;
+    $newFormData->formInfo = $formContent->formInfo;
 
-        return $newFormData;
+    if (is_array($formData->reports) && count($formData->reports) > 0) {
+      $newFormData->currentReport = $formData->reports[0];
+      $newFormData->report_id = $formData->reports[0]->id;
     }
+
+    return $newFormData;
+  }
 }

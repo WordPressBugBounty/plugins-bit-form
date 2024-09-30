@@ -8,7 +8,9 @@ final class FrontendHelpers
 {
   public static $isPageBuilder = false;
   public static $bfFrontendFormIds = [];
+  public static $bfFrontendViewIds = [];
   public static $bfFormIdsFromPost = [];
+  public static $bfViewIdsFromPost = [];
 
   public static $pageBuilderQueryParamsList = [
     'et_pb_preview'                   => 'true', // divi
@@ -55,6 +57,38 @@ final class FrontendHelpers
   public static function getShortCodeIds($content = '')
   {
     \preg_match_all("/\[bitform\s+id\s*=\s*('|\")\s*(\d+)\s*('|\")\]/", $content, $shortCode);
+    $ids = $shortCode[2];
+
+    return $ids;
+  }
+
+  public static function getViewIdsFromPost()
+  {
+    global $post;
+    global $wpdb;
+    if (empty($post)) {
+      self::$bfViewIdsFromPost = [];
+      return [];
+    }
+    $postId = $post->ID;
+    $shortcodeViewIds = [];
+    $bfMetaValues = $wpdb->get_results('SELECT meta_value FROM `' . $wpdb->postmeta . "` WHERE `post_id`={$postId}");
+    $postContent = $post->post_content;
+
+    $bfMetaValues[] = (object) ['meta_value' => $postContent];
+    foreach ($bfMetaValues as $bfShortcut) {
+      $meta_value = (is_string($bfShortcut->meta_value) && !empty($bfShortcut->meta_value)) ? $bfShortcut->meta_value : '';
+      $shortcodeIds = self::getViewShortCodeIds($meta_value);
+      $shortcodeViewIds = array_merge($shortcodeViewIds, $shortcodeIds);
+    }
+
+    self::$bfViewIdsFromPost = $shortcodeViewIds;
+    return $shortcodeViewIds;
+  }
+
+  public static function getViewShortCodeIds($content = '')
+  {
+    \preg_match_all("/\[bitform-view\s+id\s*=\s*('|\")\s*(\d+)\s*('|\")\]/", $content, $shortCode);
     $ids = $shortCode[2];
 
     return $ids;
@@ -169,6 +203,14 @@ final class FrontendHelpers
     $bfFormIdsFromPost = self::getFormIdsFromPost();
     $allFormIds = array_merge($bfFrontendFormIds, $bfFormIdsFromPost);
     return $allFormIds;
+  }
+
+  public static function getAllViewIdsInPage()
+  {
+    $bfFrontendViewIds = self::$bfFrontendViewIds;
+    $bfViewIdsFromPost = self::getViewIdsFromPost();
+    $allViewIds = array_merge($bfFrontendViewIds, $bfViewIdsFromPost);
+    return $allViewIds;
   }
 
   public static function getAllUniqFormIdsInPage()

@@ -13,6 +13,7 @@ use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Integration\Integrations;
 use BitCode\BitForm\Core\Util\IpTool;
 use BitCode\BitForm\Core\Util\MailConfig;
+use BitCode\BitForm\Core\Util\MetaBoxService;
 
 class AdminAjax
 {
@@ -86,7 +87,7 @@ class AdminAjax
     add_action('wp_ajax_bitforms_get_post_type', [$this, 'postTypeByUser']);
 
     // Meta Box INTEGRATION
-    add_action('wp_ajax_bitforms_get_metabox_fields', [$this, 'getMetaboxFields']);
+    add_action('wp_ajax_bitforms_get_metabox_fields', [$this, 'getMetaBoxFields']);
 
     // CHANGELOG VERSION OPTIONS
     add_action('wp_ajax_bitforms_changelog_version', [$this, 'setChangelogVersion']);
@@ -441,13 +442,6 @@ class AdminAjax
       $input = json_decode($inputJSON);
       echo wp_json_encode($input);
       die;
-      // $formHandler =  FormHandler::getInstance();
-      // $status = $formHandler->admin->getFormEntryLabelAndCount($_REQUEST, $input);
-      // if (is_wp_error($status)) {
-      //     wp_send_json_error($status->get_error_message(), 411);
-      // } else {
-      //     wp_send_json_success($status, 200);
-      // }
     } else {
       wp_send_json_error(
         __(
@@ -1465,6 +1459,7 @@ class AdminAjax
           $i++;
           $podField[$i]['key'] = $field['name'];
           $podField[$i]['name'] = $field['label'];
+          $podField[$i]['is-repeatable'] = $field['repeatable'] ?? 0;
           $podField[$i]['required'] = 1 === $field['options']['required'] ? true : false;
         }
       }
@@ -1609,9 +1604,10 @@ class AdminAjax
       $inputJSON = file_get_contents('php://input');
       $input = json_decode($inputJSON);
       $acfFields = [];
-      $acfFile = [];
+      $acfFiles = [];
 
-      $filterTypes = [
+      $allowedFields = [
+        'repeater',
         'text',
         'textarea',
         'password',
@@ -1631,48 +1627,48 @@ class AdminAjax
         'select',
         'post_object',
         'user',
+        'file',
+        'image',
+        'gallery'
       ];
-      $filterFile = ['file', 'image', 'gallery'];
 
       $field_groups = get_posts(['post_type' => 'acf-field-group']);
+
       if ($field_groups) {
         $groups = acf_get_field_groups(['post_type' => $input->post_type]);
 
         foreach ($groups as $group) {
           foreach (acf_get_fields($group['key']) as $acfField) {
-            if (in_array($acfField['type'], $filterTypes)) {
-              array_push($acfFields, [
-                'key'      => $acfField['key'],
-                'name'     => $acfField['label'],
-                'required' => $acfField['required'],
-              ]);
-            } elseif (in_array($acfField['type'], $filterFile)) {
-              array_push($acfFile, [
-                'key'      => $acfField['key'],
-                'name'     => $acfField['label'],
-                'required' => $acfField['required'],
-              ]);
-            } elseif (in_array($acfField['type'], ['group'])) {
-              foreach ($acfField['sub_fields'] as $subField) {
-                if (in_array($subField['type'], $filterTypes)) {
-                  array_push($acfFields, [
-                    'key'      => $subField['key'],
-                    'name'     => $subField['label'],
-                    'required' => $subField['required'],
-                  ]);
-                } elseif (in_array($subField['type'], $filterFile)) {
-                  array_push($acfFile, [
-                    'key'      => $subField['key'],
-                    'name'     => $subField['label'],
-                    'required' => $subField['required'],
-                  ]);
+            if (in_array($acfField['type'], $allowedFields)) {
+              if ('repeater' === $acfField['type']) {
+                foreach ($acfField['sub_fields'] as $subField) {
+                  if (in_array($subField['type'], $allowedFields)) {
+                    array_push($acfFields, [
+                      'key'      => $acfField['key'] . '.' . $subField['key'],
+                      'name'     => $acfField['label'] . '-' . $subField['label'],
+                      'required' => $subField['required'],
+                    ]);
+                  }
                 }
+              } elseif (in_array($acfField['type'], ['file', 'image', 'gallery'])) {
+                array_push($acfFiles, [
+                  'key'      => $acfField['key'],
+                  'name'     => $acfField['label'],
+                  'required' => $acfField['required'],
+                ]);
+              } else {
+                array_push($acfFields, [
+                  'key'      => $acfField['key'],
+                  'name'     => $acfField['label'],
+                  'required' => $acfField['required'],
+                ]);
               }
             }
           }
         }
       }
-      wp_send_json_success(['acfFields' => $acfFields, 'acfFile' => $acfFile], 200);
+
+      wp_send_json_success(['acfFields' => $acfFields, 'acfFile' => $acfFiles], 200);
     } else {
       wp_send_json_error(
         __(
@@ -1684,62 +1680,23 @@ class AdminAjax
     }
   }
 
-  public function getMetaboxFields()
+  public function getMetaBoxFields()
   {
     if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
-      $inputJSON = file_get_contents('php://input');
-      $input = json_decode($inputJSON);
-
-      $metaboxFields = [];
-      $metaboxFile = [];
-
-      $filterTypes = [
-        'file_input',
-        'group',
-        'tab',
-        'osm',
-        'heading',
-        'key_value',
-        'map',
-        'custom_html',
-        'background',
-        'fieldset_text',
-        'taxonomy',
-        'taxonomy_advanced',
-      ];
-
-      $fileTypes = [
-        'image',
-        'image_upload',
-        'file_advanced',
-        'file_upload',
-        'single_image',
-        'file',
-        'image_advanced',
-        'video',
-      ];
-
-      if (function_exists('rwmb_meta')) {
-        $fields = rwmb_get_object_fields($input->post_type);
-        foreach ($fields as $index => $field) {
-          if (!in_array($field['type'], $fileTypes)) {
-            if (!in_array($field['type'], $filterTypes)) {
-              $metaboxFields[$index]['name'] = $field['name'];
-            }
-
-            $metaboxFields[$index]['key'] = $field['id'];
-            $metaboxFields[$index]['required'] = $field['required'];
-          } else {
-            $metaboxFile[$index]['name'] = $field['name'];
-            $metaboxFile[$index]['key'] = $field['id'];
-            $metaboxFile[$index]['required'] = $field['required'];
-          }
-        }
+      if (!function_exists('rwmb_meta')) {
+        wp_send_json_error(__('Meta Box must be activated!', 'bit-integrations'));
       }
+
+      $input = json_decode(file_get_contents('php://input'));
+
+      $metaBoxFields = rwmb_get_object_fields($input->post_type);
+
+      $metaBoxFields = MetaBoxService::getMetaBoxFields($input->post_type);
+
       wp_send_json_success(
         [
-          'metaboxFields' => array_values($metaboxFields),
-          'metaboxFile'   => array_values($metaboxFile),
+          'metaboxFields' => array_values($metaBoxFields['text_fields']),
+          'metaboxFile'   => array_values($metaBoxFields['file_fields']),
         ],
         200
       );

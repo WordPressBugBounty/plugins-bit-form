@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit5c1ba9c4b0e57290e5faf51632de51b6
+class ComposerStaticInit46ec3ccb230b7cbacf01ba817c86b627
 {
     public static $prefixLengthsPsr4 = array (
         'e' => 
@@ -125,6 +125,7 @@ class ComposerStaticInit5c1ba9c4b0e57290e5faf51632de51b6
         'BitCode\\BitForm\\Core\\Hooks\\Hooks' => __DIR__ . '/../..' . '/includes/Core/Hooks/Hooks.php',
         'BitCode\\BitForm\\Core\\Hooks\\PostType' => __DIR__ . '/../..' . '/includes/Core/Hooks/PostType.php',
         'BitCode\\BitForm\\Core\\Integration\\Acf\\AcfHandler' => __DIR__ . '/../..' . '/includes/Core/Integration/Acf/AcfHandler.php',
+        'BitCode\\BitForm\\Core\\Integration\\Acf\\AcfHelper' => __DIR__ . '/../..' . '/includes/Core/Integration/Acf/AcfHelper.php',
         'BitCode\\BitForm\\Core\\Integration\\ActiveCampaign\\ActiveCampaignHandler' => __DIR__ . '/../..' . '/includes/Core/Integration/ActiveCampaign/ActiveCampaignHandler.php',
         'BitCode\\BitForm\\Core\\Integration\\ActiveCampaign\\RecordApiHelper' => __DIR__ . '/../..' . '/includes/Core/Integration/ActiveCampaign/RecordApiHelper.php',
         'BitCode\\BitForm\\Core\\Integration\\Acumbamail\\AcumbamailHandler' => __DIR__ . '/../..' . '/includes/Core/Integration/Acumbamail/AcumbamailHandler.php',
@@ -164,6 +165,7 @@ class ComposerStaticInit5c1ba9c4b0e57290e5faf51632de51b6
         'BitCode\\BitForm\\Core\\Integration\\MailerLite\\MailerLiteHandler' => __DIR__ . '/../..' . '/includes/Core/Integration/MailerLite/MailerLiteHandler.php',
         'BitCode\\BitForm\\Core\\Integration\\MailerLite\\RecordApiHelper' => __DIR__ . '/../..' . '/includes/Core/Integration/MailerLite/RecordApiHelper.php',
         'BitCode\\BitForm\\Core\\Integration\\MetaBox\\MetaBoxHandler' => __DIR__ . '/../..' . '/includes/Core/Integration/MetaBox/MetaBoxHandler.php',
+        'BitCode\\BitForm\\Core\\Integration\\MetaBox\\MetaBoxHelper' => __DIR__ . '/../..' . '/includes/Core/Integration/MetaBox/MetaBoxHelper.php',
         'BitCode\\BitForm\\Core\\Integration\\N8NIO\\N8NIOHandler' => __DIR__ . '/../..' . '/includes/Core/Integration/N8NIO/N8NIOHandler.php',
         'BitCode\\BitForm\\Core\\Integration\\OneDrive\\OneDriveHandler' => __DIR__ . '/../..' . '/includes/Core/Integration/OneDrive/OneDriveHandler.php',
         'BitCode\\BitForm\\Core\\Integration\\OneDrive\\RecordApiHelper' => __DIR__ . '/../..' . '/includes/Core/Integration/OneDrive/RecordApiHelper.php',
@@ -249,6 +251,8 @@ class ComposerStaticInit5c1ba9c4b0e57290e5faf51632de51b6
         'BitCode\\BitForm\\Core\\Util\\Log' => __DIR__ . '/../..' . '/includes/Core/Util/Log.php',
         'BitCode\\BitForm\\Core\\Util\\MailConfig' => __DIR__ . '/../..' . '/includes/Core/Util/MailConfig.php',
         'BitCode\\BitForm\\Core\\Util\\MailNotifier' => __DIR__ . '/../..' . '/includes/Core/Util/MailNotifier.php',
+        'BitCode\\BitForm\\Core\\Util\\MetaBoxService' => __DIR__ . '/../..' . '/includes/Core/Util/MetaBoxService.php',
+        'BitCode\\BitForm\\Core\\Util\\PostHelpers' => __DIR__ . '/../..' . '/includes/Core/Util/PostHelpers.php',
         'BitCode\\BitForm\\Core\\Util\\Render' => __DIR__ . '/../..' . '/includes/Core/Util/Render.php',
         'BitCode\\BitForm\\Core\\Util\\SmartTags' => __DIR__ . '/../..' . '/includes/Core/Util/SmartTags.php',
         'BitCode\\BitForm\\Core\\Util\\Uninstallation' => __DIR__ . '/../..' . '/includes/Core/Util/Uninstallation.php',
@@ -372,9 +376,9 @@ class ComposerStaticInit5c1ba9c4b0e57290e5faf51632de51b6
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit5c1ba9c4b0e57290e5faf51632de51b6::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit5c1ba9c4b0e57290e5faf51632de51b6::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit5c1ba9c4b0e57290e5faf51632de51b6::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit46ec3ccb230b7cbacf01ba817c86b627::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit46ec3ccb230b7cbacf01ba817c86b627::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit46ec3ccb230b7cbacf01ba817c86b627::$classMap;
 
         }, null, ClassLoader::class);
     }
