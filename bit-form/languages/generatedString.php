@@ -1621,6 +1621,10 @@ $i18n_strings = array(
 
     'Refresh WorkDrive Team Folders' => __('Refresh WorkDrive Team Folders', 'bit-form'),
 
+    'Announcement' => __('Announcement', 'bit-form'),
+
+    'Get Early Bird Offer' => __('Get Early Bird Offer', 'bit-form'),
+
     'API key saved successfully' => __('API key saved successfully', 'bit-form'),
 
     'Saving API key...' => __('Saving API key...', 'bit-form'),
@@ -1802,6 +1806,8 @@ $i18n_strings = array(
     'Read-only' => __('Read-only', 'bit-form'),
 
     'Helper Text' => __('Helper Text', 'bit-form'),
+
+    'Edit HTML Content' => __('Edit HTML Content', 'bit-form'),
 
     'Maximum' => __('Maximum', 'bit-form'),
 
@@ -3352,6 +3358,8 @@ $i18n_strings = array(
     'Please upgrade to the PRO plan to unlock all these awesome features.' => __('Please upgrade to the PRO plan to unlock all these awesome features.', 'bit-form'),
 
     'Upgrade to Pro' => __('Upgrade to Pro', 'bit-form'),
+
+    'Try Demo' => __('Try Demo', 'bit-form'),
 
     'Check out our' => __('Check out our', 'bit-form'),
 
