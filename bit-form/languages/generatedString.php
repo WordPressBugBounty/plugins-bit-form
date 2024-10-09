@@ -3317,7 +3317,7 @@ $i18n_strings = array(
 
     'Please setup your' => __('Please setup your', 'bit-form'),
 
-    'Sorry, you need to upgrade your Pro Plugin latest version(' => __('Sorry, you need to upgrade your Pro Plugin latest version(', 'bit-form'),
+    'Please update your Pro Plugin to the latest version (' => __('Please update your Pro Plugin to the latest version (', 'bit-form'),
 
     'this feature' => __('this feature', 'bit-form'),
 

@@ -14,6 +14,7 @@ use BitCode\BitForm\Core\Integration\Integrations;
 use BitCode\BitForm\Core\Util\IpTool;
 use BitCode\BitForm\Core\Util\MailConfig;
 use BitCode\BitForm\Core\Util\MetaBoxService;
+use WP_Error;
 
 class AdminAjax
 {
@@ -1195,21 +1196,39 @@ class AdminAjax
     }
   }
 
+  private function checkExtensionWithURL($urlStr)
+  {
+    $pattern = '/^https?:\/\/.*(\.(svg|png|jpg|jpeg|gif))?$/i';
+
+    return preg_match($pattern, $urlStr);
+  }
+
   public function iconUpload()
   {
     if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
       $inputJSON = file_get_contents('php://input');
       $input = json_decode($inputJSON);
+
+      $sanitize_url = sanitize_url($input->src);
+
+      if (!$this->checkExtensionWithURL($sanitize_url)) {
+        return new WP_Error(
+          'type_error',
+          __('Invalid file type', 'bit-form')
+        );
+      }
+
       $uploadDirInfo = wp_upload_dir();
       $wpUploadbaseDir = $uploadDirInfo['basedir'];
       $icnDir = $wpUploadbaseDir . DIRECTORY_SEPARATOR . 'bitforms' . DIRECTORY_SEPARATOR . 'icons';
+
       if (!is_dir($icnDir)) {
         mkdir($icnDir);
       }
 
-      $imageUrlData = file_get_contents($input->src);
+      $imageUrlData = file_get_contents($sanitize_url);
 
-      $filename = sanitize_file_name($input->id . '-' . basename($input->src));
+      $filename = sanitize_file_name($input->id . '-' . basename($sanitize_url));
 
       $validation = wp_check_filetype($filename);
       $type = $validation['type'];

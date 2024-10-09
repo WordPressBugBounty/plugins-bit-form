@@ -146,7 +146,7 @@ final class Plugin
 
   public function plugin_action_links($links)
   {
-    $links[] = '<a href="https://docs.form.bitapps.pro" target="_blank">' . __('Docs') . '</a>';
+    $links[] = '<a href="https://bitapps.pro/docs/bit-form/" target="_blank">' . __('Docs') . '</a>';
 
     return $links;
   }

@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Bit Form 2.15.2\n"
+"Project-Id-Version: Bit Form 2.15.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/bit-form\n"
 "Last-Translator: developer@bitcode.pro\n"
 "Language-Team: support@bitcode.pro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-10-01T18:11:03+00:00\n"
+"POT-Creation-Date: 2024-10-09T11:02:59+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.8.1\n"
 "X-Domain: bit-form\n"
@@ -43,59 +43,59 @@ msgstr ""
 msgid "Error Activating"
 msgstr ""
 
-#: includes/Admin/AdminAjax.php:120
-#: includes/Admin/AdminAjax.php:149
-#: includes/Admin/AdminAjax.php:170
-#: includes/Admin/AdminAjax.php:195
-#: includes/Admin/AdminAjax.php:218
-#: includes/Admin/AdminAjax.php:239
-#: includes/Admin/AdminAjax.php:255
-#: includes/Admin/AdminAjax.php:274
-#: includes/Admin/AdminAjax.php:340
-#: includes/Admin/AdminAjax.php:371
-#: includes/Admin/AdminAjax.php:411
-#: includes/Admin/AdminAjax.php:429
-#: includes/Admin/AdminAjax.php:447
-#: includes/Admin/AdminAjax.php:470
-#: includes/Admin/AdminAjax.php:492
-#: includes/Admin/AdminAjax.php:509
-#: includes/Admin/AdminAjax.php:526
-#: includes/Admin/AdminAjax.php:554
-#: includes/Admin/AdminAjax.php:596
-#: includes/Admin/AdminAjax.php:624
-#: includes/Admin/AdminAjax.php:659
-#: includes/Admin/AdminAjax.php:682
-#: includes/Admin/AdminAjax.php:705
-#: includes/Admin/AdminAjax.php:728
-#: includes/Admin/AdminAjax.php:752
-#: includes/Admin/AdminAjax.php:776
-#: includes/Admin/AdminAjax.php:816
-#: includes/Admin/AdminAjax.php:839
-#: includes/Admin/AdminAjax.php:862
-#: includes/Admin/AdminAjax.php:885
-#: includes/Admin/AdminAjax.php:908
-#: includes/Admin/AdminAjax.php:931
-#: includes/Admin/AdminAjax.php:954
-#: includes/Admin/AdminAjax.php:978
-#: includes/Admin/AdminAjax.php:1001
-#: includes/Admin/AdminAjax.php:1024
-#: includes/Admin/AdminAjax.php:1047
-#: includes/Admin/AdminAjax.php:1070
-#: includes/Admin/AdminAjax.php:1093
-#: includes/Admin/AdminAjax.php:1116
-#: includes/Admin/AdminAjax.php:1139
-#: includes/Admin/AdminAjax.php:1162
-#: includes/Admin/AdminAjax.php:1189
-#: includes/Admin/AdminAjax.php:1235
-#: includes/Admin/AdminAjax.php:1272
-#: includes/Admin/AdminAjax.php:1299
-#: includes/Admin/AdminAjax.php:1333
-#: includes/Admin/AdminAjax.php:1367
-#: includes/Admin/AdminAjax.php:1438
-#: includes/Admin/AdminAjax.php:1474
-#: includes/Admin/AdminAjax.php:1500
-#: includes/Admin/AdminAjax.php:1592
-#: includes/Admin/AdminAjax.php:1674
+#: includes/Admin/AdminAjax.php:121
+#: includes/Admin/AdminAjax.php:150
+#: includes/Admin/AdminAjax.php:171
+#: includes/Admin/AdminAjax.php:196
+#: includes/Admin/AdminAjax.php:219
+#: includes/Admin/AdminAjax.php:240
+#: includes/Admin/AdminAjax.php:256
+#: includes/Admin/AdminAjax.php:275
+#: includes/Admin/AdminAjax.php:341
+#: includes/Admin/AdminAjax.php:372
+#: includes/Admin/AdminAjax.php:412
+#: includes/Admin/AdminAjax.php:430
+#: includes/Admin/AdminAjax.php:448
+#: includes/Admin/AdminAjax.php:471
+#: includes/Admin/AdminAjax.php:493
+#: includes/Admin/AdminAjax.php:510
+#: includes/Admin/AdminAjax.php:527
+#: includes/Admin/AdminAjax.php:555
+#: includes/Admin/AdminAjax.php:597
+#: includes/Admin/AdminAjax.php:625
+#: includes/Admin/AdminAjax.php:660
+#: includes/Admin/AdminAjax.php:683
+#: includes/Admin/AdminAjax.php:706
+#: includes/Admin/AdminAjax.php:729
+#: includes/Admin/AdminAjax.php:753
+#: includes/Admin/AdminAjax.php:777
+#: includes/Admin/AdminAjax.php:817
+#: includes/Admin/AdminAjax.php:840
+#: includes/Admin/AdminAjax.php:863
+#: includes/Admin/AdminAjax.php:886
+#: includes/Admin/AdminAjax.php:909
+#: includes/Admin/AdminAjax.php:932
+#: includes/Admin/AdminAjax.php:955
+#: includes/Admin/AdminAjax.php:979
+#: includes/Admin/AdminAjax.php:1002
+#: includes/Admin/AdminAjax.php:1025
+#: includes/Admin/AdminAjax.php:1048
+#: includes/Admin/AdminAjax.php:1071
+#: includes/Admin/AdminAjax.php:1094
+#: includes/Admin/AdminAjax.php:1117
+#: includes/Admin/AdminAjax.php:1140
+#: includes/Admin/AdminAjax.php:1163
+#: includes/Admin/AdminAjax.php:1190
+#: includes/Admin/AdminAjax.php:1254
+#: includes/Admin/AdminAjax.php:1291
+#: includes/Admin/AdminAjax.php:1318
+#: includes/Admin/AdminAjax.php:1352
+#: includes/Admin/AdminAjax.php:1386
+#: includes/Admin/AdminAjax.php:1457
+#: includes/Admin/AdminAjax.php:1493
+#: includes/Admin/AdminAjax.php:1519
+#: includes/Admin/AdminAjax.php:1611
+#: includes/Admin/AdminAjax.php:1693
 #: includes/Core/Integration/ActiveCampaign/ActiveCampaignHandler.php:84
 #: includes/Core/Integration/ActiveCampaign/ActiveCampaignHandler.php:138
 #: includes/Core/Integration/ActiveCampaign/ActiveCampaignHandler.php:192
@@ -200,28 +200,29 @@ msgstr ""
 #: includes/Core/Integration/ZohoWorkDrive/ZohoWorkDriveHandler.php:256
 #: includes/Core/Integration/ZohoWorkDrive/ZohoWorkDriveHandler.php:334
 #: includes/Core/Integration/ZohoWorkDrive/ZohoWorkDriveHandler.php:402
-#: includes/Frontend/Form/FrontendFormManager.php:502
+#: includes/Frontend/Form/FrontendFormManager.php:506
 msgid "Token expired"
 msgstr ""
 
-#: includes/Admin/AdminAjax.php:143
+#: includes/Admin/AdminAjax.php:144
 msgid "No Integration Found"
 msgstr ""
 
-#: includes/Admin/AdminAjax.php:402
+#: includes/Admin/AdminAjax.php:403
 msgid "Some of the test fields are empty or an invalid email supplied"
 msgstr ""
 
-#: includes/Admin/AdminAjax.php:426
+#: includes/Admin/AdminAjax.php:427
 msgid "Migration Complete"
 msgstr ""
 
-#: includes/Admin/AdminAjax.php:1226
+#: includes/Admin/AdminAjax.php:1217
+#: includes/Admin/AdminAjax.php:1245
 msgid "Invalid file type"
 msgstr ""
 
-#: includes/Admin/AdminAjax.php:1324
-#: includes/Admin/AdminAjax.php:1358
+#: includes/Admin/AdminAjax.php:1343
+#: includes/Admin/AdminAjax.php:1377
 msgid "Invalid form id"
 msgstr ""
 
@@ -393,7 +394,7 @@ msgstr ""
 
 #: includes/Admin/Form/AdminFormHandler.php:2068
 #: includes/Admin/Form/AdminFormHandler.php:2143
-#: includes/Frontend/Form/FrontendFormManager.php:304
+#: includes/Frontend/Form/FrontendFormManager.php:308
 msgid "Entries id is invalid"
 msgstr ""
 
@@ -427,7 +428,7 @@ msgstr ""
 
 #: includes/Admin/Form/AdminFormHandler.php:2148
 #: includes/Admin/Form/AdminFormHandler.php:2215
-#: includes/Frontend/Form/FrontendFormManager.php:500
+#: includes/Frontend/Form/FrontendFormManager.php:504
 msgid "Form does not exist"
 msgstr ""
 
@@ -975,7 +976,7 @@ msgstr ""
 
 #: includes/Core/WorkFlow/WorkFlow.php:207
 #: includes/Core/WorkFlow/WorkFlow.php:293
-#: includes/Frontend/Form/FrontendFormManager.php:283
+#: includes/Frontend/Form/FrontendFormManager.php:287
 msgid "Form Submitted Successfully"
 msgstr ""
 
@@ -995,68 +996,68 @@ msgstr ""
 msgid "#%s no. Form is not active"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:383
+#: includes/Frontend/Form/FrontendFormManager.php:387
 msgid "Entry Update Successfully"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:421
+#: includes/Frontend/Form/FrontendFormManager.php:425
 msgid "Token verification failed"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:440
+#: includes/Frontend/Form/FrontendFormManager.php:444
 msgid "You are already logged in"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:489
+#: includes/Frontend/Form/FrontendFormManager.php:493
 msgid "Please submit form with valid fields"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:513
-#: includes/Frontend/Form/FrontendFormManager.php:549
+#: includes/Frontend/Form/FrontendFormManager.php:517
+#: includes/Frontend/Form/FrontendFormManager.php:553
 msgid "Please verify reCAPTCHA"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:560
-#: includes/Frontend/Form/FrontendFormManager.php:590
+#: includes/Frontend/Form/FrontendFormManager.php:564
+#: includes/Frontend/Form/FrontendFormManager.php:594
 msgid "Please verify Cloudflare Turnstile Captcha"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:580
+#: includes/Frontend/Form/FrontendFormManager.php:584
 msgid "Cloudflare Turnstile Validation Error: "
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:643
+#: includes/Frontend/Form/FrontendFormManager.php:647
 msgid "Sorry!! Entry limit exceeded"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:657
+#: includes/Frontend/Form/FrontendFormManager.php:661
 msgid "Sorry!! You have already submitted"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:716
+#: includes/Frontend/Form/FrontendFormManager.php:720
 msgid "within %s to %s"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:729
+#: includes/Frontend/Form/FrontendFormManager.php:733
 msgid "%s to %s"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:735
-#: includes/Frontend/Form/FrontendFormManager.php:738
+#: includes/Frontend/Form/FrontendFormManager.php:739
+#: includes/Frontend/Form/FrontendFormManager.php:742
 msgid "Form is available %s From %s"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:736
-#: includes/Frontend/Form/FrontendFormManager.php:739
+#: includes/Frontend/Form/FrontendFormManager.php:740
+#: includes/Frontend/Form/FrontendFormManager.php:743
 msgid "Form is available %s"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:741
+#: includes/Frontend/Form/FrontendFormManager.php:745
 msgid "Form is available on %s"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:754
-#: includes/Frontend/Form/FrontendFormManager.php:766
+#: includes/Frontend/Form/FrontendFormManager.php:758
+#: includes/Frontend/Form/FrontendFormManager.php:770
 msgid "Sorry!! Your IP address is %s, Blocked from submitting the form"
 msgstr ""
 
@@ -7675,7 +7676,7 @@ msgid "Please setup your"
 msgstr ""
 
 #: languages/generatedString.php:3320
-msgid "Sorry, you need to upgrade your Pro Plugin latest version("
+msgid "Please update your Pro Plugin to the latest version ("
 msgstr ""
 
 #: languages/generatedString.php:3322

@@ -13,7 +13,6 @@ class BfAnalytics
   {
     global $wpdb;
     $allForms = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}bitforms_form");
-    $formsInfo = [];
 
     $bfInfo = [];
     $formsArr = [];
@@ -28,6 +27,7 @@ class BfAnalytics
       $formData['integrations'] = $this->getIntegrations($form->id);
       $formData['formAbandonment'] = $this->getFormAbandonment($form->id);
       $formData['doubleOptin'] = $this->getDoubleOptin($form->id);
+      $formData['tableView'] = $this->countRow($form->id, 'bitforms_frontend_views');
       $formsArr[] = $formData;
     }
     $bfInfo['forms'] = $formsArr;
@@ -70,13 +70,13 @@ class BfAnalytics
   private function countRow($formId, $tablename)
   {
     global $wpdb;
-    $workflows = $wpdb->get_results(
+    $totalRow = $wpdb->get_results(
       $wpdb->prepare(
         "SELECT COUNT(*) as count FROM `{$wpdb->prefix}{$tablename}` WHERE form_id = %d;",
         $formId
       )
     );
-    return $workflows[0]->count;
+    return $totalRow[0]->count || 0;
   }
 
   private function getIntegrations($formId)

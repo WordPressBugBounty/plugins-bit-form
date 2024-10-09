@@ -1,7 +1,7 @@
 === Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder ===
 Plugin Name: Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder
-Version: 2.15.2
-Stable tag: 2.15.2
+Version: 2.15.3
+Stable tag: 2.15.3
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin 
@@ -33,7 +33,7 @@ Contact Form Builder for Create Multi Step form, Payment form, Conversational fo
 
 Bit Form ensures optimal web and server performance with its highly optimized size, varying based on the fields and settings used. It maintains your website's page speed, crucial for SEO, marketing, and conversions, making it one of the fastest WordPress contact form builder plugins.
 
-[Try Demo](https://towp.io/) | [Documentation](https://docs.form.bitapps.pro/) | [Bit Form Repository](https://github.com/Bit-Apps-Pro/bit-form-frontend) | [Youtube Channel](https://www.youtube.com/@bit-apps) | [Support Chat](https://tawk.to/chat/60eac4b6d6e7610a49aab375/1faah0r3e) | [Facebook Community](https://www.facebook.com/groups/bitapps)
+[Try Demo](https://towp.io/) | [Documentation](https://bitapps.pro/docs/bit-form/) | [Bit Form Repository](https://github.com/Bit-Apps-Pro/bit-form-frontend) | [Youtube Channel](https://www.youtube.com/@bit-apps) | [Support Chat](https://tawk.to/chat/60eac4b6d6e7610a49aab375/1faah0r3e) | [Facebook Community](https://www.facebook.com/groups/bitapps)
 
 #### The Most Powerful Form Builder for WordPress [INCREDIBLE] | Mr Web
 
@@ -297,7 +297,7 @@ Bit Form uniquely integrates with third-party apps without extra costs, Easily a
 - [Acumbamail](https://bitapps.pro/docs/bit-form/integrations/acumbamail-integrations)
 - [Autonami](https://bitapps.pro/docs/bit-form/integrations/funnelkit-integrations/)
 - [CPT](https://bitapps.pro/docs/bit-form/integrations/custom-post-type-integrations/)
-- [Dropbox](https://docs.form.bitapps.pro/dropbox-integrations)
+- [Dropbox](https://bitapps.pro/docs/bit-form/integrations/dropbox-integrations/)
 - [Elastic Email](https://bitapps.pro/docs/bit-form/integrations/elastic-email-integrations)
 - [Encharge](https://bitapps.pro/docs/bit-form/integrations/encharge-integrations)
 - [Fluent CRM](https://bitapps.pro/docs/bit-form/integrations/fluentcrm-integrations)
@@ -539,6 +539,12 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 6. Response table to view form entries
 
 == Changelog ==
+= 2.15.3 =
+*Release Date: 09 October, 2024*
+*Improvement:
+    1. Improved security for Icon Upload in Field Settings.
+    2. Updated the default styling for the Image Select Field.
+
 = 2.15.2 =
 *Release Date: 01 October, 2024*
 *Improvement:
@@ -548,11 +554,8 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 *Release Date: 29 September, 2024*
 *Feature
     1. Frontent entry view & edit: Added the ability to view and logged in user to edit form entries.
-*Improvement
-    1. Add new admin side bar menu & top bar menu for bit form.
 *Fix
-    1. Resolved html tag filter issue in html field.
-    2. Resolved dubplicate and export/import issue with repeater and section field.
+    1. Resolved Column Number set issue with Checkbox and Radio Field
 
 = 2.14.1 = 
 *Release Date: 26 September, 2024*
@@ -653,55 +656,11 @@ Improvement:
     1. Resolved style shrink issue of Checkbox field.
     2. Resolved submission issue with repeater field data.
 
-= 2.12.2 =
-*Release Date: 15 June, 2024*
-*Improvement:
-    1. Includes an option to download necessary fonts for PDF attachments.
-
-= 2.12.1 =
-*Release Date: 08 June, 2024*
-*Feature:
-    1. Added Concat(Repeater) function to concatenate repeated field values in conditional logic.
-*Improvements:
-    1. Enhanced user experience in the Email and PDF template editor.
-    2. Improved field re-order functionality in Table and Mobile views.
-    3. Enabled date picker display on click for Date, datetime-local, month, time, and week fields.
-*Fix:
-    1. Fixed issue where the slider field fill color was not changing.
-    2. WooCommerce upload Field issue resolved.
-    3. Zoho Sign integration issue resolved.
-
-= 2.12.0 =
-*Release Date: 29 May, 2024*
-*Improvement:
-    1. Modify predefined custom JavaScript code.
-    2. Automate the Bit Form V1 form migration process.
-*Fix:
-    1. Resolve the issue with duplicate values in the checkbox field for email notifications.
-
-= 2.11.1 = 
-*Release Date: 06 May, 2024*
-*Improvement:
-    1. Include Order Id settings in Razorpay payment field.
-    2. Unique Entry validation settings added in the Phone number Field.
-    3. Conditional Logic action with Currency field.
-*Fix:
-    1. OneDrive integration issue resolved.
-    2. Dropbox blank screen issue resolved.
-
-= 2.11.0 =
-*Release Date: 18 April, 2024*
-*Feature: 
-    1. New Slider(range) field added.
-*Fix: 
-    1. ResolvedAPI issue with brevo integration.
-    2. Resolved Checkbox and radio field action issue in conversational form.
-
 
 == Upgrade Notice ==
 
-= 2.13.0 =
-Update to this version to access the new Payment Gateway: Mollie.
+= 2.15.3 =
+Update this version to get security improvements.
 
 
 For changelog of all versions please check [Changelog.txt](https://plugins.trac.wordpress.org/browser/bit-form/trunk/changelog.txt)

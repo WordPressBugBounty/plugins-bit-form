@@ -1,3 +1,48 @@
+= 2.12.2 =
+*Release Date: 15 June, 2024*
+*Improvement:
+    1. Includes an option to download necessary fonts for PDF attachments.
+
+= 2.12.1 =
+*Release Date: 08 June, 2024*
+*Feature:
+    1. Added Concat(Repeater) function to concatenate repeated field values in conditional logic.
+*Improvements:
+    1. Enhanced user experience in the Email and PDF template editor.
+    2. Improved field re-order functionality in Table and Mobile views.
+    3. Enabled date picker display on click for Date, datetime-local, month, time, and week fields.
+*Fix:
+    1. Fixed issue where the slider field fill color was not changing.
+    2. WooCommerce upload Field issue resolved.
+    3. Zoho Sign integration issue resolved.
+
+= 2.12.0 =
+*Release Date: 29 May, 2024*
+*Improvement:
+    1. Modify predefined custom JavaScript code.
+    2. Automate the Bit Form V1 form migration process.
+*Fix:
+    1. Resolve the issue with duplicate values in the checkbox field for email notifications.
+
+= 2.11.1 = 
+*Release Date: 06 May, 2024*
+*Improvement:
+    1. Include Order Id settings in Razorpay payment field.
+    2. Unique Entry validation settings added in the Phone number Field.
+    3. Conditional Logic action with Currency field.
+*Fix:
+    1. OneDrive integration issue resolved.
+    2. Dropbox blank screen issue resolved.
+
+= 2.11.0 =
+*Release Date: 18 April, 2024*
+*Feature: 
+    1. New Slider(range) field added.
+*Fix: 
+    1. ResolvedAPI issue with brevo integration.
+    2. Resolved Checkbox and radio field action issue in conversational form.
+
+
 = 2.10.3 =
 *Release Date: 01 April, 2024*
 *Improvement:
