@@ -118,6 +118,7 @@ class ScriptFilePriorityManager
       'repeater' => [
         ['priority' => 102, 'filename' => 'bit-repeater-field.min.js'],
         ['priority' => 701, 'filename' => 'checkRepeatedField.min.js'],
+        ['priority' => 701, 'filename' => 'isRepeaterField.min.js'],
         ['priority' => 701, 'filename' => 'getRepeatedIndexes.min.js'],
         ['priority' => 701, 'filename' => 'getIndexesBaseOnConditions.min.js'],
         ['priority' => 201, 'filename' => 'customFieldsReset.min.js'],

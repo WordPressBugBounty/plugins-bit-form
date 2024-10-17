@@ -475,7 +475,9 @@ final class IntegrationHandler
     // convert the array to string repeater field value
     if ('string' === $returnRepeaterValue) {
       foreach ($repeaterField as $key) {
-        $fieldValues[$key] = implode(', ', $fieldValues[$key]);
+        if (isset($fieldValues[$key]) && is_array($fieldValues[$key])) {
+          $fieldValues[$key] = implode(', ', $fieldValues[$key]);
+        }
       }
     }
     return $fieldValues;

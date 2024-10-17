@@ -1847,6 +1847,8 @@ $i18n_strings = array(
 
     'Options' => __('Options', 'bit-form'),
 
+    'Default Amount Value' => __('Default Amount Value', 'bit-form'),
+
     'Minimum amount:' => __('Minimum amount:', 'bit-form'),
 
     'Maximum amount:' => __('Maximum amount:', 'bit-form'),
@@ -2841,8 +2843,6 @@ $i18n_strings = array(
 
     'Available Integrations' => __('Available Integrations', 'bit-form'),
 
-    'Pay with Mollie' => __('Pay with Mollie', 'bit-form'),
-
     'Text' => __('Text', 'bit-form'),
 
     'Placeholder...' => __('Placeholder...', 'bit-form'),
@@ -2950,6 +2950,8 @@ $i18n_strings = array(
     'Pay with Stripe' => __('Pay with Stripe', 'bit-form'),
 
     'Pay now' => __('Pay now', 'bit-form'),
+
+    'Pay with Mollie' => __('Pay with Mollie', 'bit-form'),
 
     'Button' => __('Button', 'bit-form'),
 

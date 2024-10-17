@@ -238,7 +238,7 @@ ICON;
     } elseif ($this->property_exists_nested($this->_fld, 'defaultValue', '', 1)) {
       $val = $this->_fld->defaultValue;
     }
-    if (!empty($val) && 'textarea' !== $this->_fld->typ) {
+    if (isset($val) && '' !== $val && 'textarea' !== $this->_fld->typ) {
       return "value='{$this->esc_attr($val)}'";
     }
     return $val;

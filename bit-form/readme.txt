@@ -1,7 +1,7 @@
 === Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder ===
 Plugin Name: Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder
-Version: 2.15.3
-Stable tag: 2.15.3
+Version: 2.15.4
+Stable tag: 2.15.4
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin 
@@ -539,8 +539,24 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 6. Response table to view form entries
 
 == Changelog ==
+= 2.15.4 =
+*Release Date: 17 October, 2024*
+*New:
+    1. Added new form template: Customer Complain Form
+    2. Add Change anction in conditional logic for repeater field.
+    2. Added new Filter and Action Hooks for handling WP User Authentication.
+*Improvement:
+    1. Default amount value settings in the Currency Field.
+    2. Improve "On Click" of button action in conditional logic section.
+*Fix:
+    1. Resolved "0" value not set as default value inssue in the Number Field.
+
+
+
 = 2.15.3 =
 *Release Date: 09 October, 2024*
+*New:
+    1. Added new form template: WP User Registration Form
 *Improvement:
     1. Improved security for Icon Upload in Field Settings.
     2. Updated the default styling for the Image Select Field.

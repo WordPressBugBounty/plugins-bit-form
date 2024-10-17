@@ -28,14 +28,17 @@ final class Request
 
   public static function isPluginPage()
   {
-    $queryToRemove = ['formID', 'entryID', 'fileID', 'download'];
     $parsed_url = wp_parse_url(home_url());
     $site_url = $parsed_url['scheme'] . '://' . $parsed_url['host'];
-
-    $reqUrl = $site_url . remove_query_arg($queryToRemove, $_SERVER['REQUEST_URI']);
+    $parsedReqUri = wp_parse_url($_SERVER['REQUEST_URI']);
+    if (!isset($parsedReqUri['path'])) {
+      return false;
+    }
+    $reqUrl = $site_url . $parsedReqUri['path'];
     $downloadUrl = FileDownloadProvider::getBaseDownloadURL();
     $reqUrl = '/' !== \substr($reqUrl, -1) ? $reqUrl . '/' : $reqUrl;
     $downloadUrl = '/' !== \substr($downloadUrl, -1) ? $downloadUrl . '/' : $downloadUrl;
+
     switch ($reqUrl) {
       case $downloadUrl:{
         return true;

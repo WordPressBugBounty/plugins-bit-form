@@ -9,11 +9,11 @@ class RepeaterField
   public static function init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $formViewerInstance,  $nestedLayout, $error = null, $value = null)
   {
     $inputWrapper = new ClassicInputWrapper($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
-    $input = self::field($field, $rowID, $formID, $formViewerInstance, $nestedLayout, $form_atomic_Cls_map, $value);
+    $input = self::field($field, $rowID, $field_name, $formID, $formViewerInstance, $nestedLayout, $form_atomic_Cls_map, $value);
     return $inputWrapper->wrapper($input);
   }
 
-  private static function field($field, $rowID, $formID, $formViewerInstance, $nestedLayout, $form_atomic_Cls_map, $value)
+  private static function field($field, $rowID, $field_name, $formID, $formViewerInstance, $nestedLayout, $form_atomic_Cls_map, $value)
   {
     $fieldHelpers = new ClassicFieldHelpers($field, $rowID, $form_atomic_Cls_map);
 
@@ -28,6 +28,7 @@ class RepeaterField
           {$fieldHelpers->getCustomAttributes('rpt-add-btn')}
           class="{$fieldHelpers->getAtomicCls('rpt-add-btn')} {$fieldHelpers->getCustomClasses('rpt-add-btn')}"
           type="{$field->addBtn->btnTyp}"
+          data-parent-field-name="{$field->fieldName}"
         >
           {$addBtnPreIcn}
           {$fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->addBtn->txt))}
@@ -48,6 +49,7 @@ ADDBTN;
             {$fieldHelpers->getCustomAttributes('add-to-end-btn')}
             class="{$fieldHelpers->getAtomicCls('add-to-end-btn')} {$fieldHelpers->getCustomClasses('add-to-end-btn')}"
             type="{$field->addToEndBtn->btnTyp}"
+            data-parent-field-name="{$field->fieldName}"
           >
             {$addToEndBtnPreIcn}
             {$fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->addToEndBtn->txt))}
@@ -90,6 +92,7 @@ ADDTOENDBTN;
             {$fieldHelpers->getCustomAttributes('rpt-rmv-btn')}
             class="{$fieldHelpers->getAtomicCls('rpt-rmv-btn')} {$fieldHelpers->getCustomClasses('rpt-rmv-btn')}"
             type="{$field->removeBtn->btnTyp}"
+            data-parent-field-name="{$field->fieldName}"
           >
             {$removeBtnPreIcn}
             {$fieldHelpers->renderHTMR($field->removeBtn->txt)}

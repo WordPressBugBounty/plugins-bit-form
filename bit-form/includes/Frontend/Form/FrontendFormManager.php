@@ -205,9 +205,9 @@ final class FrontendFormManager extends FormManager
         if (true === $existAuthFilter) {
           $result = apply_filters('bf_wp_user_auth', $existAuth[0], $_POST, $parameter);
 
-          $result = apply_filters('bitform_filter_wp_user_auth_response', $result, $_POST, $parameter);
+          $result = apply_filters('bitform_filter_wp_user_auth_response', $result, $this->_form_id, $_POST, $parameter);
 
-          do_action('bitform_wp_user_auth_response', $result, $_POST, $parameter);
+          do_action('bitform_wp_user_auth_response', $result, $this->_form_id, $_POST, $parameter);
 
           if (isset($result['auth_type']) && 'register' === $result['auth_type']) {
             if (!$result['success']) {
