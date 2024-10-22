@@ -146,6 +146,9 @@ class ScriptFilePriorityManager
       'decision-box' => [
         ['priority' => 101, 'filename' => 'decisionFldHandle.min.js'],
       ],
+      'gdpr' => [
+        ['priority' => 101, 'filename' => 'decisionFldHandle.min.js'],
+      ],
       'signature' => [
         ['priority' => 201, 'filename' => 'customFieldsReset.min.js'],
         ['priority' => 301, 'filename' => 'bit-signature-field.min.js'],
@@ -461,6 +464,11 @@ class ScriptFilePriorityManager
           ]
         ],
         'decision-box' => [
+          'dcsnbxFldValidation' => [
+            'paths' => ['valid->req']
+          ]
+        ],
+        'gdpr' => [
           'dcsnbxFldValidation' => [
             'paths' => ['valid->req']
           ]

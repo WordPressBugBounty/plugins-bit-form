@@ -122,7 +122,7 @@ final class FrontendFormManager extends FormManager
         continue;
       }
       $fileUploadFieldTypes = ['file-up', 'advanced-file-up'];
-      if ('decision-box' === $fieldType) {
+      if ('decision-box' === $fieldType || 'gdpr' === $fieldType) {
         continue;
       }
       $isFileType = in_array($fieldType, $fileUploadFieldTypes);

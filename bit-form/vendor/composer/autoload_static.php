@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitf129f55930c506f5f820f5542c50b7e4
+class ComposerStaticInit03e400230f83bb1d8eebb00492bc88f4
 {
     public static $prefixLengthsPsr4 = array (
         'e' => 
@@ -281,6 +281,7 @@ class ComposerStaticInitf129f55930c506f5f820f5542c50b7e4
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\DecisionBoxField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/DecisionBoxField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\DropdownField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/DropdownField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\FileUploadField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/FileUploadField.php',
+        'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\GDPRAgreementField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/GDPRAgreementField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\HtmlSelectField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/HtmlSelectField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\ImageSelectField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/ImageSelectField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\PayPalField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/PayPalField.php',
@@ -311,6 +312,7 @@ class ComposerStaticInitf129f55930c506f5f820f5542c50b7e4
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\DividerField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/DividerField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\DropdownField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/DropdownField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\FileUploadField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/FileUploadField.php',
+        'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\GDPRAgreementField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/GDPRAgreementField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\HTMLField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/HTMLField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\HtmlSelectField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/HtmlSelectField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\ImageField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/ImageField.php',
@@ -376,9 +378,9 @@ class ComposerStaticInitf129f55930c506f5f820f5542c50b7e4
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitf129f55930c506f5f820f5542c50b7e4::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitf129f55930c506f5f820f5542c50b7e4::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitf129f55930c506f5f820f5542c50b7e4::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit03e400230f83bb1d8eebb00492bc88f4::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit03e400230f83bb1d8eebb00492bc88f4::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit03e400230f83bb1d8eebb00492bc88f4::$classMap;
 
         }, null, ClassLoader::class);
     }

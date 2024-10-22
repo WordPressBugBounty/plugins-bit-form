@@ -1975,6 +1975,10 @@ $i18n_strings = array(
 
     'Allowed File Type:' => __('Allowed File Type:', 'bit-form'),
 
+    'Edit GDPR Concent label by clicking on edit icon' => __('Edit GDPR Concent label by clicking on edit icon', 'bit-form'),
+
+    'Edit GDPR Concent Label' => __('Edit GDPR Concent Label', 'bit-form'),
+
     'Edit the HTML field content by clicking on edit icon' => __('Edit the HTML field content by clicking on edit icon', 'bit-form'),
 
     'Add/Edit Options' => __('Add/Edit Options', 'bit-form'),
@@ -2081,9 +2085,11 @@ $i18n_strings = array(
 
     'Save Step Progress' => __('Save Step Progress', 'bit-form'),
 
-    'PayPal Dyanmic Amount Field is not Selected' => __('PayPal Dyanmic Amount Field is not Selected', 'bit-form'),
+    'PayPal Dynamic Amount Field is not Selected' => __('PayPal Dynamic Amount Field is not Selected', 'bit-form'),
 
     'PayPal Fixed Amount is not valid' => __('PayPal Fixed Amount is not valid', 'bit-form'),
+
+    'PayPal Plan Id missing' => __('PayPal Plan Id missing', 'bit-form'),
 
     'Subscription:' => __('Subscription:', 'bit-form'),
 
@@ -2842,6 +2848,12 @@ $i18n_strings = array(
     'Integrations' => __('Integrations', 'bit-form'),
 
     'Available Integrations' => __('Available Integrations', 'bit-form'),
+
+    'GDPR Agreement' => __('GDPR Agreement', 'bit-form'),
+
+    'I consent to having this website store my submitted information so they can respond to my inquiry. Learn more in' => __('I consent to having this website store my submitted information so they can respond to my inquiry. Learn more in', 'bit-form'),
+
+    'Our Privacy Policy.' => __('Our Privacy Policy.', 'bit-form'),
 
     'Text' => __('Text', 'bit-form'),
 

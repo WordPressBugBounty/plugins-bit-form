@@ -11,6 +11,7 @@ use BitCode\BitForm\Frontend\Form\View\Theme\Fields\DecisionBoxField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\DividerField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\DropdownField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\FileUploadField;
+use BitCode\BitForm\Frontend\Form\View\Theme\Fields\GDPRAgreementField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\HTMLField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\HtmlSelectField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\ImageField;
@@ -129,6 +130,8 @@ INPUTWRAPPER;
       case 'decision-box':
         // return $this->decisionBox($field, $rowID, $field_name, $formID, $error, $value);
         return DecisionBoxField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+      case 'gdpr':
+        return GDPRAgreementField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'html':
         // return $this->html($field, $rowID, $field_name, $formID, $error, $value);
         return HTMLField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);

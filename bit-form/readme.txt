@@ -1,7 +1,7 @@
 === Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder ===
 Plugin Name: Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder
-Version: 2.15.4
-Stable tag: 2.15.4
+Version: 2.16.0
+Stable tag: 2.16.0
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin 
@@ -182,6 +182,7 @@ Quickly personalize your WordPress forms using Bit Form's built-in style editor.
 - [Month Field](https://bitapps.pro/docs/bit-form/form-fields/month-field/)
 - [URL Field](https://bitapps.pro/docs/bit-form/form-fields/url-field/)
 - [Color Picker Field](https://bitapps.pro/docs/bit-form/form-fields/color-picker-field/)
+- [GDPR Agreement](https://bitapps.pro/docs/bit-form/form-fields/gdpr-agreement-field/)
 - [Decision Box Field](https://bitapps.pro/docs/bit-form/form-fields/decision-box-field/)
 - [reCaptcha v2 Field](https://bitapps.pro/docs/bit-form/form-fields/recaptcha-v2-field/)
 - [Button](https://bitapps.pro/docs/bit-form/form-fields/button-field/)
@@ -539,6 +540,15 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 6. Response table to view form entries
 
 == Changelog ==
+= 2.16.0 =
+*Release Date: 22 October, 2024*
+*New:
+    1. Added GDPR Agreement Field: Utilize this field to obtain user consent for data processing and storage in compliance with GDPR regulations.
+*Improvement:
+    1. Updated the default style of the Image Select Field for improved appearance.
+*Fix:
+    1. Resolved issues with PayPal Plan ID and invalid amount value.
+
 = 2.15.4 =
 *Release Date: 17 October, 2024*
 *New:
