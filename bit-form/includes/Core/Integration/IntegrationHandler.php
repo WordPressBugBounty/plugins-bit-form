@@ -451,12 +451,13 @@ final class IntegrationHandler
       $repeaterField[] = $key;
     }
 
-    // put the value of the child key to the parent repeater field
+    // put the value of the child key to the parent repeater field\
     foreach ($repeaterField as $key) {
       list($parentKey, $childKey) = explode('.', $key);
-      $repeatValues = $fieldValues[$parentKey];
+      $repeatValues = isset($fieldValues[$parentKey]) ? $fieldValues[$parentKey] : $key;
 
       if (!is_array($repeatValues)) {
+        $fieldValues[$key] = $fieldValues[$childKey];
         continue;
       }
 

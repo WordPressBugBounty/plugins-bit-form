@@ -89,8 +89,9 @@ RADIOBOXOPTIONS;
     }
 
     //Other Option
+    $other = __('Other...', 'bit-form');
     $optCount = property_exists($field, 'opt') ? count($field->opt) : 0;
-    $inputPh = isset($field->otherInpPh) ? $field->otherInpPh : 'Other...';
+    $inputPh = isset($field->otherInpPh) ? $field->otherInpPh : $other;
     $inpReq = isset($field->valid->otherOptReq) ? ($field->valid->otherOptReq ? 'required' : '') : '';
     if (property_exists($field, 'addOtherOpt') && $field->addOtherOpt) {
       $radioBoxOptions .= <<<RADIOBOXOPTIONS
@@ -127,7 +128,7 @@ RADIOBOXOPTIONS;
           {$fieldHelpers->getCustomAttributes('ct')}
           class="{$fieldHelpers->getAtomicCls('ct')} {$fieldHelpers->getCustomClasses('ct')}"
         >
-          Other..
+    {$other}
         </span>
       </label>
       <div data-oinp-wrp class="{$fieldHelpers->getAtomicCls('other-inp-wrp')}">

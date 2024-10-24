@@ -96,6 +96,7 @@ CHECKBOXOPTIONS;
     $optCount = property_exists($field, 'opt') ? count($field->opt) : 0;
     $inputPh = isset($field->otherInpPh) ? "placeholder='{$fieldHelpers->esc_attr($field->otherInpPh)}'" : "placeholder='Other...'";
     $inpReq = isset($field->valid->otherOptReq) ? ($field->valid->otherOptReq ? 'required' : '') : '';
+    $other = __('Other...', 'bit-form');
     if (property_exists($field, 'addOtherOpt') && $field->addOtherOpt) {
       $checkBoxOptions .= <<<CHECKBOXOPTIONS
       <div
@@ -130,7 +131,7 @@ CHECKBOXOPTIONS;
               {$fieldHelpers->getCustomAttributes('ct')}
               class="{$fieldHelpers->getAtomicCls('ct')} {$fieldHelpers->getCustomClasses('ct')}"
             >
-              Other..
+             {$other}
             </span>
           </label>
           <div data-oinp-wrp class="{$fieldHelpers->getAtomicCls('other-inp-wrp')}">

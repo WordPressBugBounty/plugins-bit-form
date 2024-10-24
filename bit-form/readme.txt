@@ -1,7 +1,7 @@
 === Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder ===
 Plugin Name: Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder
-Version: 2.16.0
-Stable tag: 2.16.0
+Version: 2.16.1
+Stable tag: 2.16.1
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin 
@@ -540,6 +540,14 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 6. Response table to view form entries
 
 == Changelog ==
+= 2.16.1 =
+*Release Date: 24 October, 2024*
+*Improvements:
+    1. Added a new field in the builder to assign the position of a field before the submit button.
+    2. Updated translation strings for "Other..." option in checkbox and radio fields.
+*Fix:
+    1. Resolved issues with Google Sheets integration when using repeater or section fields.
+
 = 2.16.0 =
 *Release Date: 22 October, 2024*
 *New:

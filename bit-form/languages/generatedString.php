@@ -3371,7 +3371,7 @@ $i18n_strings = array(
 
     'Please upgrade to the PRO plan to unlock all these awesome features.' => __('Please upgrade to the PRO plan to unlock all these awesome features.', 'bit-form'),
 
-    'Upgrade to Pro' => __('Upgrade to Pro', 'bit-form'),
+    'Get 40% OFF, Halloween Special!' => __('Get 40% OFF, Halloween Special!', 'bit-form'),
 
     'Try Demo' => __('Try Demo', 'bit-form'),
 
