@@ -1665,6 +1665,8 @@ $i18n_strings = array(
 
     'What\'s New' => __('What\'s New', 'bit-form'),
 
+    'Grab it Now' => __('Grab it Now', 'bit-form'),
+
     'For more details,' => __('For more details,', 'bit-form'),
 
     'Click here' => __('Click here', 'bit-form'),

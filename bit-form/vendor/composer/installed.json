@@ -56,17 +56,17 @@
         },
         {
             "name": "bitapps/wp-telemetry",
-            "version": "v0.0.8",
-            "version_normalized": "0.0.8.0",
+            "version": "v0.0.9",
+            "version_normalized": "0.0.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Bit-Apps-Pro/wp-telemetry.git",
-                "reference": "efa19cfc72e6325889e6bcd78bdd45556f9aa1a8"
+                "reference": "6d9f5577396fe5e0ee96a7c9f05838d9f47e8721"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Bit-Apps-Pro/wp-telemetry/zipball/efa19cfc72e6325889e6bcd78bdd45556f9aa1a8",
-                "reference": "efa19cfc72e6325889e6bcd78bdd45556f9aa1a8",
+                "url": "https://api.github.com/repos/Bit-Apps-Pro/wp-telemetry/zipball/6d9f5577396fe5e0ee96a7c9f05838d9f47e8721",
+                "reference": "6d9f5577396fe5e0ee96a7c9f05838d9f47e8721",
                 "shasum": ""
             },
             "require": {
@@ -78,7 +78,7 @@
                 "phpcompatibility/php-compatibility": "*",
                 "squizlabs/php_codesniffer": "*"
             },
-            "time": "2024-06-01T10:06:19+00:00",
+            "time": "2024-10-09T10:08:11+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
