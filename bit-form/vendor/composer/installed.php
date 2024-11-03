@@ -1,11 +1,11 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '2.16.2.x-dev',
-        'version' => '2.16.2.9999999-dev',
+        'pretty_version' => '2.16.3.x-dev',
+        'version' => '2.16.3.9999999-dev',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '0b7827209ab016824237c88e47b28317fe3b1e53',
+        'reference' => '5132b20ed395e58a55d3c73b756b3d840f810164',
         'name' => 'bitcode/bitform',
         'dev' => false,
     ),
@@ -29,12 +29,12 @@
             'dev_requirement' => false,
         ),
         'bitcode/bitform' => array(
-            'pretty_version' => '2.16.2.x-dev',
-            'version' => '2.16.2.9999999-dev',
+            'pretty_version' => '2.16.3.x-dev',
+            'version' => '2.16.3.9999999-dev',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '0b7827209ab016824237c88e47b28317fe3b1e53',
+            'reference' => '5132b20ed395e58a55d3c73b756b3d840f810164',
             'dev_requirement' => false,
         ),
         'enshrined/svg-sanitize' => array(
