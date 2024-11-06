@@ -41,7 +41,7 @@ $i18n_strings = array(
 
     'Save' => __('Save', 'bit-form'),
 
-    'Cloudflare Turnstile reCAPTCHA' => __('Cloudflare Turnstile reCAPTCHA', 'bit-form'),
+    'Cloudflare Turnstile CAPTCHA' => __('Cloudflare Turnstile CAPTCHA', 'bit-form'),
 
     'To get Site Key and Secret, Please Visit' => __('To get Site Key and Secret, Please Visit', 'bit-form'),
 
@@ -1633,6 +1633,8 @@ $i18n_strings = array(
 
     'API Integration' => __('API Integration', 'bit-form'),
 
+    'Learn more about Bit Form API' => __('Learn more about Bit Form API', 'bit-form'),
+
     'Domain URL' => __('Domain URL', 'bit-form'),
 
     'API Key' => __('API Key', 'bit-form'),
@@ -2575,6 +2577,8 @@ $i18n_strings = array(
 
     'CPT added successfully, refresh your window' => __('CPT added successfully, refresh your window', 'bit-form'),
 
+    'Learn more about CPT Integration' => __('Learn more about CPT Integration', 'bit-form'),
+
     'Post Type Slug *' => __('Post Type Slug *', 'bit-form'),
 
     'Singular Label *' => __('Singular Label *', 'bit-form'),
@@ -2808,6 +2812,8 @@ $i18n_strings = array(
     'save failed. please try again' => __('save failed. please try again', 'bit-form'),
 
     'Google Ads' => __('Google Ads', 'bit-form'),
+
+    'Learn more about Google Ads configuration' => __('Learn more about Google Ads configuration', 'bit-form'),
 
     'Client ID' => __('Client ID', 'bit-form'),
 
@@ -3068,6 +3074,8 @@ $i18n_strings = array(
     'Go to PDF Settings' => __('Go to PDF Settings', 'bit-form'),
 
     'Please configure PDF settings first.' => __('Please configure PDF settings first.', 'bit-form'),
+
+    'Learn more about PDF Attachment' => __('Learn more about PDF Attachment', 'bit-form'),
 
     'This global settings will be set as the default for any new PDF attachment generated from your forms.' => __('This global settings will be set as the default for any new PDF attachment generated from your forms.', 'bit-form'),
 
@@ -3371,7 +3379,7 @@ $i18n_strings = array(
 
     'Please upgrade to the PRO plan to unlock all these awesome features.' => __('Please upgrade to the PRO plan to unlock all these awesome features.', 'bit-form'),
 
-    'Get 40% OFF, Halloween Special!' => __('Get 40% OFF, Halloween Special!', 'bit-form'),
+    'Upgrade to Pro' => __('Upgrade to Pro', 'bit-form'),
 
     'Try Demo' => __('Try Demo', 'bit-form'),
 
@@ -3571,6 +3579,10 @@ $i18n_strings = array(
 
     'Form Name' => __('Form Name', 'bit-form'),
 
+    'Entries' => __('Entries', 'bit-form'),
+
+    'Preview' => __('Preview', 'bit-form'),
+
     'Short Code' => __('Short Code', 'bit-form'),
 
     'Views' => __('Views', 'bit-form'),
@@ -3582,8 +3594,6 @@ $i18n_strings = array(
     'Created' => __('Created', 'bit-form'),
 
     'Edit Form' => __('Edit Form', 'bit-form'),
-
-    'Entries' => __('Entries', 'bit-form'),
 
     'Conditional Logic' => __('Conditional Logic', 'bit-form'),
 
