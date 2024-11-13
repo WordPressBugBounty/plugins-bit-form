@@ -135,7 +135,8 @@ class Hooks
   {
     $links[] = '<a href="https://bitapps.pro/docs/bit-form/" target="_blank">' . __('Docs') . '</a>';
     if (!Utilities::isPro()) {
-      $links[] = '<a href="https://www.bitapps.pro/bit-form" target="_blank"><strong>' . __('Upgrade to Pro') . '</strong></a>';
+      // $links[] = '<a href="https://www.bitapps.pro/bit-form" target="_blank"><strong>' . __('Upgrade to Pro') . '</strong></a>';
+      $links[] = '<a href="https://bitapps.pro/wordpress-black-friday-discounts/" target="_blank"><strong>' . __('Get 50% Off! Black Friday Deal.') . '</strong></a>';
     }
     return $links;
   }

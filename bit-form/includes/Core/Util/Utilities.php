@@ -68,6 +68,33 @@ final class Utilities
     return $css;
   }
 
+  public static function convertToCSS(array $styles): string
+  {
+    $css = '';
+
+    foreach ($styles as $selector => $properties) {
+      $css .= "$selector{";
+
+      // Check if the properties are an array, meaning it's a nested rule (e.g., media queries, keyframes)
+      if (is_array($properties)) {
+        // If it's a nested array (media query or keyframe), recursively handle it
+        foreach ($properties as $property => $value) {
+          if (is_array($value)) {
+            // Recursively process nested arrays (media queries, keyframes, etc.)
+            $css .= self::convertToCSS([$property => $value]);
+          } else {
+            // Regular CSS property
+            $css .= "$property:$value;";
+          }
+        }
+      }
+
+      $css .= '}';
+    }
+
+    return $css;
+  }
+
   public static function appendCSS($formId, $css, $mode = 'a')
   {
     $fileName = '';

@@ -166,6 +166,84 @@ class StylesFallback
   }
 
   /**
+   *  for adding fallback styles in form staticStyles object
+   *
+   * @return void
+   */
+  public function addStaticStyleForMultiStepForm(): void
+  {
+    $stylesArray = [
+      '._frm-__fk__-stp-hdr-wrpr' => [
+        'flex-wrap' => 'wrap',
+      ],
+      '@media (max-width: 576px)' => [
+        '._frm-__fk__-stp-hdr-lbl' => [
+          'font-size' => '12px',
+        ],
+        '._frm-__fk__-stp-hdr-sub-titl' => [
+          'display' => 'none',
+        ],
+        '._frm-__fk__-stp-progress-bar' => [
+          'font-size'=> '.65rem',
+          'height'   => '.8rem'
+        ],
+      ],
+    ];
+    $formModel = new FormModel();
+    $forms = $formModel->get(
+      ['id', 'form_content', 'builder_helper_state']
+    );
+
+    if (is_wp_error($forms)) {
+      return;
+    }
+    foreach ($forms as $form) {
+      $hasStyleChanged = false;
+      $formId = $form->id;
+      $builderHelperState = json_decode($form->builder_helper_state);
+      if (empty($builderHelperState->staticStyles)) {
+        continue;
+      }
+      $staticStyleState = $builderHelperState->staticStyles;
+      $staticStyleState = Jcof::parse($staticStyleState);
+
+      $formContent = json_decode($form->form_content);
+      $layouts = $formContent->layout;
+      if (!is_array($layouts)) {
+        continue;
+      }
+
+      foreach ($layouts as $layout) {
+        if (!isset($staticStyleState['staticStyles'])) {
+          $staticStyleState['staticStyles'] = [];
+        }
+
+        $newStyles = self::replaceKeys($stylesArray, '__fk__', "b{$formId}");
+
+        $staticStyleState['staticStyles'] = array_merge($staticStyleState['staticStyles'], $newStyles);
+
+        $generatedStyleCSS = Utilities::convertToCSS($newStyles);
+        Utilities::appendCSS($formId, $generatedStyleCSS);
+        $hasStyleChanged = true;
+      }
+
+      if (!$hasStyleChanged) {
+        continue;
+      }
+      $staticStyleState = Jcof::stringify($staticStyleState);
+      $builderHelperState->staticStyles = $staticStyleState;
+      $formModel->update(
+        [
+          'builder_helper_state' => wp_json_encode($builderHelperState),
+        ],
+        [
+          'id' => $formId,
+        ]
+      );
+    }
+  }
+
+  /**
    * @method for replacing __fk__ with field key in styles array keys
    * @example: .__fk__-stripe-btn:disabled to .bk-1-stripe-btn:disabled
    *
@@ -200,4 +278,18 @@ class StylesFallback
 
   //   $this->addStyles('signature', $signatureIframeStyle);
   // }
+
+  public static function replaceKeys(array $styles, string $search, string $replace): array
+  {
+    $updatedStyles = [];
+    foreach ($styles as $key => $value) {
+      $newKey = str_replace($search, $replace, $key);
+
+      if (is_array($value)) {
+        $value = self::replaceKeys($value, $search, $replace);
+      }
+      $updatedStyles[$newKey] = $value;
+    }
+    return $updatedStyles;
+  }
 }

@@ -54,6 +54,8 @@ class FieldHelpers
       'title'           => true,
       'style'           => true,
     ];
+
+    $allowed_html['style'] = true;
     return wp_kses($title, $allowed_html);
   }
 

@@ -1667,6 +1667,8 @@ $i18n_strings = array(
 
     'What\'s New' => __('What\'s New', 'bit-form'),
 
+    'Get Black Friday Deal!' => __('Get Black Friday Deal!', 'bit-form'),
+
     'For more details,' => __('For more details,', 'bit-form'),
 
     'Click here' => __('Click here', 'bit-form'),
@@ -3379,7 +3381,7 @@ $i18n_strings = array(
 
     'Please upgrade to the PRO plan to unlock all these awesome features.' => __('Please upgrade to the PRO plan to unlock all these awesome features.', 'bit-form'),
 
-    'Upgrade to Pro' => __('Upgrade to Pro', 'bit-form'),
+    'Get 50% Off! Black Friday Deal.' => __('Get 50% Off! Black Friday Deal.', 'bit-form'),
 
     'Try Demo' => __('Try Demo', 'bit-form'),
 
