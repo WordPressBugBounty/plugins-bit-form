@@ -29,7 +29,7 @@ if (!defined('ABSPATH') && !defined('BITFORMS_ASSET_URI')) {
   ._frm-bg-b<?php echo esc_html($formID);
 
 ?> {
-    width: 961px;
+    width: min(961px, 95%);
     margin-block: 100px;
   }
   </style>

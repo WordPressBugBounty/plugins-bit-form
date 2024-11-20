@@ -11,6 +11,7 @@ use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\DateTimeHelper;
 use BitCode\BitForm\Core\Util\FileDownloadProvider;
 use BitCode\BitForm\Core\Util\IpTool;
+use BitCode\BitForm\Core\Util\Utilities;
 use WP_Admin_Bar;
 
 class Admin_Bar
@@ -41,10 +42,10 @@ class Admin_Bar
     global $submenu;
 
     $capability = apply_filters('bitforms_form_access_capability', 'manage_options');
-
+    $menuTitle = Utilities::isPro() ? 'Bit Form Pro' : 'Bit Form';
     add_menu_page(
       __('Bit Form - Most advanced form builder and database management system', 'bit-form'),
-      'Bit Form',
+      $menuTitle,
       $capability,
       'bitform',
       [$this, 'RootPage'],
@@ -317,6 +318,7 @@ class Admin_Bar
       'downloadedPdfFonts'  => is_array(get_option('bitforms_pdf_fonts')) ? get_option('bitforms_pdf_fonts') : [],
       'permission'          => empty(get_option('bitforms_allow_tracking')) ? false : true,
       'templatePath'        => BITFORMS_ROOT_URI . '/static/templates',
+      'serverInfo'          => ['php_version' => phpversion(), 'engine' => $_SERVER['SERVER_SOFTWARE'], 'wp_version' => get_bloginfo('version'), 'loaded_extensions' => get_loaded_extensions()],
     ];
 
     $isMigratingToV2 = get_option('bitforms_migrating_to_v2', false);

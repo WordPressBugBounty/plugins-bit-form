@@ -2857,12 +2857,6 @@ $i18n_strings = array(
 
     'Available Integrations' => __('Available Integrations', 'bit-form'),
 
-    'GDPR Agreement' => __('GDPR Agreement', 'bit-form'),
-
-    'I consent to having this website store my submitted information so they can respond to my inquiry. Learn more in' => __('I consent to having this website store my submitted information so they can respond to my inquiry. Learn more in', 'bit-form'),
-
-    'Our Privacy Policy.' => __('Our Privacy Policy.', 'bit-form'),
-
     'Text' => __('Text', 'bit-form'),
 
     'Placeholder...' => __('Placeholder...', 'bit-form'),
@@ -2909,6 +2903,10 @@ $i18n_strings = array(
 
     'Enter Phone Number' => __('Enter Phone Number', 'bit-form'),
 
+    'First Name' => __('First Name', 'bit-form'),
+
+    'Last Name' => __('Last Name', 'bit-form'),
+
     'Username' => __('Username', 'bit-form'),
 
     'e.g. John Doe' => __('e.g. John Doe', 'bit-form'),
@@ -2941,6 +2939,12 @@ $i18n_strings = array(
 
     'https://www.example.com' => __('https://www.example.com', 'bit-form'),
 
+    'GDPR Agreement' => __('GDPR Agreement', 'bit-form'),
+
+    'I consent to having this website store my submitted information so they can respond to my inquiry. Learn more in' => __('I consent to having this website store my submitted information so they can respond to my inquiry. Learn more in', 'bit-form'),
+
+    'Our Privacy Policy.' => __('Our Privacy Policy.', 'bit-form'),
+
     'Decision Box' => __('Decision Box', 'bit-form'),
 
     'reCaptcha v2' => __('reCaptcha v2', 'bit-form'),
@@ -2972,6 +2976,8 @@ $i18n_strings = array(
     'Pay now' => __('Pay now', 'bit-form'),
 
     'Pay with Mollie' => __('Pay with Mollie', 'bit-form'),
+
+    'Shortcode' => __('Shortcode', 'bit-form'),
 
     'Button' => __('Button', 'bit-form'),
 
@@ -3084,6 +3090,10 @@ $i18n_strings = array(
     'Remember,' => __('Remember,', 'bit-form'),
 
     'If you haven\'t used PDFs yet, you\'ll need to click the "Save" button to apply these global PDF settings. You can also customize settings for a specific PDF template by accessing the PDF templates in your form settings.' => __('If you haven\'t used PDFs yet, you\'ll need to click the "Save" button to apply these global PDF settings. You can also customize settings for a specific PDF template by accessing the PDF templates in your form settings.', 'bit-form'),
+
+    'Please update your PHP version is 7.4 or higher.' => __('Please update your PHP version is 7.4 or higher.', 'bit-form'),
+
+    'PHP extension is missing in your server. Please install it.' => __('PHP extension is missing in your server. Please install it.', 'bit-form'),
 
     'Upload' => __('Upload', 'bit-form'),
 

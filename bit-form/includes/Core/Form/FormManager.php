@@ -654,7 +654,7 @@ class FormManager
           $wpdb->query('ROLLBACK');
           return new WP_Error('insert_error', __('Sorry, Error occured in saving form entry data', 'bit-form'));
         }
-        do_action('bitform_after_save_entry_success', $this, $submitted_data, $entry_id);
+        do_action('bitform_after_save_entry_success', $this, $submitted_data, $this->form_id, $entry_id);
       } else {
         $wpdb->query('ROLLBACK');
       }

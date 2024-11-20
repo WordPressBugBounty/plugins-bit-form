@@ -20,6 +20,8 @@ class ShortcodeField
     $content = wp_kses_post(FieldValueHandler::replaceSmartTagWithValue($content));
     $content = do_shortcode($content);
 
+    $content = self::filterShortCodeContent($content, $formID, $rowID);
+
     return <<<SHORTCODEFIELD
     <div
       {$fieldHelpers->getCustomAttributes('fld-wrp')}
@@ -28,5 +30,13 @@ class ShortcodeField
       {$content}
     </div>
 SHORTCODEFIELD;
+  }
+
+  private static function filterShortCodeContent($content, $formID, $fieldKey)
+  {
+    if (has_filter('bitform_filter_sortcode_content')) {
+      $content = apply_filters('bitform_filter_sortcode_content', $content, $formID, $fieldKey);
+    }
+    return $content;
   }
 }

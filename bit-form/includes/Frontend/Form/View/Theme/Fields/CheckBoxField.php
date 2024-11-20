@@ -94,9 +94,9 @@ CHECKBOXOPTIONS;
 
     //Other Option
     $optCount = property_exists($field, 'opt') ? count($field->opt) : 0;
-    $inputPh = isset($field->otherInpPh) ? "placeholder='{$fieldHelpers->esc_attr($field->otherInpPh)}'" : "placeholder='Other...'";
     $inpReq = isset($field->valid->otherOptReq) ? ($field->valid->otherOptReq ? 'required' : '') : '';
     $other = __('Other...', 'bit-form');
+    $inputPh = isset($field->otherInpPh) ? "placeholder='{$fieldHelpers->esc_attr($field->otherInpPh)}'" : "placeholder='{$other}'";
     if (property_exists($field, 'addOtherOpt') && $field->addOtherOpt) {
       $checkBoxOptions .= <<<CHECKBOXOPTIONS
       <div

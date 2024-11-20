@@ -1,7 +1,7 @@
 === Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder ===
 Plugin Name: Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder
-Version: 2.16.5
-Stable tag: 2.16.5
+Version: 2.17.0
+Stable tag: 2.17.0
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin 
@@ -173,6 +173,8 @@ Quickly personalize your WordPress forms using Bit Form's built-in style editor.
 - [Checkbox Field](https://bitapps.pro/docs/bit-form/form-fields/checkbox-field/)
 - [Dropdown Field](https://bitapps.pro/docs/bit-form/form-fields/drop-down-field/)
 - [File Upload Field](https://bitapps.pro/docs/bit-form/form-fields/file-upload-field/)
+- [First Name Field](https://bitapps.pro/docs/bit-form/form-fields/first-name-field/)
+- [Last Name Field](https://bitapps.pro/docs/bit-form/form-fields/last-name-field/)
 - [Username Field](https://bitapps.pro/docs/bit-form/form-fields/username-field/)
 - [Password Field](https://bitapps.pro/docs/bit-form/form-fields/password-field/)
 - [Date Field](https://bitapps.pro/docs/bit-form/form-fields/date-field/)
@@ -201,6 +203,7 @@ Quickly personalize your WordPress forms using Bit Form's built-in style editor.
 - [Rating Field](https://bitapps.pro/docs/bit-form/form-fields/rating-field/)
 - [Image Select Field](https://bitapps.pro/docs/bit-form/form-fields/image-select-field/)
 - [Turnstile Field](https://bitapps.pro/docs/bit-form/form-fields/cloudflare-turnstile-integrations/)
+- [Shortcode Field](https://bitapps.pro/docs/bit-form/form-fields/shortcode-field/)
 - [Draft Button](https://bitapps.pro/docs/bit-form/form-abandonment/#setup-save-draft-button)
 - [Next Button](https://bitapps.pro/docs/bit-form/form-fields/next-step-field/)
 - [Previous Button](https://bitapps.pro/docs/bit-form/form-fields/previous-step-field/)
@@ -540,13 +543,24 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 6. Response table to view form entries
 
 == Changelog ==
+= 2.17.0 =
+*Release Date: 19 November, 2024*
+*New:
+    1. Added new fields: First Name, Last Name, and Shortcode.
+    2. Include the "Job Application" form template.
+*Improvements:
+    1. Enhanced UI: Added labels to section navigation in the top bar of the form builder.
+*Fix:
+    1. Resolved invalid placeholder image link issue on initial load in the image field.
+
+
 = 2.16.5 =
 *Release Date: 12 November, 2024*
-Improvements:
+*Improvements:
     1. Allow <style> tag usage in the HTML field.
     2. Add advanced file upload field styling in conversational forms.
     3. Improve responsiveness for multi-step forms.
-Fixes:
+*Fixes:
     1. Fix scrolling issue in the custom field options.
     2. Resolve blank page issue when opening the custom styling modal.
 
