@@ -333,6 +333,12 @@ class Admin_Bar
     $changelogVersion = get_option('bitforms_changelog_version', '0.0.0');
     $bits['changelogVersion'] = $changelogVersion;
 
+    $hideAnnouncementModal = (bool) get_option('bitforms_hide_announcement', false);
+    $bits['hideAnnouncementModal'] = $hideAnnouncementModal;
+
+    $hideCashbackModal = (bool) get_option('bitforms_hide_cashback', false);
+    $bits['hideCashbackModal'] = $hideCashbackModal;
+
     global $wpdb;
     $hasV1FormTable = $wpdb->get_var("SHOW TABLES LIKE '{$wpdb->prefix}bitforms_form_v1'");
     if ($hasV1FormTable) {

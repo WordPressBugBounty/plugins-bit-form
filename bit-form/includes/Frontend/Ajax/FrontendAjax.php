@@ -68,7 +68,7 @@ final class FrontendAjax
       $FrontendFormManager = new FrontendFormManager($form_id);
       $updateStatus = $FrontendFormManager->handleUpdateEntry();
       if (is_wp_error($updateStatus)) {
-        do_action('bitform_update_entry', $form_id, $updateStatus);
+        do_action('bitform_update_error', $form_id, $updateStatus);
         wp_send_json_error($updateStatus->get_error_message(), 400);
       } else {
         wp_send_json_success($updateStatus);

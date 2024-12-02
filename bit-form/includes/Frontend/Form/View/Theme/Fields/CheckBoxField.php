@@ -47,7 +47,11 @@ class CheckBoxField
         }
         if ($fieldHelpers->property_exists_nested($field, 'valid->disabled', true)
         || $fieldHelpers->property_exists_nested($opt, 'disabled', true)) {
-          $disabled = "disabled='disabled'";
+          $disabled = 'disabled';
+        }
+
+        if (isset($field->mx) && !empty($field->valid->disableOnMax) && !$check && ((int) $field->mx <= count($defaultValues))) {
+          $disabled = 'disabled';
         }
 
         $checkBoxOptions .= <<<CHECKBOXOPTIONS

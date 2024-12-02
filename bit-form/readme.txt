@@ -1,7 +1,7 @@
 === Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder ===
 Plugin Name: Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder
-Version: 2.17.0
-Stable tag: 2.17.0
+Version: 2.17.1
+Stable tag: 2.17.1
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin 
@@ -543,6 +543,21 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 6. Response table to view form entries
 
 == Changelog ==
+= 2.17.1 =
+*Release Date: 12 December, 2024*
+*New:
+    1. Introduced a new action hook for custom payment gateway compatibility.
+
+*Improvements:
+    1. Added "Default Phone Number" field setting in the Phone Number field.
+    2. Enhanced the Builder History feature for Section, Repeater fields and Multi step form.
+    3. Introduced the "manage_bitform" capability for user role management.
+
+*Fix:
+    1. Resolved the duplicate entry issue with Razorpay.
+    2. Fixed the Signature field image issue in PDF attachments.
+    3. Addressed the issue where empty Date fields were replaced with the current date and time.
+
 = 2.17.0 =
 *Release Date: 19 November, 2024*
 *New:

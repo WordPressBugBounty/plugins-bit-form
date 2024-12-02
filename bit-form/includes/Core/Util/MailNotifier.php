@@ -31,9 +31,9 @@ final class MailNotifier
       }
 
       if (class_exists('\BitCode\BitFormPro\Admin\AppSetting\Pdf')) {
+        $serverPath = BITFORMS_UPLOAD_DIR . DIRECTORY_SEPARATOR;
+        $pdfBody = FieldValueHandler::changeImagePathInHTMLString($pdfBody, $serverPath);
         $generatedPdf = Pdf::getInstance()->generator($pdfSetting, $pdfBody, $path, $entryID, 'F');
-
-        // $pdfFile = $path . DIRECTORY_SEPARATOR . $fileName . '.pdf';
 
         if (!is_wp_error($generatedPdf) && file_exists($generatedPdf)) {
           $attachments[] = $generatedPdf;
@@ -57,9 +57,11 @@ final class MailNotifier
           (new MailConfig())->sendMail(['from_name' => $from_name]);
           $mailSubject = FieldValueHandler::replaceFieldWithValue($mailTemplate[0]->sub, $fieldValue);
           $mailBody = FieldValueHandler::replaceFieldWithValue($mailTemplate[0]->body, $fieldValue);
-
+          $webUrl = BITFORMS_UPLOAD_BASE_URL . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;
+          $mailBody = FieldValueHandler::changeImagePathInHTMLString($mailBody, $webUrl);
           $mailHeaders = [
-            // "Content-Type: text/html; charset=UTF-8",
+            // 'Content-Type: text/html; charset=UTF-8',
+            // $embeddedMailHeader
           ];
           if (!empty($notifyDetails->replyto)) {
             $mailReplyTo = FieldValueHandler::validateMailArry($notifyDetails->replyto, $fieldValue);

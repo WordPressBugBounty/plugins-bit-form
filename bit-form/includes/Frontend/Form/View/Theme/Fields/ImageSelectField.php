@@ -50,6 +50,11 @@ class ImageSelectField
           $checked = 'checked';
         }
 
+        if ($fieldHelpers->property_exists_nested($field, 'valid->disabled', true)
+        || $fieldHelpers->property_exists_nested($opt, 'disabled', true)) {
+          $disabled = 'disabled';
+        }
+
         if (isset($field->mx) && !empty($field->valid->disableOnMax) && !$checked && ((int) $field->mx <= count($defaultValues))) {
           $disabled = 'disabled';
         }

@@ -40,6 +40,9 @@ class Hooks
 
     // Allow SVG file uploads in bit form
     add_filter('upload_mimes', [Hooks::class, 'custom_mime_types']);
+
+    // Add Bit Form menu to admin bar by "manage_bitform" capability
+    add_filter('bitforms_form_access_capability', [Hooks::class, 'bitformMenuAccessCapability']);
   }
 
   // Allow SVG file uploads
@@ -167,5 +170,15 @@ class Hooks
       $bitform_dequeued_styles = [];
     }
     $bitform_dequeued_styles = array_merge($bitform_dequeued_styles, $formIds);
+  }
+
+  public static function bitformMenuAccessCapability()
+  {
+    if (current_user_can('manage_bitform')) {
+      return 'manage_bitform';
+    } elseif (current_user_can('access_bitform')) {
+      return 'access_bitform';
+    }
+    return 'manage_options';
   }
 }

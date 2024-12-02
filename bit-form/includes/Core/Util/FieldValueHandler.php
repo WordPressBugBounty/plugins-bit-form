@@ -27,7 +27,7 @@ final class FieldValueHandler
       if (isset($fieldValues[$fieldName])) {
         $targetFieldValue = isset($fieldValues[$fieldName]['value']) ? $fieldValues[$fieldName]['value'] : $fieldValues[$fieldName];
         if ('array' === gettype($targetFieldValue) || 'object' === gettype($targetFieldValue)) {
-          foreach ((array)$targetFieldValue as $singleTargetVal) {
+          foreach ((array) $targetFieldValue as $singleTargetVal) {
             if (isset($fieldValue)) {
               if (is_numeric($fieldValue) && is_numeric($singleTargetVal)) {
                 $fieldValue = $fieldValue + $singleTargetVal;
@@ -225,7 +225,7 @@ final class FieldValueHandler
         if ('textarea' === $fldData->typ) {
           $formattedFldValues[$fldKey] = nl2br(htmlspecialchars($value));
         }
-        if ('date' === $fldData->typ) {
+        if ('date' === $fldData->typ && !empty($value)) {
           $formattedFldValues[$fldKey] = date_i18n(get_option('date_format'), strtotime(htmlspecialchars($value)));
         }
       }
@@ -234,5 +234,22 @@ final class FieldValueHandler
     $merge_values = array_merge($fieldValues, $formattedFldValues);
     $merge_values = array_merge($merge_values, $repeaterFieldKey);
     return $merge_values;
+  }
+
+  public static function changeImagePathInHTMLString($html_body, $path)
+  {
+    $html_body = preg_replace_callback(
+      '/<img\s+src="([^"]+)"/i',
+      function ($matches) use ($path) {
+        $src = $matches[1];
+        if (parse_url($src, PHP_URL_SCHEME) === null) {
+          $src = $path . ltrim($src, '/');
+        }
+        return '<img src="' . htmlspecialchars($src, ENT_QUOTES) . '"';
+      },
+      $html_body
+    );
+
+    return $html_body;
   }
 }

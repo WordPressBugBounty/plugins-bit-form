@@ -233,15 +233,17 @@ final class FrontendFormManager extends FormManager
       }
 
       $entryID = $saveResponse['entry_id'];
-      do_action('bitform_submit_success', $this->_form_id, $entryID, $_POST);
+      do_action('bitform_submit_success', $this->_form_id, $entryID, $_POST, $_FILES);
 
       // check and replace signature field value
       $formFields = $this->getFields();
-      $uploadPath = BITFORMS_UPLOAD_BASE_URL . "/uploads/{$this->_form_id}/{$entryID}";
+      // $uploadPath = BITFORMS_UPLOAD_BASE_URL . "/uploads/{$this->_form_id}/{$entryID}"; // web root
+      // $uploadPath = BITFORMS_UPLOAD_DIR . "/{$this->_form_id}/{$entryID}"; // server root
+      $uploadPath = $this->_form_id . DIRECTORY_SEPARATOR . $entryID;
 
       foreach ($formFields as $key => $field) {
         if ('signature' === $field['type']) {
-          $saveResponse['fields'][$key] = $uploadPath . '/' . $saveResponse['fields'][$key];
+          $saveResponse['fields'][$key] = $uploadPath . DIRECTORY_SEPARATOR . $saveResponse['fields'][$key];
           break;
         }
       }
@@ -345,7 +347,7 @@ final class FrontendFormManager extends FormManager
         return $updateResponse;
       }
 
-      do_action('bitform_submit_success', $this->_form_id, $entryID, $_POST);
+      do_action('bitform_update_success', $this->_form_id, $entryID, $_POST);
 
       $captchaV3Settings = $this->getCaptchaV3Settings();
       if ($captchaV3Settings) {

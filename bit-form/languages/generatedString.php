@@ -1623,7 +1623,7 @@ $i18n_strings = array(
 
     'Announcement' => __('Announcement', 'bit-form'),
 
-    'Get Early Bird Offer' => __('Get Early Bird Offer', 'bit-form'),
+    'Get Year End Deal' => __('Get Year End Deal', 'bit-form'),
 
     'API key saved successfully' => __('API key saved successfully', 'bit-form'),
 
@@ -2110,6 +2110,8 @@ $i18n_strings = array(
     'Tax Amount Type' => __('Tax Amount Type', 'bit-form'),
 
     'Tax (%)' => __('Tax (%)', 'bit-form'),
+
+    'Default Phone Number' => __('Default Phone Number', 'bit-form'),
 
     'Input Format Option' => __('Input Format Option', 'bit-form'),
 

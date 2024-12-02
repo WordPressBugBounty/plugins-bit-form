@@ -93,6 +93,9 @@ class AdminAjax
     // CHANGELOG VERSION OPTIONS
     add_action('wp_ajax_bitforms_changelog_version', [$this, 'setChangelogVersion']);
 
+    // Notice Options
+    add_action('wp_ajax_bitforms_handle_notice', [$this, 'handleNotice']);
+
     // conversational
     add_action('wp_ajax_bitforms_save_conversational_css', [$this, 'saveConversationalCSS']);
 
@@ -270,6 +273,30 @@ class AdminAjax
       $version = isset($input->version) ? $input->version : '';
       update_option('bitforms_changelog_version', $version);
       wp_send_json_success($version, 200);
+    } else {
+      wp_send_json_error(
+        __(
+          'Token expired',
+          'bit-form'
+        ),
+        401
+      );
+    }
+  }
+
+  public function handleNotice()
+  {
+    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+      try {
+        $inputJSON = file_get_contents('php://input');
+        $input = json_decode($inputJSON);
+        $optionName = isset($input->optionName) ? $input->optionName : '';
+        $optionValue = isset($input->optionValue) ? $input->optionValue : '';
+        update_option($optionName, $optionValue);
+        wp_send_json_success([$optionName, $optionValue], 200);
+      } catch (\Exception $e) {
+        wp_send_json_error($e->getMessage(), 400);
+      }
     } else {
       wp_send_json_error(
         __(

@@ -70,6 +70,8 @@ final class Uninstallation
     $this->deleteOptions('bitforms_migrated_to_v2');
     $this->deleteOptions('bitforms_migrating_to_v2');
     $this->deleteOptions('bitforms_changelog_version');
+    $this->deleteOptions('bitforms_hide_announcement');
+    $this->deleteOptions('bitforms_hide_cashback');
   }
 
   private function deletePosts($id)
