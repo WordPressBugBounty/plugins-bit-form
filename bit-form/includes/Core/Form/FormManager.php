@@ -785,9 +785,9 @@ class FormManager
             if (!empty($meta_value)) {
               if (isset($updatedValue[$field_name . '_old']) && !is_wp_error($file_exists) && count($file_exists) > 0) {
                 $meta_value = empty($files_old) ? $meta_value : array_merge($meta_value, $files_old);
-                $updatedValue[$field_name] = wp_json_encode($meta_value);
+                $updatedValue[$field_name] = $meta_value;
               } else {
-                $updatedValue[$field_name] = wp_json_encode($meta_value);
+                $updatedValue[$field_name] = $meta_value;
               }
             }
           }

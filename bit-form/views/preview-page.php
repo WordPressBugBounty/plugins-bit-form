@@ -24,6 +24,7 @@ if (!defined('ABSPATH') && !defined('BITFORMS_ASSET_URI')) {
     align-items: center;
     flex-direction: column;
     /* background-color: #f1f1f1; */
+    font-family: sans-serif;
   }
 
   ._frm-bg-b<?php echo esc_html($formID);

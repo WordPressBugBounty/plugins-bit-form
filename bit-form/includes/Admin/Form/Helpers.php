@@ -9,10 +9,10 @@ use Exception;
 
 class Helpers
 {
-
   public static $file_upload_types = ['file-up', 'advanced-file-up'];
 
   public static $repeated_array_type_data_fields = ['check', 'image-select'];
+
   public static function filterNullEntries($entries)
   {
     $filteredEntries = [];
@@ -253,17 +253,12 @@ LOAD_SECRIPT;
     return false;
   }
 
-  public static function validateEormEntryEditPermission($formId, $entryId)
+  public static function validateFormEntryEditPermission($formId, $entryId)
   {
     if (is_user_logged_in()) {
-      if(current_user_can('prevent_bitform_entry_edit')){
-        return false;
-      }
-
-      if(current_user_can('manage_bitform')||current_user_can('bitform_entry_edit') || current_user_can('edit_post')){
+      if (current_user_can('manage_bitform') || current_user_can('bitform_entry_edit') || current_user_can('edit_posts')) {
         return true;
       }
-
     }
     return false;
   }

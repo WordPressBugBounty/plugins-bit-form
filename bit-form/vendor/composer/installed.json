@@ -278,10 +278,10 @@
             "time": "2020-12-06T23:41:30+00:00",
             "type": "composer-plugin",
             "extra": {
+                "class": "TypistTech\\Imposter\\Plugin\\ImposterPlugin",
                 "branch-alias": {
                     "dev-master": "0.6.x-dev"
-                },
-                "class": "TypistTech\\Imposter\\Plugin\\ImposterPlugin"
+                }
             },
             "installation-source": "dist",
             "autoload": {

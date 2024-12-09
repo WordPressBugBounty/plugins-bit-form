@@ -9,6 +9,10 @@ class FormEntryView
 {
   public static function preview()
   {
+    if (!(current_user_can('edit_posts') || current_user_can('manage_bitform') || current_user_can('bitform_entry_edit'))) {
+      auth_redirect();
+      return;
+    }
     $requestUri = $_SERVER['REQUEST_URI'];
     $uri = explode('/', $requestUri);
 

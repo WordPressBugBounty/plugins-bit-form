@@ -64,7 +64,7 @@ class AcfHandler
 
     $existPostId = $this->_wpdb->get_results("SELECT * FROM `{$this->_wpdb->prefix}bitforms_form_entrymeta` WHERE `meta_key`='$existId' ");
 
-    $taxonomies = $taxonomy->getTaxonomies($formFields, $fieldValues);
+    $taxonomies = $taxonomy->taxonomyData($formFields, $fieldValues);
 
     if ([] === $existPostId) {
       $postId = wp_insert_post(['post_title' => '(no title)', 'post_content' => '']);

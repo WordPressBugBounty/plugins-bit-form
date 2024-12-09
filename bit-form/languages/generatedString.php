@@ -1667,7 +1667,7 @@ $i18n_strings = array(
 
     'What\'s New' => __('What\'s New', 'bit-form'),
 
-    'Get Black Friday Deal!' => __('Get Black Friday Deal!', 'bit-form'),
+    'Get Christmas Deal!' => __('Get Christmas Deal!', 'bit-form'),
 
     'For more details,' => __('For more details,', 'bit-form'),
 

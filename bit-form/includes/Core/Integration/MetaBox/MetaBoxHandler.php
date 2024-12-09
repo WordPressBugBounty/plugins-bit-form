@@ -64,7 +64,7 @@ class MetaBoxHandler
 
     $metaBoxFields = rwmb_get_object_fields($postData['post_type']);
 
-    $taxonomies = (new WpFileHandler($integrationData->form_id))->getTaxonomies($formFields, $fieldValues);
+    $taxonomies = (new WpFileHandler($integrationData->form_id))->taxonomyData($formFields, $fieldValues);
 
     if ([] === $existPostId) {
       $postId = wp_insert_post(['post_title' => '(no title)', 'post_content' => '']);

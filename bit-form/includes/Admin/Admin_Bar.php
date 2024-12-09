@@ -67,6 +67,9 @@ class Admin_Bar
       $submenu['bitform'][] = [__('Bit Form API', 'bit-form'), $capability, 'admin.php?page=bitform#/app-settings/api'];
       $submenu['bitform'][] = [__('Payments', 'bit-form'), $capability, 'admin.php?page=bitform#/app-settings/payments'];
       $submenu['bitform'][] = [__('Doc & Support', 'bit-form'), $capability, 'admin.php?page=bitform#/doc-support'];
+      if (!Utilities::isPro()) {
+        $submenu['bitform'][] = [__('<span class="bf-pro-btn">Upgrade to Pro</span>', 'bit-form'), $capability, 'https://bit-form.com/#pricing', '_blank'];
+      }
     }
   }
 

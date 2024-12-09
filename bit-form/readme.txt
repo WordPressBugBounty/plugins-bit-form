@@ -1,7 +1,7 @@
 === Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder ===
 Plugin Name: Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder
-Version: 2.17.1
-Stable tag: 2.17.1
+Version: 2.17.2
+Stable tag: 2.17.2
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin 
@@ -543,8 +543,18 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 6. Response table to view form entries
 
 == Changelog ==
+= 2.17.2 =
+*Release Date: 09 December, 2025*
+*Improvement:
+    1. Strengthened security for entry edit requests.
+    2. Added support for viewing signature images in the Frontend Entry View.
+
+*Fix:
+    1. Addressed file upload attachment issues in email notifications.
+    2. Resolved integration issues with PODS.
+
 = 2.17.1 =
-*Release Date: 12 December, 2024*
+*Release Date: 02 December, 2024*
 *New:
     1. Introduced a new action hook for custom payment gateway compatibility.
 
