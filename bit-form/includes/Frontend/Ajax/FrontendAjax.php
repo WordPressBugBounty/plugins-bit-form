@@ -64,6 +64,7 @@ final class FrontendAjax
     $form_id = str_replace('bitforms_', '', sanitize_text_field($_POST['bitforms_id']));
     $entryId = sanitize_text_field($_REQUEST['entryID']);
     $entryToken = sanitize_text_field($_REQUEST['entryToken']);
+    $GLOBALS['bf_entry_id'] = $entryId;
     if (Helpers::validateEntryTokenAndUser($entryToken, $entryId) || Helpers::validateFormEntryEditPermission($form_id, $entryId)) {
       $FrontendFormManager = new FrontendFormManager($form_id);
       $updateStatus = $FrontendFormManager->handleUpdateEntry();
@@ -133,6 +134,7 @@ final class FrontendAjax
         $cronNotOk = $request->cronNotOk;
         $entryID = $cronNotOk[0];
         $logID = $cronNotOk[1];
+        $GLOBALS['bf_entry_id'] = $entryID;
         $entryLog = new FormEntryLogModel();
         if (isset($cronNotOk[2]) && \is_int($cronNotOk[2])) {
           $queueudEntry = $entryLog->get(
