@@ -59,12 +59,14 @@ final class MailNotifier
             // 'Content-Type: text/html; charset=UTF-8',
             // $embeddedMailHeader
           ];
+          $from_mail = '';
           if (!empty($notifyDetails->from)) {
             $fromMail = FieldValueHandler::validateMailArry($notifyDetails->from, $fieldValue);
             $headerFromName = !empty($notifyDetails->fromName) ? $notifyDetails->fromName : explode('@', $fromMail[0])[0];
             $mailHeaders[] = "FROM: $headerFromName " . '<' . sanitize_email($fromMail[0]) . '>';
+            $from_mail = $fromMail[0];
           }
-          (new MailConfig())->sendMail(['from_name' => $from_name, 'from_email' => 'mdrobiulhasan2622@gmail.com']);
+          (new MailConfig())->sendMail(['from_name' => $from_name, 'from_email' => $from_mail]);
           $mailSubject = FieldValueHandler::replaceFieldWithValue($mailTemplate[0]->sub, $fieldValue);
           $mailBody = FieldValueHandler::replaceFieldWithValue($mailTemplate[0]->body, $fieldValue);
           $webUrl = BITFORMS_UPLOAD_BASE_URL . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR;
