@@ -1,7 +1,7 @@
 === Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder ===
 Plugin Name: Contact Form by Bit Form: Multi Step Form, Calculation Contact Form, Payment Contact Form & Custom Contact Form builder
-Version: 2.18.2
-Stable tag: 2.18.2
+Version: 2.18.3
+Stable tag: 2.18.3
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin 
@@ -155,9 +155,10 @@ Quickly personalize your WordPress forms using Bit Form's built-in style editor.
 
 ### Bit Contact Form Blogs writen by Popular Bloggers
 
-1. [Fluent Forms vs Bit Form: Performance and Other Considerations](https://www.webtng.com/fluent-forms-vs-bit-form-performance-and-other-considerations/) | by **David McCan**
-2. [Bit Forms: A Powerful And Easy-To-Use WordPress Form Builder](https://lytboxacademy.com/bitforms-a-powerful-form-builder/)
-3. [The Most Advanced Contact Form Builder For WordPress: Bit Form](https://bitapps.pro/advanced-contact-form-builder-for-wordpress/)
+1. [17 Best Contact Form Plugins (#8- Bit Form) ](https://kinsta.com/blog/wordpress-contact-form-plugins/#8-bit-form) | by **Kinsta**
+2. [Fluent Forms vs Bit Form: Performance and Other Considerations](https://www.webtng.com/fluent-forms-vs-bit-form-performance-and-other-considerations/) | by **David McCan**
+3. [Bit Forms: A Powerful And Easy-To-Use WordPress Form Builder](https://lytboxacademy.com/bitforms-a-powerful-form-builder/)
+4. [The Most Advanced Contact Form Builder For WordPress: Bit Form](https://bitapps.pro/advanced-contact-form-builder-for-wordpress/)
 
 ==🔹 43 Form Field Types : ==
 
