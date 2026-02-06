@@ -10,6 +10,7 @@ namespace BitCode\BitForm\Frontend\Form;
  * FrontendFormManager class
  */
 
+use BitCode\BitForm\Admin\Form\AdminFormHandler;
 use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Core\Database\FormEntryModel;
 use BitCode\BitForm\Core\Form\FormManager;
@@ -196,11 +197,44 @@ final class FrontendFormManager extends FormManager
     return $parameter;
   }
 
+  private function getFormFields($formID)
+  {
+    $adminFormHandler = new AdminFormHandler();
+    $post = new \stdClass();
+    $post = (object) [
+      'id' => $formID
+    ];
+    $getForm = $adminFormHandler->getAForm('', $post);
+    $formContainer = $getForm['form_content'];
+
+    return $formContainer['fields'];
+  }
+
+  private function transformDrpdwnValue($post)
+  {
+    $formFields = $this->getFormFields($this->_form_id);
+
+    foreach ($post as $key => $value) {
+      if (!str_starts_with($key, 'repeater') && 'select' === $formFields->{$key}->typ) {
+        if (is_array($value)) {
+          foreach ($value as $k => $v) {
+            $post[$key][$k] = !is_array($v) && is_string($v) ? explode(BITFORMS_BF_SEPARATOR, $v) : $v;
+          }
+        } else {
+          $post[$key] = explode(BITFORMS_BF_SEPARATOR, $value);
+        }
+      };
+    }
+
+    return $post;
+  }
+
   public function handleSubmission()
   {
     $this->fieldNameReplaceOfPost();
 
     $validated = $this->beforeSubmittedValidate();
+
     $validated = apply_filters('bitform_filter_form_validation', $validated, $this->_form_id);
 
     if (true === $validated) {
@@ -245,7 +279,11 @@ final class FrontendFormManager extends FormManager
       }
 
       $entryID = $saveResponse['entry_id'];
-      do_action('bitform_submit_success', $this->_form_id, $entryID, $_POST, $_FILES);
+
+      // transformed dropdown value from string to array
+      $newPost = $this->transformDrpdwnValue($_POST);
+
+      do_action('bitform_submit_success', $this->_form_id, $entryID, $newPost, $_FILES);
 
       $captchaV3Settings = $this->getCaptchaV3Settings();
       if ($captchaV3Settings) {
@@ -343,9 +381,12 @@ final class FrontendFormManager extends FormManager
         return $updateResponse;
       }
 
+      // transformed dropdown value from string to array
+      $newPost = $this->transformDrpdwnValue($_POST);
+
       //TO DO:: submit success action temporarily added for solution of a issue
-      do_action('bitform_submit_success', $this->_form_id, $entryID, $_POST, $_FILES);
-      do_action('bitform_update_success', $this->_form_id, $entryID, $_POST, $_FILES);
+      do_action('bitform_submit_success', $this->_form_id, $entryID, $newPost, $_FILES);
+      do_action('bitform_update_success', $this->_form_id, $entryID, $newPost, $_FILES);
 
       $captchaV3Settings = $this->getCaptchaV3Settings();
       if ($captchaV3Settings) {
@@ -412,7 +453,7 @@ final class FrontendFormManager extends FormManager
     return $submitted_data;
   }
 
-  public function beforeSubmittedValidate()
+  public function beforeSubmittedValidate($verifyCaptcha = true)
   {
     if ($this->verifySubmissionNonce()) {
       if ($this->isExist()) {
@@ -424,21 +465,21 @@ final class FrontendFormManager extends FormManager
           return new WP_Error('spam_detection', __('Token verification failed', 'bit-form'));
         }
         $formCurrentStep = isset($_POST['form-current-step']) ? $_POST['form-current-step'] : null;
-
-        $verifyGRecaptchaResult = $this->verifyGRecaptcha();
-        if (is_wp_error($verifyGRecaptchaResult)) {
-          return $verifyGRecaptchaResult;
-        }
-
-        $verifyHCaptchaResult = $this->verifyHCaptcha();
-        if (is_wp_error($verifyHCaptchaResult)) {
-          return $verifyHCaptchaResult;
-        }
-
-        /* Implement Turnstile Captcha start */
-        $verifyTurnstileCaptchaResult = $this->verifyTurnstileCaptcha();
-        if (is_wp_error($verifyTurnstileCaptchaResult)) {
-          return $verifyTurnstileCaptchaResult;
+        // TODO: Temporary parameter to skip captcha verification in step change of multi step form
+        if ($verifyCaptcha) {
+          $verifyGRecaptchaResult = $this->verifyGRecaptcha();
+          if (is_wp_error($verifyGRecaptchaResult)) {
+            return $verifyGRecaptchaResult;
+          }
+          $verifyHCaptchaResult = $this->verifyHCaptcha();
+          if (is_wp_error($verifyHCaptchaResult)) {
+            return $verifyHCaptchaResult;
+          }
+          /* Implement Turnstile Captcha start */
+          $verifyTurnstileCaptchaResult = $this->verifyTurnstileCaptcha();
+          if (is_wp_error($verifyTurnstileCaptchaResult)) {
+            return $verifyTurnstileCaptchaResult;
+          }
         }
         /* Implement Turnstile Captcha end */
 
@@ -685,6 +726,8 @@ final class FrontendFormManager extends FormManager
     $ipTool = new IpTool();
     $ipAddress = $ipTool->getIP();
     $currentUserId = get_current_user_id();
+    // error_log(print_r(['ip address', $ipAddress, ip2long($ipAddress)], true));
+    // error_log(print_r(['restrictions', $fromRestrictionSetitings], true));
     foreach ($fromRestrictionSetitingsEnabled as $restrictionKey => $isEnabled) {
       if ($isEnabled) {
         if (('entry_limit' === $restrictionKey && isset($fromRestrictionSetitings->{$restrictionKey})) || ('entry_limit_by_user' === $restrictionKey && isset($fromRestrictionSetitings->{$restrictionKey}))) {
@@ -695,15 +738,30 @@ final class FrontendFormManager extends FormManager
 
         if ('onePerIp' === $restrictionKey) {
           $formEntry = new FormEntryModel();
-          $countResult = $formEntry->count(
+
+          $getResult = $formEntry->get(
+            ['user_ip', 'status'],
             [
               'form_id' => $this->form_id,
               'user_ip' => ip2long($ipAddress)
-            ]
+            ],
           );
-          $count = !empty($countResult[0]) && !empty($countResult[0]->count) ? $countResult[0]->count : false;
 
-          if ($count && $count > 0) {
+          $count = 0;
+          $status = 0;
+
+          if (!is_wp_error($getResult) && count($getResult) > 0) {
+            $count = count($getResult);
+
+            foreach ($getResult as $row) {
+              if (9 === (int) $row->status) {
+                $status = 9;
+                break;
+              }
+            }
+          }
+
+          if ($count > 0 && 9 !== (int) $status) {
             $onePerIp = __('Sorry!! You have already submitted from this IP address', 'bit-form');
 
             $onePerIp = apply_filters(
@@ -752,12 +810,12 @@ final class FrontendFormManager extends FormManager
             !empty($day)
             && is_array($day)
             && (in_array('Friday', $day)
-                || in_array('Saturday', $day)
-                || in_array('Sunday', $day)
-                || in_array('Monday', $day)
-                || in_array('Tuesday', $day)
-                || in_array('Wednesday', $day)
-                || in_array('Thursday', $day))
+              || in_array('Saturday', $day)
+              || in_array('Sunday', $day)
+              || in_array('Monday', $day)
+              || in_array('Tuesday', $day)
+              || in_array('Wednesday', $day)
+              || in_array('Thursday', $day))
             && (!in_array($dateTimeHelper->getDay('full-name'), $day))
           ) {
             $isdayOk = false;
@@ -808,10 +866,10 @@ final class FrontendFormManager extends FormManager
             $restrict_form_message = null;
             if (!$isdayOk) {
               $restrict_form_message = !empty($timeNotOkMsg) ? sprintf(__('Form is available %s From %s', 'bit-form'), $dayNotOkMsg, $timeNotOkMsg) :
-                  sprintf(__('Form is available %s', 'bit-form'), $dayNotOkMsg, $timeNotOkMsg);
+                sprintf(__('Form is available %s', 'bit-form'), $dayNotOkMsg, $timeNotOkMsg);
             } elseif (!$isdateOk) {
               $restrict_form_message = !empty($timeNotOkMsg) ? sprintf(__('Form is available %s From %s', 'bit-form'), $dateNotOkMsg, $timeNotOkMsg) :
-                  sprintf(__('Form is available %s', 'bit-form'), $dateNotOkMsg, $timeNotOkMsg);
+                sprintf(__('Form is available %s', 'bit-form'), $dateNotOkMsg, $timeNotOkMsg);
             } elseif (!$istimeOk) {
               $restrict_form_message = sprintf(__('Form is available on %s', 'bit-form'), $timeNotOkMsg);
             }
@@ -879,10 +937,10 @@ final class FrontendFormManager extends FormManager
   }
 
   /**
-     * Will check if form is submitted by a bot
-     *
-     * @return Boolean true - if submitted by bot else false
-     */
+   * Will check if form is submitted by a bot
+   *
+   * @return Boolean true - if submitted by bot else false
+   */
   public function isTrappedInHoneypot()
   {
     $isHoneyPot = false;

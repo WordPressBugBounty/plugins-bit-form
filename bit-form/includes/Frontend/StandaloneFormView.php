@@ -16,10 +16,11 @@ class StandaloneFormView
       return;
     }
     $requestUri = esc_url($_SERVER['REQUEST_URI']);
-    $uri = explode('/', $requestUri);
 
-    if (is_array($uri) && count($uri) > 0) {
-      $formID = $uri[count($uri) - 1];
+    $uri = explode('/', rtrim($requestUri, '/'));
+
+    if (is_array($uri) && count($uri) >= 3) {
+      $formID = $uri[2];
       $attr = ['form_id' => $formID, 'form_preview' => true];
 
       $frontendFormHandler = new FrontendFormHandler();

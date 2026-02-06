@@ -38,7 +38,7 @@ final class FrontendAjax
     $form_id = str_replace('bitforms_', '', $_POST['bitforms_id']);
     $FrontendFormManager = FrontendFormManager::getInstance($form_id);
     $FrontendFormManager->fieldNameReplaceOfPost();
-    $validateStatus = $FrontendFormManager->beforeSubmittedValidate();
+    $validateStatus = $FrontendFormManager->beforeSubmittedValidate(false);
     if (is_wp_error($validateStatus)) {
       wp_send_json_error($validateStatus->get_error_message(), 400);
     } else {
@@ -135,99 +135,134 @@ final class FrontendAjax
   public function triggerWorkFlow()
   {
     \ignore_user_abort(true);
+
     $inputJSON = file_get_contents('php://input');
+
     if ($inputJSON) {
       $request = is_string($inputJSON) ? \json_decode($inputJSON) : $inputJSON;
       $submitted_fields = [];
       if (isset($request->id, $request->cronNotOk)) {
         $formID = str_replace('bitforms_', '', $request->id);
-        if (!wp_verify_nonce($request->token, $request->id) && is_user_logged_in()) {
-          Log::debug_log('wp_verify_nonce failed for formID=' . $formID . ' Token=' . $request->token . ' ID=' . $request->id);
-          wp_send_json_error();
-        }
         $cronNotOk = $request->cronNotOk;
-        $entryID = $cronNotOk[0];
-        $logID = $cronNotOk[1];
+
+        // Validate and sanitize entry ID and log ID
+        if (!isset($cronNotOk[0]) || !is_numeric($cronNotOk[0]) || !isset($cronNotOk[1]) || !is_numeric($cronNotOk[1])) {
+          Log::debug_log('Invalid cronNotOk data for formID=' . $formID);
+          wp_send_json_error(['message' => 'Invalid request data'], 400);
+        }
+
+        $entryID = absint($cronNotOk[0]);
+        $logID = absint($cronNotOk[1]);
         $GLOBALS['bf_entry_id'] = $entryID;
         $entryLog = new FormEntryLogModel();
-        if (isset($cronNotOk[2]) && \is_int($cronNotOk[2])) {
-          $queueudEntry = $entryLog->get(
-            'response_obj',
-            ['id' => $cronNotOk[2]]
-          );
-          if ($queueudEntry) {
-            if (!empty($queueudEntry[0]->response_obj) && \strpos($queueudEntry[0]->response_obj, 'processed') > 0) {
-              Log::debug_log('Cron Not Ok[2]Already Processed');
+
+        // Quick admin check to allow retry of workflows
+        $isAdmin = false;
+        if (is_user_logged_in()) {
+          $user = wp_get_current_user();
+          $isAdmin = in_array('administrator', $user->roles) || current_user_can('manage_bitform');
+        }
+
+        // Check if already processed (skip for administrators to allow retries)
+        if (!$isAdmin) {
+          if (isset($cronNotOk[2]) && \is_int($cronNotOk[2])) {
+            $queueudEntry = $entryLog->get(
+              'response_obj',
+              ['id' => $cronNotOk[2]]
+            );
+            if ($queueudEntry) {
+              if (!empty($queueudEntry[0]->response_obj) && \strpos($queueudEntry[0]->response_obj, 'processed') > 0) {
+                Log::debug_log('Cron Not Ok[2] Already Processed');
+                wp_send_json_error();
+              }
+            } else {
+              Log::debug_log('Cron Not Ok[2] Query Entry data not found');
               wp_send_json_error();
             }
           } else {
-            Log::debug_log('Cron Not Ok[2]Query Entry data not found');
+            Log::debug_log('Cron Not Ok[2](Log Id) data not found');
             wp_send_json_error();
           }
         } else {
-          Log::debug_log('Cron Not Ok[2](Log Id) data not found');
-          wp_send_json_error();
+          Log::debug_log('Admin bypass: Skipping "already processed" check for workflow retry');
         }
-        $trnasientData = get_transient("bitform_trigger_transient_{$entryID}");
 
-        if (!empty($trnasientData)) {
-          delete_transient("bitform_trigger_transient_{$entryID}");
-          $triggerData = is_string($trnasientData) ? json_decode($trnasientData) : $trnasientData;
+        // SECURITY CHECK: Validate trigger token using helper function
+        $validation = Helpers::validateWorkflowTriggerToken($request, $formID);
+
+        if (!$validation['valid']) {
+          wp_send_json_error(['message' => $validation['error']], 403);
+        }
+
+        // Use validated trigger data if available (prevents transient overwrite bug)
+        $triggerData = null;
+        if ($validation['triggerData']) {
+          // Token was valid and transient data retrieved
+          $triggerData = $validation['triggerData'];
         } else {
-          $formManager = new AdminFormManager($formID);
-          if (!$formManager->isExist()) {
-            Log::debug_log('provided form does not exists');
-            return wp_send_json(new WP_Error('trigger_empty_form', __('provided form does not exists', 'bit-form')));
-          }
-          $formEntryModel = new FormEntryModel();
-          $entryMeta = new FormEntryMetaModel();
+          // Admin bypass or transient not found - fetch from transient/database
+          $trnasientData = get_transient("bitform_trigger_transient_{$entryID}");
 
-          $formEntry = $formEntryModel->get(
-            '*',
-            [
-              'form_id' => $formID,
-              'id'      => $entryID,
-            ]
-          );
-
-          if (!$formEntry) {
-            Log::debug_log('provided form entries does not exists. EntryId=' . $entryID . ', FormId=' . $formID);
-            return new WP_Error('trigger_empty_form', __('provided form entries does not exists', 'bit-form'));
-          }
-          $formEntryMeta = $entryMeta->get(
-            [
-              'meta_key',
-              'meta_value',
-            ],
-            [
-              'bitforms_form_entry_id' => $entryID,
-            ]
-          );
-          $entries = [];
-          foreach ($formEntryMeta as $key => $value) {
-            $entries[$value->meta_key] = $value->meta_value;
-          }
-          $formContent = $formManager->getFormContent();
-          $submitted_fields = $formContent->fields;
-          foreach ($submitted_fields as $key => $value) {
-            if (isset($entries[$key])) {
-              $submitted_fields->{$key}->val = $entries[$key];
-              $submitted_fields->{$key}->name = $key;
+          if (!empty($trnasientData)) {
+            delete_transient("bitform_trigger_transient_{$entryID}");
+            $triggerData = is_string($trnasientData) ? json_decode($trnasientData) : $trnasientData;
+          } else {
+            $formManager = new AdminFormManager($formID);
+            if (!$formManager->isExist()) {
+              Log::debug_log('provided form does not exists');
+              return wp_send_json(new WP_Error('trigger_empty_form', __('provided form does not exists', 'bit-form')));
             }
+            $formEntryModel = new FormEntryModel();
+            $entryMeta = new FormEntryMetaModel();
+
+            $formEntry = $formEntryModel->get(
+              '*',
+              [
+                'form_id' => $formID,
+                'id'      => $entryID,
+              ]
+            );
+
+            if (!$formEntry) {
+              Log::debug_log('provided form entries does not exists. EntryId=' . $entryID . ', FormId=' . $formID);
+              return new WP_Error('trigger_empty_form', __('provided form entries does not exists', 'bit-form'));
+            }
+            $formEntryMeta = $entryMeta->get(
+              [
+                'meta_key',
+                'meta_value',
+              ],
+              [
+                'bitforms_form_entry_id' => $entryID,
+              ]
+            );
+            $entries = [];
+            foreach ($formEntryMeta as $key => $value) {
+              $entries[$value->meta_key] = $value->meta_value;
+            }
+            $formContent = $formManager->getFormContent();
+            $submitted_fields = $formContent->fields;
+            foreach ($submitted_fields as $key => $value) {
+              if (isset($entries[$key])) {
+                $submitted_fields->{$key}->val = $entries[$key];
+                $submitted_fields->{$key}->name = $key;
+              }
+            }
+
+            $workFlowRunHelper = new WorkFlow($formID);
+            $workFlowreturnedOnSubmit = $workFlowRunHelper->executeOnSubmit(
+              'create',
+              $submitted_fields,
+              $entries,
+              $entryID,
+              $logID
+            );
+
+            $triggerData = isset($workFlowreturnedOnSubmit['triggerData']) ? $workFlowreturnedOnSubmit['triggerData'] : null;
+            $triggerData['fields'] = $entries;
           }
+        } // Close else block
 
-          $workFlowRunHelper = new WorkFlow($formID);
-          $workFlowreturnedOnSubmit = $workFlowRunHelper->executeOnSubmit(
-            'create',
-            $submitted_fields,
-            $entries,
-            $entryID,
-            $logID
-          );
-
-          $triggerData = isset($workFlowreturnedOnSubmit['triggerData']) ? $workFlowreturnedOnSubmit['triggerData'] : null;
-          $triggerData['fields'] = $entries;
-        }
         if (!empty($triggerData)) {
           if (isset($triggerData['integrationRun']) && !$triggerData['integrationRun']) {
             $entryModel = new FormEntryModel();

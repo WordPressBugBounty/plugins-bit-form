@@ -4,23 +4,23 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitd9e0233255f82de3026744d6f2fe1094
+class ComposerStaticInit55cd83a724e200f060881e183c2b42e7
 {
     public static $prefixLengthsPsr4 = array (
-        'e' => 
+        'e' =>
         array (
             'enshrined\\svgSanitize\\' => 22,
         ),
-        'T' => 
+        'T' =>
         array (
             'TypistTech\\Imposter\\Plugin\\' => 27,
             'TypistTech\\Imposter\\' => 20,
         ),
-        'J' => 
+        'J' =>
         array (
             'Jcof\\' => 5,
         ),
-        'B' => 
+        'B' =>
         array (
             'BitCode\\BitForm\\ComposerScripts\\' => 32,
             'BitCode\\BitForm\\' => 16,
@@ -29,31 +29,31 @@ class ComposerStaticInitd9e0233255f82de3026744d6f2fe1094
     );
 
     public static $prefixDirsPsr4 = array (
-        'enshrined\\svgSanitize\\' => 
+        'enshrined\\svgSanitize\\' =>
         array (
             0 => __DIR__ . '/..' . '/enshrined/svg-sanitize/src',
         ),
-        'TypistTech\\Imposter\\Plugin\\' => 
+        'TypistTech\\Imposter\\Plugin\\' =>
         array (
             0 => __DIR__ . '/..' . '/typisttech/imposter-plugin/src',
         ),
-        'TypistTech\\Imposter\\' => 
+        'TypistTech\\Imposter\\' =>
         array (
             0 => __DIR__ . '/..' . '/typisttech/imposter/src',
         ),
-        'Jcof\\' => 
+        'Jcof\\' =>
         array (
             0 => __DIR__ . '/..' . '/arif-un/jcof/src',
         ),
-        'BitCode\\BitForm\\ComposerScripts\\' => 
+        'BitCode\\BitForm\\ComposerScripts\\' =>
         array (
             0 => __DIR__ . '/../..' . '/composer',
         ),
-        'BitCode\\BitForm\\' => 
+        'BitCode\\BitForm\\' =>
         array (
             0 => __DIR__ . '/../..' . '/includes',
         ),
-        'BitApps\\WPTelemetry\\' => 
+        'BitApps\\WPTelemetry\\' =>
         array (
             0 => __DIR__ . '/..' . '/bitapps/wp-telemetry/src',
         ),
@@ -393,9 +393,9 @@ class ComposerStaticInitd9e0233255f82de3026744d6f2fe1094
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitd9e0233255f82de3026744d6f2fe1094::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitd9e0233255f82de3026744d6f2fe1094::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitd9e0233255f82de3026744d6f2fe1094::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit55cd83a724e200f060881e183c2b42e7::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit55cd83a724e200f060881e183c2b42e7::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit55cd83a724e200f060881e183c2b42e7::$classMap;
 
         }, null, ClassLoader::class);
     }

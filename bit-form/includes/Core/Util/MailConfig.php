@@ -39,8 +39,10 @@ final class MailConfig
         // $phpmailer->SMTPDebug = 1;
         // $phpmailer->Debugoutput = 'error_log';
         $phpmailer->From = $integration_details->form_email_address;
+        $phpmailer->Sender = $integration_details->form_email_address;
         if (isset($this->config['from_email']) && !empty($this->config['from_email'])) {
           $phpmailer->From = $this->config['from_email'];
+          $phpmailer->Sender = $this->config['from_email'];
         }
         $from_name = $integration_details->form_name;
         if (isset($this->config['from_name']) && !empty($this->config['from_name'])) {

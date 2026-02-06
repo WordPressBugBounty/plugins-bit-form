@@ -7,6 +7,7 @@
 
 namespace BitCode\BitForm\Core\Integration\ZohoMail;
 
+use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Core\Util\ApiResponse as UtilApiResponse;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\HttpHelper;
@@ -44,13 +45,18 @@ class RecordApiHelper
 
   public function executeRecordApi($integrationDetails, $fieldValues, $formID, $entryID)
   {
+    $webUrl = BITFORMS_UPLOAD_BASE_URL . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $formID . DIRECTORY_SEPARATOR . Helpers::getEncryptedEntryId($entryID) . DIRECTORY_SEPARATOR;
+    $mailContent = FieldValueHandler::replaceFieldWithValue($integrationDetails->body, $fieldValues, $formID);
+    $mailContent = FieldValueHandler::changeImagePathInHTMLString($mailContent, $webUrl);
+    $mailContent = FieldValueHandler::changeHrefPathInHTMLString($mailContent, $webUrl);
+
     $mailInfo = [
       'fromAddress' => $integrationDetails->tokenDetails->accountEmail,
       'toAddress'   => implode(',', FieldValueHandler::validateMailArry($integrationDetails->to, $fieldValues)),
       'ccAddress'   => implode(',', FieldValueHandler::validateMailArry($integrationDetails->cc, $fieldValues)),
       'bccAddress'  => implode(',', FieldValueHandler::validateMailArry($integrationDetails->bcc, $fieldValues)),
       'subject'     => FieldValueHandler::replaceFieldWithValue($integrationDetails->subject, $fieldValues),
-      'content'     => FieldValueHandler::replaceFieldWithValue($integrationDetails->body, $fieldValues)
+      'content'     => $mailContent
     ];
 
     if ('draft' === $integrationDetails->mailType) {

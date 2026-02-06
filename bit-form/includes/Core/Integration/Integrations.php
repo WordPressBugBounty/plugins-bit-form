@@ -276,13 +276,12 @@ final class Integrations
   }
 
   // get connectd integration app
-  public function getConnectedIntegrationApp()
+  public function getConnectedIntegrationApp($integration_type = null)
   {
     $connectionCategory = 'connected_integration_apps';
 
     $integrationHandler = new IntegrationHandler(0);
-
-    $allConnectedIntegApps = $integrationHandler->getAllIntegration($connectionCategory);
+    $allConnectedIntegApps = $integrationHandler->getAllIntegration($connectionCategory, $integration_type);
 
     if (!is_wp_error($allConnectedIntegApps)) {
       foreach ($allConnectedIntegApps as $integrationkey => $integrationValue) {

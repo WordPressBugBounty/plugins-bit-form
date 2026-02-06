@@ -512,4 +512,188 @@ final class FileHandler
       }
     }
   }
+
+  /**
+   * Return file type by checking with mime type
+   * @param string $mime
+   * @return string
+   */
+  public static function getFileTypeByMime(string $mime)
+  {
+    $mime = strtolower($mime);
+
+    if (preg_match('/^image\//', $mime)) {
+      return 'image';
+    }
+
+    $compressed = [
+      'application/zip',
+      'application/x-rar-compressed',
+      'application/x-7z-compressed',
+      'application/gzip',
+      'application/x-tar',
+      'application/x-gtar',
+      'application/x-bzip2',
+      'application/x-archive',
+      'application/vnd.debian.binary-package',
+    ];
+    if (in_array($mime, $compressed, true)) {
+      return 'compressed';
+    }
+
+    $presentation = [
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.oasis.opendocument.presentation',
+      'application/vnd.apple.keynote',
+    ];
+    if (in_array($mime, $presentation, true)) {
+      return 'presentation';
+    }
+
+    $document = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/rtf',
+      'text/plain',
+      'application/vnd.oasis.opendocument.text',
+      'application/x-tex',
+      'text/rtf',
+    ];
+    if (in_array($mime, $document, true)) {
+      return 'document';
+    }
+
+    $data = [
+      'text/csv',
+      'application/xml',
+      'text/xml',
+      'application/sql',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/x-sqlite3',
+      'application/octet-stream', // generic binary (could be db files)
+    ];
+    if (in_array($mime, $data, true)) {
+      return 'data';
+    }
+
+    if (preg_match('/^audio\//', $mime)) {
+      return 'audio';
+    }
+
+    if (preg_match('/^video\//', $mime)) {
+      return 'video';
+    }
+
+    return 'other';
+  }
+
+  /**
+ * Return file type by checking with extension
+ * @param string $extension
+ * @return string
+ */
+  public static function getFileTypeByExtension($extension)
+  {
+    switch (strtolower($extension)) {
+      case 'xbm':
+      case 'tif':
+      case 'pjp':
+      case 'pjpeg':
+      case 'svgz':
+      case 'jpg':
+      case 'jpeg':
+      case 'ico':
+      case 'tiff':
+      case 'gif':
+      case 'svg':
+      case 'bmp':
+      case 'png':
+      case 'jfif':
+      case 'webp':
+        return 'image';
+
+      case '7z':
+      case 'arj':
+      case 'deb':
+      case 'pkg':
+      case 'rar':
+      case 'rpm':
+      case 'gz':
+      case 'z':
+      case 'zip':
+        return 'compressed';
+
+      case 'key':
+      case 'odp':
+      case 'pps':
+      case 'ppt':
+      case 'pptx':
+        return 'presentation';
+
+      case '_rf_':
+      case 'doc':
+      case 'docx':
+      case 'odt':
+      case 'pdf':
+      case 'rtf':
+      case 'tex':
+      case 'txt':
+      case 'wks':
+      case 'wps':
+      case 'wpd':
+        return 'document';
+
+      case 'csv':
+      case 'dat':
+      case 'db':
+      case 'dbf':
+      case 'log':
+      case 'mdb':
+      case 'sav':
+      case 'sql':
+      case 'tar':
+      case 'sqlite':
+      case 'xml':
+        return 'data';
+
+      case 'opus':
+      case 'flac':
+      case 'webm':
+      case 'weba':
+      case 'wav':
+      case 'ogg':
+      case 'm4a':
+      case 'mp3':
+      case 'oga':
+      case 'mid':
+      case 'amr':
+      case 'aiff':
+      case 'wma':
+      case 'au':
+      case 'acc':
+      case 'wpl':
+        return 'audio';
+
+      case 'ogm':
+      case 'wmv':
+      case 'mpg':
+      case 'ogv':
+      case 'mov':
+      case 'asx':
+      case 'mpeg':
+      case 'mp4':
+      case 'm4v':
+      case 'avi':
+      case '3gp':
+      case 'flv':
+      case 'mkv':
+      case 'swf':
+        return 'video';
+      default:
+        return 'other';
+    }
+  }
 }

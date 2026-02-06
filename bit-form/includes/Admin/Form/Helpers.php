@@ -327,6 +327,130 @@ LOAD_SECRIPT;
     return false;
   }
 
+  /**
+   * Validate workflow trigger token with proper input sanitization
+   *
+   * @param object $request The AJAX request object
+   * @param string $formID The form ID (already sanitized)
+   * @return array ['valid' => bool, 'error' => string, 'triggerData' => object|null, 'isAdminBypass' => bool]
+   */
+  public static function validateWorkflowTriggerToken($request, $formID)
+  {
+    // Sanitize and validate cronNotOk array
+    if (!isset($request->cronNotOk) || !is_array($request->cronNotOk)) {
+      return [
+        'valid'         => false,
+        'error'         => 'Missing or invalid cronNotOk data',
+        'triggerData'   => null,
+        'isAdminBypass' => false
+      ];
+    }
+
+    // Validate and sanitize entry ID and log ID (must be integers)
+    if (!isset($request->cronNotOk[0]) || !is_numeric($request->cronNotOk[0])) {
+      Log::debug_log('Invalid entry ID in cronNotOk[0]');
+      return ['valid' => false, 'error' => 'Invalid entry ID', 'triggerData' => null, 'isAdminBypass' => false];
+    }
+
+    if (!isset($request->cronNotOk[1]) || !is_numeric($request->cronNotOk[1])) {
+      Log::debug_log('Invalid log ID in cronNotOk[1]');
+      return ['valid' => false, 'error' => 'Invalid log ID', 'triggerData' => null, 'isAdminBypass' => false];
+    }
+
+    $entryID = absint($request->cronNotOk[0]);
+    $logID = absint($request->cronNotOk[1]);
+
+    // Check for administrator bypass
+    $isAdminBypass = false;
+    if (is_user_logged_in()) {
+      $user = wp_get_current_user();
+      if (in_array('administrator', $user->roles) || current_user_can('manage_bitform')) {
+        Log::debug_log('Admin bypass: Workflow triggered by ' . $user->user_login . ' for entryID=' . $entryID);
+        return [
+          'valid'         => true,
+          'error'         => '',
+          'triggerData'   => null,
+          'isAdminBypass' => true
+        ];
+      }
+
+      // For logged-in non-admin users: verify nonce
+      if (isset($request->token, $request->id)) {
+        if (!wp_verify_nonce($request->token, $request->id)) {
+          Log::debug_log('Nonce verification failed for logged-in user. FormID=' . $formID);
+          return [
+            'valid'         => false,
+            'error'         => 'Invalid nonce for logged-in user',
+            'triggerData'   => null,
+            'isAdminBypass' => false
+          ];
+        }
+      } else {
+        Log::debug_log('Missing nonce for logged-in user. FormID=' . $formID);
+        return [
+          'valid'         => false,
+          'error'         => 'Missing nonce',
+          'triggerData'   => null,
+          'isAdminBypass' => false
+        ];
+      }
+    }
+
+    // For non-admin users (both logged-in and anonymous): validate one-time trigger token
+    if (!isset($request->cronNotOk[3]) || empty($request->cronNotOk[3])) {
+      Log::debug_log('Missing trigger token for formID=' . $formID . ', entryID=' . $entryID);
+      return [
+        'valid'         => false,
+        'error'         => 'Missing trigger token',
+        'triggerData'   => null,
+        'isAdminBypass' => false
+      ];
+    }
+
+    $submittedToken = sanitize_text_field($request->cronNotOk[3]);
+
+    // Validate trigger token from transient
+    $transientData = get_transient("bitform_trigger_transient_{$entryID}");
+
+    if (empty($transientData)) {
+      // Transient not found - will use database fallback in calling function
+      return [
+        'valid'         => true,
+        'error'         => '',
+        'triggerData'   => null,
+        'isAdminBypass' => false
+      ];
+    }
+
+    $triggerData = is_string($transientData) ? json_decode($transientData) : $transientData;
+    // Verify token matches and belongs to this entry/log
+    if (
+      !isset($triggerData['trigger_token'])
+      || !hash_equals($triggerData['trigger_token'], $submittedToken)
+      || (int)$triggerData['entryID'] !== $entryID
+      || (int)$triggerData['logID'] !== $logID
+    ) {
+      Log::debug_log('Invalid trigger token for entryID=' . $entryID . ', logID=' . $logID);
+      return [
+        'valid'         => false,
+        'error'         => 'Invalid trigger token',
+        'triggerData'   => null,
+        'isAdminBypass' => false
+      ];
+    }
+
+    // Token is valid - delete transient to prevent reuse (single-use token)
+    delete_transient("bitform_trigger_transient_{$entryID}");
+    Log::debug_log('Valid trigger token consumed for entryID=' . $entryID);
+
+    return [
+      'valid'         => true,
+      'error'         => '',
+      'triggerData'   => $triggerData,
+      'isAdminBypass' => false
+    ];
+  }
+
   public static function validateFormEntryEditPermission($formId, $entryId)
   {
     if (is_user_logged_in()) {

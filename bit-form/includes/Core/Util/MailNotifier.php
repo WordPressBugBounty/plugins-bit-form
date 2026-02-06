@@ -38,6 +38,7 @@ final class MailNotifier
 
       if (class_exists('\BitCode\BitFormPro\Admin\AppSetting\Pdf')) {
         $serverPath = Helpers::getFullPathWithEncryptedEntryId($formID, $entryID);
+        $webPath = Helpers::getWebPathWithEncryptedEntryId($formID, $entryID);
 
         if (isset($pdfSetting->password)) {
           if (isset($pdfSetting->password->static) && $pdfSetting->password->static && !empty($pdfSetting->password->pass)) {
@@ -68,6 +69,7 @@ final class MailNotifier
 
         $pdfBody = FieldValueHandler::replaceFieldWithValue($pdfTemplate[0]->body, $fieldValue, $formID);
         $pdfBody = FieldValueHandler::changeImagePathInHTMLString($pdfBody, $serverPath);
+        $pdfBody = FieldValueHandler::changeHrefPathInHTMLString($pdfBody, $webPath);  // replace anchor tag href with constructed weburl
 
         // allow developers to modify PDF body
         $pdfBody = apply_filters(
@@ -167,6 +169,7 @@ final class MailNotifier
           $mailBody = FieldValueHandler::replaceFieldWithValue($mailBody, $fieldValue, $formID);
           $webUrl = BITFORMS_UPLOAD_BASE_URL . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $formID . DIRECTORY_SEPARATOR . Helpers::getEncryptedEntryId($entryID) . DIRECTORY_SEPARATOR;
           $mailBody = FieldValueHandler::changeImagePathInHTMLString($mailBody, $webUrl);
+          $mailBody = FieldValueHandler::changeHrefPathInHTMLString($mailBody, $webUrl);  // replace anchor tag href with constructed weburl
 
           // allow developers to modify email body
           $mailBody = apply_filters(

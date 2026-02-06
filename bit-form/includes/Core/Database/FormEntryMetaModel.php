@@ -21,8 +21,8 @@ class FormEntryMetaModel extends Model
     $values[] = $data['duplicateID'];
     $values[] = $data['entryID'];
     $sql = "INSERT INTO $this->table_name (bitforms_form_entry_id,meta_key,meta_value)"
-        . ' SELECT %d as bitforms_form_entry_id,meta_key,meta_value'
-        . " FROM `$this->table_name` WHERE bitforms_form_entry_id = %d";
+      . ' SELECT %d as bitforms_form_entry_id,meta_key,meta_value'
+      . " FROM `$this->table_name` WHERE bitforms_form_entry_id = %d";
     return $this->execute($sql, $values)->getResult();
   }
 
@@ -49,8 +49,8 @@ class FormEntryMetaModel extends Model
     $oldEntriesKey = array_keys($oldEntries);
     foreach ($data as $upKey => $upValue) {
       $updatedData[$upKey] = is_string($upValue) ?
-      $upValue :
-      wp_json_encode($upValue);
+        $upValue :
+        wp_json_encode($upValue);
       if (!\in_array($upKey, $oldEntriesKey)) {
         $this->insert(
           [
@@ -349,7 +349,7 @@ class FormEntryMetaModel extends Model
     $groupedCondition = $group['groupedCondition'];
     $all_values = $group['all_values'];
     $isFldCondition = $group['isFldCondition'];
-    $orderCondition = $this->orderCondition($formFieldsNames, $sortBy);
+    $orderCondition = $this->orderCondition($formFieldsNames, (array) $sortBy);
 
     $paginate = null;
     if (!\is_null($limit)) {
@@ -476,22 +476,29 @@ class FormEntryMetaModel extends Model
     return implode('; ', $rows);
   }
 
-  public function getExportEntry($formFields, $entries, $formId, $fieldLabels, $limit = null, $sortBy = null, $sortByField = null)
+  public function getExportEntry($formFields, $entries, $formId, $fieldLabels, $limit = null, $sortBy = null, $sortByField = null, $offset = null, $entryConditions = null)
   {
     $entry_table = $this->app_db->prefix . 'bitforms_form_entries';
     $selectedEntryMeta = '`bitforms_form_entry_id` as entry_id,';
-    $selectedEntryMeta .= "e.user_id as '__user_id',";
-    $selectedEntryMeta .= "e.status as '__entry_status',";
-    $selectedEntryMeta .= "e.user_ip as '__user_ip',";
-    $selectedEntryMeta .= "e.user_location as '__user_location',";
-    $selectedEntryMeta .= "e.user_device as '__user_device',";
-    $selectedEntryMeta .= "e.referer as '__referer',";
-    $selectedEntryMeta .= "e.created_at as '__created_at',";
-    $selectedEntryMeta .= "e.updated_at as '__updated_at',";
+    $selectedEntryMeta .= 'e.user_id as `__user_id`,';
+    $selectedEntryMeta .= 'e.status as `__entry_status`,';
+    $selectedEntryMeta .= 'e.user_ip as `__user_ip`,';
+    $selectedEntryMeta .= 'e.user_location as `__user_location`,';
+    $selectedEntryMeta .= 'e.user_device as `__user_device`,';
+    $selectedEntryMeta .= 'e.referer as `__referer`,';
+    $selectedEntryMeta .= 'e.created_at as `__created_at`,';
+    $selectedEntryMeta .= 'e.updated_at as `__updated_at`,';
     $metaChecker = 0;
 
-    $entryInfo = ['__user_id', '__user_ip', /* '__user_location', */'__user_device',
-      '__referer', '__created_at', '__updated_at'];
+    $entryInfo = [
+      '__user_id',
+      '__user_ip', /* '__user_location', */
+      '__user_device',
+      '__entry_status',
+      '__referer',
+      '__created_at',
+      '__updated_at'
+    ];
     $all_values = [];
     if ([] === $formFields) {
       $data = [
@@ -534,28 +541,48 @@ class FormEntryMetaModel extends Model
     $condition['bitforms_form_entry_id'] = $entryIDs;
     $formattedCondition = $this->getFormatedCondition($condition);
     $groupedCondition = null;
-    if ($formattedCondition) {
-      $groupedCondition = $formattedCondition['conditions'] . ' GROUP BY
-            `bitforms_form_entry_id` ';
-      $all_values = array_merge($all_values, $formattedCondition['values']);
-    }
+    $grpCon = $this->groupedCondition($condition, $all_values, $entryConditions);
+    $groupedCondition = $grpCon['groupedCondition'];
+    $all_values = $grpCon['all_values'];
+
+    // if ($formattedCondition) {
+    //   $groupedCondition = $formattedCondition['conditions'] . ' GROUP BY
+    //         `bitforms_form_entry_id` ';
+    //   $all_values = array_merge($all_values, $formattedCondition['values']);
+    // }
     $order = 'DESC' === $sortBy ? 'DESC ' : 'ASC ';
     $orderField = \is_null($sortByField) ? 'bitforms_form_entry_id' : "`$sortByField`";
 
     $orderCondition = "ORDER BY $orderField $order ";
+    // if (!\is_null($limit)) {
+    //   $limitInt = \intval($limit);
+    //   $limit = " LIMIT $limitInt ";
+    // }
+    $limitClause = '';
     if (!\is_null($limit)) {
       $limitInt = \intval($limit);
-      $limit = " LIMIT $limitInt ";
+      $limitClause = " LIMIT $limitInt ";
+      if (!\is_null($offset)) {
+        $offsetInt = \intval($offset);
+        $limitClause .= " OFFSET $offsetInt ";
+      }
     }
+
     $sql = "SELECT $selectedEntryMeta FROM `$this->table_name` em";
     $sql .= " INNER JOIN $entry_table e on e.id = em.bitforms_form_entry_id ";
-    $sql .= $groupedCondition . $orderCondition . $limit;
-
+    $sql .= $groupedCondition . $orderCondition . $limitClause;
     $result = $this->execute($sql, $all_values)->getResult();
     $allData = [];
     $entry_id = 'entry_id';
     $users = get_users(['fields' => ['ID', 'display_name']]);
     $userNames = [];
+    $entryStatus = [
+      '0' => 'Read',
+      '1' => 'Unread',
+      '2' => 'Unconfirmed',
+      '3' => 'Confirmed',
+      '9' => 'Draft',
+    ];
     foreach ($users as $key => $value) {
       $userNames[$value->ID] = $value->display_name;
     }
@@ -565,7 +592,10 @@ class FormEntryMetaModel extends Model
         if ('__user_id' === $formFieldName && intval($value->$formFieldName) > 0) {
           $allData[$key][$formFieldName] = $userNames[$value->$formFieldName];
         } elseif ('__user_ip' === $formFieldName) {
-          $allData[$key][$formFieldName] = long2ip((int)$value->$formFieldName);
+          $allData[$key][$formFieldName] = long2ip((int) $value->$formFieldName);
+        } elseif ('__entry_status' === $formFieldName) {
+          // replace numeric marker for status with actual status text
+          $allData[$key][$formFieldName] = $entryStatus[$value->{$formFieldName}];
         } else {
           $allData[$key][$formFieldName] = preg_replace('/[\]["]/i', '', $value->$formFieldName);
         }

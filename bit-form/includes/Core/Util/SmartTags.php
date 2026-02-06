@@ -64,7 +64,7 @@ final class SmartTags
   public static function getPostUserData($referer = false)
   {
     $post = [];
-    if ($referer && isset($_SERVER['HTTP_REFERER'])) {
+    if (($referer || FrontendHelpers::isAjaxRequest()) && isset($_SERVER['HTTP_REFERER'])) {
       $postId = url_to_postid($_SERVER['HTTP_REFERER']);
     } else {
       $postId = url_to_postid($_SERVER['REQUEST_URI']);
@@ -172,7 +172,7 @@ final class SmartTags
     ];
 
     $smartTags = [
-      '_bf_current_time'       => date('Y-m-d H:i:s'),
+      '_bf_current_time'       => wp_date('Y-m-d H:i:s'),
       '_bf_admin_email'        => get_bloginfo('admin_email'),
       '_bf_date_default'       => wp_date(get_option('date_format')),
       '_bf_date.m/d/y'         => wp_date('m/d/y'),

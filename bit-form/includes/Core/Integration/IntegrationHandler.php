@@ -7,6 +7,7 @@ use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Core\Database\FormEntryLogModel;
 use BitCode\BitForm\Core\Database\FormEntryModel;
 use BitCode\BitForm\Core\Database\IntegrationModel;
+use BitCode\BitForm\Core\Form\FormManager;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\MailNotifier;
 use BitCode\BitForm\Frontend\Form\FrontendFormManager;
@@ -217,11 +218,11 @@ final class IntegrationHandler
     $fieldPattern = '/\${\w[^ ${}]*}/';
     preg_match_all($fieldPattern, $stringToReplaceField, $matchedField);
     $uniqueFieldsInStr = array_unique($matchedField[0]);
-    foreach ($uniqueFieldsInStr as $key => $value) {
+
+    foreach ($uniqueFieldsInStr as $value) {
       $fieldName = substr($value, 2, strlen($value) - 3);
 
       $repeaterArr = explode('.', $fieldName);
-
       if (isset($fieldValues[$fieldName])) {
         $stringToReplaceField = is_string($fieldValues[$fieldName])
         ? str_replace($value, $fieldValues[$fieldName], $stringToReplaceField)
@@ -229,7 +230,6 @@ final class IntegrationHandler
       } elseif (2 === count($repeaterArr) && isset($fieldValues[$repeaterArr[0]])) {
         $repeaterValues = [];
         $repeaterFieldValues = $fieldValues[$repeaterArr[0]];
-
         foreach ($repeaterFieldValues as $value) {
           if (isset($value[$repeaterArr[1]])) {
             $repeaterValues[] = $value[$repeaterArr[1]];
@@ -237,6 +237,8 @@ final class IntegrationHandler
         }
 
         $stringToReplaceField = $repeaterValues;
+      } else {
+        $stringToReplaceField = FieldValueHandler::replaceSmartTagWithValue($value);
       }
     }
     return $stringToReplaceField;
@@ -298,8 +300,10 @@ final class IntegrationHandler
 
     $trnasientData = get_transient("bitform_trigger_transient_{$entryId}");
     $trnasientData = is_string($trnasientData) ? json_decode($trnasientData) : $trnasientData;
+
     if (!empty($trnasientData['fields'])) {
-      $workFlowReturnedData['fields'] = array_merge($workFlowReturnedData['fields'], $trnasientData['fields']);
+      $fieldData = isset($workFlowReturnedData['fields']) ? $workFlowReturnedData['fields'] : $workFlowReturnedData['updatedData'];
+      $workFlowReturnedData['fields'] = array_merge($fieldData, $trnasientData['fields']);
     }
 
     if (function_exists('fastcgi_finish_request') || !wp_doing_ajax()) {
@@ -394,6 +398,11 @@ final class IntegrationHandler
         $triggerData['dbl_opt_dflt_template'] = $workFlowReturnedData['dflt_template'];
         $triggerData['integrationRun'] = $workFlowReturnedData['integrationRun'];
       }
+
+      // Generate one-time trigger token for security
+      $triggerToken = wp_hash($triggerData['entryID'] . $triggerData['logID'] . time() . wp_rand(), 'nonce');
+      $triggerData['trigger_token'] = $triggerToken;
+
       set_transient("bitform_trigger_transient_{$entryID}", $triggerData, HOUR_IN_SECONDS);
       $entryLog = new FormEntryLogModel();
       $queueuEntry = $entryLog->log_history_insert(
@@ -410,6 +419,7 @@ final class IntegrationHandler
         $triggerData['entryID'],
         $triggerData['logID'],
         $queueuEntry,
+        $triggerToken, // Add one-time token as 4th element
       ];
     }
     return $responseData;
@@ -479,12 +489,139 @@ final class IntegrationHandler
 
     // convert the array to string repeater field value
     if ('string' === $returnRepeaterValue) {
+      $form = new FormManager(static::$_formID);
       foreach ($repeaterField as $key) {
         if (isset($fieldValues[$key]) && is_array($fieldValues[$key])) {
-          $fieldValues[$key] = implode(', ', $fieldValues[$key]);
+          $fieldValues[$key] = implode(', ', self::flattenArray($fieldValues[$key]));
+        }
+      }
+
+      foreach ($fieldValues as $key=>$value) {
+        if (!$form->isRepeaterField($key)) {
+          continue;
+        }
+        $repeaterValues = $fieldValues[$key];
+
+        $newFieldValues = self::constructRepeaterValue($repeaterValues, static::$_formID);
+
+        $fieldValues[$key] = json_encode(array_values($newFieldValues), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      }
+    }
+
+    return $fieldValues;
+  }
+
+  private static function flattenArray($array)
+  {
+    return array_map(function ($val) {
+      if (is_array($val)) {
+        return count($val) > 1 ? ('[' . implode(', ') . ']') : implode(', ', $val);
+      } else {
+        return $val;
+      }
+    }, $array);
+  }
+
+  /**
+   * Replace file field value with web url
+   * @param mixed $fieldValues
+   * @param number $formId
+   * @param number $entryId
+   * @return mixed $fieldValues
+   */
+  public static function replaceFileWithUrl($fieldValues, $formId, $entryId)
+  {
+    if (!$formId || !$entryId) {
+      return $fieldValues;
+    }
+    $form = new FormManager($formId);
+    $formFields = $form->getFields();
+    $webPath = Helpers::getWebPathWithEncryptedEntryId($formId, $entryId);
+
+    $fldsIncludeFile = ['file-up', 'advanced-file-up', 'repeater', 'signature'];
+    foreach ($fieldValues as $key =>$value) {
+      $fldTyp = $formFields[$key]['type'] ?? null;
+      if (!in_array($fldTyp, $fldsIncludeFile)) {
+        continue;
+      }
+
+      if ('repeater' === $fldTyp) {
+        foreach ($value as $rIndex => $rValue) {
+          foreach ($rValue as $subKey=>$subValue) {
+            if (!in_array($formFields[$subKey]['type'], $fldsIncludeFile)) {
+              continue;
+            }
+            //  for file fields inside repeater
+            if (is_array($subValue)) {
+              foreach ($subValue as $fileIndex=>$fileValue) {
+                $fieldValues[$key][$rIndex][$subKey][$fileIndex] = $webPath . '/' . $fileValue;
+              }
+            } else {
+              // for signature field inside repeater;
+              $fieldValues[$key][$rIndex][$subKey] = $webPath . '/' . $subValue;
+            }
+          }
+        }
+      }
+
+      if ('file-up' === $fldTyp || 'advanced-file-up' === $fldTyp || 'signature' === $fldTyp) {
+        if (is_array($value)) {
+          foreach ($value as $fldIndex=>$fldValue) {
+            $fieldValues[$key][$fldIndex] = $webPath . '/' . $fldValue;
+          }
+        } else {
+          $fieldValues[$key] = $webPath . '/' . $value;
         }
       }
     }
+
     return $fieldValues;
+  }
+
+  public static function assignRepeaterFieldValue($fieldValues, $formId)
+  {
+    if (!$formId) {
+      return $fieldValues;
+    }
+    $form = new FormManager($formId);
+    $formFields = $form->getFields();
+
+    foreach ($fieldValues as $key=>$value) {
+      if (!$form->isRepeaterField($key)) {
+        continue;
+      }
+
+      if ('repeater' === $formFields[$key]['type']) {
+        if (is_array($value)) {
+          foreach ($value as $rIndex=>$rValue) {
+            foreach ($rValue as $subKey =>$subValue) {
+              $fieldValues[$subKey] = $subValue;
+            }
+          }
+        }
+      }
+    }
+
+    return $fieldValues;
+  }
+
+  public static function constructRepeaterValue($repeaterValues, $formId)
+  {
+    if (!$formId) {
+      return $repeaterValues;
+    }
+    $form = new FormManager($formId);
+    $formFields = $form->getFields();
+    $newRptrValue = [];
+    foreach ($repeaterValues as $key=>$value) {
+      $newRepeatedValue = [];
+      foreach ($value as $rKey =>$rValue) {
+        $fldLbl = isset($formFields[$rKey]) ? $formFields[$rKey]['label'] : $rKey;
+        $newRepeatedValue[$fldLbl] = $rValue;
+      }
+      $newRptrValue[$key] = $newRepeatedValue;
+    }
+
+    return $newRptrValue;
   }
 }

@@ -9,14 +9,19 @@ if (!\defined('ABSPATH')) {
 }
 class BfAnalytics
 {
-  public function modifyTelemetryData()
+  private $allForms;
+
+  public function __construct()
   {
     global $wpdb;
-    $allForms = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}bitforms_form");
+    $this->allForms = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}bitforms_form");
+  }
 
+  public function modifyTelemetryData()
+  {
     $bfInfo = [];
     $formsArr = [];
-    foreach ($allForms as $form) {
+    foreach ($this->allForms as $form) {
       $formData = [];
       $formData['id'] = $form->id;
       $formContent = json_decode($form->form_content, true);
@@ -31,9 +36,10 @@ class BfAnalytics
       $formsArr[] = $formData;
     }
     $bfInfo['forms'] = $formsArr;
-    $bfInfo['totalForms'] = count($allForms);
+    $bfInfo['totalForms'] = count($this->allForms);
     $bfInfo['reCaptchaV3'] = $this->getReCaptchaV3();
     $bfInfo['paymentGateway'] = $this->getPaymentGateway();
+    $bfInfo['paymentInfo'] = $this->getPaymentInfo();
     $bfInfo['smtp'] = $this->isSMTPExist();
 
     return $bfInfo;
@@ -168,5 +174,127 @@ class BfAnalytics
       return true;
     }
     return false;
+  }
+
+  private function getPaymentInfo()
+  {
+    if (!defined('BITFORMPRO_PLUGIN_DIR')) {
+      return [];
+    }
+
+    global $wpdb;
+
+    // Fetch all transactions
+    $allTransactions = $wpdb->get_results(
+      "SELECT * FROM `{$wpdb->prefix}bitforms_payments`;"
+    );
+
+    if (empty($allTransactions)) {
+      return [];
+    }
+
+    $result = [
+      'totalPaymentFormEntries' => 0,
+      'payments'                => [],
+      'totalForm'               => 0,
+    ];
+
+    $tempTotalForms = [];
+
+    foreach ($allTransactions as $trx) {
+      $gateway = strtolower($trx->payment_name);
+
+      $paymentResponse = json_decode($trx->payment_response, true) ?? [];
+
+      if (false === in_array($trx->form_id, $tempTotalForms)) {
+        $tempTotalForms[] = $trx->form_id;
+      }
+
+      // Initialize gateway
+      if (!isset($result['payments'][$gateway])) {
+        $result['payments'][$gateway] = [
+          'totalTransaction'   => 0,
+          'transactionDetails' => []
+        ];
+      }
+
+      $gatewayRef = &$result['payments'][$gateway];
+
+      if (!$this->isLiveMode($gateway, $paymentResponse)) {
+        continue;
+      }
+      $gatewayRef['totalTransaction'] += 1;
+      // Determine amount and currency
+      [$amount, $currency] = $this->extractAmountAndCurrency($gateway, $paymentResponse);
+
+      // Add each transaction as a new object in the array
+      $gatewayRef['transactionDetails'][] = [
+        'amount'           => $amount,
+        'currency'         => $currency
+      ];
+      $result['totalPaymentFormEntries'] += 1;
+    }
+
+    $result['totalForm'] = count($tempTotalForms);
+
+    return $result;
+  }
+
+  /**
+   * Extracts amount and currency from a payment response for any gateway
+   */
+  private function extractAmountAndCurrency($gateway,  $response)
+  {
+    $amount = 0;
+    $currency = 'unknown';
+
+    switch ($gateway) {
+      case 'stripe':
+        $amount = isset($response['amount']) && is_numeric($response['amount'])
+            ? $response['amount'] / 100
+            : 0;
+        $currency = strtolower($response['currency'] ?? 'usd');
+        break;
+
+      case 'razorpay':
+        $amount = isset($response['amount']) && is_numeric($response['amount'])
+            ? $response['amount'] / 100
+            : 0;
+        $currency = strtolower($response['currency'] ?? 'inr');
+        break;
+
+      case 'paypal':
+        $unit = $response['purchase_units'][0]['amount'] ?? [];
+        $amount = floatval($unit['value'] ?? 0);
+        $currency = strtolower($unit['currency_code'] ?? 'usd');
+        break;
+
+      case 'mollie':
+        $amount = floatval($response['amount']['value'] ?? 0);
+        $currency = strtolower($response['amount']['currency'] ?? 'eur');
+        break;
+    }
+
+    return [$amount, $currency];
+  }
+
+  private function isLiveMode(string $gateway, array $response): bool
+  {
+    switch ($gateway) {
+      case 'stripe':
+        return !empty($response['livemode']);
+
+      case 'razorpay':
+        return isset($response['status']) && 'captured' === $response['status'];
+
+      case 'paypal':
+        return isset($response['status']) && 'COMPLETED' === $response['status'];
+
+      case 'mollie':
+        return isset($response['mode']) && 'live' === $response['mode'];
+
+      default:
+        return false;
+    }
   }
 }

@@ -347,6 +347,8 @@ $i18n_strings = array(
 
     'Autonami Fields' => __('Autonami Fields', 'bit-form'),
 
+    'Loaded integration:' => __('Loaded integration:', 'bit-form'),
+
     'Integration Info' => __('Integration Info', 'bit-form'),
 
     'Add New' => __('Add New', 'bit-form'),
@@ -667,6 +669,8 @@ $i18n_strings = array(
 
     'Hubspot Fields' => __('Hubspot Fields', 'bit-form'),
 
+    'Connected' => __('Connected', 'bit-form'),
+
     'Data center cann\'t be empty' => __('Data center cann\'t be empty', 'bit-form'),
 
     'Data Center:' => __('Data Center:', 'bit-form'),
@@ -694,6 +698,8 @@ $i18n_strings = array(
     'Key' => __('Key', 'bit-form'),
 
     'Value' => __('Value', 'bit-form'),
+
+    'Add field' => __('Add field', 'bit-form'),
 
     'Test Webhook' => __('Test Webhook', 'bit-form'),
 
@@ -2799,6 +2805,8 @@ $i18n_strings = array(
 
     'Message Type' => __('Message Type', 'bit-form'),
 
+    'Close Icon Color' => __('Close Icon Color', 'bit-form'),
+
     'Confirmations' => __('Confirmations', 'bit-form'),
 
     'How to set up Confirmation messages or Redirect page:' => __('How to set up Confirmation messages or Redirect page:', 'bit-form'),
@@ -2843,19 +2851,19 @@ $i18n_strings = array(
 
     'Publicly Queryable' => __('Publicly Queryable', 'bit-form'),
 
-    'Queries can be performed on the front end as part of parse_request()' => __('Queries can be performed on the front end as part of parse_request()', 'bit-form'),
+    'Queries can be performed on the front end' => __('Queries can be performed on the front end', 'bit-form'),
 
     'Show in REST API' => __('Show in REST API', 'bit-form'),
 
-    'To show this post type data in the WP REST API' => __('To show this post type data in the WP REST API', 'bit-form'),
+    'To show this post type in the WP REST API' => __('To show this post type in the WP REST API', 'bit-form'),
 
     'Show in Menu' => __('Show in Menu', 'bit-form'),
 
-    'This show the post type in the admin menu and where to show that menu.' => __('This show the post type in the admin menu and where to show that menu.', 'bit-form'),
+    'Show the post type in the admin menu' => __('Show the post type in the admin menu', 'bit-form'),
 
     'Show UI' => __('Show UI', 'bit-form'),
 
-    'Whether or not to generate a default UI for managing this post type' => __('Whether or not to generate a default UI for managing this post type', 'bit-form'),
+    'Generate UI for managing this post type' => __('Generate UI for managing this post type', 'bit-form'),
 
     'Add Post Type' => __('Add Post Type', 'bit-form'),
 
@@ -2877,6 +2885,10 @@ $i18n_strings = array(
 
     'Posts of this type should be shown in the admin UI and is publicly queryable' => __('Posts of this type should be shown in the admin UI and is publicly queryable', 'bit-form'),
 
+    'Queries can be performed on the front end as part of parse_request()' => __('Queries can be performed on the front end as part of parse_request()', 'bit-form'),
+
+    'To show this post type data in the WP REST API' => __('To show this post type data in the WP REST API', 'bit-form'),
+
     'This show the post type in the admin menu and where to show that menu' => __('This show the post type in the admin menu and where to show that menu', 'bit-form'),
 
     'Generate a default UI for managing this post type' => __('Generate a default UI for managing this post type', 'bit-form'),
@@ -2886,8 +2898,6 @@ $i18n_strings = array(
     'Update Template' => __('Update Template', 'bit-form'),
 
     'Template Name:' => __('Template Name:', 'bit-form'),
-
-    'Add field' => __('Add field', 'bit-form'),
 
     'Browse Template' => __('Browse Template', 'bit-form'),
 
@@ -2977,11 +2987,17 @@ $i18n_strings = array(
 
     'Stripe' => __('Stripe', 'bit-form'),
 
+    'Please select at least one column' => __('Please select at least one column', 'bit-form'),
+
     'no response found' => __('no response found', 'bit-form'),
 
     'How many rows to export' => __('How many rows to export', 'bit-form'),
 
     'Enter row number' => __('Enter row number', 'bit-form'),
+
+    'Select filter' => __('Select filter', 'bit-form'),
+
+    'Select columns' => __('Select columns', 'bit-form'),
 
     'Sort Order' => __('Sort Order', 'bit-form'),
 
@@ -3871,7 +3887,7 @@ $i18n_strings = array(
 
     'Please upgrade to the PRO plan to unlock all these awesome features.' => __('Please upgrade to the PRO plan to unlock all these awesome features.', 'bit-form'),
 
-    'Upgrade to Pro' => __('Upgrade to Pro', 'bit-form'),
+    'Get 74% OFF' => __('Get 74% OFF', 'bit-form'),
 
     'Try Demo' => __('Try Demo', 'bit-form'),
 
@@ -4067,7 +4083,7 @@ $i18n_strings = array(
 
     'User Approval  Method:' => __('User Approval  Method:', 'bit-form'),
 
-    'select approval method' => __('select approval method', 'bit-form'),
+    'Select approval method' => __('Select approval method', 'bit-form'),
 
     'Auto Login After Registration' => __('Auto Login After Registration', 'bit-form'),
 

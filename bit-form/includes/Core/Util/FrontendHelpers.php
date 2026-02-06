@@ -58,10 +58,25 @@ final class FrontendHelpers
 
   public static function getShortCodeIds($content = '')
   {
-    \preg_match_all("/\[bitform\s+id\s*=\s*('|\")\s*(\d+)\s*('|\")\]/", $content, $shortCode);
-    $ids = $shortCode[2];
+    $pattern = '/' . get_shortcode_regex(['bitform']) . '/';
+    \preg_match_all($pattern, $content, $short);
 
-    return $ids;
+    $formIds = [];
+    foreach ($short[3] as $attr_string) {
+      $attr = shortcode_parse_atts($attr_string);
+      if (!empty($attr['id'])) {
+        $formIds[] = $attr['id'];
+      }
+    }
+
+    // Regex handles:
+    // 1. [bitform ... id=... ]
+    // 2. id="123" or id='123' or id=123
+    // 3. Escaped quotes id=\"123\" or id=\'123\' (common in builder meta)
+    // \preg_match_all('/\[bitform\s+\b[^\]]*\bid\s*=\s*(?:\\\\?[\'"])?(\d+)(?:\\\\?[\'"])?[^\]]*\]/', $content, $shortCode);
+    // $ids = $shortCode[1];
+
+    return $formIds;
   }
 
   public static function getViewIdsFromPost()
@@ -90,10 +105,21 @@ final class FrontendHelpers
 
   public static function getViewShortCodeIds($content = '')
   {
-    \preg_match_all("/\[bitform-view\s+id\s*=\s*('|\")\s*(\d+)\s*('|\")\]/", $content, $shortCode);
-    $ids = $shortCode[2];
+    $pattern = '/' . get_shortcode_regex(['bitform-view']) . '/';
+    \preg_match_all($pattern, $content, $short);
 
-    return $ids;
+    $viewIds = [];
+
+    foreach ($short[3] as $attr_string) {
+      $attr = shortcode_parse_atts($attr_string);
+      if (!empty($attr['id'])) {
+        $viewIds[] = $attr['id'];
+      }
+    }
+
+    // \preg_match_all('/\[bitform-view\s+\b[^\]]*\bid\s*=\s*["\']?(\d+)["\']?[^\]]*\]/', $content, $shortCode);
+    // $ids = $shortCode[1];
+    return $viewIds;
   }
 
   public static function checkIsPageBuilder($srvr)
@@ -154,6 +180,29 @@ final class FrontendHelpers
     $rest_url = wp_parse_url(trailingslashit(rest_url()));
     $current_url = wp_parse_url(add_query_arg([]));
     return 0 === strpos($current_url['path'], $rest_url['path'], 0);
+  }
+
+  public static function isAjaxRequest()
+  {
+    if (function_exists('wp_doing_ajax') && wp_doing_ajax()) {
+      return true;
+    }
+    if (self::isRestRequest()) {
+      return true;
+    }
+
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 'xmlhttprequest' === strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+      return true;
+    }
+    if (isset($_SERVER['HTTP_SEC_FETCH_MODE'],$_SERVER['HTTP_SEC_FETCH_DEST'])) {
+      $destination = strtolower($_SERVER['HTTP_SEC_FETCH_DEST']);
+      $mode = strtolower($_SERVER['HTTP_SEC_FETCH_MODE']);
+      if (('empty' === $destination && in_array($mode, ['cors', 'same-origin'], true))) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public static function isAdminRequest()

@@ -78,7 +78,7 @@ class RecordApiHelper
         $recordApiResponse = $this->insertRecord(wp_json_encode($fieldData));
         $type = 'insert';
 
-        if (!empty($actions->update) && !empty($recordApiResponse->message) && 'Contact already exist' === $recordApiResponse->message) {
+        if (!empty($actions->update) && !empty($recordApiResponse->message) && 'email' === $recordApiResponse->metadata->duplicate_identifiers[0]) {
           $contactEmail = $fieldData['email'];
           $recordApiResponse = $this->updateRecord($contactEmail, wp_json_encode($fieldData));
           if (empty($recordApiResponse)) {

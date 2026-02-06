@@ -23,6 +23,20 @@ class Routes extends WP_REST_Controller
 
   public function register_routes()
   {
+    /** OAuth redirect route */
+    /** mailchimp route */
+    register_rest_route(
+      $this->namespace,
+      $this->rest_base . '/oauth-redirect/',
+      [
+        [
+          'method'             => WP_REST_Server::READABLE,
+          'callback'           => [$this->entryController, 'authRedirect'],
+          'permission_callback'=> '__return_true'
+        ]
+      ]
+    );
+
     /* google sheet route */
     register_rest_route(
       $this->namespace,

@@ -25,6 +25,7 @@ use BitCode\BitForm\Core\Util\IpTool;
 use BitCode\BitForm\Core\Util\Log;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
 use BitCode\BitForm\Core\WorkFlow\WorkFlowHandler;
+use stdClass;
 use WP_Error;
 
 class FormManager
@@ -286,6 +287,82 @@ class FormManager
     return static::$form[0]->form_name;
   }
 
+  public function getFormLayout()
+  {
+    $formContent = $this->getFormContent();
+    return $formContent->layout;
+  }
+
+  public function getFormNestedLayout()
+  {
+    $formContent = $this->getFormContent();
+    return $formContent->nestedLayout;
+  }
+
+  private function mergeNestedLayout(&$layout, $nestedLayout)
+  {
+    foreach ($nestedLayout as $key => $brkpnts) {
+      foreach ($brkpnts as $brkpnt=>$nLayout) {
+        $layout->{$brkpnt} = array_merge($layout->{$brkpnt}, $nLayout);
+      }
+    }
+  }
+
+  public function flatMultistepFormLayout()
+  {
+    $formLayout = $this->getFormLayout();
+    $multistepLayout = new stdClass();
+    foreach ($formLayout as $stpLayout) {
+      $lyout = $stpLayout->layout;
+
+      foreach ($lyout as $brkpnt=>$fields) {
+        $multistepLayout->{$brkpnt} = array_merge($multistepLayout->{$brkpnt} ?? [], $fields);
+      }
+    }
+
+    return $multistepLayout;
+  }
+
+  public function getFlatenFormLayout()
+  {
+    $layout = $this->getFormLayout();
+    $nestedLayout = $this->getFormNestedLayout();
+    if ('array' === gettype($layout)) {
+      // multi step form layout
+      $layout = $this->flatMultistepFormLayout();
+    }
+    if (!empty((array) $nestedLayout)) {
+      $this->mergeNestedLayout($layout, $nestedLayout);
+    }
+
+    return $layout;
+  }
+
+  public function getFieldsBasedOnLayout()
+  {
+    $layout = $this->getFlatenFormLayout();
+
+    $fieldKeyOrderbasedOnLayout = array_map(function ($fld) {
+      return $fld->i;
+    }, $layout->lg);
+    $orderedFields = [];
+    $fields = $this->getFields();
+
+    foreach ($fieldKeyOrderbasedOnLayout as $key) {
+      if (array_key_exists($key, $fields)) {
+        $orderedFields[$key] = $fields[$key];
+      }
+    }
+
+    foreach ($fields as $k=>$v) {
+      if (!array_key_exists($k, $fieldKeyOrderbasedOnLayout)) {
+        $orderedFields[$k] = $fields[$k];
+      }
+    }
+
+    return $orderedFields;
+  }
+
   public function getFields()
   {
     if (!is_null($this->_fields)) {
@@ -301,7 +378,7 @@ class FormManager
       }
       // $field_name = empty($field->lbl) ? null : \preg_replace('/[\`\~\!\@\#\$\'\.\s\?\+\-\*\&\|\/\\\!]/', '_', $field->lbl);
       $field_type = $field->typ;
-      $field_details[$key]['label'] = empty($field->lbl) ? null : $field->lbl;
+      $field_details[$key]['label'] = !empty($field->lbl) ? $field->lbl : (!empty($field->adminLbl) ? $field->adminLbl : (!empty($field->fieldName) ? $field->fieldName : null));
       $field_details[$key]['type'] = $field_type;
       $field_details[$key]['key'] = $key;
       $field_details[$key]['name'] = isset($field->fieldName) ? $field->fieldName : '';
@@ -440,8 +517,8 @@ class FormManager
 
       $_upload_dir = FileHandler::getEntriesFileUploadDir($form_id, $entry_id);
       FileHandler::createIndexFile($_upload_dir);
-
-      $filename = "{$entry_id}-{$fieldKey}.{$imgTypes[$imgType]}";
+      $uniqueId = time() . '-' . bin2hex(random_bytes(4));
+      $filename = "{$entry_id}-{$fieldKey}-{$uniqueId}.{$imgTypes[$imgType]}";
       $fullPath = $_upload_dir . DIRECTORY_SEPARATOR . $filename;
       if (false === file_put_contents($fullPath, $decoded_image)) {
         throw new \RuntimeException("Failed to write image to $fullPath");
@@ -728,12 +805,21 @@ class FormManager
       // Get the common path for file storage
       $this->addNewFilePathToFiles($this->form_id, $entry_id, $file_fields);
 
-      /* ======== for Signature field ===========*/
       foreach ($form_content->fields as $key => $field) {
+        /* ======== for Signature field ===========*/
         if ('signature' === $field->typ) {
-          $fld_data = $submitted_data[$key];
-          $img_type = $field->config->imgTyp;
-          $submitted_data[$key] = $this->getSignatureFilePath($fld_data, $this->form_id, $key, $entry_id, $img_type);
+          if (isset($submitted_data[$key])) {
+            $fld_data = $submitted_data[$key];
+            $img_type = $field->config->imgTyp;
+            $submitted_data[$key] = $this->getSignatureFilePath($fld_data, $this->form_id, $key, $entry_id, $img_type);
+          }
+        }
+
+        //  for Signature field inside reepater
+        if ('repeater' === $field->typ) {
+          $rptr_data = $submitted_data[$key];
+          $formFields = $form_content->fields;
+          $this->setSignatureFilePathInRepeater($rptr_data, $key, $formFields, $entry_id, $submitted_data);
         }
       }
 
@@ -755,6 +841,21 @@ class FormManager
       $workFlowreturnedOnSubmit = apply_filters('bitform_filter_return_submit_success', $workFlowreturnedOnSubmit, $this->form_id);
 
       return $workFlowreturnedOnSubmit;
+    }
+  }
+
+  private function setSignatureFilePathInRepeater($repeaterData, $repeaterFieldKey, $formFields, $entry_id, &$submitted_data)
+  {
+    foreach ($repeaterData as $rptr_entry_index => $rptr_entries) {
+      foreach ($rptr_entries as $entry_key => $entry_value) {
+        $rptr_entry_info = $formFields->{$entry_key};
+
+        if ('signature' === $rptr_entry_info->typ) {
+          $imgType = $rptr_entry_info->config->imgTyp;
+          $signatureImage = $this->getSignatureFilePath($entry_value, $this->form_id, $repeaterFieldKey, $entry_id, $imgType);
+          $submitted_data[$repeaterFieldKey][$rptr_entry_index][$entry_key] = $signatureImage;
+        }
+      }
     }
   }
 
@@ -831,6 +932,9 @@ class FormManager
           }
         }
       }
+      if (is_object($updatedValue)) {
+        $updatedValue = (array) $updatedValue;
+      }
       foreach ($file_fields as $field_key) {
         $repeaterFldKey = $this->isRepeatedField($field_key);
         if (isset($updatedValue[$field_key . '_old'])) {
@@ -887,7 +991,9 @@ class FormManager
               // Retrieve existing old files for this specific repeater index
               if (isset($repeaterFiles_old[$index - 1]) && count($repeaterFiles_old[$index - 1]) > 0) {
                 $old_meta_value = empty($repeaterFiles_old[$index - 1]) ? [] : $repeaterFiles_old[$index - 1];
-                $updatedValue[$repeaterFldKey][$index - 1][$field_key] = wp_json_encode($old_meta_value);
+                // json format causing issue with repeater file in mail attachment as it's sending broken url(for multistep and abandonment form)
+                // $updatedValue[$repeaterFldKey][$index - 1][$field_key] = wp_json_encode($old_meta_value);
+                $updatedValue[$repeaterFldKey][$index - 1][$field_key] = $old_meta_value;
               }
               $repeateFileDetails = [
                 'name'     => $file_details['name'][$index],
@@ -899,7 +1005,10 @@ class FormManager
               $meta_value = $fileHandler->moveUploadedFiles($repeateFileDetails, $formID, $entryID, $index);
               if (!empty($meta_value)) {
                 $mergedMetaValueWithOld = isset($old_meta_value) ? array_merge($old_meta_value, (array) $meta_value) : (array) $meta_value;
-                $updatedValue[$repeaterFldKey][$index - 1][$field_key] = wp_json_encode($mergedMetaValueWithOld);
+                // json format causing issue with repeater file in mail attachment as it's sending broken url(for multistep and abandonment form)
+                // $updatedValue[$repeaterFldKey][$index - 1][$field_key] = wp_json_encode($mergedMetaValueWithOld);
+                $updatedValue[$repeaterFldKey][$index - 1][$field_key] = $mergedMetaValueWithOld;
+
                 $_FILES[$field_key]['new_name'][$index - 1] = $mergedMetaValueWithOld;
                 // $_FILES[$field_key]['file_path'][$index - 1] = $common_file_path . DIRECTORY_SEPARATOR . $meta_value;
               }
@@ -924,7 +1033,12 @@ class FormManager
       $this->addNewFilePathToFiles($formID, $entryID, $file_fields);
     }
 
-    unset($updatedValue['_ajax_nonce'], $_REQUEST['g-recaptcha-response']);
+    if (is_object($updatedValue)) {
+      $updatedValue = (array) $updatedValue;
+    }
+    if (isset($updatedValue['_ajax_nonce']) && $_REQUEST['g-recaptcha-response']) {
+      unset($updatedValue['_ajax_nonce'], $_REQUEST['g-recaptcha-response']);
+    }
 
     $toUpdateValues = [];
     foreach ($form_fields as $field) {
@@ -939,6 +1053,13 @@ class FormManager
         $fld_data = $updatedValue[$key];
         $img_type = $field->config->imgTyp;
         $toUpdateValues[$key] = $this->getSignatureFilePath($fld_data, $this->form_id, $key, $entryID, $img_type);
+      }
+
+      //  for Signature field inside reepater
+      if ('repeater' === $field->typ) {
+        $rptr_data = $updatedValue[$key];
+        $formFields = $form_content->fields;
+        $this->setSignatureFilePathInRepeater($rptr_data, $key, $formFields, $entryID, $toUpdateValues);
       }
     }
 

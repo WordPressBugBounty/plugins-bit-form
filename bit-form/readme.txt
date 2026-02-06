@@ -1,7 +1,7 @@
-=== Bit Form - Custom Contact Form, Multi Step, Conversational, Payment & Quiz Form builder ===
-Plugin Name: Bit Form - Custom Contact Form, Multi Step, Conversational, Payment & Quiz Form builder
-Version: 2.20.6
-Stable tag: 2.20.6
+=== Bit Form - Custom Contact Form, Multi Step, Conversational Form & Payment Form builder ===
+Plugin Name: Bit Form - Custom Contact Form, Multi Step, Conversational Form & Payment Form builder
+Version: 2.21.10
+Stable tag: 2.21.10
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin, akaioum 
@@ -501,6 +501,110 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 6. Response table to view form entries
 
 == Changelog ==
+= 2.21.10 = 
+*Release Date: 02 February, 2026*
+*Improvements:
+    1. Export Entries: Enhanced filtering options for exporting entries.
+    
+*Fixes:
+    1. Phone Number Field: Fixed country-specific pattern validation issues.
+    2. Repeater Field: Fixed single mapped Signature field preview in email/PDF templates.
+    3. Entries Table: Fixed sorted column preference not persisting on reload.
+
+= 2.21.9 =
+*Release Date: 12 January, 2026*
+*Fixes:
+    1. Fixed trigger workflows route's invalid trigger token validation.
+    2. Resolved hCaptcha field initialization error on form submission.
+    3. Fixed test mail form returning "undefined" response when sending emails
+
+= 2.21.8 =
+*Release Date: 07 January, 2026*
+*Fixes:
+    1. Resolved the dropdown value preview issue in the repeater field..
+    2. Fixed email sending issues on older PHP versions.
+
+= 2.21.7 =
+*Release Date: 29 December, 2025*
+"Improvements:
+    1. Enhanced authentication process for Workflow trigger (AJAX) Route.
+    2. Smart Tag: display field admin label or name in email & PDF templates in All Data smart tag when field label is empty.
+    3. Files Hyperlink: add files hyperlink display in email & PDF templates.
+
+*Fixes:
+    1. Brevo (Sendinblue) integration: fixed an contact update issue.
+    2. Resolve "Back" button issue in Single Entry Details View.
+    3. SMTP Status: SMTP status configuration not update issues.
+
+= 2.21.6 =
+*Release Date: 16 December, 2025*
+*Fixes:
+    1. Fixed an issue with the WordPress current data smart tag.
+    2. Resolved missing runtime dependency issues.
+
+*Improvements:
+    1. Enhanced the Mailchimp integration authentication process.
+
+= 2.21.5 =
+*Release Date: 10 December, 2025*
+*Fixes:
+    1. Resolved an issue where repeater-field file attachments were not included in email notifications for multistep and abandonment forms.
+    2. Added the missing post route for creating and updating Custom Post Types (CPT).
+
+*Improvements:
+    1. Improved the mapping of uploaded file URLs in Google Sheets and Zoho Sheets integrations.
+
+= 2.21.3 =
+*Release Date: 24 November, 2025*
+*New:
+    1. Added Advanced Filtering option for export entries. 
+
+*Fixes:
+    1. Fixed an issue PDF and email template repeater field display.
+    2. Resolved a problem with the single IP draft submission.
+    3. Fixed an issue with form preview routing unexpected slash (/).
+
+*Improvements:
+    1. Enhanced the webhook field mapping with smart tag.
+    2. Improved display of file link in email and PDF templates.
+    3. Expanded anonymous telemetry to include payment amount and currency metrics..
+
+= 2.21.2 =
+*Release Date: 09 November, 2025*
+*Fixes:
+    1. Fixed an issue where WP Auth changes the Update button not working.
+    2. Resolved a problem with the Make.com integration not functioning correctly.
+    3. Fixed an issue causing Table Data View routing to fail.
+
+*Improvements:
+    1. Enhanced the Table Data View to better display file and repeater field values.
+    2. Updated the Single Entry Details View to support the ${bf_all_data} smart tag.
+
+= 2.21.1 =
+*Release Date: 26 October, 2025*
+*Fixes:
+    1. Fixed an issue where Razorpay webhook was not working properly for some users.
+
+= 2.21.0 =
+*Release Date: 23 October, 2025*
+*New:
+    1. Razorpay: Added webhook support for Razorpay payments after form submission.
+    2. Stripe: Added MB Way payment method.
+
+*Improvements:
+    1. Routing: Optimized AJAX routing for improved performance.
+    2. MailChimp Integration: Enhanced birthdate field mapping for better compatibility.
+    3. Payment Information: Refined payment details display within the entry details section.
+    4. Smart Tags: Improved Smart Tag handling in integration field mappings.
+
+*Fixes:
+    1. Fixed issue Repeated field math calculations.
+    2. Fixed an issue where Razorpay and Mollie workflows were triggered after successful payment.
+    3. Fixed an issue that caused form entries to be deleted when deleting a form.
+    4. Fixed an issue with empty values in dropdown field group options.
+    5. Fixed an issue preventing Mailchimp contact updates from working correctly.
+    6. Fixed the PDF attachment download link not working in entry details.
+
 = 2.20.6 =
 *Release Date: 15 September, 2025*
 *New:

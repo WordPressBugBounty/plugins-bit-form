@@ -7,6 +7,7 @@
 
 namespace BitCode\BitForm\Core\Integration\ZohoSheet;
 
+use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\ApiResponse as UtilApiResponse;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\HttpHelper;
@@ -64,6 +65,8 @@ class RecordApiHelper
 
   public function executeRecordApi($workbook, $worksheet, $headerRow, $dataCenter, $actions, $defaultConf, $fieldValues, $fieldMap)
   {
+    $fieldValues = IntegrationHandler::assignRepeaterFieldValue($fieldValues, $this->_formId);
+    $fieldValues = IntegrationHandler::formattedRepeaterValue($fieldValues, 'string');
     $entryDetails = [
       'formId'      => $this->_formId,
       'entryId'     => $this->_entryId,
@@ -75,7 +78,7 @@ class RecordApiHelper
         if ('custom' === $fieldPair->formField && isset($fieldPair->customValue)) {
           $fieldData[$fieldPair->zohoFormField] = $fieldPair->customValue;
         } else {
-          $fieldData[$fieldPair->zohoFormField] = $fieldValues[$fieldPair->formField];
+          $fieldData[$fieldPair->zohoFormField] = is_array($fieldValues[$fieldPair->formField]) ? implode(', ', $fieldValues[$fieldPair->formField]) : $fieldValues[$fieldPair->formField];
         }
       }
     }

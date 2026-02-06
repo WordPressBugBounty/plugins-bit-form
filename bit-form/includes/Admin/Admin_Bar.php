@@ -70,7 +70,7 @@ class Admin_Bar
       $submenu['bitform'][] = [__('Payments', 'bit-form'), $capability, 'admin.php?page=bitform#/app-settings/payments'];
       $submenu['bitform'][] = [__('Doc & Support', 'bit-form'), $capability, 'admin.php?page=bitform#/doc-support'];
       if (!Utilities::isPro()) {
-        $submenu['bitform'][] = ['<span class="bf-pro-btn">' . __('Upgrade to Pro', 'bit-form') . '</span>', $capability, 'https://bit-form.com/#pricing', '_blank'];
+        $submenu['bitform'][] = ['<span class="bf-pro-btn">' . __('Get 74% OFF', 'bit-form') . '</span>', $capability, 'https://bit-form.com/#pricing', '_blank'];
       }
     }
   }
@@ -208,47 +208,50 @@ class Admin_Bar
     //   );
     // }
 
-    if (wp_script_is('wp-i18n')) {
-      $deps = ['bitforms-vendors', 'bitforms-runtime', 'bitforms-file', 'wp-i18n'];
-    } else {
-      $deps = ['bitforms-vendors', 'bitforms-runtime', 'bitforms-file'];
-    }
-    if (!defined('BITAPPS_DEV')) {
-      wp_enqueue_script(
-        'bitforms-admin-script',
-        BITFORMS_ASSET_JS_URI . '/index.js',
-        $deps,
-        BITFORMS_VERSION,
-        true
-      );
-    }
+    // if (wp_script_is('wp-i18n')) {
+    //   error_log('wp_script' . wp_script_is('wp-i18n'));
+    //   $deps = ['bitforms-vendors', 'bitforms-runtime', 'bitforms-file', 'wp-i18n'];
+    // } else {
+    //   $deps = ['bitforms-vendors', 'bitforms-runtime', 'bitforms-file'];
+    // }
+    // if (!defined('BITAPPS_DEV')) {
+    //   wp_enqueue_script(
+    //     'bitforms-admin-script',
+    //     BITFORMS_ASSET_JS_URI . '/index.js',
+    //     $deps,
+    //     BITFORMS_VERSION,
+    //     true
+    //   );
+    // }
+
     wp_enqueue_script('tinymce_js', includes_url('js/tinymce/') . 'wp-tinymce.php', null, false, true);
 
     if (!wp_script_is('media-upload')) {
       wp_enqueue_media();
     }
 
-    $plugin_path = BITFORMS_ASSET_URI;
+    // $plugin_path = BITFORMS_ASSET_URI;
 
     echo "<meta name='theme-color' content='#13233c' />";
 
-    if (defined('BITAPPS_DEV') && !BITAPPS_DEV) {
-      wp_enqueue_style(
-        'bitforms-styles',
-        BITFORMS_ASSET_URI . '/css/bitforms.css',
-        null,
-        BITFORMS_VERSION,
-        'screen'
-      );
+    // if (defined('BITAPPS_DEV') && !BITAPPS_DEV) {
+    //   wp_enqueue_style(
+    //     'bitforms-styles',
+    //     BITFORMS_ASSET_URI . '/css/bitforms.css',
+    //     null,
+    //     BITFORMS_VERSION,
+    //     'screen'
+    //   );
 
-      wp_enqueue_style(
-        'bitforms-components-styles',
-        BITFORMS_ASSET_URI . '/css/components.css',
-        null,
-        BITFORMS_VERSION,
-        'screen'
-      );
-    }
+    //   wp_enqueue_style(
+    //     'bitforms-components-styles',
+    //     BITFORMS_ASSET_URI . '/css/components.css',
+    //     null,
+    //     BITFORMS_VERSION,
+    //     'screen'
+    //   );
+    // }
+
     $formHandler = FormHandler::getInstance();
     $all_forms = $formHandler->admin->getAllForm();
     $urlQuery = wp_parse_url(FileDownloadProvider::getBaseDownloadURL(), PHP_URL_QUERY);
@@ -279,6 +282,10 @@ class Admin_Bar
         $type = $integration->integration_type;
         if (!is_null($type)) {
           $integrationDetails = json_decode($integration->integration_details);
+
+          if (!is_object($integrationDetails) || is_null($integrationDetails)) {
+            $integrationDetails = new \stdClass();
+          }
           $integrationDetails->id = $integration->id;
           if ($integCount[$type] > 1) {
             if (!isset($allFormSettings[$type])) {
@@ -330,6 +337,7 @@ class Admin_Bar
       'googleRedirectURL'   => get_rest_url() . 'bitform/v1/google',
       'oneDriveRedirectURL' => get_rest_url() . 'bitform/v1/oneDrive',
       'zohoRedirectURL'     => get_rest_url() . 'bitform/v1/zoho',
+      'oAuthRedirectURL'    => get_rest_url() . 'bitform/v1/oauth-redirect',
       'userRoles'           => get_editable_roles(),
       'downloadedPdfFonts'  => is_array(get_option('bitforms_pdf_fonts')) ? get_option('bitforms_pdf_fonts') : [],
       'permission'          => empty(get_option('bitforms_allow_tracking')) ? false : true,
