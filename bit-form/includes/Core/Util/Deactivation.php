@@ -2,6 +2,10 @@
 
 namespace BitCode\BitForm\Core\Util;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 /**
  * Class handling plugin deactivation.
  *

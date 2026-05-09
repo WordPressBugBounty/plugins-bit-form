@@ -2,12 +2,15 @@
 
 namespace BitCode\BitForm\Core\Util;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Core\Database\FormEntryMetaModel;
 use BitCode\BitForm\Core\Form\FormManager;
 use BitCode\BitForm\Core\Messages\EmailTemplateHandler;
 use BitCode\BitForm\Core\Messages\PdfTemplateHandler;
-use BitCode\BitFormPro\Admin\AppSetting\Pdf;
 
 final class MailNotifier
 {
@@ -33,7 +36,7 @@ final class MailNotifier
       // $fileName = 'bit-form-pdf-' . $formID . '-' . $entryID;
 
       if (!is_dir($path)) {
-        mkdir($path, 0777, true);
+        wp_mkdir_p($path);
       }
 
       if (class_exists('\BitCode\BitFormPro\Admin\AppSetting\Pdf')) {
@@ -84,7 +87,7 @@ final class MailNotifier
           ]
         );
 
-        $generatedPdf = Pdf::getInstance()->generator($pdfSetting, $pdfBody, $path, $entryID, 'F');
+        $generatedPdf = \BitCode\BitFormPro\Admin\AppSetting\Pdf::getInstance()->generator($pdfSetting, $pdfBody, $path, $entryID, 'F');
 
         if (!is_wp_error($generatedPdf) && file_exists($generatedPdf)) {
           $attachments[] = $generatedPdf;
@@ -167,7 +170,7 @@ final class MailNotifier
           }
 
           $mailBody = FieldValueHandler::replaceFieldWithValue($mailBody, $fieldValue, $formID);
-          $webUrl = BITFORMS_UPLOAD_BASE_URL . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $formID . DIRECTORY_SEPARATOR . Helpers::getEncryptedEntryId($entryID) . DIRECTORY_SEPARATOR;
+          $webUrl = Helpers::getWebPathWithEncryptedEntryId($formID, $entryID);
           $mailBody = FieldValueHandler::changeImagePathInHTMLString($mailBody, $webUrl);
           $mailBody = FieldValueHandler::changeHrefPathInHTMLString($mailBody, $webUrl);  // replace anchor tag href with constructed weburl
 
@@ -195,9 +198,9 @@ final class MailNotifier
           }
           $oldMailBody = $mailBody;
           $data = [];
-          if ($isDblOptin && true === has_filter('bf_email_body_text')) {
+          if ($isDblOptin && true === has_filter('bitform_email_body_text')) {
             $urlParams = $formID . '_' . $entryID . '_' . $logId;
-            $data = apply_filters('bf_email_body_text', $mailBody, $urlParams);
+            $data = apply_filters('bitform_email_body_text', $mailBody, $urlParams);
             $mailBody = $data['mailbody'];
           }
 
@@ -300,6 +303,7 @@ final class MailNotifier
           if ($status && $isDblOptin && false !== strpos($oldMailBody, 'entry_confirmation_url')) {
             $entryMeta = new FormEntryMetaModel();
             $apiResponse->apiResponse($logId, '', ['type' =>  'record', 'type_name' => 'smtp'], 'success', 'Mail successfully send.', $entryDetails);
+            // Form entry meta insert; meta_key/meta_value required to store dynamic field data per entry.
             $entryMeta->insert(
               [
                 'bitforms_form_entry_id' => $entryID,

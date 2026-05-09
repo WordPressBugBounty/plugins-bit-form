@@ -47,7 +47,7 @@ final class FilesApiHelper
    */
   public function uploadFiles($files, $portalId, $projectId, $event, $eventId, $dataCenter)
   {
-    $uploadFileEndpoint = "https://projectsapi.zoho.{$dataCenter}/restapi/portal/{$portalId}/projects/{$projectId}/" . ('task' === $event || 'subtask' === $event ? 'tasks' : 'bugs') . "/${eventId}/attachments/";
+    $uploadFileEndpoint = "https://projectsapi.zoho.{$dataCenter}/restapi/portal/{$portalId}/projects/{$projectId}/" . ('task' === $event || 'subtask' === $event ? 'tasks' : 'bugs') . "/{$eventId}/attachments/";
 
     $payload = '';
     if (is_array($files)) {

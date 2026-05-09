@@ -18,9 +18,11 @@ class Render
 
   public static function view($path, $data = [])
   {
-    status_header(200);
+    $file = BITFORMS_PLUGIN_DIR_PATH . $path . '.php';
+    extract($data);
 
-    echo self::loadFile($path, $data);
+    status_header(200);
+    include $file;
 
     exit(200);
   }

@@ -30,25 +30,30 @@ class TextAreaField
     $contentCount = count($bfFrontendFormIds);
 
     // {...'disabled' in attr.valid && { readOnly: attr.valid.disabled }}
-    return <<<TEXTAREAFIELD
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getConversationalCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
+    $inputWrapperCustomAttributes = $fieldHelpers->getCustomAttributes('inp-fld-wrp');
+    $inputWrapperClass = $fieldHelpers->getConversationalCls('inp-fld-wrp') . ' ' . $fieldHelpers->getCustomClasses('inp-fld-wrp');
+    $fieldCustomAttributes = $fieldHelpers->getCustomAttributes('fld');
+    $fieldClass = $fieldHelpers->getConversationalCls('focus-elm') . ' ' . $fieldHelpers->getConversationalMultiCls('fld') . ' ' . $fieldHelpers->getCustomClasses('fld');
+    $id = "{$rowID}-{$contentCount}";
+    $escapedValue = $fieldHelpers->esc_textarea($value);
+
+    return '<div
+      ' . $inputWrapperCustomAttributes . '
+      class="' . $inputWrapperClass . '"
     >
       <textarea
-        {$fieldHelpers->getCustomAttributes('fld')}
-        id="{$rowID}-{$contentCount}"
-        class="{$fieldHelpers->getConversationalCls('focus-elm')} {$fieldHelpers->getConversationalMultiCls('fld')} {$fieldHelpers->getCustomClasses('fld')}"
-        {$req}
-        {$disabled}
-        {$readonly}
-        {$ph}
-        {$ac}
-        {$name}
-      >{$fieldHelpers->esc_textarea($value)}</textarea>
-      {$prefixIcn}
-      {$suffixIcn}
-    </div>
-TEXTAREAFIELD;
+        ' . $fieldCustomAttributes . '
+        id="' . $id . '"
+        class="' . $fieldClass . '"
+        ' . $req . '
+        ' . $disabled . '
+        ' . $readonly . '
+        ' . $ph . '
+        ' . $ac . '
+        ' . $name . '
+      >' . $escapedValue . '</textarea>
+      ' . $prefixIcn . '
+      ' . $suffixIcn . '
+    </div>';
   }
 }

@@ -3,6 +3,7 @@
 namespace BitCode\BitForm\Frontend\Form\View;
 
 use BitCode\BitForm\Admin\Form\Helpers;
+use BitCode\BitForm\Core\Util\EscapingHelper;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
 
@@ -26,6 +27,9 @@ class FieldHelpers
       $customAttributs = $this->_fld->customAttributes->{$element};
 
       foreach ($customAttributs as $attr) {
+        if (!isset($attr->key) || !EscapingHelper::isSafeAttributeKey((string) $attr->key)) {
+          continue;
+        }
         $attrString .= " {$this->esc_attr($attr->key)}='{$this->esc_attr($attr->value)}'";
       }
       return $attrString;
@@ -80,14 +84,18 @@ class FieldHelpers
   public function icon($icnPropName, $element)
   {
     if ($this->property_exists_nested($this->_fld, $icnPropName, '', 1)) {
-      return <<<ICON
-<img
-  {$this->getCustomAttributes($element)}
-  class="{$this->getAtomicCls($element)} {$this->getCustomClasses($element)}"
-  src="{$this->esc_url($this->_fld->{$icnPropName})}"
-  alt=""
-/>
-ICON;
+      return sprintf(
+        '<img
+        %1$s
+        class="%2$s %3$s"
+        src="%4$s"
+        alt=""
+      />',
+        $this->getCustomAttributes($element),
+        $this->getAtomicCls($element),
+        $this->getCustomClasses($element),
+        $this->esc_url($this->_fld->{$icnPropName})
+      );
     }
     return '';
   }
@@ -211,8 +219,10 @@ ICON;
       if ($this->property_exists_nested($this->_fld, 'typ', 'file-up') && $this->property_exists_nested($this->_fld, 'config->multiple', true)) {
         return "name='{$this->esc_attr($this->_fld->fieldName)}[]'";
       }
-      if ($this->property_exists_nested($this->_fld, 'typ', 'image-select')
-      && $this->property_exists_nested($this->_fld, 'inpType', 'checkbox')) {
+      if (
+        $this->property_exists_nested($this->_fld, 'typ', 'image-select')
+        && $this->property_exists_nested($this->_fld, 'inpType', 'checkbox')
+      ) {
         return "name='{$this->esc_attr($this->_fld->fieldName)}[]'";
       }
       return "name='{$this->esc_attr($this->_fld->fieldName)}'";
@@ -258,5 +268,24 @@ ICON;
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
     return "{$this->_fk}-{$contentCount}";
+  }
+
+  public function isChecked()
+  {
+    if (!isset($this->_fld->val)) {
+      return false;
+    }
+    $checked = false;
+    $msg = $this->_fld->msg;
+    foreach ($msg as $status => $value) {
+      if ($value === $this->_fld->val) {
+        if ('checked' === $status) {
+          $checked = true;
+          break;
+        }
+      }
+    }
+
+    return $checked;
   }
 }

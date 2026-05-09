@@ -19,13 +19,17 @@ class HTMLField
 
     $content = FieldValueHandler::replaceSmartTagWithValue($content);
 
-    return <<<HTMLFIELD
-    <div
-      {$fieldHelpers->getCustomAttributes('fld-wrp')}
-      class="{$fieldHelpers->getAtomicCls('fld-wrp')} {$fieldHelpers->getCustomClasses('fld-wrp')}"
-    >
-      {$fieldHelpers->renderHTMR($content)}
-    </div>
-HTMLFIELD;
+    return sprintf(
+      '<div
+        %1$s
+        class="%2$s %3$s"
+      >
+        %4$s
+      </div>',
+      $fieldHelpers->getCustomAttributes('fld-wrp'),
+      $fieldHelpers->getAtomicCls('fld-wrp'),
+      $fieldHelpers->getCustomClasses('fld-wrp'),
+      $fieldHelpers->renderHTMR($content)
+    );
   }
 }

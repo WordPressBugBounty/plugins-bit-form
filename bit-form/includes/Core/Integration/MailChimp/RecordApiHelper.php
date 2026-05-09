@@ -69,7 +69,7 @@ class RecordApiHelper
         } elseif ('custom' === $fieldPair->formField && isset($fieldPair->customValue)) {
           $mergeFields[$fieldPair->mailChimpField] = $fieldPair->customValue;
         } elseif ('BIRTHDAY' === $fieldPair->mailChimpField) {
-          $mergeFields[$fieldPair->mailChimpField] = !empty($fieldValues[$fieldPair->formField]) ? date('m/d', strtotime($fieldValues[$fieldPair->formField])) : '';
+          $mergeFields[$fieldPair->mailChimpField] = !empty($fieldValues[$fieldPair->formField]) ? gmdate('m/d', strtotime($fieldValues[$fieldPair->formField])) : '';
         } else {
           $mergeFields[$fieldPair->mailChimpField] = $fieldValues[$fieldPair->formField];
         }

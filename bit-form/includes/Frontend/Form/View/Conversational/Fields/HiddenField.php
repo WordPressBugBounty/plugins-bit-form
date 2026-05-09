@@ -39,24 +39,22 @@ class HiddenField
       $inputMode = "inputMode='{$fieldHelpers->esc_attr($field->inputMode)}'";
     }
 
-    return <<<HiddenField
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getConversationalCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
+    return '<div 
+      ' . $fieldHelpers->getCustomAttributes('inp-fld-wrp') . '
+      class="' . $fieldHelpers->getConversationalCls('inp-fld-wrp') . ' ' . $fieldHelpers->getCustomClasses('inp-fld-wrp') . '"
     >
       <input
-        {$fieldHelpers->getCustomAttributes('fld')}
-        id="{$rowID}-{$contentCount}"
-        {$list}
-        class="{$fieldHelpers->getConversationalCls('focus-elm')} {$fieldHelpers->getConversationalMultiCls('fld')} {$fieldHelpers->getCustomClasses('fld')}"
-        type="{$field->typ}"   
-        {$ph}
-        {$inputMode}
-        {$name}
-        {$value}
+        ' . $fieldHelpers->getCustomAttributes('fld') . '
+        id="' . $rowID . '-' . $contentCount . '"
+        ' . $list . '
+        class="' . $fieldHelpers->getConversationalCls('focus-elm') . ' ' . $fieldHelpers->getConversationalMultiCls('fld') . ' ' . $fieldHelpers->getCustomClasses('fld') . '"
+        type="' . $field->typ . '"   
+        ' . $ph . '
+        ' . $inputMode . '
+        ' . $name . '
+        ' . $value . '
       />
     </div>
-    {$sugg}
-HiddenField;
+    ' . $sugg;
   }
 }

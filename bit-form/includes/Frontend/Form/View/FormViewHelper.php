@@ -40,25 +40,33 @@ class FormViewHelper
     if (empty($source)) {
       return '';
     }
-    return <<<ICON
-<img
-  class="{$this->_form->getAtomicCls($classElement)} _frm-b-stp-icn"
-  src="{$source}"
-  alt=""
-/>
-ICON;
+    return sprintf(
+      '<img
+          class="%1$s _frm-b-stp-icn"
+          src="%2$s"
+          alt=""
+       />
+      ',
+      $this->_form->getAtomicCls($classElement),
+      $source
+    );
   }
 
   private function getHeaderLabelMarkup($lbl, $preIcn, $sufIcn, $uniqClass)
   {
     $formID = $this->getFormId();
-    return <<<HEADERLABEL
-            <span class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-{$uniqClass}")} _frm-b-stp-hdr-{$uniqClass}'>
-              {$this->getIconMarkup($preIcn, "_frm-b{$formID}-stp-{$uniqClass}-pre-i")}
-              {$this->filterHtml($lbl)}
-              {$this->getIconMarkup($sufIcn, "_frm-b{$formID}-stp-{$uniqClass}-suf-i")}
-            </span>
-HEADERLABEL;
+    return sprintf(
+      '<span class="%1$s _frm-b-stp-hdr-%2$s">
+              %3$s
+              %4$s
+              %5$s
+      </span>',
+      $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-{$uniqClass}"),
+      $uniqClass,
+      $this->getIconMarkup($preIcn, "_frm-b{$formID}-stp-{$uniqClass}-pre-i"),
+      $this->filterHtml($lbl),
+      $this->getIconMarkup($sufIcn, "_frm-b{$formID}-stp-{$uniqClass}-suf-i")
+    );
   }
 
   private function getStepButton($btnSettings)
@@ -72,18 +80,25 @@ HEADERLABEL;
     $preIcnMrkp = $this->getIconMarkup($preIcn, "_frm-b{$formID}-{$key}-pre-i");
     $sufIcnMrkp = $this->getIconMarkup($sufIcn, "_frm-b{$formID}-{$key}-suf-i");
     $btnSpinner = '<span class="bf-spinner d-none"></span>';
-    return <<<BUTTON
-        <button
-          class="{$this->_form->getAtomicCls("_frm-b{$formID}-{$key}")} {$key}"
-          name="{$key}"
-          type="{$btnTyp}"
+    return sprintf(
+      '<button
+          class="%1$s %2$s"
+          name="%2$s"
+          type="%3$s"
         >
-          {$preIcnMrkp}
-          {$this->filterHtml($txt)}
-          {$sufIcnMrkp}
-          {$btnSpinner}
-        </button>
-BUTTON;
+          %4$s
+          %5$s
+          %6$s
+          %7$s
+        </button>',
+      $this->_form->getAtomicCls("_frm-b{$formID}-{$key}"),
+      $key,
+      $btnTyp,
+      $preIcnMrkp,
+      $this->filterHtml($txt),
+      $sufIcnMrkp,
+      $btnSpinner
+    );
   }
 
   public function getStepHeaderHtml()
@@ -96,10 +111,12 @@ BUTTON;
 
     $formID = $this->_form->getFormID();
     $layout = $this->_layout;
-    $stepHeaderHtml = <<<HEADERHTML
-    <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-cntnr")} _frm-b-stp-hdr-cntnr'>
-      <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-wrpr")} _frm-b-stp-hdr-wrpr'>
-HEADERHTML;
+    $stepHeaderHtml = sprintf(
+      '<div class="%1$s _frm-b-stp-hdr-cntnr">
+       <div class="%2$s _frm-b-stp-hdr-wrpr">',
+      $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-cntnr"),
+      $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-wrpr")
+    );
 
     $showHeadarIcon = isset($multiStepSettings->headerIcon->show) ? $multiStepSettings->headerIcon->show : false;
     $showLbl = isset($multiStepSettings->showLbl) ? $multiStepSettings->showLbl : false;
@@ -124,13 +141,16 @@ HEADERHTML;
         $stepIcon = "<span class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-num")}'>{$step}</span>";
       }
       if ($showHeadarIcon) {
-        $iconWrapper = <<<ICONWRPR
-        <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-icn-wrp")} _frm-b-stp-hdr-icn-wrp'>
-          <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-icn-cntn")} _frm-b-stp-icn-cntn'>
-            {$stepIcon}
+        $iconWrapper = sprintf(
+          '<div class="%1$s _frm-b-stp-hdr-icn-wrp">
+          <div class="%2$s _frm-b-stp-icn-cntn">
+            %3$s
           </div>
-        </div>
-ICONWRPR;
+        </div>',
+          $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-icn-wrp"),
+          $this->_form->getAtomicCls("_frm-b{$formID}-stp-icn-cntn"),
+          $stepIcon
+        );
       }
       $showStepLbl = $showLbl && isset($settings->showLbl) ? $settings->showLbl : false;
       $showStepSubtitle = $showSubtitle && isset($settings->showSubtitle) ? $settings->showSubtitle : false;
@@ -143,22 +163,31 @@ ICONWRPR;
 
       $activeClass = 0 === $key ? 'active' : '';
       $disableClass = (0 !== $key && $stepValidation) ? 'disabled' : '';
-      $stepHeaderHtml .= <<<HEADERHTML
-      <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr")} _frm-b-stp-hdr {$activeClass} {$disableClass}' data-step='{$step}'>
-        <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-cntnt")} _frm-b-stp-hdr-cntnt'>
-          {$iconWrapper}
-          <span class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-titl-wrpr")} _frm-b-stp-hdr-titl-wrpr'>
-            {$stepLabelMarkup}
-            {$stepSubtitleMarkup}
+      $stepHeaderHtml .= sprintf(
+        '
+      <div class="%1$s _frm-b-stp-hdr %2$s %3$s" data-step="%4$s">
+        <div class="%5$s _frm-b-stp-hdr-cntnt">
+          %6$s
+          <span class="%7$s _frm-b-stp-hdr-titl-wrpr">
+            %8$s
+            %9$s
           </span>
         </div>
-      </div>
-HEADERHTML;
+      </div>',
+        $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr"),
+        $activeClass,
+        $disableClass,
+        $step,
+        $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-cntnt"),
+        $iconWrapper,
+        $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-titl-wrpr"),
+        $stepLabelMarkup,
+        $stepSubtitleMarkup
+      );
     }
-    $stepHeaderHtml .= <<<HEADERHTML
+    $stepHeaderHtml .= '
       </div>
-    </div>
-HEADERHTML;
+    </div>';
     return $stepHeaderHtml;
   }
 
@@ -171,17 +200,22 @@ HEADERHTML;
     }
     $precentage = (isset($progressBarSettings->showPercentage) && $progressBarSettings->showPercentage) ? '0%' : '';
     $formID = $this->getFormId();
-    return <<<PROGRESSHTML
-    <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-progress-wrpr")}'>
-      <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-progress")}'>
-        <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-progress-bar")}'>
-          <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-progress-fill")}' style="width: 0%;">
-            {$precentage}
+    return sprintf(
+      '<div class="%1$s">
+      <div class="%2$s">
+        <div class="%3$s">
+          <div class="%4$s" style="width: 0%%;">
+            %5$s
           </div>
         </div>
       </div>
-    </div>
-    PROGRESSHTML;
+    </div>',
+      $this->_form->getAtomicCls("_frm-b{$formID}-stp-progress-wrpr"),
+      $this->_form->getAtomicCls("_frm-b{$formID}-stp-progress"),
+      $this->_form->getAtomicCls("_frm-b{$formID}-stp-progress-bar"),
+      $this->_form->getAtomicCls("_frm-b{$formID}-progress-fill"),
+      $precentage
+    );
   }
 
   public function getStepButtonMarkup()
@@ -192,13 +226,17 @@ HEADERHTML;
       return '';
     }
     $formID = $this->getFormId();
-    return <<<BUTTONWRPR
-            <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-btn-wrpr")}'>
-              <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-btn-cntnt")}'>
-                {$this->getStepButton($btnSettings->prevBtn)}
-                {$this->getStepButton($btnSettings->nextBtn)}
+    return sprintf(
+      '<div class="%1$s">
+              <div class="%2$s">
+                %3$s
+                %4$s
               </div>
-            </div>
-BUTTONWRPR;
+      </div>',
+      $this->_form->getAtomicCls("_frm-b{$formID}-stp-btn-wrpr"),
+      $this->_form->getAtomicCls("_frm-b{$formID}-stp-btn-cntnt"),
+      $this->getStepButton($btnSettings->prevBtn),
+      $this->getStepButton($btnSettings->nextBtn)
+    );
   }
 }

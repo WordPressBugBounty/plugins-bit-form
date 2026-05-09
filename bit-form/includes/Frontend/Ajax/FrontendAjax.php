@@ -2,6 +2,10 @@
 
 namespace BitCode\BitForm\Frontend\Ajax;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Admin\Form\AdminFormManager;
 use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Core\Database\FormEntryLogModel;
@@ -35,7 +39,11 @@ final class FrontendAjax
 
   public function beforeSubmittedValidate()
   {
-    $form_id = str_replace('bitforms_', '', $_POST['bitforms_id']);
+    // CSRF verified inside FrontendFormManager::handleSubmission() via verifySubmissionNonce() using HMAC-SHA256 token (Helpers::csrfDecrypted).
+    $form_id = isset($_POST['bitforms_id']) ? str_replace('bitforms_', '', sanitize_text_field(wp_unslash($_POST['bitforms_id']))) : '';
+    if (empty($form_id)) {
+      wp_send_json_error(__('Form ID not found', 'bit-form'), 400);
+    }
     $FrontendFormManager = FrontendFormManager::getInstance($form_id);
     $FrontendFormManager->fieldNameReplaceOfPost();
     $validateStatus = $FrontendFormManager->beforeSubmittedValidate(false);
@@ -49,7 +57,8 @@ final class FrontendAjax
   public function submit_form()
   {
     \ignore_user_abort();
-    $form_id = str_replace('bitforms_', '', $_POST['bitforms_id']);
+    // CSRF verified inside FrontendFormManager::handleSubmission() via verifySubmissionNonce() using HMAC-SHA256 token (Helpers::csrfDecrypted).
+    $form_id = isset($_POST['bitforms_id']) ? str_replace('bitforms_', '', sanitize_text_field(wp_unslash($_POST['bitforms_id']))) : '';
     $FrontendFormManager = FrontendFormManager::getInstance($form_id);
     $submitSatus = $FrontendFormManager->handleSubmission();
     if (is_wp_error($submitSatus)) {
@@ -63,10 +72,14 @@ final class FrontendAjax
   public function update_entry()
   {
     \ignore_user_abort();
-    $form_id = str_replace('bitforms_', '', sanitize_text_field($_POST['bitforms_id']));
-    $entryId = sanitize_text_field($_REQUEST['entryID']);
-    $entryToken = sanitize_text_field($_REQUEST['entryToken']);
-    $GLOBALS['bf_entry_id'] = $entryId;
+    // Entry token validated via Helpers::validateEntryTokenAndUser() or capability check; CSRF covered by HMAC-SHA256 token (Helpers::csrfDecrypted).
+    $form_id = isset($_POST['bitforms_id']) ? str_replace('bitforms_', '', sanitize_text_field(wp_unslash($_POST['bitforms_id']))) : '';
+    if (empty($form_id)) {
+      wp_send_json_error(__('Form ID not found', 'bit-form'), 400);
+    }
+    $entryId = isset($_REQUEST['entryID']) ? sanitize_text_field(wp_unslash($_REQUEST['entryID'])) : '';
+    $entryToken = isset($_REQUEST['entryToken']) ? sanitize_text_field(wp_unslash($_REQUEST['entryToken'])) : '';
+    $GLOBALS['bitform_entry_id'] = $entryId;
     if (Helpers::validateEntryTokenAndUser($entryToken, $entryId) || FrontendHelpers::is_current_user_can_access($form_id, 'entryEditAccess')) {
       $FrontendFormManager = FrontendFormManager::getInstance($form_id);
       $updateStatus = $FrontendFormManager->handleUpdateEntry();
@@ -119,14 +132,16 @@ final class FrontendAjax
   public function addHiddenFieldAndProperty()
   {
     \ignore_user_abort();
-    $request = file_get_contents('php://input');
-    if ($request) {
+    $rawInput = file_get_contents('php://input');
+    if ($rawInput) {
+      $request = is_string($rawInput) ? sanitize_text_field($rawInput) : $rawInput;
       $data = is_string($request) ? \json_decode($request) : $request;
       if (!isset($data->formId)) {
         wp_send_json_error('Form Id not found', 400);
       } else {
-        $fields = $this->hiddenFields($data->formId);
-        $properties = $this->hiddenPropeties($data->formId);
+        $formId = absint($data->formId);
+        $fields = $this->hiddenFields($formId);
+        $properties = $this->hiddenPropeties($formId);
         wp_send_json_success(['hidden_fields'=>$fields, 'hidden_properties'=>$properties]);
       }
     }
@@ -136,13 +151,14 @@ final class FrontendAjax
   {
     \ignore_user_abort(true);
 
-    $inputJSON = file_get_contents('php://input');
+    $rawInput = file_get_contents('php://input');
 
-    if ($inputJSON) {
+    if ($rawInput) {
+      $inputJSON = is_string($rawInput) ? sanitize_text_field($rawInput) : $rawInput;
       $request = is_string($inputJSON) ? \json_decode($inputJSON) : $inputJSON;
       $submitted_fields = [];
       if (isset($request->id, $request->cronNotOk)) {
-        $formID = str_replace('bitforms_', '', $request->id);
+        $formID = absint(str_replace('bitforms_', '', sanitize_text_field($request->id)));
         $cronNotOk = $request->cronNotOk;
 
         // Validate and sanitize entry ID and log ID
@@ -153,7 +169,7 @@ final class FrontendAjax
 
         $entryID = absint($cronNotOk[0]);
         $logID = absint($cronNotOk[1]);
-        $GLOBALS['bf_entry_id'] = $entryID;
+        $GLOBALS['bitform_entry_id'] = $entryID;
         $entryLog = new FormEntryLogModel();
 
         // Quick admin check to allow retry of workflows
@@ -279,7 +295,7 @@ final class FrontendAjax
               wp_send_json_error($updatedStatus->get_error_message(), 411);
             } else {
               if ($triggerData['dbl_opt_dflt_template']) {
-                do_action('bf_double_optin_confirmation', $triggerData['dbl_opt_donf'], $triggerData);
+                do_action('bitform_double_optin_confirmation', $triggerData['dbl_opt_donf'], $triggerData);
               } elseif (isset($triggerData['dblOptin'])) {
                 foreach ($triggerData['dblOptin'] as $value) {
                   MailNotifier::notify($value, $triggerData['formID'], $triggerData['fields'], $entryID, true, $logID);

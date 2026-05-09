@@ -153,29 +153,14 @@ class FormManager
 
   public function getCustomStyle()
   {
-    $customCssCodes = '';
     $customCSSPath = BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles' . DIRECTORY_SEPARATOR . "bitform-custom-{$this->form_id}.css";
-
-    if (file_exists($customCSSPath)) {
-      $file = fopen($customCSSPath, 'r');
-      $customCssCodes = fread($file, filesize($customCSSPath));
-      fclose($file);
-    }
-
-    return $customCssCodes;
+    return FileHandler::readFile($customCSSPath);
   }
 
   public function getCustomJS()
   {
-    $customJSCodes = '';
     $customJsPath = BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-scripts' . DIRECTORY_SEPARATOR . "bitform-custom-{$this->form_id}.js";
-    if (file_exists($customJsPath)) {
-      $file = fopen($customJsPath, 'r');
-      $customJSCodes = fread($file, filesize($customJsPath));
-      fclose($file);
-    }
-
-    return $customJSCodes;
+    return FileHandler::readFile($customJsPath);
   }
 
   public function getFormContentWithValue($defaultValues = [])
@@ -517,7 +502,7 @@ class FormManager
 
       $_upload_dir = FileHandler::getEntriesFileUploadDir($form_id, $entry_id);
       FileHandler::createIndexFile($_upload_dir);
-      $uniqueId = time() . '-' . bin2hex(random_bytes(4));
+      $uniqueId = time() . '-' . bin2hex(\random_bytes(4));
       $filename = "{$entry_id}-{$fieldKey}-{$uniqueId}.{$imgTypes[$imgType]}";
       $fullPath = $_upload_dir . DIRECTORY_SEPARATOR . $filename;
       if (false === file_put_contents($fullPath, $decoded_image)) {
@@ -547,7 +532,7 @@ class FormManager
     return $entryId;
   }
 
-  private function submisionLog($user_details, $entry_id, $type)
+  public function submisionLog($user_details, $entry_id, $type)
   {
     $formEntryLogModel = new FormEntryLogModel();
     $submissionLogData = [
@@ -609,8 +594,7 @@ class FormManager
 
   private function addNewFilePathToFiles($form_id, $entry_id, $file_fields = [])
   {
-    $common_file_path = Helpers::getWebPathWithEncryptedEntryId($form_id, $entry_id);
-    // Handle files and assign file_path
+    $common_file_path = Helpers::getFullPathWithEncryptedEntryId($form_id, $entry_id);
     foreach ($_FILES as $field_key => $file_details) {
       if (!($file_fields && in_array($field_key, $file_fields))) {
         continue;
@@ -689,6 +673,7 @@ class FormManager
       } else {
         $value = wp_json_encode($value);
       }
+      // Form entry meta insert; meta_key/meta_value required to store dynamic field data per entry.
       $status = $entryMeta->insert(
         [
           'bitforms_form_entry_id' => $entry_id,
@@ -711,6 +696,7 @@ class FormManager
 
   public function saveFormEntry($submitted_data)
   {
+    // CSRF verified upstream via FrontendFormManager::verifySubmissionNonce() before this method is invoked.
     $submitted_data = $this->formatSubmittedData($submitted_data);
     $submitted_data = apply_filters('bitform_filter_save_form_entry', $submitted_data, $this->form_id);
     $form_content = \json_decode(static::$form[0]->form_content);
@@ -725,7 +711,7 @@ class FormManager
       if ($file_fields && in_array($file_name, $file_fields)) {
         $validation = $fileHandler->validation($file_name, $file_details, $this->form_id);
         if (!empty($validation['error_type']) && !empty($validation['message'])) {
-          return new WP_Error($validation['error_type'], __($validation['message'], 'bit-form'));
+          return new WP_Error($validation['error_type'], esc_html($validation['message']));
         }
       }
     }
@@ -737,11 +723,12 @@ class FormManager
     $submitted_data = $this->passwordEncrypted($submitted_data, $form_fields);
     $submitted_data = $this->formatRepeateFieldData($submitted_data, $form_fields);
     global $wpdb;
+    // Direct transaction control; no user input involved.
     $wpdb->query('START TRANSACTION');
     $entry_id = $this->entryInsert($user_details);
     $log_id = null;
 
-    $GLOBALS['bf_entry_id'] = $entry_id;
+    $GLOBALS['bitform_entry_id'] = $entry_id;
 
     if (is_wp_error($entry_id)) {
       return new WP_Error('insert_error', __('Sorry, Error occurred in saving form entry', 'bit-form'));
@@ -875,9 +862,30 @@ class FormManager
 
   public function updateFormEntry($updatedValue, $formID, $entryID)
   {
+    // CSRF / entry-token verified upstream via FrontendFormManager::handleUpdateEntry() before this method is invoked.
     $updatedValue = $this->formatSubmittedData($updatedValue);
     $updatedValue = apply_filters('bitform_filter_update_form_entry', $updatedValue, $this->form_id);
     do_action('bitform_update_entry', $this, $updatedValue, $formID, $entryID);
+    $form_content = $this->getFormContent();
+    if (isset($form_content->additional->enabled->submission)) {
+      // Run workflow but skip DB/meta update
+      $workFlowRunHelper = new WorkFlow($formID);
+      $fieldsWithValue = $this->getFormContentWithValue($updatedValue)->fields;
+      $workFlowreturnedOnSubmit = $workFlowRunHelper->executeOnSubmit(
+        'edit',
+        $fieldsWithValue,
+        $updatedValue,
+        $entryID,
+        0
+      );
+      if (empty($workFlowreturnedOnSubmit['message'])) {
+        $workFlowreturnedOnSubmit['message'] = __('Entry update skipped due to submission restriction.', 'bit-form');
+      }
+      $workFlowreturnedOnSubmit['entry_id'] = $entryID;
+      $workFlowreturnedOnSubmit = apply_filters('bitform_filter_return_edit_success', $workFlowreturnedOnSubmit, $this->form_id);
+      return $workFlowreturnedOnSubmit;
+    }
+
     $formEntryModel = new FormEntryModel();
     $formEntryLogModel = new FormEntryLogModel();
     $formOldData = $formEntryLogModel->get_form_value($entryID);
@@ -900,7 +908,11 @@ class FormManager
         }
       }
     }
-    $oldEntry = $formEntryModel->get('status', ['id' => $entryID])[0];
+    $geResult = $formEntryModel->get('status', ['id' => $entryID]);
+    if (is_wp_error($geResult) || empty($geResult)) {
+      return new WP_Error('empty_form', __('provided form entries does not exists', 'bit-form'));
+    }
+    $oldEntry = $geResult[0];
     $formEntry = $formEntryModel->update(
       [
         'status'      => ('9' === $oldEntry->status && !$this->_saveFormAsDraft) ? 1 : $oldEntry->status,
@@ -928,7 +940,7 @@ class FormManager
         if ($file_fields && in_array($file_name, $file_fields)) {
           $validation = $fileHandler->validation($file_name, $file_details, $this->form_id);
           if (!empty($validation['error_type']) && !empty($validation['message'])) {
-            return new WP_Error($validation['error_type'], __($validation['message'], 'bit-form'));
+            return new WP_Error($validation['error_type'], esc_html($validation['message']));
           }
         }
       }
@@ -940,6 +952,7 @@ class FormManager
         if (isset($updatedValue[$field_key . '_old'])) {
           // Handle file deletion for repeater fields
           if ($repeaterFldKey) {
+            // Form entry meta lookup; meta_key/meta_value query required to retrieve repeater field data by entry.
             $repeaterExistData = $entryMeta->get(
               'meta_value',
               [
@@ -964,7 +977,7 @@ class FormManager
               }
             }
           } else {
-            // Handle file deletion for non-repeater fields
+            // Handle file deletion for non-repeater fields; meta_key/meta_value lookup required to identify stored file paths per entry.
             $file_exists = $entryMeta->get(
               'meta_value',
               [
@@ -1036,7 +1049,7 @@ class FormManager
     if (is_object($updatedValue)) {
       $updatedValue = (array) $updatedValue;
     }
-    if (isset($updatedValue['_ajax_nonce']) && $_REQUEST['g-recaptcha-response']) {
+    if (isset($updatedValue['_ajax_nonce'], $_REQUEST['g-recaptcha-response']) && sanitize_text_field(wp_unslash($_REQUEST['g-recaptcha-response']))) {
       unset($updatedValue['_ajax_nonce'], $_REQUEST['g-recaptcha-response']);
     }
 
@@ -1111,9 +1124,10 @@ class FormManager
           continue;
         }
         if (is_array($_FILES[$formOldData[$i]->meta_key]['name']) && !in_array($_FILES[$formOldData[$i]->meta_key]['name'], json_decode($formOldData[$i]->meta_value))) {
-          $key[$i] = '${' . $formOldData[$i]->meta_key . '} file was Updated  To ' . wp_json_encode($_FILES[$formOldData[$i]->meta_key]['name']);
+          $sanitized_names = array_map('sanitize_file_name', array_map('wp_unslash', (array) $_FILES[$formOldData[$i]->meta_key]['name']));
+          $key[$i] = '${' . $formOldData[$i]->meta_key . '} file was Updated  To ' . wp_json_encode($sanitized_names);
         } elseif (!is_array($_FILES[$formOldData[$i]->meta_key]['name']) && !in_array($_FILES[$formOldData[$i]->meta_key]['name'], json_decode($formOldData[$i]->meta_value))) {
-          $key[$i] = '${' . $formOldData[$i]->meta_key . '} file was Updated  To ' . $_FILES[$formOldData[$i]->meta_key]['name'];
+          $key[$i] = '${' . $formOldData[$i]->meta_key . '} file was Updated  To ' . sanitize_file_name(wp_unslash($_FILES[$formOldData[$i]->meta_key]['name']));
         }
         unset($toUpdateValues[$formOldData[$i]->meta_key]);
       } elseif (isset($toUpdateValues[$formOldData[$i]->meta_key])) {
@@ -1203,15 +1217,16 @@ class FormManager
 
   public function fieldNameReplaceOfPost()
   {
+    // CSRF verified upstream before this method is called; $_POST/$_FILES are being normalized (field key remapping), not reading new user input.
     $fields = $this->getFields();
     foreach ($fields as $fieldKey => $fieldData) {
       if (array_key_exists('name', $fieldData)) {
         $fldName = $fieldData['name'];
         $fldName = str_replace(['.', ' '], '_', $fldName);
         if (array_key_exists($fldName, $_POST)) {
-          $temp = $_POST[$fldName];
+          $postData = wp_unslash($_POST[$fldName]);
           unset($_POST[$fldName]);
-          $_POST[$fieldKey] = $temp;
+          $_POST[$fieldKey] = $postData;
         } elseif (array_key_exists($fldName, $_FILES)) {
           $temp = $_FILES[$fldName];
           unset($_FILES[$fldName]);
@@ -1367,14 +1382,14 @@ class FormManager
   protected function addEntryInfo($field_details, $counter)
   {
     $infos = [
-      '__user_id'      => __('User'),
-      '__entry_status' => __('Status'),
+      '__user_id'      => __('User', 'bit-form'),
+      '__entry_status' => __('Status', 'bit-form'),
       //'__user_location' => __(''),
-      '__referer'     => __('Refer URL'),
-      '__user_device' => __('Device'),
-      '__user_ip'     => __('IP address'),
-      '__created_at'  => __('Created Time'),
-      '__updated_at'  => __('Modified Time'),
+      '__referer'     => __('Refer URL', 'bit-form'),
+      '__user_device' => __('Device', 'bit-form'),
+      '__user_ip'     => __('IP address', 'bit-form'),
+      '__created_at'  => __('Created Time', 'bit-form'),
+      '__updated_at'  => __('Modified Time', 'bit-form'),
     ];
     foreach ($infos as $key => $value) {
       $field_details[$counter]['name'] = $value;

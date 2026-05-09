@@ -4,6 +4,7 @@ namespace BitCode\BitForm\Admin\Form;
 
 use BitCode\BitForm\Core\Cryptography\Cryptography;
 use BitCode\BitForm\Core\Database\FormEntryModel;
+use BitCode\BitForm\Core\Util\FileHandler;
 use BitCode\BitForm\Core\Util\Log;
 use Exception;
 use WP_Error;
@@ -37,37 +38,48 @@ class Helpers
     $attributes = wp_json_encode($attrs);
     $instObj = '';
     if ($instanceObj) {
-      $instObj .= <<<INST
-script.onload = function () {
-  bfSelect('#{$contentId}').querySelectorAll('{$selector}').forEach(function(fld){
-    $instanceObj;
-  });
-}
-INST;
+      $instObj .= sprintf(
+        '
+      script.onload = function () {
+          bfSelect("#{%1$s}").querySelectorAll("{%2$s}").forEach(function(fld){
+          %3$s;
+         });
+  }
+      ',
+        $contentId,
+        $selector,
+        $instanceObj
+      );
     }
-    return <<<LOAD_SECRIPT
-var script =  document.createElement('script'), integrity = '$integrity', attrs = $attributes, id = '$id';
-script.src = '$src';
-script.id = id;
-if(integrity){
-  script.integrity = integrity;
-  script.crossOrigin = 'anonymous';
-}
-if(attrs){
-  Object.entries(attrs).forEach(function([key, val]){
-    script.setAttribute(key,val);
-  })
-}
-$instObj;
-var bodyElm = document.body;
-var alreadyExistScriptElm = bodyElm ? bodyElm.querySelector('script#$id'):null;
-if(alreadyExistScriptElm){
-  bodyElm.removeChild(alreadyExistScriptElm)
-}
-if(!(window.recaptcha && id === 'g-recaptcha-script')){
-  bodyElm.appendChild(script);
-}
-LOAD_SECRIPT;
+    return sprintf(
+      '
+    var script =  document.createElement("script"), integrity = "%1$s", attrs = %2$s, id = "%3$s";
+        script.src = "%4$s";
+        script.id = id;
+        if(integrity){
+          script.integrity = integrity;
+          script.crossOrigin = "anonymous";
+        }
+        if(attrs){
+          Object.entries(attrs).forEach(function([key, val]){
+            script.setAttribute(key,val);
+          })
+        }
+        $instObj;
+        var bodyElm = document.body;
+        var alreadyExistScriptElm = bodyElm ? bodyElm.querySelector("script#$id"):null;
+        if(alreadyExistScriptElm){
+          bodyElm.removeChild(alreadyExistScriptElm)
+        }
+        if(!(window.recaptcha && id === "g-recaptcha-script")){
+          bodyElm.appendChild(script);
+        }
+    ',
+      $integrity,
+      $attributes,
+      $id,
+      $src,
+    );
   }
 
   public static function minifyJs($input)
@@ -173,19 +185,17 @@ LOAD_SECRIPT;
       foreach ($pathArr as $d) {
         $rootDir .= $d . DIRECTORY_SEPARATOR;
         if (!realpath($rootDir)) {
-          mkdir($rootDir);
+          wp_mkdir_p($rootDir);
         }
       }
       $fullPath = $rootDir . $fileName;
-      $file = fopen($fullPath, $fileOpenMode);
-      if (false === $file) {
-        throw new Exception("Failed to open file: $fullPath");
+      if ('a' === $fileOpenMode) {
+        $result = FileHandler::appendFile($fullPath, $script);
+      } else {
+        $result = FileHandler::writeFile($fullPath, $script);
       }
-      if (false === fwrite($file, $script)) {
+      if (false === $result) {
         throw new Exception("Failed to write to file: $fullPath");
-      }
-      if (false === fclose($file)) {
-        throw new Exception("Failed to close file: $fullPath");
       }
       return true;
     } catch (\Exception $e) {
@@ -213,13 +223,7 @@ LOAD_SECRIPT;
 
   public static function fileRead($filePath)
   {
-    $fileContent = '';
-    if (file_exists($filePath)) {
-      $file = fopen($filePath, 'r');
-      $fileContent .= fread($file, filesize($filePath));
-      fclose($file);
-    }
-    return $fileContent;
+    return FileHandler::readFile($filePath);
   }
 
   public static function getDataFromNestedPath($data, $key)
@@ -268,7 +272,6 @@ LOAD_SECRIPT;
       $data = $data->$k;
     }
     $data->$lastKey = json_decode(wp_json_encode($value));
-    ;
     return $data;
   }
 
@@ -318,7 +321,7 @@ LOAD_SECRIPT;
     }
     // check if the entry token is valid
     if (isset($entryToken) && $entryToken) {
-      $decryptEntryId = Cryptography::decrypt($entryToken, AUTH_SALT);
+      $decryptEntryId = Cryptography::decrypt($entryToken, self::getBitformSalt());
       if ($decryptEntryId === $entryId) {
         return true;
       }
@@ -413,10 +416,10 @@ LOAD_SECRIPT;
     $transientData = get_transient("bitform_trigger_transient_{$entryID}");
 
     if (empty($transientData)) {
-      // Transient not found - will use database fallback in calling function
+      Log::debug_log('Trigger token transient missing for entryID=' . $entryID . ', logID=' . $logID);
       return [
-        'valid'         => true,
-        'error'         => '',
+        'valid'         => false,
+        'error'         => 'Trigger token expired or missing',
         'triggerData'   => null,
         'isAdminBypass' => false
       ];
@@ -474,7 +477,7 @@ LOAD_SECRIPT;
       $secretKey = 'bf-' . time();
       update_option('bf_csrf_secret', $secretKey);
     }
-    $tIdenty = base64_encode(random_bytes(32));
+    $tIdenty = base64_encode(\random_bytes(32));
     $csrf = \base64_encode(\hash_hmac('sha256', $tIdenty, $secretKey, true));
     return ['csrf' => $csrf, 't_identity' => $tIdenty];
   }
@@ -499,8 +502,20 @@ LOAD_SECRIPT;
 
   public static function getTruncatedEncryptToken($str, $length = 20)
   {
-    $token = hash_hmac('sha256', $str, AUTH_SALT);
+    $token = hash_hmac('sha256', $str, self::getBitformSalt());
     return substr($token, 0, $length);
+  }
+
+  public static function getAuthSaltEncryptToken($str, $length = 20)
+  {
+    if (!$str) {
+      return '';
+    }
+    if (!defined('AUTH_SALT')) {
+      return '';
+    }
+
+    return substr(hash_hmac('sha256', $str, AUTH_SALT), 0, $length);
   }
 
   public static function getEncryptedEntryId($entryId)
@@ -513,14 +528,56 @@ LOAD_SECRIPT;
 
   public static function getFullPathWithEncryptedEntryId($formId, $entryId)
   {
-    $encryptDirectory = Helpers::getEncryptedEntryId($entryId);
-    return BITFORMS_UPLOAD_DIR . DIRECTORY_SEPARATOR . $formId . DIRECTORY_SEPARATOR . $encryptDirectory;
+    $uploadDir = rtrim(BITFORMS_UPLOAD_DIR, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $formId . DIRECTORY_SEPARATOR;
+    $encryptDirectoryId = Helpers::getEncryptedEntryId($entryId);
+    $encryptDirectory = $uploadDir . $encryptDirectoryId;
+    if (is_dir($encryptDirectory)) {
+      return $encryptDirectory;
+    }
+
+    $oldEntriesFileUploadDir = Helpers::getOldEntriesFileUploadDir($uploadDir, $entryId);
+    if (!empty($oldEntriesFileUploadDir) && is_dir($oldEntriesFileUploadDir)) {
+      return $oldEntriesFileUploadDir;
+    }
+
+    return $encryptDirectory;
   }
 
   public static function getWebPathWithEncryptedEntryId($formId, $entryId)
   {
-    $encryptDirectory = Helpers::getEncryptedEntryId($entryId);
-    return BITFORMS_UPLOAD_BASE_URL . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . $formId . DIRECTORY_SEPARATOR . $encryptDirectory;
+    $serverFileUploadDir = rtrim(BITFORMS_UPLOAD_DIR, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $formId . DIRECTORY_SEPARATOR;
+    $webFileDirectory = BITFORMS_UPLOAD_BASE_URL . '/' . 'uploads' . '/' . $formId . '/';
+    $encryptDirectoryId = Helpers::getEncryptedEntryId($entryId);
+    $encryptDirectory = $serverFileUploadDir . $encryptDirectoryId;
+    if (is_dir($encryptDirectory)) {
+      return  $webFileDirectory . $encryptDirectoryId;
+    }
+
+    $authSaltEncryptedEntryId = Helpers::getAuthSaltEncryptToken($entryId);
+    $authSaltEncryptedDirectory = $serverFileUploadDir . $authSaltEncryptedEntryId;
+    if (!empty($authSaltEncryptedEntryId) && is_dir($authSaltEncryptedDirectory)) {
+      return $webFileDirectory . $authSaltEncryptedEntryId;
+    }
+    $previousEntryDirectory = $serverFileUploadDir . $entryId;
+    if (!empty($previousEntryDirectory) && is_dir($previousEntryDirectory)) {
+      return $webFileDirectory . $entryId;
+    }
+
+    return $webFileDirectory . $encryptDirectoryId;
+  }
+
+  public static function getOldEntriesFileUploadDir($uploadDir, $entry_id)
+  {
+    $authSaltEncryptedEntryId = Helpers::getAuthSaltEncryptToken($entry_id);
+    $authSaltEncryptedDirectory = $uploadDir . $authSaltEncryptedEntryId;
+    if (!empty($authSaltEncryptedEntryId) && is_dir($authSaltEncryptedDirectory)) {
+      return $authSaltEncryptedDirectory;
+    }
+    $previousEntryDirectory = $uploadDir . $entry_id;
+    if (!empty($previousEntryDirectory) && is_dir($previousEntryDirectory)) {
+      return $previousEntryDirectory;
+    }
+    return '';
   }
 
   public static function PDFPassHash($entryId)
@@ -546,12 +603,12 @@ LOAD_SECRIPT;
   }
 
   /**
-     * Sanitize user-provided HTML content by removing dangerous JS code
-     * while allowing all valid HTML/CSS.
-     *
-     * @param string $html Raw HTML from user input
-     * @return string Sanitized safe HTML
-     */
+   * Sanitize user-provided HTML content by removing dangerous JS code
+   * while allowing all valid HTML/CSS.
+   *
+   * @param string $html Raw HTML from user input
+   * @return string Sanitized safe HTML
+   */
   public static function sanitizeUserHTML(string $html): string
   {
     // Remove <script> tags entirely
@@ -703,5 +760,15 @@ LOAD_SECRIPT;
 
     // Convert array to object recursively
     return json_decode(json_encode($defaultGlobalMessages));
+  }
+
+  public static function getBitformSalt()
+  {
+    $salt = get_option('bitforms_salt');
+    if (!$salt) {
+      $salt = bin2hex(\random_bytes(32));
+      update_option('bitforms_salt', $salt);
+    }
+    return $salt;
   }
 }

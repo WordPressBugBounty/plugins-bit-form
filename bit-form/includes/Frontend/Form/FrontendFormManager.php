@@ -18,14 +18,12 @@ use BitCode\BitForm\Core\Form\Validator\FormFieldValidator;
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Messages\SuccessMessageHandler;
 use BitCode\BitForm\Core\Util\ApiResponse as UtilApiResponse;
-use BitCode\BitForm\Core\Util\DateTimeHelper;
-use BitCode\BitForm\Core\Util\EntryLimitHelper;
 use BitCode\BitForm\Core\Util\HttpHelper;
 use BitCode\BitForm\Core\Util\IpTool;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
 use BitCode\BitForm\Core\WorkFlow\WorkFlowHandler;
 use BitCode\BitForm\Frontend\Form\View\FormViewer;
-use BitCode\BitFormPro\Admin\FormSettings\FormAbandonment;
+use BitCode\BitForm\GlobalHelper;
 use WP_Error;
 
 final class FrontendFormManager extends FormManager
@@ -72,12 +70,6 @@ final class FrontendFormManager extends FormManager
   public function getFormToken()
   {
     return $this->_form_token;
-  }
-
-  public function isSubmitted()
-  {
-    // return isset($_POST[$this->_form_identifier]) ? true : false;
-    return (isset($_POST['bitforms_id']) && $_POST['bitforms_id'] === $this->_form_identifier) ? true : false;
   }
 
   public function getSubmittedFields($submitted_data)
@@ -231,6 +223,7 @@ final class FrontendFormManager extends FormManager
 
   public function handleSubmission()
   {
+    // CSRF verified via verifySubmissionNonce() before this method is called. All $_POST reads below occur after that verification.
     $this->fieldNameReplaceOfPost();
 
     $validated = $this->beforeSubmittedValidate();
@@ -245,27 +238,29 @@ final class FrontendFormManager extends FormManager
       $regSuccMsg = '';
 
       $existAuth = (new IntegrationHandler($this->_form_id))->getAllIntegration('wp_user_auth', 'wp_auth', 1);
+      $unslashed_post = wp_unslash($_POST);
       if (!is_wp_error($existAuth) && count($existAuth) > 0) {
         $parameter = $this->getParams();
-        $existAuthFilter = has_filter('bf_wp_user_auth');
+        $existAuthFilter = has_filter('bitform_wp_user_auth');
 
         if (true === $existAuthFilter) {
-          $result = apply_filters('bf_wp_user_auth', $existAuth[0], $_POST, $parameter);
+          $filesData = GlobalHelper::sanitize_files_input($_FILES);
+          $result = apply_filters('bitform_wp_user_auth', $existAuth[0], $unslashed_post, $parameter);
 
-          $result = apply_filters('bitform_filter_wp_user_auth_response', $result, $this->_form_id, $_POST, $parameter);
+          $result = apply_filters('bitform_filter_wp_user_auth_response', $result, $this->_form_id, $unslashed_post, $parameter);
 
-          do_action('bitform_wp_user_auth_response', $result, $this->_form_id, $_POST, $parameter);
+          do_action('bitform_wp_user_auth_response', $result, $this->_form_id, $unslashed_post, $parameter);
 
           if (isset($result['auth_type']) && 'register' === $result['auth_type']) {
             if (!$result['success']) {
-              return new WP_Error('errors', __($result['message'], 'bit-form'));
+              return new WP_Error('errors', esc_html($result['message']));
             } elseif (isset($result['success'])) {
               $redirectPage = $result['redirectPage'];
               $regSuccMsg = $result['message'];
             }
           } else {
             if (!$result['success']) {
-              return new WP_Error('errors', __($result['message'], 'bit-form'));
+              return new WP_Error('errors', esc_html($result['message']));
             } else {
               return $result;
             }
@@ -273,7 +268,7 @@ final class FrontendFormManager extends FormManager
         }
       }
 
-      $saveResponse = $this->saveFormEntry($_POST);
+      $saveResponse = $this->saveFormEntry($unslashed_post);
       if (is_wp_error($saveResponse)) {
         return $saveResponse;
       }
@@ -281,13 +276,13 @@ final class FrontendFormManager extends FormManager
       $entryID = $saveResponse['entry_id'];
 
       // transformed dropdown value from string to array
-      $newPost = $this->transformDrpdwnValue($_POST);
+      $newPost = $this->transformDrpdwnValue($unslashed_post);
 
-      do_action('bitform_submit_success', $this->_form_id, $entryID, $newPost, $_FILES);
+      do_action('bitform_submit_success', $this->_form_id, $entryID, $newPost, $filesData);
 
       $captchaV3Settings = $this->getCaptchaV3Settings();
       if ($captchaV3Settings) {
-        $token = $_POST['g-recaptcha-response'];
+        $token = isset($_POST['g-recaptcha-response']) ? sanitize_text_field(wp_unslash($_POST['g-recaptcha-response'])) : '';
         $integrationHandler = new IntegrationHandler(0);
         $allFormIntegrations = $integrationHandler->getAllIntegration('app', 'gReCaptchaV3');
         if (!is_wp_error($allFormIntegrations)) {
@@ -335,12 +330,13 @@ final class FrontendFormManager extends FormManager
 
   public function handleUpdateEntry()
   {
+    // Entry token or capability verified by caller (FrontendAjax::update_entry). All $_POST reads occur after that check.
     $this->fieldNameReplaceOfPost();
     $validated = $this->beforeSubmittedValidate();
     $validated = apply_filters('bitform_filter_form_validation', $validated, $this->_form_id);
 
-    $entryID = $_REQUEST['entryID'];
-    $GLOBALS['bf_entry_id'] = $entryID;
+    $entryID = isset($_REQUEST['entryID']) ? sanitize_text_field(wp_unslash($_REQUEST['entryID'])) : null;
+    $GLOBALS['bitform_entry_id'] = $entryID;
     if (is_null($entryID)) {
       return new WP_Error('empty_form', __('Entries id is invalid', 'bit-form'));
     }
@@ -350,25 +346,27 @@ final class FrontendFormManager extends FormManager
 
       $redirectPage = '';
       $regSuccMsg = '';
+      $postData = wp_unslash($_POST);
+      $filesData = GlobalHelper::sanitize_files_input($_FILES);
 
       $existAuth = (new IntegrationHandler($this->_form_id))->getAllIntegration('wp_user_auth', 'wp_auth', 1);
       if (!is_wp_error($existAuth) && count($existAuth) > 0) {
         $parameter = $this->getParams();
-        $existAuthFilter = has_filter('bf_wp_user_auth');
+        $existAuthFilter = has_filter('bitform_wp_user_auth');
 
         if (true === $existAuthFilter) {
-          $result = apply_filters('bf_wp_user_auth', $existAuth[0], $_POST, $parameter);
+          $result = apply_filters('bitform_wp_user_auth', $existAuth[0], $postData, $parameter);
 
           if (isset($result['auth_type']) && 'register' === $result['auth_type']) {
             if (!$result['success']) {
-              return new WP_Error('errors', __($result['message'], 'bit-form'));
+              return new WP_Error('errors', esc_html($result['message']));
             } elseif (isset($result['success'])) {
               $redirectPage = $result['redirectPage'];
               $regSuccMsg = $result['message'];
             }
           } else {
             if (!$result['success']) {
-              return new WP_Error('errors', __($result['message'], 'bit-form'));
+              return new WP_Error('errors', esc_html($result['message']));
             } else {
               return $result;
             }
@@ -376,21 +374,21 @@ final class FrontendFormManager extends FormManager
         }
       }
 
-      $updateResponse = $this->updateFormEntry($_POST, $this->getFormID(), $entryID);
+      $updateResponse = $this->updateFormEntry(wp_unslash($_POST), $this->getFormID(), $entryID);
       if (is_wp_error($updateResponse)) {
         return $updateResponse;
       }
 
       // transformed dropdown value from string to array
-      $newPost = $this->transformDrpdwnValue($_POST);
+      $newPost = $this->transformDrpdwnValue($postData);
 
       //TO DO:: submit success action temporarily added for solution of a issue
-      do_action('bitform_submit_success', $this->_form_id, $entryID, $newPost, $_FILES);
-      do_action('bitform_update_success', $this->_form_id, $entryID, $newPost, $_FILES);
+      do_action('bitform_submit_success', $this->_form_id, $entryID, $newPost, $filesData);
+      do_action('bitform_update_success', $this->_form_id, $entryID, $newPost, $filesData);
 
       $captchaV3Settings = $this->getCaptchaV3Settings();
       if ($captchaV3Settings) {
-        $token = $_POST['g-recaptcha-response'];
+        $token = isset($_POST['g-recaptcha-response']) ? sanitize_text_field(wp_unslash($_POST['g-recaptcha-response'])) : '';
         $integrationHandler = new IntegrationHandler(0);
         $allFormIntegrations = $integrationHandler->getAllIntegration('app', 'gReCaptchaV3');
         if (!is_wp_error($allFormIntegrations)) {
@@ -423,7 +421,7 @@ final class FrontendFormManager extends FormManager
         $updateResponse['message'] = $regSuccMsg;
       }
       $updateResponse['new_nonce'] = wp_create_nonce('bitforms_' . $this->_form_id);
-      $updateResponse = IntegrationHandler::maybeSetCronForIntegration($updateResponse, 'create');
+      $updateResponse = IntegrationHandler::maybeSetCronForIntegration($updateResponse, 'update');
       $entryId = $updateResponse['entry_id'];
 
       $responseMsg = is_array($updateResponse) && !empty($updateResponse) ? $updateResponse : __('Entry Update Successfully', 'bit-form');
@@ -461,10 +459,13 @@ final class FrontendFormManager extends FormManager
         if ($isRestricted && !empty($isRestricted)) {
           return new WP_Error('spam_detection', $isRestricted[0]);
         }
-        if ($this->isTrappedInHoneypot()) {
+        $postData = wp_unslash($_POST);
+        $filesData = GlobalHelper::sanitize_files_input($_FILES);
+        $isHoneypot = apply_filters('bitform_check_honeypot', false, $this->_form_id, $postData);
+        if ($isHoneypot) {
           return new WP_Error('spam_detection', __('Token verification failed', 'bit-form'));
         }
-        $formCurrentStep = isset($_POST['form-current-step']) ? $_POST['form-current-step'] : null;
+        $formCurrentStep = isset($_POST['form-current-step']) ? sanitize_text_field(wp_unslash($_POST['form-current-step'])) : null;
         // TODO: Temporary parameter to skip captcha verification in step change of multi step form
         if ($verifyCaptcha) {
           $verifyGRecaptchaResult = $this->verifyGRecaptcha();
@@ -490,12 +491,12 @@ final class FrontendFormManager extends FormManager
         if (!is_wp_error($existAuth) && count($existAuth) > 0 && is_user_logged_in()) {
           return new WP_Error('auth_error', __('You are already logged in', 'bit-form'));
         }
-        $validateForm = $this->validateFormSubmission($_POST);
-        $validateFormFiles = $this->validateFormSubmission($_FILES);
+        $validateForm = $this->validateFormSubmission($postData);
+        $validateFormFiles = $this->validateFormSubmission($filesData);
         $validateForm = array_merge($validateForm, $validateFormFiles);
         $form_fields = $this->getFields();
         // check if form-current-step is set and form is multi-step
-        $formCurrentStep = isset($_POST['form-current-step']) ? $_POST['form-current-step'] : null;
+        $formCurrentStep = isset($_POST['form-current-step']) ? sanitize_text_field(wp_unslash($_POST['form-current-step'])) : null;
         if (!is_null($formCurrentStep)) {
           $formContents = $this->getFormContent();
           $layout = $formContents->layout;
@@ -516,11 +517,11 @@ final class FrontendFormManager extends FormManager
           }
           $form_fields = $step_fields;
         }
-        $formFieldValidator = new FormFieldValidator($form_fields, $_POST, $_FILES);
+        $formFieldValidator = new FormFieldValidator($form_fields, $postData, $filesData);
         $validUniuqFields = [];
-        $existFilter = has_filter('bf_check_duplicate_entry');
+        $existFilter = has_filter('bitform_check_duplicate_entry');
         if (true === $existFilter) {
-          $validUniuqFields = apply_filters('bf_check_duplicate_entry', $form_fields, $_POST);
+          $validUniuqFields = apply_filters('bitform_check_duplicate_entry', $form_fields, $postData);
 
           $fieldKeys = array_keys($validUniuqFields);
           $form_fields_keys = array_keys($form_fields);
@@ -530,7 +531,7 @@ final class FrontendFormManager extends FormManager
               $uniqueFields[] = $form_fields[$key];
             }
           }
-          do_action('bitform_Unique_entry', $uniqueFields, $validUniuqFields, $this->_form_id, $_POST);
+          do_action('bitform_Unique_entry', $uniqueFields, $validUniuqFields, $this->_form_id, $postData);
         }
         $validateField = $formFieldValidator->validate('create', $this->_form_id);
 
@@ -559,7 +560,7 @@ final class FrontendFormManager extends FormManager
     $captchaSettings = $this->getCaptchaSettings();
     $captchaV3Settings = $this->getCaptchaV3Settings();
     if ($captchaSettings || $captchaV3Settings) {
-      $token = $_POST['g-recaptcha-response'];
+      $token = isset($_POST['g-recaptcha-response']) ? sanitize_text_field(wp_unslash($_POST['g-recaptcha-response'])) : '';
       if (!isset($_POST['g-recaptcha-response'])) {
         return new WP_Error('spam_detection', __('Please recheck your reCaptcha Configuration', 'bit-form'));
       }
@@ -587,10 +588,7 @@ final class FrontendFormManager extends FormManager
             && ((float) $gRecaptchaResponse->score < (float) $captchaV3Settings->score)
           ) {
             wp_send_json_error(
-              __(
-                $captchaV3Settings->message,
-                'bit-form'
-              )
+              sanitize_text_field((string) $captchaV3Settings->message)
             );
           }
 
@@ -611,7 +609,7 @@ final class FrontendFormManager extends FormManager
         return new WP_Error('spam_detection', __('Please verify hCaptcha', 'bit-form'));
       }
 
-      $token = sanitize_text_field($_POST['h-captcha-response']);
+      $token = sanitize_text_field(wp_unslash($_POST['h-captcha-response']));
 
       $integrationHandler = new IntegrationHandler(0);
       $allFormIntegrations = $integrationHandler->getAllIntegration('app', 'hcaptcha');
@@ -632,7 +630,7 @@ final class FrontendFormManager extends FormManager
           [
             'secret'   => $hCaptcha->secretKey,
             'response' => $token,
-            'remoteip' => $_SERVER['REMOTE_ADDR'] ?? ''
+            'remoteip' => (isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '')
           ]
         );
 
@@ -655,7 +653,7 @@ final class FrontendFormManager extends FormManager
       if (!isset($_POST['cf-turnstile-response'])) {
         return new WP_Error('spam_detection', __('Please verify Cloudflare Turnstile Captcha', 'bit-form'));
       }
-      $token = sanitize_text_field($_POST['cf-turnstile-response']);
+      $token = sanitize_text_field(wp_unslash($_POST['cf-turnstile-response']));
       $turnstileCaptcha = null;
       $integrationHandler = new IntegrationHandler(0);
       $turnstileIntegration = $integrationHandler->getAllIntegration('app', 'turnstileCaptcha')[0];
@@ -672,10 +670,12 @@ final class FrontendFormManager extends FormManager
         );
         if (!is_wp_error($turnstileRecaptchaResponse)) {
           if (!$turnstileRecaptchaResponse->success) {
+            $errorCodes = implode(', ', (array) ($turnstileRecaptchaResponse->{'error-codes'} ?? []));
             wp_send_json_error(
-              __(
-                'Cloudflare Turnstile Validation Error: ' . implode(', ', $turnstileRecaptchaResponse->{'error-codes'}),
-                'bit-form'
+              sprintf(
+                /* translators: %s: dynamic value. */
+                __('Cloudflare Turnstile Validation Error: %s', 'bit-form'),
+                $errorCodes
               )
             );
           }
@@ -691,11 +691,11 @@ final class FrontendFormManager extends FormManager
 
   public function verifySubmissionNonce()
   {
-    if (!isset($_POST['t_identity']) && !isset($_POST['csrf'])) {
+    if (!isset($_POST['t_identity']) || !isset($_POST['csrf'])) {
       return false;
     }
-    $tIdenty = sanitize_text_field($_POST['t_identity']);
-    $csrf = sanitize_text_field($_POST['csrf']);
+    $tIdenty = sanitize_text_field(wp_unslash($_POST['t_identity']));
+    $csrf = sanitize_text_field(wp_unslash($_POST['csrf']));
     unset($_POST['t_identity'], $_POST['action'], $_POST['bitforms_id'], $_POST['csrf']);
     return Helpers::csrfDecrypted($tIdenty, $csrf);
   }
@@ -730,10 +730,24 @@ final class FrontendFormManager extends FormManager
     // error_log(print_r(['restrictions', $fromRestrictionSetitings], true));
     foreach ($fromRestrictionSetitingsEnabled as $restrictionKey => $isEnabled) {
       if ($isEnabled) {
-        if (('entry_limit' === $restrictionKey && isset($fromRestrictionSetitings->{$restrictionKey})) || ('entry_limit_by_user' === $restrictionKey && isset($fromRestrictionSetitings->{$restrictionKey}))) {
-          $entryLimitHelper = new EntryLimitHelper($this->form_id, $fromRestrictionSetitings, $fromRestrictionSetitingsEnabled);
-          $advancedLimitMessages = $entryLimitHelper->checkAllLimits($ipAddress, $currentUserId);
-          $restrictionMessage = array_merge($restrictionMessage, $advancedLimitMessages);
+        /**
+         * Allow add-ons to handle any restriction key (Pro-only restrictions
+         * should be implemented in the add-on, not shipped in the free plugin).
+         *
+         * Return a non-null string to block submission.
+         */
+        $addonMsg = apply_filters(
+          'bitform_submission_restriction',
+          null,
+          $restrictionKey,
+          $this->form_id,
+          $fromRestrictionSetitings,
+          $ipAddress,
+          $currentUserId
+        );
+        if (!is_null($addonMsg) && '' !== $addonMsg) {
+          $restrictionMessage[] = $addonMsg;
+          continue;
         }
 
         if ('onePerIp' === $restrictionKey) {
@@ -743,7 +757,7 @@ final class FrontendFormManager extends FormManager
             ['user_ip', 'status'],
             [
               'form_id' => $this->form_id,
-              'user_ip' => ip2long($ipAddress)
+              'user_ip' => (int) ip2long((string) $ipAddress)
             ],
           );
 
@@ -785,7 +799,7 @@ final class FrontendFormManager extends FormManager
           $restrictionMessage[] = $is_login_messages;
         }
         if ($checkedEmptySubmitted && 'empty_submission' === $restrictionKey) {
-          $isEmpty = $this->checkEmptySubmission($_POST, $_FILES);
+          $isEmpty = $this->checkEmptySubmission(wp_unslash($_POST), GlobalHelper::sanitize_files_input($_FILES));
           if ($isEmpty) {
             $restriction = $fromRestrictionSetitings->empty_submission->message;
 
@@ -796,139 +810,6 @@ final class FrontendFormManager extends FormManager
             );
 
             $restrictionMessage[] = $restriction;
-          }
-        }
-        if ('restrict_form' === $restrictionKey && isset($fromRestrictionSetitings->{$restrictionKey})) {
-          $day = empty($fromRestrictionSetitings->{$restrictionKey}->day) ? null : $fromRestrictionSetitings->{$restrictionKey}->day;
-          $date = empty($fromRestrictionSetitings->{$restrictionKey}->date) ? null : $fromRestrictionSetitings->{$restrictionKey}->date;
-          $time = empty($fromRestrictionSetitings->{$restrictionKey}->time) ? null : $fromRestrictionSetitings->{$restrictionKey}->time;
-
-          $isdayOk = $isdateOk = $istimeOk = true;
-          $dayNotOkMsg = $dateNotOkMsg = $timeNotOkMsg = '';
-          $dateTimeHelper = new DateTimeHelper();
-          if (
-            !empty($day)
-            && is_array($day)
-            && (in_array('Friday', $day)
-              || in_array('Saturday', $day)
-              || in_array('Sunday', $day)
-              || in_array('Monday', $day)
-              || in_array('Tuesday', $day)
-              || in_array('Wednesday', $day)
-              || in_array('Thursday', $day))
-            && (!in_array($dateTimeHelper->getDay('full-name'), $day))
-          ) {
-            $isdayOk = false;
-            $dayMsgVarsFormat = '';
-            foreach ($day as $dayIndex => $dayValue) {
-              if ($dayIndex > 0) {
-                $dayMsgVarsFormat .= ', ';
-              }
-              $dayMsgVarsFormat .= '%s';
-            }
-            $dayNotOkMsg = vsprintf(__("in $dayMsgVarsFormat", 'bit-form'), $day);
-          }
-          if (
-            !empty($day)
-            && is_array($day)
-            && (in_array('Custom', $day))
-          ) {
-            $startDate = empty($date->from) ? '00-00-0000' : $date->from;
-            $endDate = empty($date->to) ? '00-00-0000' : $date->to;
-            $dateFormat = preg_match('/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/', $startDate) ? 'Y-m-d' : 'm-d-Y';
-            if (!empty($date->from) && false !== strpos($startDate, 'T')) {
-              $startDate = $dateTimeHelper->getDate($startDate, false, null, $dateFormat);
-            }
-            if (!empty($date->to) && false !== strpos($endDate, 'T')) {
-              $endDate = $dateTimeHelper->getDate($endDate, false, null, $dateFormat);
-            }
-            $currentDate = $dateTimeHelper->getDate(null, null, null, $dateFormat);
-            if (!($currentDate >= $startDate && $currentDate <= $endDate)) {
-              $isdateOk = false;
-              $dateNotOkMsg = sprintf(__('within %s to %s', 'bit-form'), $startDate, $endDate);
-            }
-          }
-
-          if (!empty($time)) {
-            $startTime = empty($time->from) ? '00:00' : $time->from;
-            $endTime = empty($time->to) ? '23:59.999' : $time->to;
-            $currentTime = $dateTimeHelper->getTime(null, null, null, 'H:i');
-            if (!($currentTime >= $startTime && $currentTime <= $endTime)) {
-              $istimeOk = false;
-              $startTime = $dateTimeHelper->getTime($startTime, 'H:i', null);
-              $endTime = $dateTimeHelper->getTime($endTime, 'H:i', null);
-              $isTimeOk = false;
-              $timeNotOkMsg = sprintf(__('%s to %s', 'bit-form'), $startTime, $endTime);
-            }
-          }
-
-          if (!($isdateOk && $isdayOk && $istimeOk)) {
-            $restrict_form_message = null;
-            if (!$isdayOk) {
-              $restrict_form_message = !empty($timeNotOkMsg) ? sprintf(__('Form is available %s From %s', 'bit-form'), $dayNotOkMsg, $timeNotOkMsg) :
-                sprintf(__('Form is available %s', 'bit-form'), $dayNotOkMsg, $timeNotOkMsg);
-            } elseif (!$isdateOk) {
-              $restrict_form_message = !empty($timeNotOkMsg) ? sprintf(__('Form is available %s From %s', 'bit-form'), $dateNotOkMsg, $timeNotOkMsg) :
-                sprintf(__('Form is available %s', 'bit-form'), $dateNotOkMsg, $timeNotOkMsg);
-            } elseif (!$istimeOk) {
-              $restrict_form_message = sprintf(__('Form is available on %s', 'bit-form'), $timeNotOkMsg);
-            }
-
-            if ($restrict_form_message) {
-              $restrict_form_message = apply_filters(
-                'bitform_filter_restrict_form_message',
-                $restrict_form_message,
-                $this->form_id
-              );
-
-              $restrictionMessage[] = $restrict_form_message;
-            }
-          }
-        }
-        if ('blocked_ip' === $restrictionKey && isset($fromRestrictionSetitings->{$restrictionKey})) {
-          $isIpBlocked = false;
-          foreach ($fromRestrictionSetitings->{$restrictionKey} as $ipIndex => $ipDetails) {
-            if (!empty($ipDetails->status) && $ipDetails->status && !empty($ipDetails->ip) && $ipDetails->ip === $ipAddress) {
-              $isIpBlocked = true;
-              break;
-            }
-          }
-          if ($isIpBlocked) {
-            $blocked_ip_message = sprintf(
-              __('Sorry!! Your IP address is %s, Blocked from submitting the form', 'bit-form'),
-              $ipAddress
-            );
-
-            $blocked_ip_message = apply_filters(
-              'bitform_filter_restricted_ip_message',
-              $blocked_ip_message,
-              $this->form_id
-            );
-
-            $restrictionMessage[] = $blocked_ip_message;
-          }
-        }
-        if ('private_ip' === $restrictionKey && isset($fromRestrictionSetitings->{$restrictionKey})) {
-          $isIpWhiteListed = false;
-          foreach ($fromRestrictionSetitings->{$restrictionKey} as $ipIndex => $ipDetails) {
-            if (!empty($ipDetails->status) && $ipDetails->status && !empty($ipDetails->ip) && $ipDetails->ip === $ipAddress) {
-              $isIpWhiteListed = true;
-              break;
-            }
-          }
-          if (!$isIpWhiteListed) {
-            $private_ip = sprintf(
-              __('Sorry!! Your IP address is %s, Blocked from submitting the form', 'bit-form'),
-              $ipAddress
-            );
-
-            $private_ip = apply_filters(
-              'bitform_filter_private_ip_message',
-              $private_ip,
-              $this->form_id
-            );
-
-            $restrictionMessage[] = $private_ip;
           }
         }
       }
@@ -943,43 +824,13 @@ final class FrontendFormManager extends FormManager
    */
   public function isTrappedInHoneypot()
   {
-    $isHoneyPot = false;
-
-    if (!$this->isHoneypotActive()) {
-      return false;
-    }
-
-    $token = $_POST['b_h_t'];
-    $pattern = '/^([a-zA-Z0-9]*_[a-zA-Z0-9]*){4}$/';
-    $decryptedToken = base64_decode(base64_decode($token));
-
-    preg_match($pattern, $decryptedToken, $validToken);
-
-    if ($validToken) {
-      if (isset($_POST[$token]) && empty($_POST[$token])) {
-        $isHoneyPot = false;
-      } else {
-        $isHoneyPot = true;
-      }
-    } else {
-      $isHoneyPot = true;
-    }
-
-    if (isset($_POST[$token])) {
-      unset($_POST[$token]);
-    }
-    unset($_POST['b_h_t']);
-    return $isHoneyPot;
+    // Honeypot is implemented by add-ons (e.g. Pro) via filter.
+    return (bool) apply_filters('bitform_check_honeypot', false, $this->_form_id, wp_unslash($_POST));
   }
 
   public function isHoneypotActive()
   {
-    $formContents = $this->getFormContent();
-    $enabled = empty($formContents->additional->enabled) ? null : $formContents->additional->enabled;
-    if (!empty($enabled->honeypot) && $enabled->honeypot) {
-      return true;
-    }
-    return false;
+    return (bool) apply_filters('bitform_is_honeypot_active', false, $this->_form_id, $this->getFormContent());
   }
 
   public function checkPaymentFields()
@@ -1061,24 +912,13 @@ final class FrontendFormManager extends FormManager
 
   public function getFormAbandonmentMessage()
   {
-    if (class_exists('\BitCode\BitFormPro\Admin\FormSettings\FormAbandonment')) {
-      $formAbandonmentSettings = FormAbandonment::getFormAbandonmentSettings($this->form_id);
-      $msg = '';
-      if (isset($formAbandonmentSettings->showWarningMsg) && $formAbandonmentSettings->showWarningMsg && !empty($formAbandonmentSettings->warningMsg)) {
-        $msg = $formAbandonmentSettings->warningMsg;
-        $msg = '<div class="bf-form-msg active warning">' . wp_kses_post($msg) . '</div>';
-      }
-      return $msg;
-    }
+    $msg = apply_filters('bitform_form_abandonment_warning_markup', '', $this->form_id);
+    return is_string($msg) ? $msg : '';
   }
 
   public function getFormAbandonmentSettings()
   {
-    if (class_exists('\BitCode\BitFormPro\Admin\FormSettings\FormAbandonment')) {
-      $formAbandonmentSettings = FormAbandonment::getFormAbandonmentSettings($this->form_id);
-      return $formAbandonmentSettings;
-    }
-    return null;
+    return apply_filters('bitform_form_abandonment_settings', null, $this->form_id);
   }
 
   private function messageMarkup($msg)
@@ -1087,20 +927,30 @@ final class FrontendFormManager extends FormManager
     $msgConfig = json_decode($msg->message_config);
     $scrollClass = 'below' === $msgConfig->msgType ? 'scroll' : '';
 
-    return <<<SUCCESSMSG
-            <div role="dialog" aria-hidden="true" data-modal-backdrop="true" class="{$this->getAtomicCls("msg-container-{$msgId}")} deactive {$scrollClass}">
-              <div data-contentid="{$this->getFormIdentifier()}" data-msgid="{$msgId}" role="button" class="{$this->getAtomicCls("msg-background-{$msgId}")} msg-backdrop">
-                <div class="bf-msg-content {$this->getAtomicCls("msg-content-{$msgId}")}">
-                  <button data-contentid="{$this->getFormIdentifier()}" data-msgid="{$msgId}" class="{$this->getAtomicCls("close-{$msgId}")} bf-msg-close" type="button">
-                    <svg class="{$this->getAtomicCls("close-icn-{$msgId}")}" viewBox="0 0 30 30">
-                      <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" x1="4" y1="3.88" x2="26" y2="26.12"></line>
-                      <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" x1="26" y1="3.88" x2="4" y2="26.12"></line>
-                    </svg>
-                  </button>
-                  <div class="msg-content"></div>
-                </div>
-              </div>
-            </div>
-SUCCESSMSG;
+    return '<div 
+              role="dialog"
+              aria-hidden="true"
+              data-modal-backdrop="true"
+              class="' . $this->getAtomicCls("msg-container-{$msgId}") . ' deactive ' . $scrollClass . '">
+	              <div 
+                data-contentid="' . $this->getFormIdentifier() . '" 
+                data-msgid="' . $msgId . '" 
+                role="button" 
+                class="' . $this->getAtomicCls("msg-background-{$msgId}") . ' msg-backdrop">
+	                <div class="bf-msg-content ' . $this->getAtomicCls("msg-content-{$msgId}") . '">
+	                  <button 
+                       data-contentid="' . $this->getFormIdentifier() . '" 
+                       data-msgid="' . $msgId . '" 
+                       class="' . $this->getAtomicCls("close-{$msgId}") . ' bf-msg-close" 
+                       type="button">
+	                        <svg class="' . $this->getAtomicCls("close-icn-{$msgId}") . '" viewBox="0 0 30 30">
+	                        <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" x1="4" y1="3.88" x2="26" y2="26.12"></line>
+	                        <line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" x1="26" y1="3.88" x2="4" y2="26.12"></line>
+	                        </svg>
+	                  </button>
+	                  <div class="msg-content"></div>
+	                </div>
+	              </div>
+	            </div>';
   }
 }

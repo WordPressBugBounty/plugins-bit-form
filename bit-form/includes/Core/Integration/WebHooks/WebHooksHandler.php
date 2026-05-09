@@ -7,6 +7,10 @@
 
 namespace BitCode\BitForm\Core\Integration\WebHooks;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\ApiResponse as UtilApiResponse;
 use BitCode\BitForm\Core\Util\HttpHelper;
@@ -41,14 +45,11 @@ class WebHooksHandler
 
   public static function testWebhook()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
-      // $inputJSON = file_get_contents('php://input');
-      // $webhookDetails = json_decode($inputJSON);
-
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       GlobalHelper::requirePostMethod();
 
       try {
-        $webhookDetails = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $webhookDetails = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -130,12 +131,6 @@ class WebHooksHandler
           break;
       }
 
-      // if bitform pro is not active then return the response without response log
-      // if (!class_exists('BitCode\\BitFormPro\\Plugin')) {
-      //   return $response;
-      // }
-
-      // if bitform pro is active then return the response with response log
       if (is_wp_error($response)) {
         $this->_logResponse->apiResponse(
           $logID,

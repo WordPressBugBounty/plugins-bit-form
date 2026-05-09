@@ -2,6 +2,10 @@
 
 namespace BitCode\BitForm\Frontend;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use ReflectionMethod;
 
 class CustomRoutes

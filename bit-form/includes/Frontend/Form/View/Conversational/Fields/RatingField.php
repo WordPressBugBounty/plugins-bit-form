@@ -70,54 +70,81 @@ class RatingField
         } else {
           $checkedCls = null;
         }
-        $ratingOption .= <<<RATINGOPTION
-        <label
-          class="{$fieldHelpers->getConversationalMultiCls('rating-lbl')} {$fieldHelpers->getCustomClasses('rating-lbl')}"
-          for="{$rowID}-{$contentCount}-rating-{$key}"
-          {$fieldHelpers->getCustomAttributes('rating-lbl')}
-          data-indx="{$key}"
+        // sprintf args order:
+        // 1: label class, 2: rowID, 3: contentCount, 4: key, 5: label attrs
+        // 6: input class, 7: name attr, 8: value, 9: label text, 10: checked, 11: required, 12: input attrs
+        // 13: img class, 14: img src, 15: img attrs
+        $ratingOption .= sprintf(
+          '<label
+          class="%1$s"
+          for="%2$s-%3$s-rating-%4$s"
+          %5$s
+          data-indx="%4$s"
         >
-          <input
-            type="radio"
-            class="{$fieldHelpers->getConversationalMultiCls('rating-input')} {$fieldHelpers->getCustomClasses('rating-input')}"
-            {$name}
-            value={$val}
-            aria-label="{$lbl}"
-            id="{$rowID}-{$contentCount}-rating-{$key}"
-            {$checked}
-            {$req}
-            {$fieldHelpers->getCustomAttributes('rating-input')}
-          />
-          <img
-            class="{$fieldHelpers->getConversationalMultiCls('rating-img')} {$fieldHelpers->getCustomClasses('rating-img')} {$checkedCls}"
-            src="{$img}"
-            alt="{$lbl}"
-            aria-label="{$lbl}"
-            {$fieldHelpers->getCustomAttributes('rating-img')}
-          />
-        </label>
-RATINGOPTION;
+               <input
+                 type="radio"
+                 class="%6$s"
+                 %7$s
+                 value="%8$s"
+                 aria-label="%9$s"
+                 id="%2$s-%3$s-rating-%4$s"
+                 %10$s
+                 %11$s
+                 %12$s
+               />
+               <img
+                 class="%13$s"
+                 src="%14$s"
+                 alt="%9$s"
+                 aria-label="%9$s"
+                 %15$s
+               />
+         </label>
+',
+          $fieldHelpers->getConversationalMultiCls('rating-lbl') . ' ' . $fieldHelpers->getCustomClasses('rating-lbl'),
+          $rowID,
+          $contentCount,
+          $key,
+          $fieldHelpers->getCustomAttributes('rating-lbl'),
+          $fieldHelpers->getConversationalMultiCls('rating-input') . ' ' . $fieldHelpers->getCustomClasses('rating-input'),
+          $name,
+          $val,
+          $lbl,
+          $checked,
+          $req,
+          $fieldHelpers->getCustomAttributes('rating-input'),
+          $fieldHelpers->getConversationalMultiCls('rating-img') . ' ' . $fieldHelpers->getCustomClasses('rating-img') . ' ' . $checkedCls,
+          $img,
+          $fieldHelpers->getCustomAttributes('rating-img')
+        );
       }
     }
 
-    return <<<RATINGFIELD
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getConversationalMultiCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
-    >
-      <div 
-        {$fieldHelpers->getCustomAttributes('rating-wrp')}
-        class="{$fieldHelpers->getConversationalMultiCls('rating-wrp')} {$fieldHelpers->getCustomClasses('rating-wrp')}"
-        tabindex="0"
+    return sprintf(
+      '<div
+      %1$s
+      class="%2$s"
       >
-        {$ratingOption}
-      </div>
-      <span 
-        class="{$fieldHelpers->getConversationalMultiCls('rating-msg')} {$fieldHelpers->getCustomClasses('rating-msg')}"
-        {$fieldHelpers->getCustomAttributes('rating-msg')}
-      >
-      </span>
-    </div>
-RATINGFIELD;
+           <div
+             %3$s
+             class="%4$s"
+             tabindex="0"
+           >
+             %5$s      
+           </div>
+           <span
+             class="%6$s"
+             %7$s
+           >
+           </span>
+    </div>',
+      $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
+      $fieldHelpers->getConversationalMultiCls('inp-fld-wrp') . ' ' . $fieldHelpers->getCustomClasses('inp-fld-wrp'),
+      $fieldHelpers->getCustomAttributes('rating-wrp'),
+      $fieldHelpers->getConversationalMultiCls('rating-wrp') . ' ' . $fieldHelpers->getCustomClasses('rating-wrp'),
+      $ratingOption,
+      $fieldHelpers->getConversationalMultiCls('rating-msg') . ' ' . $fieldHelpers->getCustomClasses('rating-msg'),
+      $fieldHelpers->getCustomAttributes('rating-msg')
+    );
   }
 }

@@ -8,12 +8,15 @@ class SpacerField
   {
     $fieldHelpers = new ClassicFieldHelpers($field, $rowID, $form_atomic_Cls_map);
 
-    return <<<SpacerField
-    <div
-      {$fieldHelpers->getCustomAttributes('fld-wrp')}
-      class="{$fieldHelpers->getAtomicCls('fld-wrp')} {$fieldHelpers->getCustomClasses('fld-wrp')}"
+    return sprintf(
+      '<div
+      %1$s
+      class="%2$s %3$s"
     >
-    </div>
-SpacerField;
+    </div>',
+      $fieldHelpers->getCustomAttributes('fld-wrp'),
+      $fieldHelpers->getAtomicCls('fld-wrp'),
+      $fieldHelpers->getCustomClasses('fld-wrp')
+    );
   }
 }

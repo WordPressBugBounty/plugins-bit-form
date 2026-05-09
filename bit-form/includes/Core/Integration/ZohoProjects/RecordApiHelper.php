@@ -146,7 +146,7 @@ class RecordApiHelper
 
   private function testDate($x)
   {
-    if (date('Y-m-d', strtotime($x)) === $x) {
+    if (gmdate('Y-m-d', strtotime($x)) === $x) {
       return true;
     }
     return false;
@@ -191,7 +191,8 @@ class RecordApiHelper
           }
         }
         if (empty($fieldData[$sEvent][$fieldPair->zohoFormField]) && \in_array($fieldPair->zohoFormField, $required)) {
-          $error = new WP_Error('REQ_FIELD_EMPTY', wp_sprintf(__('%s is required for %s', 'bit-form'), $fieldPair->zohoFormField, $sEvent));
+          /* translators: %1$s: field name, %2$s: event or context name */
+          $error = new WP_Error('REQ_FIELD_EMPTY', wp_sprintf(__('%1$s is required for %2$s', 'bit-form'), $fieldPair->zohoFormField, $sEvent));
           $this->_logResponse->apiResponse($this->_logID, $this->_integrationID, ['type' => 'record', 'type_name' => 'field'], 'validation', $error, $entryDetails);
           return $error;
         }
@@ -227,7 +228,7 @@ class RecordApiHelper
               $action->custom_date = date_format(date_create($action->custom_date), 'm-d-Y');
             }
             if (isset($action->reminder_time)) {
-              $action->reminder_time = date('H:i', strtotime($action->reminder_time));
+              $action->reminder_time = gmdate('H:i', strtotime($action->reminder_time));
             }
 
             unset($action->custom_date_fld, $action->reminder_time_fld);

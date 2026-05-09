@@ -2,6 +2,10 @@
 
 namespace BitCode\BitForm\Admin;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 /**
  * The admin menu and page handler class
  */
@@ -43,7 +47,7 @@ class Admin_Bar
     global $submenu;
 
     $capability = apply_filters('bitforms_form_access_capability', 'manage_options');
-    $menuTitle = Utilities::isPro() ? 'Bit Form Pro' : 'Bit Form';
+    $menuTitle = Utilities::isProLicensed() ? 'Bit Form Pro' : 'Bit Form';
     add_menu_page(
       __('Bit Form - Most advanced form builder and entries management plugin', 'bit-form'),
       $menuTitle,
@@ -55,9 +59,9 @@ class Admin_Bar
     );
     if (current_user_can($capability)) {
       $entriesCount = '';
-      if (self::countUnreadEntries()) {
-        $entriesCount = ' <span class="update-plugins">' . self::countUnreadEntries() . '</span>';
-      }
+      // if (self::countUnreadEntries()) {
+      //   $entriesCount = ' <span class="update-plugins">' . self::countUnreadEntries() . '</span>';
+      // }
 
       $submenu['bitform'][] = [__('All Forms', 'bit-form') . $entriesCount, $capability, 'admin.php?page=bitform#/'];
       $submenu['bitform'][] = [__('Form Templates', 'bit-form') . '<span class="bf-template-new-badge">New</span>', $capability, 'admin.php?page=bitform#/form-templates'];
@@ -78,9 +82,9 @@ class Admin_Bar
   public function AdminTopMenu(WP_Admin_Bar $wp_admin_bar)
   {
     $indicator = '';
-    if (self::countUnreadEntries()) {
-      $indicator = ' <div class="wp-core-ui wp-ui-notification bf-indicator-badge">' . self::countUnreadEntries() . '</div>';
-    }
+    // if (self::countUnreadEntries()) {
+    //   $indicator = ' <div class="wp-core-ui wp-ui-notification bf-indicator-badge">' . self::countUnreadEntries() . '</div>';
+    // }
 
     $wp_admin_bar->add_node([
       'id'    => 'bitform',
@@ -166,13 +170,14 @@ class Admin_Bar
     $site_url .= empty($parsed_url['port']) ? null : ':' . $parsed_url['port'];
     $base_path_admin = str_replace($site_url, '', get_admin_url());
     // loading google fonts
-    wp_enqueue_style('googleapis-BITFORM-PRECONNECT', 'https://fonts.googleapis.com');
-    wp_enqueue_style('gstatic-BITFORM-PRECONNECT-CROSSORIGIN', 'https://fonts.gstatic.com');
+    wp_enqueue_style('googleapis-BITFORM-PRECONNECT', 'https://fonts.googleapis.com', [], BITFORMS_VERSION, false);
+    wp_enqueue_style('gstatic-BITFORM-PRECONNECT-CROSSORIGIN', 'https://fonts.gstatic.com', [], BITFORMS_VERSION, false);
     foreach (self::$fonts_url as $i => $font_url) {
-      wp_enqueue_style('bf-font-' . $i, $font_url);
+      wp_enqueue_style('bf-font-' . $i, $font_url, [], BITFORMS_VERSION);
     }
 
     if (defined('BITAPPS_DEV') && BITAPPS_DEV) {
+      // Vite dev server scripts; null version intentional (dev mode, no cache busting needed).
       wp_enqueue_script('vite-client-helper-BITFORM-MODULE', BIT_DEV_URL . '/config/devHotModule.js', [], null);
       wp_enqueue_script('vite-client-BITFORM-MODULE', BIT_DEV_URL . '/@vite/client', [], null);
       wp_enqueue_script('index-BITFORM-MODULE', BIT_DEV_URL . '/main.jsx', [], null);
@@ -224,7 +229,7 @@ class Admin_Bar
     //   );
     // }
 
-    wp_enqueue_script('tinymce_js', includes_url('js/tinymce/') . 'wp-tinymce.php', null, false, true);
+    wp_enqueue_script('tinymce_js', includes_url('js/tinymce/') . 'wp-tinymce.php', [], get_bloginfo('version'), true);
 
     if (!wp_script_is('media-upload')) {
       wp_enqueue_media();
@@ -342,7 +347,7 @@ class Admin_Bar
       'downloadedPdfFonts'  => is_array(get_option('bitforms_pdf_fonts')) ? get_option('bitforms_pdf_fonts') : [],
       'permission'          => empty(get_option('bitforms_allow_tracking')) ? false : true,
       'templatePath'        => BITFORMS_ROOT_URI . '/static/templates',
-      'serverInfo'          => ['php_version' => phpversion(), 'engine' => $_SERVER['SERVER_SOFTWARE'], 'wp_version' => get_bloginfo('version'), 'loaded_extensions' => get_loaded_extensions()],
+      'serverInfo'          => ['php_version' => phpversion(), 'engine' => isset($_SERVER['SERVER_SOFTWARE']) ? sanitize_text_field(wp_unslash($_SERVER['SERVER_SOFTWARE'])) : '', 'wp_version' => get_bloginfo('version'), 'loaded_extensions' => get_loaded_extensions()],
     ];
 
     $isMigratingToV2 = get_option('bitforms_migrating_to_v2', false);
@@ -364,6 +369,7 @@ class Admin_Bar
     $bits['hideCashbackModal'] = $hideCashbackModal;
 
     global $wpdb;
+    // Direct query: table name interpolation only (no user input). $wpdb->prepare() cannot parameterize schema-check queries.
     $hasV1FormTable = $wpdb->get_var("SHOW TABLES LIKE '{$wpdb->prefix}bitforms_form_v1'");
     if ($hasV1FormTable) {
       $bits['canRollbackToV1'] = true;
@@ -377,7 +383,7 @@ class Admin_Bar
     $allowBitFormTranslation = apply_filters('bitforms_filter_allow_translation', true);
     if ($allowBitFormTranslation && 'en_US' !== get_user_locale() && file_exists(BITFORMS_PLUGIN_DIR_PATH . '/languages/generatedString.php')) {
       include_once BITFORMS_PLUGIN_DIR_PATH . '/languages/generatedString.php';
-      $bitforms['translations'] = $i18n_strings;
+      $bitforms['translations'] = $bitforms_i18n_strings;
 
       // Apply a filter to allow user/custom translations to modify the $bitforms translations
       $bitforms['translations'] = apply_filters('bitform_filter_translations', $bitforms['translations']);
@@ -464,6 +470,7 @@ class Admin_Bar
   private static function countUnreadEntries()
   {
     global $wpdb;
+    // Direct query: table name interpolation only (no user input). status = 1 is a hardcoded literal.
     $unreadEntries = $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}bitforms_form_entries WHERE status = 1");
     return $unreadEntries;
   }

@@ -30,24 +30,27 @@ class InputWrapper
     $labelWrapper = !$noLabel ? $this->labelWrapper() : '';
     $helperText = $this->helperText();
     $error = !$noErrMsg ? $this->errorMessages() : '';
-    $inputWrapper = <<<INPUTWRAPPER
-    <div 
-      {$this->_fieldHelpers->getCustomAttributes('fld-wrp')}
-      class="{$this->_fieldHelpers->getAtomicCls('fld-wrp')} {$this->_fieldHelpers->getCustomClasses('fld-wrp')}"
-    >
-      {$labelWrapper}
-      <div 
-        {$this->_fieldHelpers->getCustomAttributes('inp-wrp')}
-        class="{$this->_fieldHelpers->getAtomicCls('inp-wrp')} {$this->_fieldHelpers->getCustomClasses('inp-wrp')}"
-      > 
-        {$field}
-        {$helperText}
-        {$error}
-      </div>
-    </div>
-INPUTWRAPPER;
 
-    return $inputWrapper;
+    return sprintf(
+      '<div %1$s class="%2$s %3$s">
+  %4$s
+  <div %5$s class="%6$s %7$s">
+    %8$s
+    %9$s
+    %10$s
+  </div>
+</div>',
+      $this->_fieldHelpers->getCustomAttributes('fld-wrp'),
+      $this->_fieldHelpers->getAtomicCls('fld-wrp'),
+      $this->_fieldHelpers->getCustomClasses('fld-wrp'),
+      $labelWrapper,
+      $this->_fieldHelpers->getCustomAttributes('inp-wrp'),
+      $this->_fieldHelpers->getAtomicCls('inp-wrp'),
+      $this->_fieldHelpers->getCustomClasses('inp-wrp'),
+      $field,
+      $helperText,
+      $error
+    );
   }
 
   private function labelWrapper()
@@ -78,14 +81,12 @@ INPUTWRAPPER;
       && $this->_fieldHelpers->property_exists_nested($this->_fieldData, 'valid->reqShow', true)
       && $this->_fieldHelpers->property_exists_nested($this->_fieldData, 'valid->reqPos', 'before')
     ) {
-      $_reqPre = <<<REQPRE
-      <span 
-        {$this->_fieldHelpers->getCustomAttributes('req-smbl')}
-        class="{$this->_fieldHelpers->getAtomicCls('req-smbl')} {$this->_fieldHelpers->getCustomClasses('req-smbl')}" 
-      >
-        *
-      </span>
-REQPRE;
+      $_reqPre = sprintf(
+        '<span %1$s class="%2$s %3$s">*</span>',
+        $this->_fieldHelpers->getCustomAttributes('req-smbl'),
+        $this->_fieldHelpers->getAtomicCls('req-smbl'),
+        $this->_fieldHelpers->getCustomClasses('req-smbl')
+      );
     }
     // for post required icon
     if (
@@ -93,14 +94,12 @@ REQPRE;
       && $this->_fieldHelpers->property_exists_nested($this->_fieldData, 'valid->reqShow', true)
       && $this->_fieldHelpers->property_exists_nested($this->_fieldData, 'valid->reqPos', 'before', 1)
     ) {
-      $_reqPost = <<<REQPOST
-      <span 
-        {$this->_fieldHelpers->getCustomAttributes('req-smbl')}
-        class="{$this->_fieldHelpers->getAtomicCls('req-smbl')} {$this->_fieldHelpers->getCustomClasses('req-smbl')}" 
-      >
-        *
-      </span>
-REQPOST;
+      $_reqPost = sprintf(
+        '<span %1$s class="%2$s %3$s">*</span>',
+        $this->_fieldHelpers->getCustomAttributes('req-smbl'),
+        $this->_fieldHelpers->getAtomicCls('req-smbl'),
+        $this->_fieldHelpers->getCustomClasses('req-smbl')
+      );
     }
 
     // for Label
@@ -111,42 +110,42 @@ REQPOST;
     ) {
       $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
       $contentCount = count($bfFrontendFormIds);
-      $_label = <<<LABEL
-      <label 
-        {$this->_fieldHelpers->getCustomAttributes('lbl')} 
-        class="{$this->_fieldHelpers->getAtomicCls('lbl')} {$this->_fieldHelpers->getCustomClasses('lbl')}"
-        for="{$this->_fieldKey}-{$contentCount}">
-        {$_reqPre}
-        {$_lblPreIcn}
-        {$_lbl}
-        {$_lblSufIcn}
-        {$_reqPost}
-      </label>
-LABEL;
+      $_label = sprintf(
+        '<label %1$s class="%2$s %3$s" for="%4$s-%5$d">%6$s%7$s%8$s%9$s%10$s</label>',
+        $this->_fieldHelpers->getCustomAttributes('lbl'),
+        $this->_fieldHelpers->getAtomicCls('lbl'),
+        $this->_fieldHelpers->getCustomClasses('lbl'),
+        $this->_fieldKey,
+        $contentCount,
+        $_reqPre,
+        $_lblPreIcn,
+        $_lbl,
+        $_lblSufIcn,
+        $_reqPost
+      );
     }
 
     // for subtitle
     if (property_exists($this->_fieldData, 'subtitle') && $this->_fieldData->subtitleHide) {
-      $_subtitle = <<<SUBTITLE
-      <div 
-        {$this->_fieldHelpers->getCustomAttributes('sub-titl')}
-        class="{$this->_fieldHelpers->getAtomicCls('sub-titl')} {$this->_fieldHelpers->getCustomClasses('sub-titl')}" 
-      >
-        {$_subtitlePreIcn}
-        {$_subtitleText}
-        {$_subtitlePostIcn}
-      </div>
-SUBTITLE;
+      $_subtitle = sprintf(
+        '<div %1$s class="%2$s %3$s">%4$s%5$s%6$s</div>',
+        $this->_fieldHelpers->getCustomAttributes('sub-titl'),
+        $this->_fieldHelpers->getAtomicCls('sub-titl'),
+        $this->_fieldHelpers->getCustomClasses('sub-titl'),
+        $_subtitlePreIcn,
+        $_subtitleText,
+        $_subtitlePostIcn
+      );
     }
-    return <<<LABELWRAPPER
-      <div 
-        {$this->_fieldHelpers->getCustomAttributes('lbl-wrp')}
-        class="{$this->_fieldHelpers->getAtomicCls('lbl-wrp')} {$this->_fieldHelpers->getCustomClasses('lbl-wrp')}" 
-      >
-        {$_label}
-        {$_subtitle}
-      </div>
-LABELWRAPPER;
+
+    return sprintf(
+      '<div %1$s class="%2$s %3$s">%4$s%5$s</div>',
+      $this->_fieldHelpers->getCustomAttributes('lbl-wrp'),
+      $this->_fieldHelpers->getAtomicCls('lbl-wrp'),
+      $this->_fieldHelpers->getCustomClasses('lbl-wrp'),
+      $_label,
+      $_subtitle
+    );
   }
 
   private function helperText()
@@ -160,16 +159,15 @@ LABELWRAPPER;
     }
 
     if (property_exists($this->_fieldData, 'helperTxt') && $this->_fieldData->helperTxt) {
-      $_helperTxt = <<<HELPERTEXT
-      <div 
-        {$this->_fieldHelpers->getCustomAttributes('hlp-txt')}
-        class="{$this->_fieldHelpers->getAtomicCls('hlp-txt')} {$this->_fieldHelpers->getCustomClasses('hlp-txt')}" 
-      >
-        {$_helperTxtPreIcn}
-        {$_helperTxt}
-        {$_helperTxtSufIcn}
-      </div>
-HELPERTEXT;
+      $_helperTxt = sprintf(
+        '<div %1$s class="%2$s %3$s">%4$s%5$s%6$s</div>',
+        $this->_fieldHelpers->getCustomAttributes('hlp-txt'),
+        $this->_fieldHelpers->getAtomicCls('hlp-txt'),
+        $this->_fieldHelpers->getCustomClasses('hlp-txt'),
+        $_helperTxtPreIcn,
+        $_helperTxt,
+        $_helperTxtSufIcn
+      );
     }
 
     // for helper text
@@ -203,16 +201,31 @@ HELPERTEXT;
       $errMsgCustomAttr = '';
     }
 
-    return <<<ERRORMESSAGES
-    <div class='{$this->_fieldHelpers->getAtomicCls('err-wrp')}' style="{$_style}">
-    <div class='{$this->_fieldHelpers->getAtomicCls('err-inner')}'>
-      {$errMsgStart}
-        {$_errorPreIcn}
-        <div {$this->_fieldHelpers->getCustomAttributes('err-txt')} {$errMsgCustomAttr} class="{$errMsgAtomicCls} {$errMsgCustomCls} {$this->_fieldHelpers->getAtomicCls('err-txt')} {$this->_fieldHelpers->getCustomClasses('err-txt')}" {$msgStyle}>{$_error}</div>
-        {$_errorSufIcn}
-      {$errMsgEnd}
-      </div>
-    </div>
-ERRORMESSAGES;
+    return sprintf(
+      '<div class="%1$s" style="%2$s">
+  <div class="%3$s">
+    %4$s
+      %5$s
+      <div %6$s %7$s class="%8$s %9$s %10$s %11$s" %12$s>%13$s</div>
+      %14$s
+    %15$s
+  </div>
+</div>',
+      $this->_fieldHelpers->getAtomicCls('err-wrp'),
+      $_style,
+      $this->_fieldHelpers->getAtomicCls('err-inner'),
+      $errMsgStart,
+      $_errorPreIcn,
+      $this->_fieldHelpers->getCustomAttributes('err-txt'),
+      $errMsgCustomAttr,
+      $errMsgAtomicCls,
+      $errMsgCustomCls,
+      $this->_fieldHelpers->getAtomicCls('err-txt'),
+      $this->_fieldHelpers->getCustomClasses('err-txt'),
+      $msgStyle,
+      $_error,
+      $_errorSufIcn,
+      $errMsgEnd
+    );
   }
 }

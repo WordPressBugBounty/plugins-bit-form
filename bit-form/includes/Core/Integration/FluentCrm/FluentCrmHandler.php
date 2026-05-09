@@ -7,6 +7,10 @@
 
 namespace BitCode\BitForm\Core\Integration\FluentCrm;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use FluentCrm\App\Models\CustomContactField;
 use FluentCrm\App\Models\Lists;
@@ -53,7 +57,7 @@ class FluentCrmHandler
    */
   public static function fluentCrmLists()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $response = null;
       if (self::checkedExistsFluentCRM()) {
         $lists = Lists::get();
@@ -97,7 +101,7 @@ class FluentCrmHandler
 
   public static function fluentCrmFields()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $response = null;
       if (self::checkedExistsFluentCRM()) {
         $fieldOptions = [];
@@ -161,7 +165,7 @@ class FluentCrmHandler
    */
   public static function fluentCrmAuthorize()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       if (self::checkedExistsFluentCRM()) {
         wp_send_json_success(true);
       } else {

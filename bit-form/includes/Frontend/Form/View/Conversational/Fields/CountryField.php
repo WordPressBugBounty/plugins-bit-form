@@ -46,38 +46,50 @@ class CountryField
     }
 
     if ($fieldHelpers->property_exists_nested($field, 'config->selectedFlagImage', true)) {
-      $img = <<<FLAGIMAGE
-        <img
-          {$fieldHelpers->getCustomAttributes('selected-country-img')} 
-          class="{$fieldHelpers->getConversationalMultiCls('selected-country-img')} {$fieldHelpers->getCustomClasses('selected-country-img')}"
+      $img = sprintf(
+        '<img
+          %1$s 
+          class="%2$s %3$s"
           aria-hidden="true"
           alt="selected country flag"
-          src="{$img}"
+          src="%4$s"
         >
-FLAGIMAGE;
+',
+        $fieldHelpers->getCustomAttributes('selected-country-img'),
+        $fieldHelpers->getConversationalMultiCls('selected-country-img'),
+        $fieldHelpers->getCustomClasses('selected-country-img'),
+        $img
+      );
     } else {
       $img = '';
     }
 
-    $selectedFlagImage = <<<SELECTEDOPTLABEL
-      <div class="{$fieldHelpers->getConversationalMultiCls('selected-country-wrp')}">
-        {$img}
-        <span
-          {$fieldHelpers->getCustomAttributes('selected-country-lbl')}
-          class="{$fieldHelpers->getConversationalMultiCls('selected-country-lbl')} {$fieldHelpers->getCustomClasses('selected-country-lbl')}" 
-        >
-          {$fieldHelpers->esc_html($ph)}
-        </span>
+    $selectedFlagImage = sprintf(
+      '<div class="%1$s">
+             %2$s
+           <span
+             %3$s
+             class="%4$s %5$s" 
+           >
+             %6$s
+           </span>
       </div>
-SELECTEDOPTLABEL;
+',
+      $fieldHelpers->getConversationalMultiCls('selected-country-wrp'),
+      $img,
+      $fieldHelpers->getCustomAttributes('selected-country-lbl'),
+      $fieldHelpers->getConversationalMultiCls('selected-country-lbl'),
+      $fieldHelpers->getCustomClasses('selected-country-lbl'),
+      $fieldHelpers->esc_html($ph)
+    );
 
     if ($fieldHelpers->property_exists_nested($field, 'config->selectedCountryClearable', true)) {
-      $selectedCountryClearable = <<<CLEARABLE
-      <button
-        {$fieldHelpers->getCustomAttributes('inp-clr-btn')}
+      $selectedCountryClearable = sprintf(
+        '      <button
+        %1$s
         type="button"
         title="Clear selected country value"
-        class="{$fieldHelpers->getConversationalMultiCls('inp-clr-btn')} {$fieldHelpers->getCustomClasses('inp-clr-btn')}"
+        class="%2$s %3$s"
       >
         <svg
           width="15"
@@ -95,7 +107,11 @@ SELECTEDOPTLABEL;
           <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
       </button>
-CLEARABLE;
+',
+        $fieldHelpers->getCustomAttributes('inp-clr-btn'),
+        $fieldHelpers->getConversationalMultiCls('inp-clr-btn'),
+        $fieldHelpers->getCustomClasses('inp-clr-btn')
+      );
     }
 
     if ($fieldHelpers->property_exists_nested($field, 'config->searchPlaceholder', '', 1)) {
@@ -103,62 +119,66 @@ CLEARABLE;
     }
 
     if ($fieldHelpers->property_exists_nested($field, 'config->searchClearable', true)) {
-      $searchClearable = <<<CLEARABLE
-      <button
-        {$fieldHelpers->getCustomAttributes('search-clear-btn')}
+      $searchClearable = sprintf(
+        '<button
+        %1$s
         type="button"
         title="Clear search"
-        class="{$fieldHelpers->getConversationalMultiCls('icn')} {$fieldHelpers->getConversationalMultiCls('search-clear-btn')} {$fieldHelpers->getCustomClasses('search-clear-btn')}"
+        class="%2$s %3$s %4$s"
         tabIndex="-1"
-      >
-        <svg
-          width="13"
-          height="13"
-          role="img"
-          title="Cross icon"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-CLEARABLE;
+       >
+             <svg
+               width="13"
+               height="13"
+               role="img"
+               title="Cross icon"
+               viewBox="0 0 24 24"
+               fill="none"
+               stroke="currentColor"
+               stroke-width="2"
+               stroke-linecap="round"
+               stroke-linejoin="round"
+             >
+               <line x1="18" y1="6" x2="6" y2="18" />
+               <line x1="6" y1="6" x2="18" y2="18" />
+             </svg>
+        </button>
+',
+        $fieldHelpers->getCustomAttributes('search-clear-btn'),
+        $fieldHelpers->getConversationalMultiCls('icn'),
+        $fieldHelpers->getConversationalMultiCls('search-clear-btn'),
+        $fieldHelpers->getCustomClasses('search-clear-btn')
+      );
     }
 
-    return <<<COUNTRYFIELD
-    <div class="{$fieldHelpers->getConversationalMultiCls('country-fld-container')}">
+    return '    <div class="' . $fieldHelpers->getConversationalMultiCls('country-fld-container') . '">
       <div 
-        {$fieldHelpers->getCustomAttributes('country-fld-wrp')}
-        class="{$fieldHelpers->getConversationalMultiCls('country-fld-wrp')} {$fieldHelpers->getCustomClasses('country-fld-wrp')} {$disabled} {$readonly}"
+        ' . $fieldHelpers->getCustomAttributes('country-fld-wrp') . '
+        class="' . $fieldHelpers->getConversationalMultiCls('country-fld-wrp') . ' ' . $fieldHelpers->getCustomClasses('country-fld-wrp') . ' ' . $disabled . ' ' . $readonly . '"
       >
         <input
-          {$name}
-          {$req}
+          ' . $name . '
+          ' . $req . '
           type="text"
           title="Country Hidden Input"
-          class="{$fieldHelpers->getConversationalMultiCls('country-hidden-input')} d-none"
-          {$disabled}
-          {$readonly}
-          {$val}
+          class="' . $fieldHelpers->getConversationalMultiCls('country-hidden-input') . ' d-none"
+          ' . $disabled . '
+          ' . $readonly . '
+          ' . $val . '
         />
         <div
-          class="{$fieldHelpers->getConversationalMultiCls('dpd-wrp')}"
+          class="' . $fieldHelpers->getConversationalMultiCls('dpd-wrp') . '"
           aria-live="assertive"
           aria-label="Select a Country"
           role="combobox"
           aria-expanded="false"
-          tabIndex={$tabIndx}
+          tabIndex=' . $tabIndx . '
         >
-          {$selectedFlagImage}
+          ' . $selectedFlagImage . '
     
-          <div class="{$fieldHelpers->getConversationalMultiCls('dpd-btn-wrp')}">
-          {$selectedCountryClearable}
-            <div class="{$fieldHelpers->getConversationalMultiCls('dpd-down-btn')}">
+          <div class="' . $fieldHelpers->getConversationalMultiCls('dpd-btn-wrp') . '">
+          ' . $selectedCountryClearable . '
+            <div class="' . $fieldHelpers->getConversationalMultiCls('dpd-down-btn') . '">
               <svg
                 width="15"
                 height="15"
@@ -177,22 +197,22 @@ CLEARABLE;
           </div>
         </div>
         <div 
-          {$fieldHelpers->getCustomAttributes('option-wrp')}
-          class="{$fieldHelpers->getConversationalMultiCls('option-wrp')} {$fieldHelpers->getCustomClasses('option-wrp')}"
+          ' . $fieldHelpers->getCustomAttributes('option-wrp') . '
+          class="' . $fieldHelpers->getConversationalMultiCls('option-wrp') . ' ' . $fieldHelpers->getCustomClasses('option-wrp') . '"
         >
-          <div class="{$fieldHelpers->getConversationalMultiCls('option-inner-wrp')}">
-            <div class="{$fieldHelpers->getConversationalMultiCls('option-search-wrp')}">
+          <div class="' . $fieldHelpers->getConversationalMultiCls('option-inner-wrp') . '">
+            <div class="' . $fieldHelpers->getConversationalMultiCls('option-search-wrp') . '">
               <input
-                {$fieldHelpers->getCustomAttributes('opt-search-input')}
+                ' . $fieldHelpers->getCustomAttributes('opt-search-input') . '
                 type="search"
-                class="{$fieldHelpers->getConversationalMultiCls('opt-search-input')} {$fieldHelpers->getCustomClasses('opt-search-input')}"
-                {$searchPlaceholder}
+                class="' . $fieldHelpers->getConversationalMultiCls('opt-search-input') . ' ' . $fieldHelpers->getCustomClasses('opt-search-input') . '"
+                ' . $searchPlaceholder . '
                 autoComplete="country-name"
                 tabIndex="-1"
               />
               <svg
-                {$fieldHelpers->getCustomAttributes('opt-search-icn')}
-                class="{$fieldHelpers->getConversationalMultiCls('icn')} {$fieldHelpers->getConversationalMultiCls('opt-search-icn')} {$fieldHelpers->getCustomClasses('opt-search-icn')}"
+                ' . $fieldHelpers->getCustomAttributes('opt-search-icn') . '
+                class="' . $fieldHelpers->getConversationalMultiCls('icn') . ' ' . $fieldHelpers->getConversationalMultiCls('opt-search-icn') . ' ' . $fieldHelpers->getCustomClasses('opt-search-icn') . '"
                 aria-hidden="true"
                 width="22"
                 height="22"
@@ -208,21 +228,20 @@ CLEARABLE;
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
-             {$searchClearable}
+             ' . $searchClearable . '
             </div>
             <ul
-              {$fieldHelpers->getCustomAttributes('option-list')}
-              class="{$fieldHelpers->getConversationalMultiCls('option-list')} {$fieldHelpers->getCustomClasses('option-list')}"
+              ' . $fieldHelpers->getCustomAttributes('option-list') . '
+              class="' . $fieldHelpers->getConversationalMultiCls('option-list') . ' ' . $fieldHelpers->getCustomClasses('option-list') . '"
               tabIndex="-1"
               role="listbox"
               aria-label="country list"
             >
-              {$options}
+              ' . $options . '
             </ul>
           </div>
         </div>
       </div>
-    </div>
-COUNTRYFIELD;
+    </div>';
   }
 }

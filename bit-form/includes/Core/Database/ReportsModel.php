@@ -86,7 +86,7 @@ class ReportsModel extends Model
     }
     $result = $this->app_db->query(
       $this->app_db->prepare(
-        "DELETE FROM $this->table_name $condition_to_check",
+        "DELETE FROM `{$this->table_name}` $condition_to_check",
         $all_values
       )
     );

@@ -33,7 +33,7 @@ final class WorkFlow
       ];
     } else {
       $condition = [
-        'id' => [$workFlowIds],
+        'id' => $workFlowIds,
       ];
     }
     if (!empty($workFlowRun)) {
@@ -192,7 +192,7 @@ final class WorkFlow
   public function isExistDoubleOptin($data)
   {
     $data['integrationRun'] = true;
-    if (has_action('bf_double_optin_confirmation')) {
+    if (has_action('bitform_double_optin_confirmation')) {
       $activeDoubleOpt = (new IntegrationHandler(static::$_formID))->getAllIntegration('double-opt-in', 'double-opt-in', 1);
 
       if (!is_wp_error($activeDoubleOpt) && count($activeDoubleOpt) > 0) {

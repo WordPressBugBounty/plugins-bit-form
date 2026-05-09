@@ -20,16 +20,24 @@ class PostType
     register_post_type('bitforms', $args);
   }
 
+  public static function scheduleRewriteFlush()
+  {
+    set_transient('bitform_flush_rewrite_rules', true, DAY_IN_SECONDS);
+  }
+
   public static function registerCustomPostType()
   {
-    flush_rewrite_rules(false);
+    if (get_transient('bitform_flush_rewrite_rules')) {
+      delete_transient('bitform_flush_rewrite_rules');
+      flush_rewrite_rules(false);
+    }
     $cpts = get_option('bitform_custom_post_types');
     if (!empty($cpts)) {
       foreach ($cpts as $cpt) {
         $labels = [
-          'name'          => _x($cpt->name, 'Post type general name', 'bit-form'),
-          'singular_name' => _x($cpt->singular_label, 'Post type singular name', 'bit-form'),
-          'menu_name'     => _x($cpt->menu_name, 'Admin Menu text', 'bit-form'),
+          'name'          => esc_html($cpt->name),
+          'singular_name' => esc_html($cpt->singular_label),
+          'menu_name'     => esc_html($cpt->menu_name),
         ];
         $args = [
           'labels'             => $labels,

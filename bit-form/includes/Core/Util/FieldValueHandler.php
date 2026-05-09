@@ -77,7 +77,7 @@ final class FieldValueHandler
 
   public static function replaceBackBtnWithPrevPageUrl($stringToReplaceField)
   {
-    $prevPageUrl = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : home_url();
+    $prevPageUrl = isset($_SERVER['HTTP_REFERER']) ? esc_url_raw(wp_unslash($_SERVER['HTTP_REFERER'])) : home_url();
     preg_match_all('/\$?\{back_to_view\}/', $stringToReplaceField, $matches);
     $matched = $matches[0];
 
@@ -167,7 +167,8 @@ final class FieldValueHandler
     }
 
     $ajaxRequest = false;
-    if (isset($_REQUEST['action']) && 'bitforms_trigger_workflow' === $_REQUEST['action']) {
+    // Read-only action name check for routing; CSRF verified upstream in the form submission flow via verifySubmissionNonce().
+    if (isset($_REQUEST['action']) && 'bitforms_trigger_workflow' === sanitize_text_field(wp_unslash($_REQUEST['action']))) {
       $ajaxRequest = true;
     }
 
@@ -854,8 +855,11 @@ final class FieldValueHandler
       }
     }
 
-    if (in_array($fldType, ['signature', 'file-up', 'advanced-file-up'])) {
+    if (in_array($fldType, ['file-up', 'advanced-file-up'])) {
       return self::anchorMarkup($newData);
+    }
+    if ('signature' === $fldType) {
+      return self::imgMarkup($newData);
     }
 
     return (string) $data;

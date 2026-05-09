@@ -33,9 +33,7 @@ class RecordApiHelper
       return;
     }
     $filePath = $this->makeFilePath($filePath);
-    $filesize = filesize($filePath);
-    $fp = fopen($filePath, 'rb');
-    $body = fread($fp, $filesize);
+    $body = FileHandler::readFile($filePath);
     if (!$body) {
       return new WP_Error(423, 'Can\'t open file!');
     }

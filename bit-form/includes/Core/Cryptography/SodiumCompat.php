@@ -10,7 +10,7 @@ class SodiumCompat
   public function __construct()
   {
     if (!class_exists('ParagonIE_Sodium_Compat')) {
-      require ABSPATH . WPINC . '/sodium_compat/autoload.php';
+      require_once ABSPATH . WPINC . '/sodium_compat/autoload.php';
       Log::debug_log(class_exists('ParagonIE_Sodium_Compat') ? 'Found' : 'ParagonIE\Sodium\Compat not found');
     }
   }
@@ -30,7 +30,7 @@ class SodiumCompat
       $message = strval($message);
     }
 
-    $nonce = random_bytes(24); // NONCE = Number to be used ONCE, for each message
+    $nonce = \random_bytes(24); // NONCE = Number to be used ONCE, for each message
     $encrypted = \ParagonIE_Sodium_Compat::crypto_aead_xchacha20poly1305_ietf_encrypt(
       $message,
       $nonce,

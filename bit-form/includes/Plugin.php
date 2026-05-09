@@ -2,14 +2,16 @@
 
 namespace BitCode\BitForm;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 /**
  * Main class for the plugin.
  *
  * @since 1.0.0-alpha
  */
 
-use BitCode\BitForm\BitApps\WPTelemetry\Telemetry\Telemetry;
-use BitCode\BitForm\BitApps\WPTelemetry\Telemetry\TelemetryConfig;
 use BitCode\BitForm\Core\Database\DB;
 use BitCode\BitForm\Core\Database\FormModel;
 use BitCode\BitForm\Core\Fallback\FormFallback;
@@ -37,12 +39,10 @@ final class Plugin
   public function register()
   {
     add_action('plugins_loaded', [$this, 'init_plugin']);
-    add_action('init', [$this, 'localization_setup']);
+    // add_action('init', [$this, 'localization_setup']);
     (new Activation())->activate();
     (new Deactivation())->register();
     (new Uninstallation())->register();
-
-    $this->initWpTelemetry();
   }
 
   private function commaReplace($options, $lbl, $val)
@@ -149,7 +149,7 @@ final class Plugin
 
   public function plugin_action_links($links)
   {
-    $links[] = '<a href="https://bitapps.pro/docs/bit-form/" target="_blank">' . __('Docs') . '</a>';
+    $links[] = '<a href="https://bitapps.pro/docs/bit-form/" target="_blank">' . __('Docs', 'bit-form') . '</a>';
 
     return $links;
   }
@@ -179,23 +179,8 @@ final class Plugin
     }
   }
 
-  public function localization_setup()
-  {
-    load_plugin_textdomain('bit-form', false, dirname(BITFORMS_PLUGIN_BASENAME) . '/languages');
-  }
-
-  private function initWpTelemetry()
-  {
-    TelemetryConfig::setSlug(Config::SLUG);
-    TelemetryConfig::setTitle(Config::TITLE);
-    TelemetryConfig::setVersion(Config::VERSION);
-    TelemetryConfig::setPrefix(Config::VAR_PREFIX);
-
-    TelemetryConfig::setServerBaseUrl('https://wp-api.bitapps.pro/public/');
-    TelemetryConfig::setTermsUrl('https://bitapps.pro/terms-of-service/');
-    TelemetryConfig::setPolicyUrl('https://bitapps.pro/privacy-policy/');
-
-    Telemetry::report()->addPluginData()->init();
-    Telemetry::feedback()->init();
-  }
+  // public function localization_setup()
+  // {
+  //   // load_plugin_textdomain('bit-form', false, dirname(BITFORMS_PLUGIN_BASENAME) . '/languages');
+  // }
 }

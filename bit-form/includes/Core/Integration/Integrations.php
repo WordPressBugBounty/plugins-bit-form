@@ -182,6 +182,8 @@ final class Integrations
   {
     $integrationHandler = new IntegrationHandler($formID);
     $logResponse = new ApiResponse();
+    $intThatNeedNoFileHandling = ['ACF', 'MetaBox', 'Pods']; //these takes raw file and upload it
+    $baseFieldValues = $fieldValues;
     $entryDetails = [
       'formId'      => $formID,
       'entryId'     => $entryID,
@@ -192,6 +194,7 @@ final class Integrations
         if (!is_string($integrationIDStr)) {
           return;
         }
+        $currentFieldValues = $baseFieldValues;
         $integrationID = intval(json_decode($integrationIDStr)->id, 10);
         if (!empty($integrationID) && is_int($integrationID)) {
           $integrationResult
@@ -202,20 +205,23 @@ final class Integrations
             $integrationName = 'SendinBlue';
           }
           if (!is_null($integrationName) && static::isExists($integrationName)) {
+            if (!in_array($integrationName, $intThatNeedNoFileHandling)) {
+              $currentFieldValues = IntegrationHandler::handleFileUrl($currentFieldValues, $formID, $entryID);
+            }
             $integration = static::isExists($integrationName);
             $handler = new $integration($integrationID, $formID);
             $integDetails = is_string($integrationDetails->integration_details) ? json_decode($integrationDetails->integration_details) : $integrationDetails->integration_details;
             if (isset($integDetails->field_map)) {
               $sptagData = self::specialTagFields($integDetails->field_map);
-              $fieldValues = $fieldValues + $sptagData;
+              $currentFieldValues = $currentFieldValues + $sptagData;
             }
-            $handler->execute($integrationHandler, $integrationDetails, $fieldValues, $entryID, $logID);
+            $handler->execute($integrationHandler, $integrationDetails, $currentFieldValues, $entryID, $logID);
           } else {
             do_action('bitform_integration_run_failure', $integrationID, $formID);
 
             $errorMsg = apply_filters('bitform_filter_integration_run_failure_message', __('Integration execution failed', 'bit-form'), $integrationID, $formID);
 
-            Log::debug_log('[+] Integration execution failed: ' . print_r($errorMsg, true));
+            Log::debug_log('[+] Integration execution failed: ' . $errorMsg);
 
             $logResponse->apiResponse(
               $logID,

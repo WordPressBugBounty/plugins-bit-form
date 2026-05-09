@@ -70,54 +70,83 @@ class RatingField
         } else {
           $checkedCls = null;
         }
-        $ratingOption .= <<<RATINGOPTION
-        <label
-          class="{$fieldHelpers->getAtomicCls('rating-lbl')} {$fieldHelpers->getCustomClasses('rating-lbl')}"
-          for="{$rowID}-{$contentCount}-rating-{$key}"
-          {$fieldHelpers->getCustomAttributes('rating-lbl')}
-          data-indx="{$key}"
-        >
-          <input
-            type="radio"
-            class="{$fieldHelpers->getAtomicCls('rating-input')} {$fieldHelpers->getCustomClasses('rating-input')}"
-            {$name}
-            value={$val}
-            aria-label="{$lbl}"
-            id="{$rowID}-{$contentCount}-rating-{$key}"
-            {$checked}
-            {$req}
-            {$fieldHelpers->getCustomAttributes('rating-input')}
-          />
-          <img
-            class="{$fieldHelpers->getAtomicCls('rating-img')} {$fieldHelpers->getCustomClasses('rating-img')} {$checkedCls}"
-            src="{$img}"
-            alt="{$lbl}"
-            aria-label="{$lbl}"
-            {$fieldHelpers->getCustomAttributes('rating-img')}
-          />
-        </label>
-RATINGOPTION;
+        $ratingOption .= sprintf(
+          '        <label
+            class="%1$s %2$s"
+            for="%3$s-%4$s-rating-%5$s"
+            %6$s
+            data-indx="%5$s"
+          >
+            <input
+              type="radio"
+              class="%7$s %8$s"
+              %9$s
+              value="%10$s"
+              aria-label="%11$s"
+              id="%3$s-%4$s-rating-%5$s"
+              %12$s
+              %13$s
+              %14$s
+            />
+            <img
+              class="%15$s %16$s %17$s"
+              src="%18$s"
+              alt="%11$s"
+              aria-label="%11$s"
+              %19$s
+            />
+          </label>',
+          $fieldHelpers->getAtomicCls('rating-lbl'),
+          $fieldHelpers->getCustomClasses('rating-lbl'),
+          $rowID,
+          $contentCount,
+          $key,
+          $fieldHelpers->getCustomAttributes('rating-lbl'),
+          $fieldHelpers->getAtomicCls('rating-input'),
+          $fieldHelpers->getCustomClasses('rating-input'),
+          $name,
+          $fieldHelpers->esc_attr($val),
+          $fieldHelpers->esc_attr($lbl),
+          $checked,
+          $req,
+          $fieldHelpers->getCustomAttributes('rating-input'),
+          $fieldHelpers->getAtomicCls('rating-img'),
+          $fieldHelpers->getCustomClasses('rating-img'),
+          $checkedCls,
+          $fieldHelpers->esc_url($img),
+          $fieldHelpers->getCustomAttributes('rating-img')
+        );
       }
     }
 
-    return <<<RATINGFIELD
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getAtomicCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
-    >
-      <div 
-        {$fieldHelpers->getCustomAttributes('rating-wrp')}
-        class="{$fieldHelpers->getAtomicCls('rating-wrp')} {$fieldHelpers->getCustomClasses('rating-wrp')}"
-        tabindex="0"
+    return sprintf(
+      '<div
+        %1$s
+        class="%2$s %3$s"
       >
-        {$ratingOption}
-      </div>
-      <span 
-        class="{$fieldHelpers->getAtomicCls('rating-msg')} {$fieldHelpers->getCustomClasses('rating-msg')}"
-        {$fieldHelpers->getCustomAttributes('rating-msg')}
-      >
-      </span>
-    </div>
-RATINGFIELD;
+        <div
+          %4$s
+          class="%5$s %6$s"
+          tabindex="0"
+        >
+%7$s
+        </div>
+        <span
+          class="%8$s %9$s"
+          %10$s
+        >
+        </span>
+      </div>',
+      $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
+      $fieldHelpers->getAtomicCls('inp-fld-wrp'),
+      $fieldHelpers->getCustomClasses('inp-fld-wrp'),
+      $fieldHelpers->getCustomAttributes('rating-wrp'),
+      $fieldHelpers->getAtomicCls('rating-wrp'),
+      $fieldHelpers->getCustomClasses('rating-wrp'),
+      $ratingOption,
+      $fieldHelpers->getAtomicCls('rating-msg'),
+      $fieldHelpers->getCustomClasses('rating-msg'),
+      $fieldHelpers->getCustomAttributes('rating-msg')
+    );
   }
 }

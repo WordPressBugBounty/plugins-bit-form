@@ -6,31 +6,23 @@ use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Core\Form\FormManager;
 use BitCode\BitForm\enshrined\svgSanitize\Sanitizer;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
 final class FileHandler
 {
   public function rmrf($dir)
   {
-    if (is_dir($dir)) {
-      $objects = scandir($dir);
-      foreach ($objects as $object) {
-        if ('.' !== $object && '..' !== $object) {
-          if (is_dir($dir . DIRECTORY_SEPARATOR . $object) && !is_link($dir . DIRECTORY_SEPARATOR . $object)) {
-            $this->rmrf($dir . DIRECTORY_SEPARATOR . $object);
-          } else {
-            wp_delete_file($dir . DIRECTORY_SEPARATOR . $object);
-          }
-        }
-      }
-      rmdir($dir);
-    } else {
-      wp_delete_file($dir);
+    $fs = self::initWpFilesystem();
+    if ($fs && $fs->exists($dir)) {
+      $fs->delete($dir, true);
     }
   }
 
   public function cpyr($source, $destination)
   {
     if (is_dir($source)) {
-      mkdir($destination);
+      wp_mkdir_p($destination);
       // chmod($destination, 0744);
       $objects = scandir($source);
       foreach ($objects as $object) {
@@ -52,15 +44,26 @@ final class FileHandler
 
   public function moveUploadedFiles($file_details, $form_id, $entry_id)
   {
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+
     $file_upoalded = [];
     $_upload_dir = self::getEntriesFileUploadDir($form_id, $entry_id);
+    $_upload_url = self::getEntriesFileUploadURL($form_id, $entry_id);
     $this::createIndexFile($_upload_dir);
+
+    $upload_dir_filter = function ($uploads) use ($_upload_dir, $_upload_url) {
+      $uploads['path'] = $_upload_dir;
+      $uploads['url'] = $_upload_url;
+      $uploads['subdir'] = '';
+      $uploads['basedir'] = dirname($_upload_dir);
+      $uploads['baseurl'] = dirname($_upload_url);
+      return $uploads;
+    };
+
     if (is_array($file_details['name'])) {
       foreach ($file_details['name'] as $key => $value) {
-        //check accepted filetype in_array($file_details['name'][$key], $supported_files) else \
         if (!empty($value)) {
           $fileNameCount = 1;
-          // $file_upoalded[$key] = time()."_$value";
           $file_upoalded[$key] = sanitize_file_name($value);
           while (file_exists($_upload_dir . DIRECTORY_SEPARATOR . $file_upoalded[$key])) {
             $fileNameWithSeparator = BITFORMS_BF_SEPARATOR . $fileNameCount;
@@ -70,9 +73,20 @@ final class FileHandler
               break;
             }
           }
-          $move_status = \move_uploaded_file($file_details['tmp_name'][$key], $_upload_dir . DIRECTORY_SEPARATOR . $file_upoalded[$key]);
-          if (!$move_status) {
+          $file = [
+            'name'     => $file_upoalded[$key],
+            'type'     => $file_details['type'][$key] ?? '',
+            'tmp_name' => $file_details['tmp_name'][$key],
+            'error'    => $file_details['error'][$key] ?? 0,
+            'size'     => $file_details['size'][$key] ?? 0,
+          ];
+          add_filter('upload_dir', $upload_dir_filter);
+          $upload_result = wp_handle_upload($file, ['test_form' => false]);
+          remove_filter('upload_dir', $upload_dir_filter);
+          if (isset($upload_result['error'])) {
             unset($file_upoalded[$key]);
+          } else {
+            $file_upoalded[$key] = basename($upload_result['file']);
           }
         }
       }
@@ -88,9 +102,20 @@ final class FileHandler
             break;
           }
         }
-        $move_status = \move_uploaded_file($file_details['tmp_name'], $_upload_dir . DIRECTORY_SEPARATOR . $file_upoalded[0]);
-        if (!$move_status) {
+        $file = [
+          'name'     => $file_upoalded[0],
+          'type'     => $file_details['type'] ?? '',
+          'tmp_name' => $file_details['tmp_name'],
+          'error'    => $file_details['error'] ?? 0,
+          'size'     => $file_details['size'] ?? 0,
+        ];
+        add_filter('upload_dir', $upload_dir_filter);
+        $upload_result = wp_handle_upload($file, ['test_form' => false]);
+        remove_filter('upload_dir', $upload_dir_filter);
+        if (isset($upload_result['error'])) {
           unset($file_upoalded[0]);
+        } else {
+          $file_upoalded[0] = basename($upload_result['file']);
         }
       }
     }
@@ -122,11 +147,39 @@ final class FileHandler
 
   public static function fileCopy($tmpdir, $destinationDir, $file)
   {
-    $tmpFile = $tmpdir . DIRECTORY_SEPARATOR . $file;
-    $newFile = $destinationDir . DIRECTORY_SEPARATOR . $file;
-    if (file_exists($tmpFile)) {
-      copy($tmpFile, $newFile);
+    $tmpBase = realpath($tmpdir);
+    $destBase = realpath($destinationDir);
+    if (false === $tmpBase || false === $destBase) {
+      Log::debug_log([
+        'message'        => 'FileHandler::fileCopy base path invalid',
+        'tmpdir'         => $tmpdir,
+        'destinationDir' => $destinationDir,
+      ]);
+      return;
     }
+
+    $safeFile = is_string($file) ? trim($file) : '';
+    if ('' === $safeFile) {
+      return;
+    }
+
+    $candidate = $tmpBase . DIRECTORY_SEPARATOR . $safeFile;
+    $resolved = realpath($candidate);
+    if (false === $resolved || 0 !== strpos($resolved, $tmpBase . DIRECTORY_SEPARATOR)) {
+      Log::debug_log([
+        'message'  => 'FileHandler::fileCopy blocked path traversal',
+        'file'     => $file,
+        'resolved' => $resolved,
+        'tmpBase'  => $tmpBase,
+      ]);
+      return;
+    }
+    if (!is_readable($resolved)) {
+      return;
+    }
+
+    $newFile = $destBase . DIRECTORY_SEPARATOR . basename($resolved);
+    copy($resolved, $newFile);
   }
 
   public static function tempDirToUploadDir($submitted_data, $fields, $formId, $entryID)
@@ -153,9 +206,16 @@ final class FileHandler
         }
       }
     }
-    array_map('unlink', array_filter(
-      (array) array_merge(glob("$tempDir/*"))
-    ));
+    $tempBase = realpath($tempDir);
+    if (false !== $tempBase) {
+      $tmpFiles = glob($tempBase . DIRECTORY_SEPARATOR . '*');
+      foreach ((array) $tmpFiles as $tmpFile) {
+        $resolved = realpath($tmpFile);
+        if (false !== $resolved && 0 === strpos($resolved, $tempBase . DIRECTORY_SEPARATOR)) {
+          wp_delete_file($resolved);
+        }
+      }
+    }
 
     return $submitted_data;
   }
@@ -248,8 +308,8 @@ final class FileHandler
   private function validateFileInfo($fieldType, $file_details, $allowFileTypes, $maxSize, $maxTotalFileSize)
   {
     $errorMessage = [
-      'message'   => '',
-      'error_type'=> '',
+      'message'    => '',
+      'error_type' => '',
     ];
     if (is_array($file_details['name'])) {
       $totalSize = 0;
@@ -336,8 +396,14 @@ final class FileHandler
     // Hard-block risky types regardless
     // 3) Block obvious executable types regardless of allow list
     $disallowedMimes = apply_filters('bitform_filter_upload_disallowed_mimes', [
-      'application/x-php', 'text/x-php', 'application/x-msdownload', 'application/x-msdos-program',
-      'application/x-sh', 'application/x-csh', 'text/x-shellscript', 'application/java-archive'
+      'application/x-php',
+      'text/x-php',
+      'application/x-msdownload',
+      'application/x-msdos-program',
+      'application/x-sh',
+      'application/x-csh',
+      'text/x-shellscript',
+      'application/java-archive'
     ]);
     $denyExt = apply_filters('bitform_filter_upload_denied_extensions', ['php', 'phtml', 'phar', 'htaccess', 'html', 'js', 'exe', 'sh', 'bat', 'cmd']);
     if (in_array($detectedMime, $disallowedMimes, true) || in_array($fileExtension, $denyExt, true)) {
@@ -404,8 +470,40 @@ final class FileHandler
       }
     }
 
+    if ('pdf' === $fileExtension || 'application/pdf' === $detectedMime || 'application/pdf' === $wpType) {
+      $blockedList = [
+        '/\/JS\b/',
+        '/\/JavaScript\b/',
+        '/eval\(/i',
+        '/app\.alert/i',
+        '/console\.log\b/i',
+        '/document\.write\b/i',
+
+        '/\/GoToR\b/i',
+        '/\/Launch\b/i',
+
+        '/\/EmbeddedFile\b/i',
+        '/\/EmbeddedFiles\b/i',
+        '/\/Filespec\b/i',
+        '/\/FileAttachment\b/i',
+
+        '/\/SubmitForm\b/i',
+        '/\/ResetForm\b/i',
+        '/\/ImportData\b/i',
+
+        '/\/RichMedia\b/i',
+      ];
+
+      $pdfContent = file_get_contents($file['tmp_name']);
+      foreach ($blockedList as $blockedKeyWrd) {
+        if (preg_match($blockedKeyWrd, $pdfContent)) {
+          return ['message' => __('Invalid file', 'bit-form'), 'error_type' => 'file_type_error'];
+        }
+      }
+    }
+
     // --- Allow developer to make a final decision override (optional) ---
-    $final = apply_filters('bit_form_upload_allow_file', true, [
+    $final = apply_filters('bitform_filter_upload_allow_file', true, [
       'file_name'     => $fileName,
       'extension'     => $fileExtension,
       'detected_mime' => $detectedMime,
@@ -432,18 +530,31 @@ final class FileHandler
   public static function getEntriesFileUploadDir($form_id, $entry_id)
   {
     $uploadDir = rtrim(BITFORMS_UPLOAD_DIR, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $form_id . DIRECTORY_SEPARATOR;
-    $previousEntryDirectory = $uploadDir . $entry_id;
-    if (is_dir($previousEntryDirectory)) {
-      return $previousEntryDirectory;
+    $encrypted_directoryId = Helpers::getEncryptedEntryId($entry_id);
+    $encryptedDirectory = $uploadDir . $encrypted_directoryId;
+    if (is_dir($encryptedDirectory)) {
+      return $encryptedDirectory;
     }
-    $encrypted_directory = Helpers::getEncryptedEntryId($entry_id);
-    return $uploadDir . $encrypted_directory;
+    $oldEntriesFileUploadDir = Helpers::getOldEntriesFileUploadDir($uploadDir, $entry_id);
+    if (!empty($oldEntriesFileUploadDir) && is_dir($oldEntriesFileUploadDir)) {
+      return $oldEntriesFileUploadDir;
+    }
+    return $encryptedDirectory;
   }
 
   private static function replaceDocumentRoot($path)
   {
-    $relativePath = str_replace(ABSPATH, '', $path); // Remove absolute server path
-    return site_url($relativePath); // Prepend with domain
+    $uploadDir = wp_upload_dir();
+    $basedir = wp_normalize_path(rtrim($uploadDir['basedir'], '/\\'));
+    $baseurl = rtrim($uploadDir['baseurl'], '/');
+    $normalPath = wp_normalize_path($path);
+
+    if (0 === strpos($normalPath, $basedir . '/') || $normalPath === $basedir) {
+      return $baseurl . substr($normalPath, strlen($basedir));
+    }
+
+    // Fallback: path outside uploads dir — strip ABSPATH and prepend home URL.
+    return home_url(ltrim(str_replace(wp_normalize_path(ABSPATH), '', $normalPath), '/'));
   }
 
   public static function getEntriesFileUploadURL($form_id, $entry_id)
@@ -459,7 +570,7 @@ final class FileHandler
       $indexFilePath = rtrim($directory, '/') . '/index.php';
       if (!file_exists($indexFilePath)) {
         try {
-          if (false === file_put_contents($indexFilePath, "<?php\n// No direct access allowed.")) {
+          if (false === self::writeFile($indexFilePath, "<?php\n// No direct access allowed.")) {
             throw new \Exception("Failed to create index.php in $directory");
           }
         } catch (\Exception $e) {
@@ -468,6 +579,78 @@ final class FileHandler
       }
     }
     return false;
+  }
+
+  /**
+   * Initialise and return the WP_Filesystem abstraction layer.
+   *
+   * @return WP_Filesystem_Base|false
+   */
+  private static function initWpFilesystem()
+  {
+    global $wp_filesystem;
+    if (empty($wp_filesystem)) {
+      require_once ABSPATH . 'wp-admin/includes/file.php';
+      WP_Filesystem();
+    }
+    return $wp_filesystem;
+  }
+
+  /**
+   * Write (overwrite) content to a file using WP_Filesystem.
+   *
+   * @param string $filePath  Absolute path to the file.
+   * @param string $content   Content to write.
+   * @return bool  True on success, false on failure.
+   */
+  public static function writeFile($filePath, $content)
+  {
+    $fs = self::initWpFilesystem();
+    if ($fs) {
+      return $fs->put_contents($filePath, $content, FS_CHMOD_FILE);
+    }
+    // Fallback: file_put_contents is acceptable when WP_Filesystem is unavailable.
+    return false !== file_put_contents($filePath, $content);
+  }
+
+  /**
+   * Append content to a file using WP_Filesystem.
+   * WP_Filesystem has no native append; we read + concatenate + write.
+   *
+   * @param string $filePath  Absolute path to the file.
+   * @param string $content   Content to append.
+   * @return bool  True on success, false on failure.
+   */
+  public static function appendFile($filePath, $content)
+  {
+    $fs = self::initWpFilesystem();
+    if ($fs) {
+      $existing = $fs->exists($filePath) ? (string) $fs->get_contents($filePath) : '';
+      return $fs->put_contents($filePath, $existing . $content, FS_CHMOD_FILE);
+    }
+    // Fallback: file_put_contents is acceptable when WP_Filesystem is unavailable.
+    return false !== file_put_contents($filePath, $content, FILE_APPEND | LOCK_EX);
+  }
+
+  /**
+   * Read and return the full content of a file using WP_Filesystem.
+   *
+   * @param string $filePath  Absolute path to the file.
+   * @return string  File contents, or empty string if unreadable.
+   */
+  public static function readFile($filePath)
+  {
+    $fs = self::initWpFilesystem();
+    if ($fs && $fs->exists($filePath)) {
+      $content = $fs->get_contents($filePath);
+      return false !== $content ? $content : '';
+    }
+    // Fallback.
+    if (file_exists($filePath)) {
+      $content = file_get_contents($filePath);
+      return false !== $content ? $content : '';
+    }
+    return '';
   }
 
   public static function processRepeaterAttachment($repeaterKey, $fileKey, $fieldValue, $basePath, &$attachments)
@@ -498,19 +681,44 @@ final class FileHandler
 
   private static function addAttachmentFiles($fileValue, $basePath, &$attachments)
   {
+    $baseResolved = realpath($basePath);
+    if (false === $baseResolved) {
+      Log::debug_log([
+        'message'  => 'FileHandler::addAttachmentFiles base path invalid',
+        'basePath' => $basePath,
+      ]);
+      return;
+    }
+
+    $addFile = static function ($candidate) use ($baseResolved, &$attachments) {
+      $safeFile = is_string($candidate) ? trim($candidate) : '';
+      if ('' === $safeFile) {
+        return;
+      }
+      $path = $baseResolved . DIRECTORY_SEPARATOR . $safeFile;
+      $resolved = realpath($path);
+      if (false === $resolved || 0 !== strpos($resolved, $baseResolved . DIRECTORY_SEPARATOR)) {
+        Log::debug_log([
+          'message'      => 'FileHandler::addAttachmentFiles blocked path traversal',
+          'file'         => $candidate,
+          'resolved'     => $resolved,
+          'baseResolved' => $baseResolved,
+        ]);
+        return;
+      }
+      if (is_readable($resolved)) {
+        $attachments[] = $resolved;
+      }
+    };
+
     if (is_array($fileValue)) {
       foreach ($fileValue as $singleFile) {
-        $filePath = $basePath . $singleFile;
-        if (is_readable($filePath)) {
-          $attachments[] = $filePath;
-        }
+        $addFile($singleFile);
       }
-    } else {
-      $filePath = $basePath . $fileValue;
-      if (is_readable($filePath)) {
-        $attachments[] = $filePath;
-      }
+      return;
     }
+
+    $addFile($fileValue);
   }
 
   /**
@@ -591,10 +799,10 @@ final class FileHandler
   }
 
   /**
- * Return file type by checking with extension
- * @param string $extension
- * @return string
- */
+   * Return file type by checking with extension
+   * @param string $extension
+   * @return string
+   */
   public static function getFileTypeByExtension($extension)
   {
     switch (strtolower($extension)) {

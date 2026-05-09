@@ -327,7 +327,7 @@ final class IntegrationHandler
         }
       }
       ob_start();
-      echo wp_doing_ajax() || defined('REST_REQUEST') ? wp_json_encode($response) : $workFlowReturnedData['message'];
+      echo wp_doing_ajax() || defined('REST_REQUEST') ? wp_json_encode($response) : esc_html($workFlowReturnedData['message']);
       ob_end_flush();
       flush();
       session_write_close();
@@ -348,7 +348,7 @@ final class IntegrationHandler
         if (!is_wp_error($updatedStatus)) {
           if ($workFlowReturnedData['dflt_template']) {
             // $triggerData['fields'] = $workFlowReturnedData['fields'];
-            do_action('bf_double_optin_confirmation', $workFlowReturnedData['integrationDetails'], $triggerData);
+            do_action('bitform_double_optin_confirmation', $workFlowReturnedData['integrationDetails'], $triggerData);
           } elseif (isset($triggerData['dblOptin'])) {
             foreach ($triggerData['dblOptin'] as $value) {
               MailNotifier::notify($value, $triggerData['formID'], $triggerData['fields'], $triggerData['entryID'], true, $triggerData['logID']);
@@ -504,7 +504,7 @@ final class IntegrationHandler
 
         $newFieldValues = self::constructRepeaterValue($repeaterValues, static::$_formID);
 
-        $fieldValues[$key] = json_encode(array_values($newFieldValues), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $fieldValues[$key] = is_array($newFieldValues) ? json_encode(array_values($newFieldValues), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : $fieldValues[$key];
       }
     }
 
@@ -529,14 +529,13 @@ final class IntegrationHandler
    * @param number $entryId
    * @return mixed $fieldValues
    */
-  public static function replaceFileWithUrl($fieldValues, $formId, $entryId)
+  public static function handleFileUrl($fieldValues, $formId, $entryId)
   {
     if (!$formId || !$entryId) {
       return $fieldValues;
     }
-    $form = new FormManager($formId);
+    $form = FormManager::getInstance($formId);
     $formFields = $form->getFields();
-    $webPath = Helpers::getWebPathWithEncryptedEntryId($formId, $entryId);
 
     $fldsIncludeFile = ['file-up', 'advanced-file-up', 'repeater', 'signature'];
     foreach ($fieldValues as $key =>$value) {
@@ -545,7 +544,7 @@ final class IntegrationHandler
         continue;
       }
 
-      if ('repeater' === $fldTyp) {
+      if ('repeater' === $fldTyp && is_array($value)) {
         foreach ($value as $rIndex => $rValue) {
           foreach ($rValue as $subKey=>$subValue) {
             if (!in_array($formFields[$subKey]['type'], $fldsIncludeFile)) {
@@ -554,23 +553,23 @@ final class IntegrationHandler
             //  for file fields inside repeater
             if (is_array($subValue)) {
               foreach ($subValue as $fileIndex=>$fileValue) {
-                $fieldValues[$key][$rIndex][$subKey][$fileIndex] = $webPath . '/' . $fileValue;
+                $fieldValues[$key][$rIndex][$subKey][$fileIndex] = self::constructFileUrl($formId, $entryId, $fileValue);
               }
             } else {
               // for signature field inside repeater;
-              $fieldValues[$key][$rIndex][$subKey] = $webPath . '/' . $subValue;
+              $fieldValues[$key][$rIndex][$subKey] = self::constructFileUrl($formId, $entryId, $subValue);
             }
           }
         }
       }
 
-      if ('file-up' === $fldTyp || 'advanced-file-up' === $fldTyp || 'signature' === $fldTyp) {
+      if (in_array($fldTyp, ['file-up', 'advanced-file-up', 'signature'], true)) {
         if (is_array($value)) {
           foreach ($value as $fldIndex=>$fldValue) {
-            $fieldValues[$key][$fldIndex] = $webPath . '/' . $fldValue;
+            $fieldValues[$key][$fldIndex] = self::constructFileUrl($formId, $entryId, $fldValue);
           }
         } else {
-          $fieldValues[$key] = $webPath . '/' . $value;
+          $fieldValues[$key] = self::constructFileUrl($formId, $entryId, $value);
         }
       }
     }
@@ -607,10 +606,10 @@ final class IntegrationHandler
 
   public static function constructRepeaterValue($repeaterValues, $formId)
   {
-    if (!$formId) {
+    if (!$formId || !is_array($repeaterValues)) {
       return $repeaterValues;
     }
-    $form = new FormManager($formId);
+    $form = FormManager::getInstance($formId);
     $formFields = $form->getFields();
     $newRptrValue = [];
     foreach ($repeaterValues as $key=>$value) {
@@ -624,4 +623,28 @@ final class IntegrationHandler
 
     return $newRptrValue;
   }
+
+  private static function constructFileUrl($formId, $entryId, $fileName)
+  {
+    $webPath = Helpers::getWebPathWithEncryptedEntryId($formId, $entryId);
+
+    return rtrim($webPath, '/') . '/' . ltrim($fileName, '/');
+  }
+
+  // private static function constructFileUrl($formId, $entryId, $fileName)
+  // {
+  //   $restBaseUrl = get_rest_url();
+  //   if (!$restBaseUrl) {
+  //     return $fileName;
+  //   }
+  //   //http://bitlocal.local/wp-json/bitform/v1/bitform-file-download/?formID=1&entryID=16&fileID=bit-form-1005.pdf
+  //   $queryParam = build_query([
+  //     'formID'  => $formId,
+  //     'entryID' => $entryId,
+  //     'fileID'  => $fileName
+  //   ]);
+
+  //   $path = $restBaseUrl . 'bitform' . '/' . 'v1' . '/' . 'bitform-file-download' . '/' . '?' . $queryParam;
+  //   return rtrim($path, '/');
+  // }
 }

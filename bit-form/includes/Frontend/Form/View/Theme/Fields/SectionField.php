@@ -25,15 +25,20 @@ class SectionField
       }
     }
 
-    return <<<SECTIONFIELD
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getAtomicCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
+    return sprintf(
+      '<div 
+      %1$s
+      class="%2$s %3$s"
     >
-        <div class="_frm-b{$formID} section-grid">
-          {$fieldHtml}
+        <div class="_frm-b%4$s section-grid">
+          %5$s
         </div>
-    </div>
-SECTIONFIELD;
+    </div>',
+      $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
+      $fieldHelpers->getAtomicCls('inp-fld-wrp'),
+      $fieldHelpers->getCustomClasses('inp-fld-wrp'),
+      $formID,
+      $fieldHtml
+    );
   }
 }

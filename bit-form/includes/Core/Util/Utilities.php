@@ -8,9 +8,27 @@ final class Utilities
 {
   public static function isPro()
   {
+    // IMPORTANT:
+    // For wp.org (free) distribution we treat "Pro" as "Pro addon is installed/active".
+    // License enforcement must live inside the Pro addon, not in the free plugin.
+    return class_exists('BitCode\\BitFormPro\\Plugin');
+  }
+
+  /**
+   * Kept for backward compatibility where the free plugin needs to know if a Pro
+   * license is marked active. Prefer checking license inside the Pro addon.
+   */
+  public static function isProLicensed(): bool
+  {
+    if (!self::isPro()) {
+      return false;
+    }
     $integrateData = get_option('bitformpro_integrate_key_data');
-    $isProLicenseActivated = !empty($integrateData) && is_array($integrateData) && 'success' === $integrateData['status'];
-    return class_exists('BitCode\\BitFormPro\\Plugin') && $isProLicenseActivated;
+
+    return !empty($integrateData)
+      && is_array($integrateData)
+      && !empty($integrateData['status'])
+      && 'success' === $integrateData['status'];
   }
 
   public static function getRealPath($dir, $name)
@@ -111,15 +129,8 @@ final class Utilities
     global $wpdb;
     $oldTable = "{$wpdb->prefix}bitforms_{$oldTableName}";
     $newTable = "{$wpdb->prefix}bitforms_{$newTableName}";
-    $wpdb->query(
-      $wpdb->prepare(
-        "CREATE TABLE IF NOT EXISTS $newTable LIKE $oldTable"
-      )
-    );
-    $wpdb->query(
-      $wpdb->prepare(
-        "INSERT $newTable SELECT * FROM $oldTable"
-      )
-    );
+    // Schema operation: table name interpolation only (no user input). $wpdb->prepare() cannot parameterize DDL statements.
+    $wpdb->query("CREATE TABLE IF NOT EXISTS `{$newTable}` LIKE `{$oldTable}`");
+    $wpdb->query("INSERT INTO `{$newTable}` SELECT * FROM `{$oldTable}`");
   }
 }

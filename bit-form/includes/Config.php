@@ -164,11 +164,11 @@ final class Config
   {
     return [
       'app-setting' => [
-        'title' => __('App Setting', self::SLUG),
+        'title' => __('App Setting', 'bit-form'),
         'url'   => self::get('ADMIN_URL') . 'admin.php?page=bitform#/app-settings/general',
       ],
       'doc-support' => [
-        'title' => __('Doc & Support', self::SLUG),
+        'title' => __('Doc & Support', 'bit-form'),
         'url'   => self::get('ADMIN_URL') . 'admin.php?page=bitform#/doc-support',
       ],
     ];

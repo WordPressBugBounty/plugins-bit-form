@@ -48,7 +48,8 @@ class RecordApiHelper
         }
 
         if (in_array($fieldPair->wcField, $required) && empty($fieldValues[$fieldPair->formField])) {
-          $error = new WP_Error('REQ_FIELD_EMPTY', wp_sprintf(__('%s is required for woocommerce %s', 'bit-form'), $fieldPair->wcField, $module));
+          /* translators: %1$s: field name, %2$s: WooCommerce module name. */
+          $error = new WP_Error('REQ_FIELD_EMPTY', wp_sprintf(__('%1$s is required for woocommerce %2$s', 'bit-form'), $fieldPair->wcField, $module));
           $this->_logResponse->apiResponse($this->_logID, $this->_integrationID, ['type' => $module, 'type_name' => 'create'], 'validation', $error, $entryDetails);
           return $error;
         }
@@ -170,6 +171,7 @@ class RecordApiHelper
         update_user_meta($user_id, $metaKey, $metaValue);
       }
 
+      // Fires WooCommerce core hook so other WC extensions can react to the customer update.
       do_action('woocommerce_update_customer',  $user_id);
     }
 
@@ -223,10 +225,21 @@ class RecordApiHelper
   {
     require_once ABSPATH . 'wp-admin/includes/image.php';
 
-    $image_url = $url;
+    $response = wp_remote_get($url);
+    if (is_wp_error($response)) {
+      return null;
+    }
+    $response_code = wp_remote_retrieve_response_code($response);
+    if (200 !== $response_code) {
+      return null;
+    }
+    $image_data = wp_remote_retrieve_body($response);
+    if (empty($image_data)) {
+      return null;
+    }
+
     $url_array = explode('/', $url);
     $image_name = $url_array[count($url_array) - 1];
-    $image_data = file_get_contents($image_url);
 
     $upload_dir = wp_upload_dir();
     $unique_file_name = wp_unique_filename($upload_dir['path'], $image_name);

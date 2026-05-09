@@ -34,7 +34,7 @@ class DecisionBoxField
       $disabled = 'disabled';
     }
 
-    if ($fieldHelpers->property_exists_nested($field, 'valid->checked', true)) {
+    if ($fieldHelpers->property_exists_nested($field, 'valid->checked', true) || $fieldHelpers->isChecked()) {
       $checked = 'checked';
     }
 
@@ -49,59 +49,91 @@ class DecisionBoxField
       $lbl = $field->info->lbl;
     }
 
-    return <<<DECISIONBOXFIELD
-      <div
-        {$fieldHelpers->getCustomAttributes('cc')}
-        class="{$fieldHelpers->getAtomicCls('cc')} {$fieldHelpers->getCustomClasses('cc')}"
+    return sprintf(
+      '<div
+        %1$s
+        class="%2$s %3$s"
       >
-        <svg class="{$fieldHelpers->getAtomicCls('cks')}">
-          <symbol id="{$rowID}-ck-svg" viewBox="0 0 12 10">
+        <svg class="%4$s">
+          <symbol id="%5$s-ck-svg" viewBox="0 0 12 10">
             <polyline
-              class="{$fieldHelpers->getAtomicCls('ck-svgline')}"
+              class="%6$s"
               points="1.5 6 4.5 9 10.5 1"
             ></polyline>
           </symbol>
         </svg>
 
         <div
-          {$fieldHelpers->getCustomAttributes('cw')}
-          class="{$fieldHelpers->getAtomicCls('cw')} {$fieldHelpers->getCustomClasses('cw')}"
+          %7$s
+          class="%8$s %9$s"
         >
           <input
-            id="{$rowID}-{$contentCount}-decision"
+            id="%10$s-%11$s-decision"
             type="checkbox"
-            class="{$fieldHelpers->getAtomicCls('ci')}"
-            {$disabled}
-            {$readonly}
-            {$req}
-            {$name}
-            {$checked}
-            {$value}
+            class="%12$s"
+            %13$s
+            %14$s
+            %15$s
+            %16$s
+            %17$s
+            %18$s
           />
           <label
-            {$fieldHelpers->getCustomAttributes('cl')}
+            %19$s
             data-cl
-            for="{$rowID}-{$contentCount}-decision"
-            class="{$fieldHelpers->getAtomicCls('cl')}"
+            for="%20$s-%21$s-decision"
+            class="%22$s"
           >
             <span
-              {$fieldHelpers->getCustomAttributes('bx')}
+              %23$s
               data-bx
-              class="{$fieldHelpers->getAtomicCls('bx')} {$fieldHelpers->getAtomicCls('bx')}"
+              class="%24$s %25$s"
             >
-              <svg width="12" height="10" viewBox="0 0 12 10" class="{$fieldHelpers->getAtomicCls('svgwrp')}">
-                <use data-ck-icn href="#{$rowID}-ck-svg" class="{$fieldHelpers->getAtomicCls('ck-icn')}" />
+              <svg width="12" height="10" viewBox="0 0 12 10" class="%26$s">
+                <use data-ck-icn href="#%27$s-ck-svg" class="%28$s" />
               </svg>
             </span>
             <span
-              {$fieldHelpers->getCustomAttributes('ct')}
-              class="{$fieldHelpers->getAtomicCls('ct')} {$fieldHelpers->getCustomClasses('ct')}"
+              %29$s
+              class="%30$s %31$s"
             >
-              {$fieldHelpers->kses_post($fieldHelpers->renderHTMR($lbl))}
+              %32$s
             </span>
           </label>
         </div>
-      </div>
-DECISIONBOXFIELD;
+      </div>',
+      $fieldHelpers->getCustomAttributes('cc'),                   // 1
+      $fieldHelpers->getAtomicCls('cc'),                          // 2
+      $fieldHelpers->getCustomClasses('cc'),                      // 3
+      $fieldHelpers->getAtomicCls('cks'),                         // 4
+      $rowID,                                                     // 5
+      $fieldHelpers->getAtomicCls('ck-svgline'),                  // 6
+      $fieldHelpers->getCustomAttributes('cw'),                   // 7
+      $fieldHelpers->getAtomicCls('cw'),                          // 8
+      $fieldHelpers->getCustomClasses('cw'),                      // 9
+      $rowID,                                                     // 10
+      $contentCount,                                              // 11
+      $fieldHelpers->getAtomicCls('ci'),                          // 12
+      $disabled,                                                  // 13
+      $readonly,                                                  // 14
+      $req,                                                       // 15
+      $name,                                                      // 16
+      $checked,                                                   // 17
+      $value,                                                     // 18
+      $fieldHelpers->getCustomAttributes('cl'),                   // 19
+      $rowID,                                                     // 20
+      $contentCount,                                              // 21
+      $fieldHelpers->getAtomicCls('cl'),                          // 22
+      $fieldHelpers->getCustomAttributes('bx'),                   // 23
+      $fieldHelpers->getAtomicCls('bx'),                          // 24
+      $fieldHelpers->getAtomicCls('bx'),                          // 25
+      $fieldHelpers->getAtomicCls('svgwrp'),                      // 26
+      $rowID,                                                     // 27
+      $fieldHelpers->getAtomicCls('ck-icn'),                      // 28
+      $fieldHelpers->getCustomAttributes('ct'),                   // 29
+      $fieldHelpers->getAtomicCls('ct'),                          // 30
+      $fieldHelpers->getCustomClasses('ct'),                      // 31
+      $fieldHelpers->kses_post($fieldHelpers->renderHTMR($lbl))   // 32
+    );
   }
 }

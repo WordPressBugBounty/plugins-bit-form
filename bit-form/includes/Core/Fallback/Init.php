@@ -1,5 +1,9 @@
 <?php
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Fallback\FallBack;
 
 /*

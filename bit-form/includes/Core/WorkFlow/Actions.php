@@ -6,7 +6,6 @@ namespace BitCode\BitForm\Core\WorkFlow;
 
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Messages\SuccessMessageHandler;
-use BitCode\BitForm\Core\Util\Utilities;
 
 final class Actions
 {
@@ -214,7 +213,7 @@ final class Actions
       }
 
       $workFlowReturnable['message'] = Helper::replaceFieldWithValue($messageContent, $fieldValue, true, static::$_formID);
-      if (!empty($workFlowReturnable['message']) && Utilities::isPro()) {
+      if (!empty($workFlowReturnable['message'])) {
         $workFlowReturnable['message'] = do_shortcode($workFlowReturnable['message']);
       }
       $workFlowReturnable['msg_id'] = $message[0]->id;

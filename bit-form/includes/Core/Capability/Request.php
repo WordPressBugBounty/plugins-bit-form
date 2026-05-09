@@ -30,7 +30,8 @@ final class Request
   {
     $parsed_url = wp_parse_url(home_url());
     $site_url = $parsed_url['scheme'] . '://' . $parsed_url['host'];
-    $parsedReqUri = wp_parse_url($_SERVER['REQUEST_URI']);
+    // Read-only: REQUEST_URI parsed to check if current request targets a plugin-managed URL. No state change.
+    $parsedReqUri = isset($_SERVER['REQUEST_URI']) ? wp_parse_url(wp_unslash($_SERVER['REQUEST_URI'])) : [];
     if (!isset($parsedReqUri['path'])) {
       return false;
     }

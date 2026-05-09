@@ -1,13 +1,13 @@
 === Bit Form - Custom Contact Form, Multi Step, Conversational Form & Payment Form builder ===
-Plugin Name: Bit Form - Custom Contact Form, Multi Step, Conversational Form & Payment Form builder
-Version: 2.21.10
-Stable tag: 2.21.10
+Plugin Name: Bit Form
+Version: 2.22.2
+Stable tag: 2.22.2
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin, akaioum 
 Tags:  contact form, form, form builder, wp forms, form plugin
 Requires at least: 5.0
-Tested up to: 6.8.2
+Tested up to: 6.9
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -54,7 +54,7 @@ Enjoy advanced form features like SMTP, double opt-in, automation, and multiling
 
 ### ⭐ Features that make it the Best Contact Form builder for WordPress:
 
-- 45+ fields [Phone number, Country, Currency, Advanced File Upload]
+- 50+ fields (Free & Pro)
 - Multi Step Form
 - Conversational Form
 - Landing page / Standalone Form / Form pages / Direct share
@@ -80,7 +80,11 @@ Enjoy advanced form features like SMTP, double opt-in, automation, and multiling
 - Advance style editor
 - Analytics
 
-==🔹 45+ Input Fields : ==
+==🔹 50+ Input Fields : ==
+
+== Free Form Fields ==
+
+The following fields are available in the free version of Bit Form:
 
 - Text Field
 - Multiline Field
@@ -110,40 +114,50 @@ Enjoy advanced form features like SMTP, double opt-in, automation, and multiling
 - Decision Box
 - reCaptcha v2
 - Button
-- PayPal
-- Razorpay
-- Stripe
-- Mollie
-- Advance File Upload
 - Image
 - Title
 - Divider
 - HTML
 - Section
 - Repeater
-- Signature
 - Rating
 - Image Select
 - Turnstile
-- Shortcode
-- Draft Button
 - Next Button
 - Previous Button
 - Spacer
 
-### Top Notch Customer Support
-Bit Form offers the best support. Our users love and appreciate the assistance we provide. Here are some reviews from our users:
-> [great support, great app](https://wordpress.org/support/topic/great-support-great-app-4/)
-> thx a lot for time on anydesk to help me to configure integration as i wanted
-> @meditrust
+== Pro Form Fields ==
 
-> [Outstanding Support](https://wordpress.org/support/topic/outstanding-support-296/)
-> Extremely impressed with their support – far beyond what I expected. Bit Form is not only a very capable form builder but part of a fantastic product suite. The team consistently goes above and beyond for their customers.
-> @bubdev
+The following fields require Bit Form Pro:
 
-> [Top WordPress Plugin and Great Support](https://wordpress.org/support/topic/top-wordpress-plugin-and-great-support/)
-> The customer support is exceptional. When I had an issue, the support team was quick and efficient, resolving my problem in less than a day. I highly recommend Bit Form for its reliability and simplicity.
-> @nourdh
+- PayPal
+- Razorpay
+- Stripe
+- Mollie
+- Signature
+- Advance File Upload
+- Advanced Date-Time
+- Draft Button
+- Shortcode
+
+== Pro Features ==
+
+The following features are available exclusively in Bit Form Pro. These features are gated and require an active Pro license to use:
+
+* **Payment Fields:** PayPal, Razorpay, Stripe, and Mollie payment gateways for collecting payments through your forms
+* **WP Authentication:** User registration, login, forgot password, and reset password forms with admin approval workflow
+* **Double Opt-in:** Email confirmation to verify entries and prevent spam or fake emails
+* **Honeypot Spam Protection:** Built-in honeypot field to reduce spam submissions
+* **Google Ads Integration:** Capture and sync GCLID (Google Click ID) for conversion tracking
+* **Custom Post Type (CPT):** Create and update WordPress posts and custom post types from form submissions
+* **Form Abandonment:** Partial form submission, save as draft, and resume functionality
+* **PDF Attachment:** Attach PDF files with form entry data to email notifications
+* **Frontend Entry View & Edit:** Allow logged-in users to view and edit their submissions
+* **Landing Page / Standalone Form:** Share forms via distraction-free direct links
+* **Form Entry Reports:** Filter responses by conditions and save as reusable reports
+
+Note: Bit Form Pro is distributed separately from this plugin. The free version of Bit Form is fully functional with its own feature set.
 
 ### Why Bit Form is the powerful Form Builder Plugin for WordPress?
 
@@ -169,7 +183,7 @@ Our conversational forms guide users through the process one question at a time,
 
 A standalone form is a self-contained, independent component on a website or application, designed for a specific function such as user registration, feedback, or surveys. It operates independently from other webpage elements, offering a focused and user-friendly interface. These forms are versatile, easily integrated into various platforms, and can be customized to suit specific needs and branding.
 
-## Signature Fields [Free]
+## Signature Fields (Pro)
 
 Add a touch of professionalism to your forms with our easy-to-use Signature Field feature. Perfect for contracts and official agreements, ensuring both convenience and legal compliance.
 
@@ -181,48 +195,11 @@ Bit Form has evolved from a simple contact form plugin to an advanced tool for c
 
 Now you can make your customized wp form with the help of Bit Form's fastest built-in style editor. This style editor makes your form more beautiful that will help your visitor to spend more time. Customizations you will find in Bit Form are ***Background customization***, ***Form customization***, ***Field block customization*** & ***Field customization***.
 
-## Advanced Conditional Logic
 
-One of the most unique features of Bit Form is conditional logic. Without having any coding sense, you can run actions (Success/Error message, Redirect URL, Web Hook, Email notification, Integration) on the basis of some preset conditions.
+### ♻ Integrations with 50+ platforms:
 
-## Calculator Form
+Bit Form connects & sends form data to 50+ platforms directly,
 
-Create any type of advanced and complex calculated form with Bit Form. The Conditional logic is so powerful that you will be able to do complex levels of calculation at ease.
-
-## PDF Attachment with email
-
-Turn your form entries into PDFs that users can easily download or get via email. Perfect for making invoices, reports, or order summaries, this feature makes it simple and convenient to share important information.
-
-## Partial form submission
-
-Partial form submission in WordPress contact forms captures user data even if the form isn't fully completed, ensuring valuable insights are never missed. It's a key tool for understanding user behavior and improving form engagement.
-
-## Survey, Poll, and Quiz Creation with Bit Form
-
-Optimize user feedback collection using Bit Form's versatile features for surveys, polls, and quizzes. Create branded, engaging forms with custom questions and scoring. Analyze user responses effectively with comprehensive reporting for insightful decision-making.
-
-## Free Google reCAPTCHA v2/v3 and Honeypot Integration
-
-Avoid overwhelming your inbox with form spam using Bit Form complimentary Google reCAPTCHA and Honeypot features. Easily deter bots and ensure a hassle-free experience for your visitors, without the need for challenging captcha phrases.
-
-## Analytics
-
-WordPress Form Submission Analytics offers insightful tracking of user interactions with your forms, providing key data on submission rates, user behavior, and form performance. Harness this powerful tool to optimize your forms, enhance user engagement, and improve conversion rates.
-
-## Repeater Field
-
-Enhance your WordPress forms with the Repeater Field, a dynamic feature that allows users to duplicate specific fields as needed. Ideal for gathering detailed, repetitive information, it is easy form submissions without compromising on data complexity.
-
-
-### Highly customizable form styling with the most advanced style editor in WordPress
-
-Quickly personalize your WordPress forms using Bit Form's built-in style editor. Opt for themes such as Bit Form default and Atlassian, or select 'No theme' to match your site's design. Create attractive and unique forms with ease using Bit Form.
-
-### ♻ Integrations with 290+ platforms:
-
-Bit Form connects & sends form data to 290+ platforms with the help of Bit Integrations [Free]
-
-- [Bit Integrations](https://wordpress.org/plugins/bit-integrations/)
 - ACF
 - Active Campaign
 - CPT
@@ -253,13 +230,255 @@ Bit Form connects & sends form data to 290+ platforms with the help of Bit Integ
 - Zoho Sheet
 - n8n
 
+== External services ==
+
+Bit Form connects to external services only when:
+- You enable a specific integration (e.g., Zoho CRM, Mailchimp, Google Sheets)
+- You use a built-in feature that requires external processing (e.g., spam protection, icon search)
+
+If you do not enable integrations or use those features, the plugin does not send data to external servers (except as noted below for captcha/icon search when those features are enabled).
+
+= Built-in Features =
+
+Icon Search (icons.bitapps.pro)
+- What it does: Provides icon search results in the form builder's icon picker (admin only).
+- When it connects: When you open the icon picker and search for icons, or when icons load in the picker.
+- Data sent: Search query, pagination parameters, and your site URL (for API authentication).
+- Terms of Use: https://bitapps.pro/terms-of-service/
+- Privacy Policy: https://bitapps.pro/privacy-policy/
+
+Google reCAPTCHA
+- What it does: Validates that form submissions are from humans, not bots (spam protection).
+- When it connects: When a form with reCAPTCHA v2 or v3 is displayed or submitted.
+- Data sent: Token from reCAPTCHA widget, user IP, form submission context. Google may collect additional data per its policies.
+- Terms of Use: https://policies.google.com/terms
+- Privacy Policy: https://policies.google.com/privacy
+
+hCaptcha
+- What it does: Alternative CAPTCHA service for spam protection.
+- When it connects: When a form with hCaptcha is displayed or submitted.
+- Data sent: Token from hCaptcha widget, user IP, form submission context.
+- Terms of Use: https://www.hcaptcha.com/terms
+- Privacy Policy: https://www.hcaptcha.com/privacy
+
+Cloudflare Turnstile
+- What it does: Invisible CAPTCHA alternative for spam protection.
+- When it connects: When a form with Cloudflare Turnstile is displayed or submitted.
+- Data sent: Token from Turnstile widget, user IP, form submission context.
+- Terms of Use: https://www.cloudflare.com/terms/
+- Privacy Policy: https://www.cloudflare.com/privacypolicy/
+
+Placeholder Images (https://placehold.co/)
+- What it does: Generates placeholder images for the Image field when no custom image is set.
+- When it connects: When a form with an Image field using the default placeholder is rendered on the frontend.
+- Data sent: Dimensions (width/height) in the image URL.
+- Service website: https://placehold.co/
+
+= Integrations (When You Enable Them) =
+
+The following services are used only when you configure and enable the corresponding integration in Bit Form.
+
+-- Email Marketing & CRM --
+
+GetGist
+- What it does: Add contacts to GetGist lists.
+- Data sent: Form field values mapped to GetGist fields, on form submission.
+- Terms of Use: https://getgist.com/terms-of-service/
+- Privacy Policy: https://getgist.com/privacy/
+
+Mailchimp
+- What it does: Add subscribers to Mailchimp lists.
+- Data sent: Form field values (email, name, etc.), on form submission.
+- Terms of Use: https://mailchimp.com/legal/terms/
+- Privacy Policy: https://mailchimp.com/legal/prior-privacy-policy/
+
+Brevo (Sendinblue)
+- What it does: Email marketing, CRM automation.
+- Data sent: Form field values, on form submission.
+- Terms of Use: https://www.brevo.com/legal/termsofuse/
+- Privacy Policy: https://www.brevo.com/legal/privacypolicy/
+
+ActiveCampaign
+- What it does: CRM and email automation.
+- Data sent: Form field values, on form submission.
+- Terms of Use: https://www.activecampaign.com/legal/terms-of-service
+- Privacy Policy: https://www.activecampaign.com/legal/privacy-policy
+
+MailerLite
+- What it does: Email marketing.
+- Data sent: Form field values, on form submission.
+- Terms of Use: https://www.mailerlite.com/legal/terms-of-service
+- Privacy Policy: https://www.mailerlite.com/legal/privacy-policy
+
+Elastic Email
+- What it does: Email delivery and list management.
+- Data sent: Form field values, on form submission.
+- Terms of Use: https://elasticemail.com/resources/usage-policies
+- Privacy Policy: https://elasticemail.com/resources/usage-policies
+
+HubSpot
+- What it does: CRM contacts and marketing automation.
+- Data sent: Form field values, on form submission.
+- Terms of Use: https://legal.hubspot.com/terms-of-service
+- Privacy Policy: https://legal.hubspot.com/privacy-policy
+
+Acumbamail
+- What it does: Email marketing.
+- Data sent: Form field values, on form submission.
+- Terms of Use: https://acumbamail.com/en/terms-of-use/
+- Privacy Policy: https://acumbamail.com/en/privacy-policy/
+
+Rapidmail
+- What it does: Email campaigns.
+- Data sent: Form field values, on form submission.
+- Terms of Use: https://www.rapidmail.com/general-terms-and-conditions
+- Privacy Policy: https://www.rapidmail.com/data-protection
+
+Encharge
+- What it does: Product and email automation.
+- Data sent: Form field values, on form submission.
+- Terms of Use: https://encharge.io/terms-of-service/
+- Privacy Policy: https://encharge.io/privacy-policy/
+
+SendFox
+- What it does: Email list subscribe and unsubscribe.
+- Data sent: Form field values, on form submission.
+- Terms of Service: https://sendfox.com/tos
+- Privacy Policy: https://sendfox.com/privacy
+
+Mail Poet
+- What it does: Email marketing (WordPress plugin integration).
+- Data sent: Form field values, on form submission.
+- Terms of Service: https://wordpress.com/tos/
+- Privacy Policy: https://automattic.com/privacy/
+
+-- Zoho Services --
+
+All Zoho integrations connect to Zoho's API servers. OAuth tokens are used for authentication. Data is sent only when you submit a form with a Zoho integration enabled.
+- Terms of Use: https://www.zoho.com/terms.html
+- Privacy Policy: https://www.zoho.com/privacy.html
+
+Zoho CRM - Creates or updates CRM records. Data sent: Form field values, OAuth tokens.
+Zoho Sheet - Writes rows to Zoho Sheet spreadsheets. Data sent: Form field values, OAuth tokens.
+Zoho WorkDrive - Uploads files to Zoho WorkDrive. Data sent: Form field values, file uploads, OAuth tokens.
+Zoho Recruit - Creates recruitment records. Data sent: Form field values, OAuth tokens.
+Zoho Campaigns - Subscribes or unsubscribes contacts. Data sent: Form field values, OAuth tokens.
+Zoho Sign - Sends documents for e-signature. Data sent: Form field values, OAuth tokens.
+Zoho Mail - Sends emails via Zoho Mail API. Data sent: Form field values, OAuth tokens.
+Zoho Desk - Creates support tickets. Data sent: Form field values, OAuth tokens.
+Zoho Creator - Creates records in Zoho Creator apps. Data sent: Form field values, OAuth tokens.
+Zoho Bigin - Creates pipeline CRM records. Data sent: Form field values, OAuth tokens.
+Zoho Analytics - Creates analytics records. Data sent: Form field values, OAuth tokens.
+Zoho MarketingHub - Marketing automation. Data sent: Form field values, OAuth tokens.
+Zoho Projects - Creates project tasks. Data sent: Form field values, OAuth tokens.
+Zoho Flow - Triggers Zoho Flow automation workflows. Data sent: Form field values, OAuth tokens.
+
+-- File Storage & Collaboration --
+
+Google Sheets
+- What it does: Writes form submission data to a Google Sheets spreadsheet.
+- Data sent: Form field values, OAuth tokens, on form submission.
+- Terms of Use: https://policies.google.com/terms
+- Privacy Policy: https://policies.google.com/privacy
+
+Dropbox
+- What it does: Uploads form-submitted files to Dropbox.
+- Data sent: Form field values, file uploads, OAuth tokens, on form submission.
+- Terms of Use: https://www.dropbox.com/terms
+- Privacy Policy: https://www.dropbox.com/privacy
+
+OneDrive
+- What it does: Uploads form-submitted files to Microsoft OneDrive.
+- Data sent: Form field values, file uploads, OAuth tokens, on form submission.
+- Terms of Use: https://www.microsoft.com/en/servicesagreement
+- Privacy Policy: https://learn.microsoft.com/en-us/sharepoint/onedrive-privacy-security-overview
+
+-- Messaging & Notifications --
+
+Telegram Bot API
+- What it does: Sends form data and files to a Telegram bot.
+- Data sent: Form field values, file uploads, bot token, on form submission.
+- Terms of Use: https://telegram.org/tos
+- Privacy Policy: https://telegram.org/privacy
+
+Twilio
+- What it does: Sends SMS or voice messages with form data.
+- Data sent: Form field values, phone numbers, on form submission.
+- Terms of Use: https://www.twilio.com/en-us/legal/tos
+- Privacy Policy: https://www.twilio.com/en-us/legal/privacy
+
+-- Automation & Webhooks --
+
+- What it does: Sends form submission data to configured automation and webhook services to trigger workflows, scenarios, applets, or custom actions.
+- Data sent: Form field values to your configured URL or connected service on form submission.
+
+Webhooks (Generic)
+- Terms of Service: Defined by the service you connect to.
+- Privacy Policy: Defined by the service you connect to.
+
+Zapier
+- Terms of Service: https://zapier.com/legal/terms-of-service
+- Privacy Policy: https://zapier.com/legal/data-privacy
+
+Make (Integromat)
+- Terms of Service: https://www.make.com/en/terms-and-conditions
+- Privacy Policy: https://www.make.com/en/privacy-and-gdpr
+
+Pabbly
+- Terms of Service: https://www.pabbly.com/terms-conditions/
+- Privacy Policy: https://www.pabbly.com/privacy-policy/
+
+Integrately
+- Terms of Service: https://integrately.com/home/terms
+- Privacy Policy: https://integrately.com/home/privacy
+
+IFTTT
+- Terms of Service: https://ifttt.com/terms
+- Privacy Policy: https://ifttt.com/privacy
+
+n8n
+- Terms of Service: https://n8n.io/legal/
+- Privacy Policy: https://n8n.io/legal/privacy/
+
+Ottokit (SureTriggers)
+- Terms of Service: https://ottokit.com/terms-and-conditions/
+- Privacy Policy: https://ottokit.com/privacy-policy/
+
+For a full reference with additional details see: https://github.com/bit-apps-pro/bit-form-frontend/blob/main/external-services.md
+
+## Advanced Conditional Logic
+
+One of the most unique features of Bit Form is conditional logic. Without having any coding sense, you can run actions (Success/Error message, Redirect URL, Web Hook, Email notification, Integration) on the basis of some preset conditions.
+
+## Calculator Form
+
+Create any type of advanced and complex calculated form with Bit Form. The Conditional logic is so powerful that you will be able to do complex levels of calculation at ease.
+
+## PDF Attachment with email
+
+Turn your form entries into PDFs that users can easily download or get via email. Perfect for making invoices, reports, or order summaries, this feature makes it simple and convenient to share important information.
+
+## Partial form submission
+
+Partial form submission in WordPress contact forms captures user data even if the form isn't fully completed, ensuring valuable insights are never missed. It's a key tool for understanding user behavior and improving form engagement.
+
+
+## Free Google reCAPTCHA v2/v3 and Honeypot Integration
+
+Avoid overwhelming your inbox with form spam using Bit Form complimentary Google reCAPTCHA and Honeypot features. Easily deter bots and ensure a hassle-free experience for your visitors, without the need for challenging captcha phrases.
+
+## Analytics
+
+WordPress Form Submission Analytics offers insightful tracking of user interactions with your forms, providing key data on submission rates, user behavior, and form performance. Harness this powerful tool to optimize your forms, enhance user engagement, and improve conversion rates.
+
+## Repeater Field
+
+Enhance your WordPress forms with the Repeater Field, a dynamic feature that allows users to duplicate specific fields as needed. Ideal for gathering detailed, repetitive information, it is easy form submissions without compromising on data complexity.
+
 
 ### Bit Form Blogs written by Popular Bloggers
 
 1. [17 Best Contact Form Plugins (#8- Bit Form) ](https://kinsta.com/blog/wordpress-contact-form-plugins/#8-bit-form) | by **Kinsta**
-2. [Fluent Forms vs Bit Form: Performance and Other Considerations](https://www.webtng.com/fluent-forms-vs-bit-form-performance-and-other-considerations/) | by **David McCan**
-3. [Bit Forms: A Powerful And Easy-To-Use WordPress Form Builder](https://lytboxacademy.com/bitforms-a-powerful-form-builder/)
-4. [The Most Advanced Contact Form Builder For WordPress: Bit Form](https://bitapps.pro/advanced-contact-form-builder-for-wordpress/)
 
 
 == Easy WordPress GDPR Compliance ==
@@ -282,31 +501,10 @@ Bit Form enhances WordPress GDPR compliance by not collecting or storing persona
 - Support Ticket Form
 - Lead Generation Form
 - Appointment Form
-- Quiz Form
-- Poll Form
 - Conversational Form
 - Multi Step Form
 - Calculator Form
 
-### ⭐ Workflow of Addons :
-
-== 🔅Form Entry Rules : ==
-
-1.  Unlimited Form Submission/Entries.
-2.  You can sort the entries depending on any field.
-3.  Search Form entries.
-4.  Hide/Show Column or Field.
-5.  Edit entry.
-6.  Bulk delete, duplicate.
-7.  Export Entries with file type (CSV, Xls, Xlsx, Ods, Fods, Prn, Text, Html and Eth).
-
-== 🔅Form Entry Settings : ==
-
-1.  You can control the submission of form using Time/IP/Entry.
-2.  IP addresses can be allowed & blocked.
-3.  You can set multiple success/error messages based on conditional logic. Also based on these conditions you can use redirect page & web webhook.
-    > [ Unlimited conditional logic in pro version]
-4.  Capture GCLID.
 
 == 📰 Multi-Column Layout : ==
 
@@ -358,27 +556,6 @@ Bit Form's REST [API](https://bit-form.com/wp-docs/developer-docs/api/) lets you
 > @abrenwal
 
 
-### 🎉 Overview of other products we are offering :
-
-[**Bit Integrations:**](https://wordpress.org/plugins/bit-integrations/) – Automate 280+ platforms and Contact form 7, Elementor Form, WooCommerce, Google Sheet, wpforms, Forminator, BuddyBoss, LearnDash, Hubspot, Mail poet, MailChimp, Webhook, ACF, Zapier, Fluent CRM, Forms, CRM, LMS, Membership & many more.
-
-[**Bit Assist:**](https://wordpress.org/plugins/bit-assist/) – Connect your all support assistant in a single button. Floating Chat Widget, Contact Chat Icons, Telegram Chat, Line Messenger, WeChat, WhatsApp, Email, SMS, Call Button & more.
-
-[**Bit File Manager:**](https://wordpress.org/plugins/file-manager/) – 100% free WordPress file manager plugin.
-
-[**Bit SMTP:**](https://wordpress.org/plugins/bit-smtp/) – 100% free WordPress SMTP plugin.
-
-[**Webhook.is:**](https://webhook.is/) – Test your incoming webhook response & send outgoing webhook request for free.
-
-[**Bit Social:**](https://bit-social.com/) – Auto Post, Schedule & Share WordPress post to Facebook, LinkedIn, Twitter with Bit Social Auto Poster. Scheduling & Share post on social media easily.
-
-[**Bit Flows**](https://bit-flows.com/) - an Advanced Automation plugin like Zapier/n8n inside WordPress.
-
-## Telemetry Data
-
-Bit Form uses [wp-telemetry](https://packagist.org/packages/bitapps/wp-telemetry) to collect some telemetry data upon user confirmation. This helps us to troubleshoot problems faster & make product improvements.
-
-WP-Telemetry **DOES NOT IMMEDIATELY** start gathering data. It only collects basic telemetry data when a user consents. We collect this data to ensure a great user experience for all our users.
 
 ## FAQ
 
@@ -412,37 +589,32 @@ With the Contact Form Builder by Bit Form, you can build any type of form you ha
 Not are limited to these, but you can build any type of form you have ever imagined with Bit Form, the advanced contact form builder plugin in WordPress .
 
 = Which Form Fields does Bit Form offer?
-As a WordPress Contact Form Builder, Bit Form always tries to provide the best form building experience with its easy to use interface and powerful features. Bit Form has 30+ field types to build any type of form:
+As a WordPress Contact Form Builder, Bit Form always tries to provide the best form building experience with its easy to use interface and powerful features. Bit Form has 30+ field types in the free version and additional Pro fields with Bit Form Pro.
 
-Here are the Standard & Basic contact form fields:
+Free Form Fields (included in the free plugin):
 
+Standard & Basic:
 - Text
 - Multiline
 - Email
 - Number
 - Select
 
-Here is a list of our custom crafted form fields for your next contact form:
-
+Custom crafted:
 - Radio Button
 - Checkbox
 - Dropdown
 - File Upload
 
-Here is a list of our advanced form fields with tremendous amount of features and functionalities that will help you advanced WordPress forms:
-
-- Advance File Upload
-- Advance Date-Time
+Advanced Fields:
+- Advance Date-Time(Pro)
 - Country
 - Currency
 - Phone Number
 - Repeater
-- Signature
-- Rating
-- Repeater
+- Signature (Pro)
 
-Here are some information based form fields that can help you create registration form, login form, event form or booking form with ease:
-
+Information & auth:
 - Username
 - Password
 - Date
@@ -451,8 +623,7 @@ Here are some information based form fields that can help you create registratio
 - Week
 - Month
 
-Here are some additional form fields that can help you to take more information and also prevent spam from your WordPress contact form:
-
+Additional & spam protection:
 - URL
 - Color Picker
 - Decision Box
@@ -460,20 +631,25 @@ Here are some additional form fields that can help you to take more information 
 - Turnstile
 - Button
 
-Here is a list of payment fields Bit Form provides to use in the Payment Contact Form or Donation Contact Form:
-
-- Paypal
-- Razorpay
-- Stripe
-- Mollie
-
-Here is a list of the presentation fields Bit Form has to offer its users to make their contact form more attractive and informative:
-
+Presentation:
 - Title
 - Image
 - Divider
 - HTML
 - Section
+
+Pro Form Fields (require Bit Form Pro):
+
+Payment:
+- Paypal
+- Razorpay
+- Stripe
+- Mollie
+
+Advanced (Pro):
+- Advance File Upload
+- Advance Date-Time
+- Signature
 
 = Does Bit Form includes spam protection?
 Yes, Bit Form has built-in spam protection better than any other Contact Form Builder out there. We have included Google reCAPTCHA with compatibility of:
@@ -501,6 +677,55 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 6. Response table to view form entries
 
 == Changelog ==
+= 2.22.2 =
+*Release Date: 5th May, 2026*
+*Improvements:
+    1. Resolved all Plugin Checker warnings and errors for improved code quality and security.
+    2. Sanitized all user inputs and outputs in the codebase to prevent potential security vulnerabilities.
+    3. Escaped all markup in the codebase for enhanced security against XSS attacks.
+
+= 2.22.1 =
+*Release Date: 21 April, 2026*
+*Improvements:
+    1. Improved entry table view to display multiple field values within a single cell.
+    2. Added full URL paths for uploaded files in integrations and API responses.
+
+*Fixes:
+    1. Fixed an issue where "flush_rewrite_rules" was executed on every page load, causing performance issues.
+    2. Fixed an issue where multiple workflow triggers were not working when using the Entry Add API endpoint.
+
+= 2.22.0 =
+*Release Date: 04 April, 2026*
+*Improvements:
+    1. Refactored code by moving certain Pro features to the Pro plugin, aligning with WordPress plugin guidelines and best practices.
+    2. Converted selected Pro features into free features and adjusted default values of some existing features to enhance user experience.
+
+= 2.21.13 =
+*Release Date: 17 March, 2026*
+*Improvements:
+    1. Refactored unsafe SQL queries to use prepared statements for enhanced security against SQL injection attacks.
+    2. Updated the codebase to follow WordPress Plugin Checker best practices for improved code quality and maintainability.
+
+*Fixes:
+    1. Resolve Dark Mode style issues with multiple class selectors.
+
+= 2.21.12 =
+*Release Date: 23 February, 2026*
+*Improvements:
+    1. Replaced heredoc markups with sprintf for better performance and security in the codebase.
+    2. Added escaping for all markup in the codebase for improved security.
+    3. Followed WordPress Plugin Checker best practices for code structure and formatting.
+
+= 2.21.11 =
+*Release Date: 18 February, 2026*
+*Improvements: 
+    1. Security: Improved query validation to prevent SQL injections.
+    2. File validation: Improved PDF file validation for the File Upload and Advance File Upload fields.
+*Fix: 
+    1. Entry edit modal: Fixed the submit button in the entry edit modal.
+    2. FluentCRM integration: Fixed custom-data mapping for FluentCRM.
+    3. Stripe payment field: Fixed stripe payment submission issue with payment processing status. 
+
 = 2.21.10 = 
 *Release Date: 02 February, 2026*
 *Improvements:

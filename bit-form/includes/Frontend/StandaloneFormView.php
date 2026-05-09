@@ -15,12 +15,12 @@ class StandaloneFormView
       auth_redirect();
       return;
     }
-    $requestUri = esc_url($_SERVER['REQUEST_URI']);
-
-    $uri = explode('/', rtrim($requestUri, '/'));
-
-    if (is_array($uri) && count($uri) >= 3) {
-      $formID = $uri[2];
+    // $requestUri = isset($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '';
+    // ('Request URI: ' . $requestUri);
+    // $uri = explode('/', rtrim($requestUri, '/'));
+    // Read-only: form ID from query string for view dispatch. No state mutation.
+    $formID = isset($_REQUEST['bitform-form-view']) && is_scalar($_REQUEST['bitform-form-view']) ? intval(sanitize_text_field(wp_unslash($_REQUEST['bitform-form-view']))) : null;
+    if (!is_array($formID) && is_numeric($formID)) {
       $attr = ['form_id' => $formID, 'form_preview' => true];
 
       $frontendFormHandler = new FrontendFormHandler();
@@ -32,58 +32,80 @@ class StandaloneFormView
       $formHTML = $formViewObject->html;
       $font = $formViewObject->font;
       $bfGlobals = $formViewObject->bfGlobals;
+      $formContent = isset($formViewObject->formContent) ? $formViewObject->formContent : null;
 
       set_transient('bitform_form_preview', true);
       $frontendFormHandler->generateJs($formID);
       $title = 'BitForm Preview page';
-      Render::view('views/preview-page', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals'));
+      Render::view('views/preview-page', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'formContent'));
     }
   }
 
   private static function getCustomUrlFormId()
   {
-    $currentUrl = get_site_url() . $_SERVER['REQUEST_URI'];
-    $parsedCurrentUrl = wp_parse_url($currentUrl);
-    $formModel = new FormModel();
-    $forms = $formModel->get(
-      ['id', 'form_content']
-    );
+    $urlMap = get_transient('bitform_standalone_url_map');
+    if (false === $urlMap) {
+      $urlMap = self::buildStandaloneUrlMap();
+      set_transient('bitform_standalone_url_map', $urlMap, DAY_IN_SECONDS);
+    }
 
-    if (!is_wp_error($forms)) {
-      foreach ($forms as $form) {
-        $formID = $form->id;
-        $formContent = json_decode($form->form_content);
-        $isStandaloneActive = !empty($formContent->formInfo->standaloneSettings->active);
-        if ($isStandaloneActive) {
-          $standaloneSettings = $formContent->formInfo->standaloneSettings;
-          $hasCustomUrl = !empty($standaloneSettings->customUrl);
-          if (!$hasCustomUrl) {
-            continue;
-          }
-          $customUrl = get_site_url() . '/' . $standaloneSettings->customUrl;
-          $parsedCustomUrl = wp_parse_url($customUrl);
-          $pathMatched = $parsedCustomUrl['path'] === $parsedCurrentUrl['path'];
-          if (!$pathMatched) {
-            continue;
-          }
-          if (!isset($parsedCustomUrl['query'])) {
-            return $formID;
-          }
-          parse_str($parsedCustomUrl['query'], $parsedCustomQueries);
-          parse_str($parsedCurrentUrl['query'], $parsedCurrentQueries);
-          $diff = array_diff_assoc($parsedCustomQueries, $parsedCurrentQueries);
-          if (empty($diff)) {
-            return $formID;
-          }
-        }
+    if (empty($urlMap)) {
+      return null;
+    }
+
+    $currentUrl = get_site_url() . (isset($_SERVER['REQUEST_URI']) ? esc_url_raw(wp_unslash($_SERVER['REQUEST_URI'])) : '');
+    $parsedCurrentUrl = wp_parse_url($currentUrl);
+
+    foreach ($urlMap as $formID => $customUrlSlug) {
+      $customUrl = get_site_url() . '/' . $customUrlSlug;
+      $parsedCustomUrl = wp_parse_url($customUrl);
+      $pathMatched = isset($parsedCustomUrl['path']) && $parsedCustomUrl['path'] === ($parsedCurrentUrl['path'] ?? '');
+      if (!$pathMatched) {
+        continue;
+      }
+      if (!isset($parsedCustomUrl['query'])) {
+        return $formID;
+      }
+      parse_str($parsedCustomUrl['query'], $parsedCustomQueries);
+      parse_str($parsedCurrentUrl['query'] ?? '', $parsedCurrentQueries);
+      if (empty(array_diff_assoc($parsedCustomQueries, $parsedCurrentQueries))) {
+        return $formID;
       }
     }
+
+    return null;
+  }
+
+  private static function buildStandaloneUrlMap()
+  {
+    $formModel = new FormModel();
+    $forms = $formModel->get(['id', 'form_content']);
+    $urlMap = [];
+    if (is_wp_error($forms) || !is_array($forms)) {
+      return $urlMap;
+    }
+    foreach ($forms as $form) {
+      $formContent = json_decode($form->form_content);
+      if (empty($formContent->formInfo->standaloneSettings->active)) {
+        continue;
+      }
+      $standaloneSettings = $formContent->formInfo->standaloneSettings;
+      if (empty($standaloneSettings->customUrl)) {
+        continue;
+      }
+      $urlMap[$form->id] = $standaloneSettings->customUrl;
+    }
+    return $urlMap;
   }
 
   public static function standaloneFormView()
   {
+    if (is_admin()) {
+      return;
+    }
+    // Read-only: form ID from query string for standalone view dispatch. No state mutation.
     $hasBitFormParam = isset($_GET['bit-form']);
-    $formID = isset($_GET['bit-form']) ? $_GET['bit-form'] : '';
+    $formID = isset($_GET['bit-form']) ? sanitize_text_field(wp_unslash($_GET['bit-form'])) : '';
 
     if (empty($formID)) {
       $formID = self::getCustomUrlFormId();
@@ -114,11 +136,12 @@ class StandaloneFormView
     $formHTML = $formViewObject->html;
     $font = $formViewObject->font;
     $bfGlobals = $formViewObject->bfGlobals;
+    $formContent = isset($formViewObject->formContent) ? $formViewObject->formContent : null;
 
     set_transient('bitform_form_preview', true);
     $frontendFormHandler->generateJs($formID);
     $title = !empty($standaloneSettings->pageTitle) ? $standaloneSettings->pageTitle : 'Bit Form';
-    Render::view('views/standalone-form', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals'));
+    Render::view('views/standalone-form', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'formContent'));
 
     exit(200);
   }

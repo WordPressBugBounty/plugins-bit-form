@@ -46,45 +46,44 @@ class RadioBoxField
           $disabled = "disabled='disabled'";
         }
 
-        $radioBoxOptions .= <<<RADIOBOXOPTIONS
-          <div 
-            {$fieldHelpers->getCustomAttributes('cw')}
-            class="{$fieldHelpers->getConversationalCls('cw')} {$fieldHelpers->getCustomClasses('cw')}"
+        $radioBoxOptions .= '<div
+            ' . $fieldHelpers->getCustomAttributes('cw') . '
+            class="' . $fieldHelpers->getConversationalCls('cw') . ' ' . $fieldHelpers->getCustomClasses('cw') . '"
           >
             <input
-              {$fieldHelpers->getCustomAttributes('ci')}
-              id="{$rowID}-{$contentCount}-chk-{$key}"
+              ' . $fieldHelpers->getCustomAttributes('ci') . '
+              id="' . $rowID . '-' . $contentCount . '-chk-' . $key . '"
               type="radio"
-              class="{$fieldHelpers->getConversationalCls('ci')} {$fieldHelpers->getCustomClasses('ci')}"
-              value="{$fieldHelpers->esc_attr($value)}"
-              {$check}
-              {$name}
-              {$req}
-              {$disabled}
+              class="' . $fieldHelpers->getConversationalCls('ci') . ' ' . $fieldHelpers->getCustomClasses('ci') . '"
+              value="' . $fieldHelpers->esc_attr($value) . '"
+              ' . $check . '
+              ' . $name . '
+              ' . $req . '
+              ' . $disabled . '
             />
             <label
-              {$fieldHelpers->getCustomAttributes('cl')}
+              ' . $fieldHelpers->getCustomAttributes('cl') . '
               data-cl
-              for="{$rowID}-{$contentCount}-chk-{$key}"
-              class="{$fieldHelpers->getConversationalCls('cl')} {$fieldHelpers->getCustomClasses('cl')}"
+              for="' . $rowID . '-' . $contentCount . '-chk-' . $key . '"
+              class="' . $fieldHelpers->getConversationalCls('cl') . ' ' . $fieldHelpers->getCustomClasses('cl') . '"
             >
               <span
-                {$fieldHelpers->getCustomAttributes('bx')}
+                ' . $fieldHelpers->getCustomAttributes('bx') . '
                 data-bx
-                class="{$fieldHelpers->getConversationalCls('bx')} {$fieldHelpers->getCustomClasses('bx')}"
+                class="' . $fieldHelpers->getConversationalCls('bx') . ' ' . $fieldHelpers->getCustomClasses('bx') . '"
               >
-                <span class="{$fieldHelpers->getConversationalCls('opt-key-lbl')}">Key</span>
-                <span class="{$fieldHelpers->getConversationalCls('opt-key')}">{$keyChar}</span>
+                <span class="' . $fieldHelpers->getConversationalCls('opt-key-lbl') . '">Key</span>
+                <span class="' . $fieldHelpers->getConversationalCls('opt-key') . '">' . $keyChar . '</span>
               </span>
               <span
-                {$fieldHelpers->getCustomAttributes('ct')}
-                class="{$fieldHelpers->getConversationalCls('ct')} {$fieldHelpers->getCustomClasses('ct')}"
+                ' . $fieldHelpers->getCustomAttributes('ct') . '
+                class="' . $fieldHelpers->getConversationalCls('ct') . ' ' . $fieldHelpers->getCustomClasses('ct') . '"
               >
-                {$fieldHelpers->kses_post($lbl)}
+                ' . $fieldHelpers->kses_post($lbl) . '
               </span>
             </label>
           </div>
-RADIOBOXOPTIONS;
+';
       }
     }
 
@@ -95,61 +94,62 @@ RADIOBOXOPTIONS;
     $inpReq = isset($field->valid->otherOptReq) ? ($field->valid->otherOptReq ? 'required' : '') : '';
     if (property_exists($field, 'addOtherOpt') && $field->addOtherOpt) {
       $keyChar = chr(65 + count($field->opt));
-      $radioBoxOptions .= <<<RADIOBOXOPTIONS
-      <div 
-        {$fieldHelpers->getCustomAttributes('cw')}
-        class="{$fieldHelpers->getConversationalCls('cw')} {$fieldHelpers->getCustomClasses('cw')}"
+      $radioBoxOptions .= '      <div
+        ' . $fieldHelpers->getCustomAttributes('cw') . '
+        class="' . $fieldHelpers->getConversationalCls('cw') . ' ' . $fieldHelpers->getCustomClasses('cw') . '"
       >
-      <input
-        {$fieldHelpers->getCustomAttributes('ci')}
-        id="{$rowID}-{$contentCount}-chk-{$optCount}"
-        data-oopt="{$rowID}"
-        type="radio"
-        class="{$fieldHelpers->getConversationalCls('ci')} {$fieldHelpers->getCustomClasses('ci')}"
-        value=""
-        {$check}
-        {$name}
-      />
-      <label
-        {$fieldHelpers->getCustomAttributes('cl')}
-        data-cl
-        for="{$rowID}-{$contentCount}-chk-{$optCount}"
-        class="{$fieldHelpers->getConversationalCls('cl')} {$fieldHelpers->getCustomClasses('cl')}"
-      >
-        <span
-          {$fieldHelpers->getCustomAttributes('rdo')}
-          data-bx
-          class="{$fieldHelpers->getConversationalCls('bx')} {$fieldHelpers->getConversationalCls('rdo')} {$fieldHelpers->getCustomClasses('rdo')}"
-        >
-          <span class="{$fieldHelpers->getConversationalCls('opt-key')}">{$keyChar}</span>
-        </span>
-        <span
-          {$fieldHelpers->getCustomAttributes('ct')}
-          class="{$fieldHelpers->getConversationalCls('ct')} {$fieldHelpers->getCustomClasses('ct')}"
-        >
-          {$otherOptLbl}
-        </span>
-      </label>
-      <div data-oinp-wrp class="{$fieldHelpers->getConversationalCls('other-inp-wrp')}">
         <input
-          data-bf-other-inp="{$rowID}-chk-{$optCount}"
-          type="text"
-          class="{$fieldHelpers->getConversationalCls('other-inp')}"
-          {$inpReq}
-          placeholder="{$fieldHelpers->esc_attr($inputPh)}"
+          ' . $fieldHelpers->getCustomAttributes('ci') . '
+          id="' . $rowID . '-' . $contentCount . '-chk-' . $optCount . '"
+          data-oopt="' . $rowID . '"
+          type="radio"
+          class="' . $fieldHelpers->getConversationalCls('ci') . ' ' . $fieldHelpers->getCustomClasses('ci') . '"
+          value=""
+          ' . $check . '
+          ' . $name . '
+        />
+        <label
+          ' . $fieldHelpers->getCustomAttributes('cl') . '
+          data-cl
+          for="' . $rowID . '-' . $contentCount . '-chk-' . $optCount . '"
+          class="' . $fieldHelpers->getConversationalCls('cl') . ' ' . $fieldHelpers->getCustomClasses('cl') . '"
         >
+          <span
+            ' . $fieldHelpers->getCustomAttributes('rdo') . '
+            data-bx
+            class="' . $fieldHelpers->getConversationalCls('bx') . ' ' . $fieldHelpers->getConversationalCls('rdo') . ' ' . $fieldHelpers->getCustomClasses('rdo') . '"
+          >
+            <span class="' . $fieldHelpers->getConversationalCls('opt-key') . '">' . $keyChar . '</span>
+          </span>
+          <span
+            ' . $fieldHelpers->getCustomAttributes('ct') . '
+            class="' . $fieldHelpers->getConversationalCls('ct') . ' ' . $fieldHelpers->getCustomClasses('ct') . '"
+          >
+            ' . $otherOptLbl . '
+          </span>
+        </label>
+        <div data-oinp-wrp class="' . $fieldHelpers->getConversationalCls('other-inp-wrp') . '">
+          <input
+            data-bf-other-inp="' . $rowID . '-chk-' . $optCount . '"
+            type="text"
+            class="' . $fieldHelpers->getConversationalCls('other-inp') . '"
+            ' . $inpReq . '
+            placeholder="' . $fieldHelpers->esc_attr($inputPh) . '"
+          >
+        </div>
       </div>
-    </div>
-RADIOBOXOPTIONS;
+';
     }
 
-    return <<<RADIOBOX
-      <div
-        {$fieldHelpers->getCustomAttributes('cc')}
-        class="{$fieldHelpers->getConversationalCls('cc')} {$fieldHelpers->getCustomClasses('cc')}"
+    return sprintf(
+      '      <div
+        %1$s
+        class="%2$s"
       >
-        {$radioBoxOptions}
-      </div>
-RADIOBOX;
+%3$s      </div>',
+      $fieldHelpers->getCustomAttributes('cc'),
+      $fieldHelpers->getConversationalCls('cc') . ' ' . $fieldHelpers->getCustomClasses('cc'),
+      $radioBoxOptions
+    );
   }
 }

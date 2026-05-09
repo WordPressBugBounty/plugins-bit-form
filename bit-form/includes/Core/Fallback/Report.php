@@ -15,9 +15,10 @@ class Report
     $tablename = $wpdb->prefix . 'bitforms_reports';
 
     // $latestIds = $wpdb->get_results("SELECT  MAX(`id`) as latest_id FROM $tablename GROUP BY `context`");
+    // Direct query: table name from $wpdb->prefix concatenation (no user input). $wpdb->prepare() cannot parameterize table names.
     $wpdb->query(
       $wpdb->prepare(
-        "SELECT  MAX(`id`) as latest_id FROM $tablename GROUP BY `context`"
+        "SELECT  MAX(`id`) as latest_id FROM `{$tablename}` GROUP BY `context`"
       )
     );
     $latestIds = $wpdb->last_result;

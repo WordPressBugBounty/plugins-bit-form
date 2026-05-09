@@ -32,13 +32,6 @@ class RecordApiHelper
     }
 
     $filePath = $this->makeFilePath($filePath);
-    $filesize = filesize($filePath);
-    $fp = fopen($filePath, 'rb');
-    $body = fread($fp, $filesize);
-    fclose($fp);
-    if (!$body) {
-      return new WP_Error(423, 'Can\'t open or read file!');
-    }
     if (is_null($parentId)) {
       $parentId = $folderId;
     }
@@ -49,27 +42,26 @@ class RecordApiHelper
     if ('' === $filePath) {
       return false;
     }
+    $body = FileHandler::readFile($filePath);
+    if (!$body) {
+      return new WP_Error(423, 'Can\'t open or read file!');
+    }
     $apiEndpoint = 'https://api.onedrive.com/v1.0/drives/' . $ids[0] . '/items/' . $parentId . ':/' . basename($filePath) . ':/content';
     $headers = [
-      'Authorization: Bearer ' . $this->token,
-      'Content-Type: application/octet-stream',
-      'Content-Length: ' . filesize($filePath),
-      'Prefer: respond-async',
-      'X-HTTP-Method: PUT'
+      'Authorization' => 'Bearer ' . $this->token,
+      'Content-Type'  => 'application/octet-stream',
+      'Prefer'        => 'respond-async',
+      'X-HTTP-Method' => 'PUT'
     ];
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $apiEndpoint);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, file_get_contents($filePath));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    $response = json_decode($response);
-    return $response;
+    $args = [
+      'body'    => $body,
+      'headers' => $headers,
+      'timeout' => 30,
+      'method'  => 'PUT',
+    ];
+    $response = wp_remote_request($apiEndpoint, $args);
+    $responseBody = wp_remote_retrieve_body($response);
+    return json_decode($responseBody);
   }
 
   public function handleAllFiles($folderWithFile, $actions, $folderId, $parentId)

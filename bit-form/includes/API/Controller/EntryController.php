@@ -43,7 +43,7 @@ class EntryController extends WP_REST_Controller
 
     $redirect_url = $state . '&' . http_build_query($params);
 
-    if (wp_redirect($redirect_url, 302)) {
+    if (wp_safe_redirect($redirect_url, 302)) {
       exit;
     }
   }

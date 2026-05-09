@@ -8,6 +8,7 @@ class EntryMetaFallback
   {
     global $wpdb;
     $tablename = $wpdb->prefix . 'bitforms_form_entrymeta';
+    // Direct query: table name from $wpdb->prefix concatenation only (no user input). $wpdb->prepare() cannot parameterize table names in self-join delete.
     $sql = $wpdb->query("DELETE a FROM $tablename AS a
     JOIN (
         SELECT bitforms_form_entry_id, meta_key, MAX(meta_id) AS max_id

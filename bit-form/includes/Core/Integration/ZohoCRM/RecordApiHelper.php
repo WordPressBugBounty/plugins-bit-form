@@ -70,7 +70,8 @@ class RecordApiHelper
           $fieldData[$fieldPair->zohoFormField] = $this->formatFieldValue($fieldValues[$fieldPair->formField], $defaultConf->layouts->{$module}->{$layout}->fields->{$fieldPair->zohoFormField});
         }
         if (empty($fieldData[$fieldPair->zohoFormField]) && \in_array($fieldPair->zohoFormField, $required)) {
-          $error = new WP_Error('REQ_FIELD_EMPTY', wp_sprintf(__('%s is required for zoho crm, %s module', 'bit-form'), $fieldPair->zohoFormField, $module));
+          /* translators: %1$s: field name, %2$s: module name */
+          $error = new WP_Error('REQ_FIELD_EMPTY', wp_sprintf(__('%1$s is required for zoho crm, %2$s module', 'bit-form'), $fieldPair->zohoFormField, $module));
           $this->_logResponse->apiResponse($logID, $integId, ['type' => 'record', 'type_name' => 'field'], 'validation', $error, $entryDetails);
           return $error;
         }
@@ -81,7 +82,8 @@ class RecordApiHelper
               @count($fieldData[$fieldPair->zohoFormField])
               : strlen($fieldData[$fieldPair->zohoFormField]);
           if ($currentLength > $requiredLength) {
-            $error = new WP_Error('REQ_FIELD_LENGTH_EXCEEDED', wp_sprintf(__('zoho crm field %s\'s maximum length is %s, Given %s', 'bit-form'), $fieldPair->zohoFormField, $module));
+            /* translators: %1$s: field name, %2$s: maximum length, %3$s: given length */
+            $error = new WP_Error('REQ_FIELD_LENGTH_EXCEEDED', wp_sprintf(__('zoho crm field %1$s\'s maximum length is %2$s, Given %3$s', 'bit-form'), $fieldPair->zohoFormField, $requiredLength, $currentLength));
             $this->_logResponse->apiResponse($logID, $integId, ['type' => 'record', 'type_name' => 'field'], 'validation', $error, $entryDetails);
             return $error;
           }

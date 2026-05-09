@@ -41,31 +41,56 @@ class TurnstileField
       $dNone = 'd-none';
       $beforeInteractiveCallback = 'data-before-interactive-callback="' . $beforeExcFuncName . '"';
       $afterInteractiveCallback = 'data-after-interactive-callback="' . $afterExcFuncName . '"';
-      $script = <<<TURNSTILESCRIPT
-      <script>
-        function {$beforeExcFuncName}() {
-          const bfTurnstileFldSelector = document.querySelector('.{$fldKeyWithContentId}-turnstile-wrp');
-          if(bfTurnstileFldSelector) bfTurnstileFldSelector.parentElement.classList.remove('d-none');
-        }
-        function {$afterExcFuncName}() {
-          const bfTurnstileFldSelector = document.querySelector('.{$fldKeyWithContentId}-turnstile-wrp');
-          if(bfTurnstileFldSelector) bfTurnstileFldSelector.parentElement.classList.add('d-none');
-        }
-      </script>
-TURNSTILESCRIPT;
+      $script = sprintf(
+        '<script>
+          function %1$s() {
+            const bfTurnstileFldSelector = document.querySelector(\'.%2$s-turnstile-wrp\');
+            if (bfTurnstileFldSelector) bfTurnstileFldSelector.parentElement.classList.remove(\'d-none\');
+          }
+          function %3$s() {
+            const bfTurnstileFldSelector = document.querySelector(\'.%2$s-turnstile-wrp\');
+            if (bfTurnstileFldSelector) bfTurnstileFldSelector.parentElement.classList.add(\'d-none\');
+          }
+        </script>',
+        $beforeExcFuncName,
+        $fldKeyWithContentId,
+        $afterExcFuncName
+      );
     }
 
-    return <<<TURNSTILEFIELD
-      {$script}
+    return sprintf(
+      '%1$s
       <div
-        {$fieldHelpers->getCustomAttributes('fld-wrp')}
-        class="{$fieldHelpers->getAtomicCls('fld-wrp')} {$fieldHelpers->getCustomClasses('fld-wrp')} {$dNone}"
+        %2$s
+        class="%3$s %4$s %5$s"
       >
-        <div class="$fldKeyWithContentId-turnstile-wrp">
-          <div class="cf-turnstile" {$beforeInteractiveCallback} {$afterInteractiveCallback} data-appearance="{$appearance}" data-language="{$language}" data-theme="{$theme}" data-size="{$size}" data-sitekey="{$fieldHelpers->esc_attr($siteKey)}">
+        <div class="%6$s-turnstile-wrp">
+          <div
+            class="cf-turnstile"
+            %7$s
+            %8$s
+            data-appearance="%9$s"
+            data-language="%10$s"
+            data-theme="%11$s"
+            data-size="%12$s"
+            data-sitekey="%13$s"
+          >
           </div>
         </div>
-      </div>
-TURNSTILEFIELD;
+      </div>',
+      $script,
+      $fieldHelpers->getCustomAttributes('fld-wrp'),
+      $fieldHelpers->getAtomicCls('fld-wrp'),
+      $fieldHelpers->getCustomClasses('fld-wrp'),
+      $dNone,
+      $fldKeyWithContentId,
+      $beforeInteractiveCallback,
+      $afterInteractiveCallback,
+      $fieldHelpers->esc_attr($appearance),
+      $fieldHelpers->esc_attr($language),
+      $fieldHelpers->esc_attr($theme),
+      $fieldHelpers->esc_attr($size),
+      $fieldHelpers->esc_attr($siteKey)
+    );
   }
 }

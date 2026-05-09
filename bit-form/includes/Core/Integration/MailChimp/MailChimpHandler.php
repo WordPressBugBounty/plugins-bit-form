@@ -7,6 +7,10 @@
 
 namespace BitCode\BitForm\Core\Integration\MailChimp;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\HttpHelper;
 use BitCode\BitForm\GlobalHelper;
@@ -56,15 +60,13 @@ class MailChimpHandler
    */
   public static function generateTokens()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $authorizationHeader = null;
-      // $inputJSON = file_get_contents('php://input');
-      // $requestsParams = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
 
       try {
-        $requestsParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $requestsParams = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -127,15 +129,13 @@ class MailChimpHandler
    */
   public static function refreshAudienceAjaxHelper()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $authorizationHeader = null;
-      // $inputJSON = file_get_contents('php://input');
-      // $queryParams = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
 
       try {
-        $queryParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $queryParams = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -199,14 +199,12 @@ class MailChimpHandler
   {
     $authorizationHeader = null;
     $response = null;
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
-      // $inputJSON = file_get_contents('php://input');
-      // $queryParams = json_decode($inputJSON);
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       // wp_send_json_success($queryParams);
       GlobalHelper::requirePostMethod();
 
       try {
-        $queryParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $queryParams = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -262,14 +260,11 @@ class MailChimpHandler
   {
     $authorizationHeader = null;
     $response = null;
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
-      // $inputJSON = file_get_contents('php://input');
-      // $queryParams = json_decode($inputJSON);
-
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       GlobalHelper::requirePostMethod();
 
       try {
-        $queryParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $queryParams = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }

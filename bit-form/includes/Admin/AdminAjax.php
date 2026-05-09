@@ -2,10 +2,13 @@
 
 namespace BitCode\BitForm\Admin;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Admin\Form\FrontEndScriptGenerator;
 use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Admin\Form\Template\TemplateProvider;
-use BitCode\BitForm\BfAnalytics;
 use BitCode\BitForm\Core\Database\FormEntryModel;
 use BitCode\BitForm\Core\Database\FormModel;
 use BitCode\BitForm\Core\Form\FormHandler;
@@ -23,7 +26,6 @@ class AdminAjax
   public function register()
   {
     add_action('wp_ajax_bitforms_integrations', [$this, 'integrations']);
-    add_action('wp_ajax_integration', [$this, 'integration']);
     add_action('wp_ajax_bitforms_save_connected_integration_apps', [$this, 'saveConnectedIntegrationApps']);
     add_action('wp_ajax_bitforms_get_connected_integration_apps', [$this, 'getConnectedIntegrationApps']);
     add_action('wp_ajax_bitforms_delete_connected_app', [$this, 'deleteConnectedApp']);
@@ -104,20 +106,22 @@ class AdminAjax
     // conversational
     add_action('wp_ajax_bitforms_save_conversational_css', [$this, 'saveConversationalCSS']);
 
-    // telematry
-    add_action('wp_ajax_bitforms_analytics_permission', [$this, 'telemetry']);
-
     // get form html markup
     add_action('wp_ajax_bitforms_get_form_html', [$this, 'getFormHtml']);
+  }
 
-    // $result = (new BfAnalytics())->getPaymentInfo();
-    // error_log('BfAnalytics' . print_r($result, true));
+  private function verifyAdminPermission()
+  {
+    if (!current_user_can('manage_bitform') && !current_user_can('manage_options')) {
+      wp_send_json_error(__('Insufficient permissions.', 'bit-form'), 403);
+    }
   }
 
   public function getFormHtml()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
-      $formId = sanitize_text_field($_REQUEST['formID']);
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
+      $formId = isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '';
 
       $FrontendFormManager = FrontendFormManager::getInstance($formId);
       $formContent = $FrontendFormManager->getFormContentWithValue();
@@ -157,48 +161,14 @@ class AdminAjax
   }
 
   /**
-   * Telemetry data collection
-   */
-  public function telemetry()
-  {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
-      // $inputJSON = wp_unslash($_POST['data']);
-      // $input = json_decode($inputJSON);
-
-      GlobalHelper::requirePostMethod();
-      try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
-      } catch (\InvalidArgumentException $e) {
-        wp_send_json_error($e->getMessage(), 400);
-      }
-
-      // error_log('telemetry data: ' . json_encode($input));
-      $bfAnalytics = new BfAnalytics();
-      $results = $bfAnalytics->analyticsOptIn($input->permission);
-      if (is_wp_error($results)) {
-        wp_send_json_error($results, 411);
-      } else {
-        wp_send_json_success($results, 200);
-      }
-    } else {
-      wp_send_json_error(
-        __(
-          'Token expired',
-          'bit-form'
-        ),
-        401
-      );
-    }
-  }
-
-  /**
    * Undocumented function
    *
    * @return void
    */
   public function integrations()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       $testIntegration = Integrations::getInstance();
       $allIntegrations = $testIntegration->getAllintegrations();
       if ($allIntegrations) {
@@ -227,12 +197,13 @@ class AdminAjax
    */
   public function saveConnectedIntegrationApps()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -266,10 +237,11 @@ class AdminAjax
    */
   public function getConnectedIntegrationApps()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -298,20 +270,20 @@ class AdminAjax
 
   public function deleteConnectedApp()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
-      if ($_REQUEST['appId']) {
-        $appId = wp_unslash($_REQUEST['appId']);
-      } else {
-        $appId = wp_unslash($input->appId);
-      }
+      // Nonce verified at handler entry (wp_verify_nonce 'bitforms_save', line 273).
+      $appId = isset($_REQUEST['appId']) && $_REQUEST['appId']
+        ? sanitize_text_field(wp_unslash($_REQUEST['appId']))
+        : sanitize_text_field(wp_unslash((string) $input->appId));
       $integrationHandler = Integrations::getInstance();
       $status = $integrationHandler->deleteConnectedApp($appId);
       if (is_wp_error($status)) {
@@ -332,7 +304,8 @@ class AdminAjax
 
   public function templates()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       $templateProvider = new TemplateProvider();
       $status = $templateProvider->getAllTemplates();
       if (is_wp_error($status)) {
@@ -353,13 +326,14 @@ class AdminAjax
 
   public function builerHelperState()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -385,17 +359,21 @@ class AdminAjax
 
   public function getTemplate()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->getTemplate($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->getTemplate($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -414,7 +392,8 @@ class AdminAjax
 
   public function getAllForms()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       $formHandler = FormHandler::getInstance();
       $all_forms = $formHandler->admin->getAllForm();
       if (is_wp_error($all_forms)) {
@@ -435,7 +414,8 @@ class AdminAjax
 
   public function migrateFormContents()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       $all_forms = get_transient('bitforms_v1_form_contents');
       wp_send_json_success($all_forms, 200);
     } else {
@@ -451,12 +431,13 @@ class AdminAjax
 
   public function setChangelogVersion()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -477,12 +458,13 @@ class AdminAjax
 
   public function handleNotice()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
         // $inputJSON = wp_unslash($_POST['data']);
         // $input = json_decode($inputJSON);
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
         $optionName = isset($input->optionName) ? $input->optionName : '';
         $optionValue = isset($input->optionValue) ? $input->optionValue : '';
         update_option($optionName, $optionValue);
@@ -548,7 +530,8 @@ class AdminAjax
   {
     \ignore_user_abort();
 
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       $ipTool = new IpTool();
       $user_details = $ipTool->getUserDetail();
       $integrationHandler = new IntegrationHandler(0, $user_details);
@@ -572,13 +555,14 @@ class AdminAjax
   public function saveEmailConfig()
   {
     \ignore_user_abort();
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       $ipTool = new IpTool();
       $user_details = $ipTool->getUserDetail();
       $integrationHandler = new IntegrationHandler(0, $user_details);
       try {
-        $formattedData = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $formattedData = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -607,11 +591,12 @@ class AdminAjax
 
   public function testEmail()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
 
       try {
-        $formattedData = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $formattedData = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -655,7 +640,8 @@ class AdminAjax
 
   public function migrationComplete()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       delete_transient('bitforms_v1_form_contents');
       delete_option('bitforms_migrating_to_v2');
       update_option('bitforms_migrated_to_v2', true);
@@ -673,12 +659,13 @@ class AdminAjax
 
   public function importDataStore()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -697,12 +684,13 @@ class AdminAjax
 
   public function getFormEntryLabelAndCount()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -727,15 +715,19 @@ class AdminAjax
 
   public function getFormEntry()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->getFormEntry($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->getFormEntry($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -748,15 +740,19 @@ class AdminAjax
 
   public function getEntriesForReport()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->getEntriesForReport($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->getEntriesForReport($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -769,10 +765,11 @@ class AdminAjax
 
   public function filterExportEntry()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -796,15 +793,16 @@ class AdminAjax
   public function updateForm()
   {
     \ignore_user_abort();
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->updateForm($_REQUEST, $input);
+      $status = $formHandler->admin->updateForm([], $input);
       if (isset($input->customCodes)) {
         FrontEndScriptGenerator::customCodeFile($input->id, $input->customCodes);
       }
@@ -826,10 +824,11 @@ class AdminAjax
 
   public function saveCss()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -873,15 +872,19 @@ class AdminAjax
 
   public function createNewForm()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->createNewForm($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->createNewForm($sanitized_request, $input);
       $formId = sanitize_text_field($input->form_id);
       if (isset($input->customCodes)) {
         FrontEndScriptGenerator::customCodeFile($formId, $input->customCodes);
@@ -904,10 +907,11 @@ class AdminAjax
 
   public function updateEntryStatus()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -943,19 +947,23 @@ class AdminAjax
 
   public function changeFormStatus()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
 
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->changeFormStatus($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->changeFormStatus($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -974,15 +982,19 @@ class AdminAjax
 
   public function changeBulkFormStatus()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->changeBulkFormStatus($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->changeBulkFormStatus($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1001,15 +1013,19 @@ class AdminAjax
 
   public function getAForm()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->getAForm($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->getAForm($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1029,15 +1045,19 @@ class AdminAjax
   public function duplicateAForm()
   {
     \ignore_user_abort();
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->duplicateAForm($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->duplicateAForm($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1057,10 +1077,11 @@ class AdminAjax
   public function importAForm()
   {
     \ignore_user_abort();
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -1083,7 +1104,7 @@ class AdminAjax
   }
 
   // public function exportAForm() {
-  //   if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+  //   if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
   //     $formHandler = FormHandler::getInstance();
   //     $status = $formHandler->admin->exportAForm($_REQUEST);
   //     if (is_wp_error($status)) {
@@ -1101,15 +1122,19 @@ class AdminAjax
   // }
   public function exportAForm()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->exportAForm($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->exportAForm($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1128,15 +1153,20 @@ class AdminAjax
 
   public function deleteAForm()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->deleteAForm($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'id'     => isset($_REQUEST['id']) ? absint($_REQUEST['id']) : 0,
+      ];
+      $status = $formHandler->admin->deleteAForm($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1155,15 +1185,22 @@ class AdminAjax
 
   public function deleteBlukForm()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->deleteBlukForm($_REQUEST, $input);
+      $sanitized_request = [
+        'formID'  => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'entries' => isset($_REQUEST['entries']) && is_array($_REQUEST['entries'])
+                        ? array_map('absint', $_REQUEST['entries'])
+                        : [],
+      ];
+      $status = $formHandler->admin->deleteBlukForm($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1182,15 +1219,22 @@ class AdminAjax
 
   public function deleteBlukFormEntries()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->deleteBlukFormEntries($_REQUEST, $input);
+      $sanitized_request = [
+        'formID'  => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'entries' => isset($_REQUEST['entries']) && is_array($_REQUEST['entries'])
+                        ? array_map('absint', $_REQUEST['entries'])
+                        : [],
+      ];
+      $status = $formHandler->admin->deleteBlukFormEntries($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1209,15 +1253,22 @@ class AdminAjax
 
   public function duplicateFormEntry()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->duplicateFormEntry($_REQUEST, $input);
+      $sanitized_request = [
+        'formID'  => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'entries' => isset($_REQUEST['entries']) && is_array($_REQUEST['entries'])
+                        ? array_map('absint', $_REQUEST['entries'])
+                        : [],
+      ];
+      $status = $formHandler->admin->duplicateFormEntry($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1236,17 +1287,22 @@ class AdminAjax
 
   public function editFormEntry()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->editFormEntry($_REQUEST, $input);
+      $sanitized_request = [
+        'formID'  => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'entryID' => isset($_REQUEST['entryID']) ? absint($_REQUEST['entryID']) : 0,
+      ];
+      $status = $formHandler->admin->editFormEntry($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1265,19 +1321,24 @@ class AdminAjax
 
   public function getLogHistory()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
 
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->getLogHistory($_REQUEST, $input);
+      $sanitized_request = [
+        'formID'  => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'entryID' => isset($_REQUEST['entryID']) ? absint($_REQUEST['entryID']) : 0,
+      ];
+      $status = $formHandler->admin->getLogHistory($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1297,9 +1358,14 @@ class AdminAjax
   public function updateFormEntry()
   {
     \ignore_user_abort();
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->updateFormEntry($_REQUEST, $_POST);
+      $sanitized_request = [
+        'formID'  => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'entryID' => isset($_REQUEST['entryID']) ? absint($_REQUEST['entryID']) : 0,
+      ];
+      $status = $formHandler->admin->updateFormEntry($sanitized_request, wp_unslash($_POST));
 
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
@@ -1320,19 +1386,23 @@ class AdminAjax
 
   public function getAllWPPages()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
 
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->getAllWPPages($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->getAllWPPages($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1351,17 +1421,22 @@ class AdminAjax
 
   public function deleteSuccessMessage()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->deleteSuccessMessage($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'id'     => isset($_REQUEST['id']) ? absint($_REQUEST['id']) : 0,
+      ];
+      $status = $formHandler->admin->deleteSuccessMessage($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1380,19 +1455,24 @@ class AdminAjax
 
   public function deleteAIntegration()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
 
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->deleteAIntegration($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'id'     => isset($_REQUEST['id']) ? absint($_REQUEST['id']) : 0,
+      ];
+      $status = $formHandler->admin->deleteAIntegration($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1411,19 +1491,24 @@ class AdminAjax
 
   public function deleteAWorkflow()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
 
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
 
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->deleteAWorkflow($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'id'     => isset($_REQUEST['id']) ? absint($_REQUEST['id']) : 0,
+      ];
+      $status = $formHandler->admin->deleteAWorkflow($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1442,19 +1527,24 @@ class AdminAjax
 
   public function deleteAMailTemplate()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
 
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
 
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->deleteAMailTemplate($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'id'     => isset($_REQUEST['id']) ? absint($_REQUEST['id']) : 0,
+      ];
+      $status = $formHandler->admin->deleteAMailTemplate($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1473,18 +1563,23 @@ class AdminAjax
 
   public function duplicateAMailTemplate()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->duplicateAMailTemplate($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+        'id'     => isset($_REQUEST['id']) ? absint($_REQUEST['id']) : 0,
+      ];
+      $status = $formHandler->admin->duplicateAMailTemplate($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1503,20 +1598,24 @@ class AdminAjax
 
   public function setAllFormsReport()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
 
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
 
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->setAllFormsReport($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->setAllFormsReport($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1535,17 +1634,21 @@ class AdminAjax
 
   public function savegReCaptcha()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
 
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
 
       $formHandler = FormHandler::getInstance();
-      $status = $formHandler->admin->savegReCaptcha($_REQUEST, $input);
+      $sanitized_request = [
+        'formID' => isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '',
+      ];
+      $status = $formHandler->admin->savegReCaptcha($sanitized_request, $input);
       if (is_wp_error($status)) {
         wp_send_json_error($status->get_error_message(), 411);
       } else {
@@ -1564,13 +1667,14 @@ class AdminAjax
 
   public function saveApiKey()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -1606,13 +1710,14 @@ class AdminAjax
 
   public function iconUpload()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -1631,7 +1736,7 @@ class AdminAjax
       $icnDir = $wpUploadbaseDir . DIRECTORY_SEPARATOR . 'bitforms' . DIRECTORY_SEPARATOR . 'icons';
 
       if (!is_dir($icnDir)) {
-        mkdir($icnDir);
+        wp_mkdir_p($icnDir);
       }
 
       $imageUrlData = file_get_contents($sanitize_url);
@@ -1692,7 +1797,8 @@ class AdminAjax
 
   public function getDownlodedIcons()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       $files = $this->getFiles();
       wp_send_json_success($files, 200);
     } else {
@@ -1708,14 +1814,15 @@ class AdminAjax
 
   public function iconRemove()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
 
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -1743,14 +1850,15 @@ class AdminAjax
 
   public function addCustomCode()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
 
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -1786,14 +1894,15 @@ class AdminAjax
 
   public function getCustomCode()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
 
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -1829,7 +1938,8 @@ class AdminAjax
 
   public function getGenerelSettings()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       $data = get_option('bitform_app_config', (object) ['cache_plugin' => 0, 'delete_table' => 0]);
 
       if (is_wp_error($data)) {
@@ -1843,7 +1953,8 @@ class AdminAjax
     } else {
       wp_send_json_error(
         __(
-          'Token expired'
+          'Token expired',
+          'bit-form'
         ),
         401
       );
@@ -1852,11 +1963,12 @@ class AdminAjax
 
   public function saveGenerelSettings()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
 
       try {
-        $inputData = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $inputData = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
         return;
@@ -1870,12 +1982,13 @@ class AdminAjax
           $formHandler = FormHandler::getInstance();
           $formHandler->admin->updateGeneratedScriptPageIds();
         }
-        wp_send_json_success(__('Save successfully done'));
+        wp_send_json_success(__('Save successfully done', 'bit-form'));
       }
     } else {
       wp_send_json_error(
         __(
-          'Token expired'
+          'Token expired',
+          'bit-form'
         ),
         401
       );
@@ -1884,14 +1997,15 @@ class AdminAjax
 
   public function saveGlobalMessages()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $inputData = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
 
       try {
-        $inputData = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $inputData = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
         return;
@@ -1907,12 +2021,13 @@ class AdminAjax
       } else {
         $formHandler = FormHandler::getInstance();
         $formHandler->admin->replaceAllFormsErrorMessagesByGlobalMessages();
-        wp_send_json_success(__('Save successfully done'));
+        wp_send_json_success(__('Save successfully done', 'bit-form'));
       }
     } else {
       wp_send_json_error(
         __(
-          'Token expired'
+          'Token expired',
+          'bit-form'
         ),
         401
       );
@@ -1921,12 +2036,13 @@ class AdminAjax
 
   public function getPodsField()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -1963,7 +2079,8 @@ class AdminAjax
 
   public function getPodsType()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       $users = get_users(['fields' => ['ID', 'display_name']]);
       $pods = [];
       $podsAdminExists = is_plugin_active('pods/init.php');
@@ -1989,7 +2106,8 @@ class AdminAjax
 
   public function postTypeByUser()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       $users = get_users(
         [
           'fields' => ['ID', 'display_name', 'user_login', 'user_email', 'user_nicename'],
@@ -2044,7 +2162,8 @@ class AdminAjax
 
   public function getAcfGroupFields()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       $acfFields = [];
       $types = ['select', 'checkbox', 'radio'];
 
@@ -2081,14 +2200,15 @@ class AdminAjax
 
   public function getCustomField()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $input = json_decode($inputJSON);
 
       GlobalHelper::requirePostMethod();
 
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -2171,17 +2291,16 @@ class AdminAjax
 
   public function getMetaBoxFields()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       if (!function_exists('rwmb_meta')) {
         wp_send_json_error(__('Meta Box must be activated!', 'bit-form'));
       }
 
-      // $input = json_decode(file_get_contents('php://input'));
-
       GlobalHelper::requirePostMethod();
 
       try {
-        $input = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $input = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -2210,12 +2329,13 @@ class AdminAjax
 
   public function saveConversationalCSS()
   {
-    if (wp_verify_nonce(sanitize_text_field($_REQUEST['_ajax_nonce']), 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
       // $inputJSON = wp_unslash($_POST['data']);
       // $requestsParams = json_decode($inputJSON);
       GlobalHelper::requirePostMethod();
       try {
-        $requestsParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $requestsParams = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }

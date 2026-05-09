@@ -49,25 +49,39 @@ class ButtonField
     $btnClass = self::getBtnClass($field->btnTyp);
     $btnTyp = self::getBtnTyp($field->btnTyp);
 
-    return <<<BUTTONFIELD
-      <div 
-        {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-        class="{$fieldHelpers->getAtomicCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
+    return sprintf(
+      '<div
+        %1$s
+        class="%2$s %3$s"
       >
         <button
-          {$fieldHelpers->getCustomAttributes('btn')}
-          class="{$fieldHelpers->getAtomicCls('btn')} {$fieldHelpers->getCustomClasses('btn')} {$btnClass}"
-          type="{$btnTyp}"
-          {$name}
-          {$disabled}
+          %4$s
+          class="%5$s %6$s %7$s"
+          type="%8$s"
+          %9$s
+          %10$s
         >
-          {$btnPreIcn}
-          {$fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->txt))}
-          {$btnSufIcn}
-          {$btnSpinner}
+          %11$s
+          %12$s
+          %13$s
+          %14$s
         </button>
-      </div>
-BUTTONFIELD;
+      </div>',
+      $fieldHelpers->getCustomAttributes('inp-fld-wrp'),                // 1
+      $fieldHelpers->getAtomicCls('inp-fld-wrp'),                        // 2
+      $fieldHelpers->getCustomClasses('inp-fld-wrp'),                    // 3
+      $fieldHelpers->getCustomAttributes('btn'),                         // 4
+      $fieldHelpers->getAtomicCls('btn'),                                // 5
+      $fieldHelpers->getCustomClasses('btn'),                            // 6
+      $btnClass,                                                         // 7
+      $btnTyp,                                                           // 8
+      $name,                                                             // 9
+      $disabled,                                                         // 10
+      $btnPreIcn,                                                        // 11
+      $fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->txt)),  // 12
+      $btnSufIcn,                                                        // 13
+      $btnSpinner                                                        // 14
+    );
   }
 
   private static function helperTxt($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error = null, $value = null)
@@ -77,17 +91,22 @@ BUTTONFIELD;
     $hlpSufIcn = $fieldHelpers->icon('hlpSufIcn', 'hlp-txt-suf-i');
     $hlpTxt = isset($field->helperTxt) ? $fieldHelpers->renderHTMR($field->helperTxt) : '';
 
-    $helperTxt = <<<HELPERTXT
-      <div
-        {$fieldHelpers->getCustomAttributes('hlp-txt')}
-        class="{$fieldHelpers->getAtomicCls('hlp-txt')} {$fieldHelpers->getCustomClasses('hlp-txt')}"
+    $helperTxt = sprintf(
+      '<div
+        %1$s
+        class="%2$s %3$s"
       >
-        {$hlpPreIcn}
-        {$fieldHelpers->kses_post($hlpTxt)}
-        {$hlpSufIcn}
-      </div>
-
-HELPERTXT;
+        %4$s
+        %5$s
+        %6$s
+      </div>',
+      $fieldHelpers->getCustomAttributes('hlp-txt'),
+      $fieldHelpers->getAtomicCls('hlp-txt'),
+      $fieldHelpers->getCustomClasses('hlp-txt'),
+      $hlpPreIcn,
+      $fieldHelpers->kses_post($hlpTxt),
+      $hlpSufIcn
+    );
 
     return  property_exists($field, 'helperTxt') ? $helperTxt : '';
   }

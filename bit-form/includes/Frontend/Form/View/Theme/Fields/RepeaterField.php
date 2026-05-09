@@ -23,40 +23,61 @@ class RepeaterField
     if (isset($field->addBtn->show) && $field->addBtn->show) {
       $addBtnPreIcn = $fieldHelpers->icon('addBtnPreIcn', 'rpt-add-btn-pre-i');
       $addBtnSufIcn = $fieldHelpers->icon('addBtnSufIcn', 'rpt-add-btn-suf-i');
-      $addBtnMarkup = <<<ADDBTN
-        <button
-          {$fieldHelpers->getCustomAttributes('rpt-add-btn')}
-          class="{$fieldHelpers->getAtomicCls('rpt-add-btn')} {$fieldHelpers->getCustomClasses('rpt-add-btn')}"
-          type="{$field->addBtn->btnTyp}"
-          data-parent-field-name="{$field->fieldName}"
+
+      $addBtnMarkup = sprintf(
+        '<button
+          %1$s
+          class="%2$s %3$s"
+          type="%4$s"
+          data-parent-field-name="%5$s"
         >
-          {$addBtnPreIcn}
-          {$fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->addBtn->txt))}
-          {$addBtnSufIcn}
-        </button>
-ADDBTN;
+          %6$s
+          %7$s
+          %8$s
+        </button>',
+        $fieldHelpers->getCustomAttributes('rpt-add-btn'),
+        $fieldHelpers->getAtomicCls('rpt-add-btn'),
+        $fieldHelpers->getCustomClasses('rpt-add-btn'),
+        $field->addBtn->btnTyp,
+        $field->fieldName,
+        $addBtnPreIcn,
+        $fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->addBtn->txt)),
+        $addBtnSufIcn
+      );
     };
 
     if (isset($field->addToEndBtn->show) && $field->addToEndBtn->show) {
       $addToEndBtnPreIcn = $fieldHelpers->icon('addToEndBtnPreIcn', 'add-to-end-btn-pre-i');
       $addToEndBtnSufIcn = $fieldHelpers->icon('addToEndBtnSufIcn', 'add-to-end-btn-suf-i');
-      $addToEndBtnMarkup = <<<ADDTOENDBTN
-        <div 
-          {$fieldHelpers->getCustomAttributes('add-to-end-btn-wrp')}
-          class="{$fieldHelpers->getAtomicCls('add-to-end-btn-wrp')} {$fieldHelpers->getCustomClasses('add-to-end-btn-wrp')}"
+
+      $addToEndBtnMarkup = sprintf(
+        '<div 
+          %1$s
+          class="%2$s %3$s"
         >       
           <button
-            {$fieldHelpers->getCustomAttributes('add-to-end-btn')}
-            class="{$fieldHelpers->getAtomicCls('add-to-end-btn')} {$fieldHelpers->getCustomClasses('add-to-end-btn')}"
-            type="{$field->addToEndBtn->btnTyp}"
-            data-parent-field-name="{$field->fieldName}"
+            %4$s
+            class="%5$s %6$s"
+            type="%7$s"
+            data-parent-field-name="%8$s"
           >
-            {$addToEndBtnPreIcn}
-            {$fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->addToEndBtn->txt))}
-            {$addToEndBtnSufIcn}
+            %9$s
+            %10$s
+            %11$s
           </button>
-        </div>
-ADDTOENDBTN;
+        </div>',
+        $fieldHelpers->getCustomAttributes('add-to-end-btn-wrp'),
+        $fieldHelpers->getAtomicCls('add-to-end-btn-wrp'),
+        $fieldHelpers->getCustomClasses('add-to-end-btn-wrp'),
+        $fieldHelpers->getCustomAttributes('add-to-end-btn'),
+        $fieldHelpers->getAtomicCls('add-to-end-btn'),
+        $fieldHelpers->getCustomClasses('add-to-end-btn'),
+        $field->addToEndBtn->btnTyp,
+        $field->fieldName,
+        $addToEndBtnPreIcn,
+        $fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->addToEndBtn->txt)),
+        $addToEndBtnSufIcn
+      );
     };
 
     $removeBtnPreIcn = $fieldHelpers->icon('removeBtnPreIcn', 'rpt-rmv-btn-pre-i');
@@ -70,72 +91,89 @@ ADDTOENDBTN;
       }
     }
 
-    $repeatableWrap = <<<RPTABLEWRAP
-      <div 
-        {$fieldHelpers->getCustomAttributes('rpt-wrp')}
-        class="{$fieldHelpers->getAtomicCls('rpt-wrp')} {$fieldHelpers->getCustomClasses('rpt-wrp')}"
+    $repeatableWrap = sprintf(
+      '<div 
+        %1$s
+        class="%2$s %3$s"
       >
         <div 
-          {$fieldHelpers->getCustomAttributes('rpt-grid-wrp')}
-          class="{$fieldHelpers->getAtomicCls('rpt-grid-wrp')} {$fieldHelpers->getCustomClasses('rpt-grid-wrp')}"
+          %4$s
+          class="%5$s %6$s"
         >   
-          <div class="_frm-b{$formID} repeater-grid">
-            {$fieldHtml}
+          <div class="_frm-b%7$s repeater-grid">
+            %8$s
           </div>
         </div>
         <div 
-          {$fieldHelpers->getCustomAttributes('pair-btn-wrp')}
-          class="{$fieldHelpers->getAtomicCls('pair-btn-wrp')} {$fieldHelpers->getCustomClasses('pair-btn-wrp')}"
+          %9$s
+          class="%10$s %11$s"
         >
-          {$addBtnMarkup}
+          %12$s
           <button
-            {$fieldHelpers->getCustomAttributes('rpt-rmv-btn')}
-            class="{$fieldHelpers->getAtomicCls('rpt-rmv-btn')} {$fieldHelpers->getCustomClasses('rpt-rmv-btn')}"
-            type="{$field->removeBtn->btnTyp}"
-            data-parent-field-name="{$field->fieldName}"
+            %13$s
+            class="%14$s %15$s"
+            type="%16$s"
+            data-parent-field-name="%17$s"
           >
-            {$removeBtnPreIcn}
-            {$fieldHelpers->renderHTMR($field->removeBtn->txt)}
-            {$removeBtnSufIcn}
+            %18$s
+            %19$s
+            %20$s
           </button>
         </div>
-      </div>
-RPTABLEWRAP;
+      </div>',
+      $fieldHelpers->getCustomAttributes('rpt-wrp'),
+      $fieldHelpers->getAtomicCls('rpt-wrp'),
+      $fieldHelpers->getCustomClasses('rpt-wrp'),
+      $fieldHelpers->getCustomAttributes('rpt-grid-wrp'),
+      $fieldHelpers->getAtomicCls('rpt-grid-wrp'),
+      $fieldHelpers->getCustomClasses('rpt-grid-wrp'),
+      $formID,
+      $fieldHtml,
+      $fieldHelpers->getCustomAttributes('pair-btn-wrp'),
+      $fieldHelpers->getAtomicCls('pair-btn-wrp'),
+      $fieldHelpers->getCustomClasses('pair-btn-wrp'),
+      $addBtnMarkup,
+      $fieldHelpers->getCustomAttributes('rpt-rmv-btn'),
+      $fieldHelpers->getAtomicCls('rpt-rmv-btn'),
+      $fieldHelpers->getCustomClasses('rpt-rmv-btn'),
+      $field->removeBtn->btnTyp,
+      $field->fieldName,
+      $removeBtnPreIcn,
+      $fieldHelpers->renderHTMR($field->removeBtn->txt),
+      $removeBtnSufIcn
+    );
 
-    $defaultRow = isset($field->defaultRow) ? intval($field->defaultRow) : 1;
-    if (isset($field->maxRow) && $defaultRow > intval($field->maxRow)) {
-      $defaultRow = intval($field->maxRow);
-    }
+    $repeatedRow = apply_filters('bitform_repeater_repeated_rows', $repeatableWrap, $field);
 
-    if (isset($field->minRow) && $defaultRow < intval($field->minRow)) {
-      $defaultRow = intval($field->minRow);
-    }
-    $repeatedRow = $repeatableWrap;
-    while ($defaultRow > 1) {
-      $repeatedRow .= $repeatableWrap;
-      $defaultRow--;
-    }
-
-    return <<<SECTIONFIELD
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getAtomicCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
+    return sprintf(
+      '<div 
+      %1$s
+      class="%2$s %3$s"
     >
       <div 
-        {$fieldHelpers->getCustomAttributes('rpt-fld-wrp')}
-        class="{$fieldHelpers->getAtomicCls('rpt-fld-wrp')} {$fieldHelpers->getCustomClasses('rpt-fld-wrp')}"
+        %4$s
+        class="%5$s %6$s"
       >
-        {$repeatedRow}
-        {$addToEndBtnMarkup}
+        %7$s
+        %8$s
         <input
           type="text"
           class="d-none"
           title="Rpeater Index Hidden Input"
-          name="{$fieldHelpers->esc_attr($field->fieldName . '-repeat-index')}"
+          name="%9$s"
           value=""
         />
       </div>
-    </div>
-SECTIONFIELD;
+    </div>',
+      $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
+      $fieldHelpers->getAtomicCls('inp-fld-wrp'),
+      $fieldHelpers->getCustomClasses('inp-fld-wrp'),
+      $fieldHelpers->getCustomAttributes('rpt-fld-wrp'),
+      $fieldHelpers->getAtomicCls('rpt-fld-wrp'),
+      $fieldHelpers->getCustomClasses('rpt-fld-wrp'),
+      $repeatedRow,
+      $addToEndBtnMarkup,
+      $fieldHelpers->esc_attr($field->fieldName . '-repeat-index')
+    );
   }
 }

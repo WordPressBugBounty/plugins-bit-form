@@ -24,15 +24,25 @@ class SectionField
       }
     }
 
-    return <<<SECTIONFIELD
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getConversationalMultiCls('inp-fld-wrp')} {$fieldHelpers->getConversationalCls('inner-grid-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
+    $wrapperAttrs = $fieldHelpers->getCustomAttributes('inp-fld-wrp');
+    $wrapperClass = $fieldHelpers->getConversationalMultiCls('inp-fld-wrp')
+      . ' ' . $fieldHelpers->getConversationalCls('inner-grid-fld-wrp')
+      . ' ' . $fieldHelpers->getCustomClasses('inp-fld-wrp');
+    $sectionGridClass = "_frm-b{$formID} section-grid";
+
+    return sprintf(
+      '<div
+      %1$s
+      class="%2$s"
     >
-        <div class="_frm-b{$formID} section-grid">
-          {$fieldHtml}
-        </div>
-    </div>
-SECTIONFIELD;
+      <div class="%3$s">
+        %4$s
+      </div>
+    </div>',
+      $wrapperAttrs,
+      $wrapperClass,
+      $sectionGridClass,
+      $fieldHtml
+    );
   }
 }

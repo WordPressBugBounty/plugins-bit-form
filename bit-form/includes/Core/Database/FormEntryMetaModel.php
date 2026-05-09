@@ -32,6 +32,7 @@ class FormEntryMetaModel extends Model
     if (empty($entryID)) {
       return false;
     }
+    // Form entry meta lookup; meta_key/meta_value query required to map dynamic field keys per entry.
     $formEntryMeta = $this->get(
       [
         'meta_key',

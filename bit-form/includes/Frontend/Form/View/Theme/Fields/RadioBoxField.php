@@ -45,46 +45,83 @@ class RadioBoxField
           $disabled = "disabled='disabled'";
         }
 
-        $radioBoxOptions .= <<<RADIOBOXOPTIONS
-          <div 
-            {$fieldHelpers->getCustomAttributes('cw')}
-            class="{$fieldHelpers->getAtomicCls('cw')} {$fieldHelpers->getCustomClasses('cw')}"
+        $radioBoxOptions .= sprintf(
+          '<div
+            %1$s
+            class="%2$s %3$s"
           >
             <input
-              {$fieldHelpers->getCustomAttributes('ci')}
-              id="{$rowID}-{$contentCount}-chk-{$key}"
+              %4$s
+              id="%5$s-%6$s-chk-%7$s"
               type="radio"
-              class="{$fieldHelpers->getAtomicCls('ci')} {$fieldHelpers->getCustomClasses('ci')}"
-              value="{$fieldHelpers->esc_attr($value)}"
-              {$check}
-              {$name}
-              {$req}
-              {$disabled}
+              class="%8$s %9$s"
+              value="%10$s"
+              %11$s
+              %12$s
+              %13$s
+              %14$s
             />
             <label
-              {$fieldHelpers->getCustomAttributes('cl')}
+              %15$s
               data-cl
-              for="{$rowID}-{$contentCount}-chk-{$key}"
-              class="{$fieldHelpers->getAtomicCls('cl')} {$fieldHelpers->getCustomClasses('cl')}"
+              for="%5$s-%6$s-chk-%7$s"
+              class="%16$s %17$s"
             >
               <span
-                {$fieldHelpers->getCustomAttributes('bx')}
+                %18$s
                 data-bx
-                class="{$fieldHelpers->getAtomicCls('bx')} {$fieldHelpers->getCustomClasses('bx')}"
+                class="%19$s %20$s"
               >
-                <svg width="12" height="10" viewBox="0 0 12 10" class="{$fieldHelpers->getAtomicCls('svgwrp')} {$fieldHelpers->getCustomClasses('svgwrp')}">
-                  <use data-ck-icn href=#{$rowID}-ck-svg class="{$fieldHelpers->getAtomicCls('ck-icn')} {$fieldHelpers->getCustomClasses('ck-icn')}" />
+                <svg
+                  width="12"
+                  height="10"
+                  viewBox="0 0 12 10"
+                  class="%21$s %22$s"
+                >
+                  <use
+                    data-ck-icn
+                    href=#%5$s-ck-svg
+                    class="%23$s %24$s"
+                  />
                 </svg>
               </span>
               <span
-                {$fieldHelpers->getCustomAttributes('ct')}
-                class="{$fieldHelpers->getAtomicCls('ct')} {$fieldHelpers->getCustomClasses('ct')}"
+                %25$s
+                class="%26$s %27$s"
               >
-                {$fieldHelpers->kses_post($lbl)}
+                %28$s
               </span>
             </label>
-          </div>
-RADIOBOXOPTIONS;
+          </div>',
+          $fieldHelpers->getCustomAttributes('cw'),
+          $fieldHelpers->getAtomicCls('cw'),
+          $fieldHelpers->getCustomClasses('cw'),
+          $fieldHelpers->getCustomAttributes('ci'),
+          $rowID,
+          $contentCount,
+          $key,
+          $fieldHelpers->getAtomicCls('ci'),
+          $fieldHelpers->getCustomClasses('ci'),
+          $fieldHelpers->esc_attr($value),
+          $check,
+          $name,
+          $req,
+          $disabled,
+          $fieldHelpers->getCustomAttributes('cl'),
+          $fieldHelpers->getAtomicCls('cl'),
+          $fieldHelpers->getCustomClasses('cl'),
+          $fieldHelpers->getCustomAttributes('bx'),
+          $fieldHelpers->getAtomicCls('bx'),
+          $fieldHelpers->getCustomClasses('bx'),
+          $fieldHelpers->getAtomicCls('svgwrp'),
+          $fieldHelpers->getCustomClasses('svgwrp'),
+          $fieldHelpers->getAtomicCls('ck-icn'),
+          $fieldHelpers->getCustomClasses('ck-icn'),
+          $fieldHelpers->getCustomAttributes('ct'),
+          $fieldHelpers->getAtomicCls('ct'),
+          $fieldHelpers->getCustomClasses('ct'),
+          $fieldHelpers->kses_post($lbl)
+        );
       }
     }
 
@@ -94,63 +131,107 @@ RADIOBOXOPTIONS;
     $inputPh = isset($field->otherInpPh) ? $field->otherInpPh : $otherOptLbl;
     $inpReq = isset($field->valid->otherOptReq) ? ($field->valid->otherOptReq ? 'required' : '') : '';
     if (property_exists($field, 'addOtherOpt') && $field->addOtherOpt) {
-      $radioBoxOptions .= <<<RADIOBOXOPTIONS
-      <div 
-        {$fieldHelpers->getCustomAttributes('cw')}
-        class="{$fieldHelpers->getAtomicCls('cw')} {$fieldHelpers->getCustomClasses('cw')}"
+      $check = $check ?? '';
+      $radioBoxOptions .= sprintf(
+        '      <div
+        %1$s
+        class="%2$s %3$s"
       >
-      <input
-        {$fieldHelpers->getCustomAttributes('ci')}
-        id="{$rowID}-{$contentCount}-chk-{$optCount}"
-        data-oopt="{$rowID}"
-        type="radio"
-        class="{$fieldHelpers->getAtomicCls('ci')} {$fieldHelpers->getCustomClasses('ci')}"
-        value=""
-        {$check}
-        {$name}
-      />
-      <label
-        {$fieldHelpers->getCustomAttributes('cl')}
-        data-cl
-        for="{$rowID}-{$contentCount}-chk-{$optCount}"
-        class="{$fieldHelpers->getAtomicCls('cl')} {$fieldHelpers->getCustomClasses('cl')}"
-      >
-        <span
-          {$fieldHelpers->getCustomAttributes('rdo')}
-          data-bx
-          class="{$fieldHelpers->getAtomicCls('bx')} {$fieldHelpers->getAtomicCls('rdo')} {$fieldHelpers->getCustomClasses('rdo')}"
-        >
-          <svg width="12" height="10" viewBox="0 0 12 10" class="{$fieldHelpers->getAtomicCls('svgwrp')} {$fieldHelpers->getCustomClasses('svgwrp')}">
-            <use data-ck-icn href=#{$rowID}-ck-svg class="{$fieldHelpers->getAtomicCls('ck-icn')} {$fieldHelpers->getCustomClasses('ck-icn')}" />
-          </svg>
-        </span>
-        <span
-          {$fieldHelpers->getCustomAttributes('ct')}
-          class="{$fieldHelpers->getAtomicCls('ct')} {$fieldHelpers->getCustomClasses('ct')}"
-        >
-          {$otherOptLbl}
-        </span>
-      </label>
-      <div data-oinp-wrp class="{$fieldHelpers->getAtomicCls('other-inp-wrp')}">
         <input
-          data-bf-other-inp="{$rowID}-chk-{$optCount}"
-          type="text"
-          class="{$fieldHelpers->getAtomicCls('other-inp')}"
-          {$inpReq}
-          placeholder="{$fieldHelpers->esc_attr($inputPh)}"
+          %4$s
+          id="%5$s-%6$s-chk-%7$s"
+          data-oopt="%5$s"
+          type="radio"
+          class="%8$s %9$s"
+          value=""
+          %10$s
+          %11$s
+        />
+        <label
+          %12$s
+          data-cl
+          for="%5$s-%6$s-chk-%7$s"
+          class="%13$s %14$s"
         >
-      </div>
-    </div>
-RADIOBOXOPTIONS;
+          <span
+            %15$s
+            data-bx
+            class="%16$s %17$s %18$s"
+          >
+            <svg
+              width="12"
+              height="10"
+              viewBox="0 0 12 10"
+              class="%19$s %20$s"
+            >
+              <use
+                data-ck-icn
+                href=#%5$s-ck-svg
+                class="%21$s %22$s"
+              />
+            </svg>
+          </span>
+          <span
+            %23$s
+            class="%24$s %25$s"
+          >
+            %26$s
+          </span>
+        </label>
+        <div data-oinp-wrp class="%27$s">
+          <input
+            data-bf-other-inp="%5$s-chk-%7$s"
+            type="text"
+            class="%28$s"
+            %29$s
+            placeholder="%30$s"
+          >
+        </div>
+      </div>',
+        $fieldHelpers->getCustomAttributes('cw'),
+        $fieldHelpers->getAtomicCls('cw'),
+        $fieldHelpers->getCustomClasses('cw'),
+        $fieldHelpers->getCustomAttributes('ci'),
+        $rowID,
+        $contentCount,
+        $optCount,
+        $fieldHelpers->getAtomicCls('ci'),
+        $fieldHelpers->getCustomClasses('ci'),
+        $check,
+        $name,
+        $fieldHelpers->getCustomAttributes('cl'),
+        $fieldHelpers->getAtomicCls('cl'),
+        $fieldHelpers->getCustomClasses('cl'),
+        $fieldHelpers->getCustomAttributes('rdo'),
+        $fieldHelpers->getAtomicCls('bx'),
+        $fieldHelpers->getAtomicCls('rdo'),
+        $fieldHelpers->getCustomClasses('rdo'),
+        $fieldHelpers->getAtomicCls('svgwrp'),
+        $fieldHelpers->getCustomClasses('svgwrp'),
+        $fieldHelpers->getAtomicCls('ck-icn'),
+        $fieldHelpers->getCustomClasses('ck-icn'),
+        $fieldHelpers->getCustomAttributes('ct'),
+        $fieldHelpers->getAtomicCls('ct'),
+        $fieldHelpers->getCustomClasses('ct'),
+        $otherOptLbl,
+        $fieldHelpers->getAtomicCls('other-inp-wrp'),
+        $fieldHelpers->getAtomicCls('other-inp'),
+        $inpReq,
+        $fieldHelpers->esc_attr($inputPh)
+      );
     }
 
-    return <<<RADIOBOX
-      <div
-        {$fieldHelpers->getCustomAttributes('cc')}
-        class="{$fieldHelpers->getAtomicCls('cc')} {$fieldHelpers->getCustomClasses('cc')}"
+    return sprintf(
+      '<div
+        %1$s
+        class="%2$s %3$s"
       >
-        {$radioBoxOptions}
-      </div>
-RADIOBOX;
+      %4$s
+      </div>',
+      $fieldHelpers->getCustomAttributes('cc'),
+      $fieldHelpers->getAtomicCls('cc'),
+      $fieldHelpers->getCustomClasses('cc'),
+      $radioBoxOptions
+    );
   }
 }

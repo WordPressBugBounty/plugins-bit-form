@@ -64,6 +64,7 @@ class WorkFlow
     }
     if ($workFlowUpdatedSatus) {
       global $wpdb;
+      // Schema migration: table name interpolation only. $wpdb->prepare() cannot parameterize DDL statements.
       $wpdb->query(
         "ALTER TABLE `{$wpdb->prefix}bitforms_workflows` DROP `workflow_action`"
       );

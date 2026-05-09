@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit55cd83a724e200f060881e183c2b42e7
+class ComposerStaticInit7ef9e4c8707b0fde87e4484f88496b1d
 {
     public static $prefixLengthsPsr4 = array (
         'e' =>
@@ -24,7 +24,6 @@ class ComposerStaticInit55cd83a724e200f060881e183c2b42e7
         array (
             'BitCode\\BitForm\\ComposerScripts\\' => 32,
             'BitCode\\BitForm\\' => 16,
-            'BitApps\\WPTelemetry\\' => 20,
         ),
     );
 
@@ -53,44 +52,24 @@ class ComposerStaticInit55cd83a724e200f060881e183c2b42e7
         array (
             0 => __DIR__ . '/../..' . '/includes',
         ),
-        'BitApps\\WPTelemetry\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/bitapps/wp-telemetry/src',
-        ),
     );
 
     public static $classMap = array (
         'BitCode\\BitForm\\API\\BitForm_Public\\BitForm_Public' => __DIR__ . '/../..' . '/includes/API/BitForm_Public/BitForm_Public.php',
         'BitCode\\BitForm\\API\\Controller\\EntryController' => __DIR__ . '/../..' . '/includes/API/Controller/EntryController.php',
+        'BitCode\\BitForm\\API\\Controller\\FileController' => __DIR__ . '/../..' . '/includes/API/Controller/FileController.php',
         'BitCode\\BitForm\\API\\Route\\Routes' => __DIR__ . '/../..' . '/includes/API/Route/Routes.php',
         'BitCode\\BitForm\\Admin\\AdminAjax' => __DIR__ . '/../..' . '/includes/Admin/AdminAjax.php',
         'BitCode\\BitForm\\Admin\\Admin_Bar' => __DIR__ . '/../..' . '/includes/Admin/Admin_Bar.php',
         'BitCode\\BitForm\\Admin\\Form\\AdminFormHandler' => __DIR__ . '/../..' . '/includes/Admin/Form/AdminFormHandler.php',
         'BitCode\\BitForm\\Admin\\Form\\AdminFormManager' => __DIR__ . '/../..' . '/includes/Admin/Form/AdminFormManager.php',
         'BitCode\\BitForm\\Admin\\Form\\CustomFieldHandler' => __DIR__ . '/../..' . '/includes/Admin/Form/CustomFieldHandler.php',
-        'BitCode\\BitForm\\Admin\\Form\\ExtraFieldJS\\CheckDisableOnMax' => __DIR__ . '/../..' . '/includes/Admin/Form/ExtraFieldJS/CheckDisableOnMax.php',
-        'BitCode\\BitForm\\Admin\\Form\\ExtraFieldJS\\OtherOptionJS' => __DIR__ . '/../..' . '/includes/Admin/Form/ExtraFieldJS/OtherOptionJS.php',
-        'BitCode\\BitForm\\Admin\\Form\\ExtraFieldJS\\SetSliderFieldValue' => __DIR__ . '/../..' . '/includes/Admin/Form/ExtraFieldJS/SetSliderFieldValue.php',
         'BitCode\\BitForm\\Admin\\Form\\FrontEndScriptGenerator' => __DIR__ . '/../..' . '/includes/Admin/Form/FrontEndScriptGenerator.php',
         'BitCode\\BitForm\\Admin\\Form\\Helpers' => __DIR__ . '/../..' . '/includes/Admin/Form/Helpers.php',
-        'BitCode\\BitForm\\Admin\\Form\\InitJs\\HCaptcha' => __DIR__ . '/../..' . '/includes/Admin/Form/InitJs/HCaptcha.php',
-        'BitCode\\BitForm\\Admin\\Form\\InitJs\\Paypal' => __DIR__ . '/../..' . '/includes/Admin/Form/InitJs/Paypal.php',
-        'BitCode\\BitForm\\Admin\\Form\\InitJs\\Razorpay' => __DIR__ . '/../..' . '/includes/Admin/Form/InitJs/Razorpay.php',
-        'BitCode\\BitForm\\Admin\\Form\\InitJs\\Recaptcha' => __DIR__ . '/../..' . '/includes/Admin/Form/InitJs/Recaptcha.php',
-        'BitCode\\BitForm\\Admin\\Form\\InitJs\\RecaptchaV3' => __DIR__ . '/../..' . '/includes/Admin/Form/InitJs/RecaptchaV3.php',
-        'BitCode\\BitForm\\Admin\\Form\\InitJs\\ScriptLoader' => __DIR__ . '/../..' . '/includes/Admin/Form/InitJs/ScriptLoader.php',
-        'BitCode\\BitForm\\Admin\\Form\\InitJs\\Stripe' => __DIR__ . '/../..' . '/includes/Admin/Form/InitJs/Stripe.php',
-        'BitCode\\BitForm\\Admin\\Form\\InitJs\\Turnstile' => __DIR__ . '/../..' . '/includes/Admin/Form/InitJs/Turnstile.php',
         'BitCode\\BitForm\\Admin\\Form\\ScriptFilePriorityManager' => __DIR__ . '/../..' . '/includes/Admin/Form/ScriptFilePriorityManager.php',
         'BitCode\\BitForm\\Admin\\Form\\Template\\ContactFormTemplate' => __DIR__ . '/../..' . '/includes/Admin/Form/Template/ContactFormTemplate.php',
         'BitCode\\BitForm\\Admin\\Form\\Template\\TemplateBase' => __DIR__ . '/../..' . '/includes/Admin/Form/Template/TemplateBase.php',
         'BitCode\\BitForm\\Admin\\Form\\Template\\TemplateProvider' => __DIR__ . '/../..' . '/includes/Admin/Form/Template/TemplateProvider.php',
-        'BitCode\\BitForm\\BfAnalytics' => __DIR__ . '/../..' . '/includes/BfAnalytics.php',
-        'BitCode\\BitForm\\BitApps\\WPTelemetry\\Telemetry\\Feedback\\Feedback' => __DIR__ . '/..' . '/bitapps/wp-telemetry/src/Telemetry/Feedback/Feedback.php',
-        'BitCode\\BitForm\\BitApps\\WPTelemetry\\Telemetry\\Report\\Report' => __DIR__ . '/..' . '/bitapps/wp-telemetry/src/Telemetry/Report/Report.php',
-        'BitCode\\BitForm\\BitApps\\WPTelemetry\\Telemetry\\Report\\ReportInfo' => __DIR__ . '/..' . '/bitapps/wp-telemetry/src/Telemetry/Report/ReportInfo.php',
-        'BitCode\\BitForm\\BitApps\\WPTelemetry\\Telemetry\\Telemetry' => __DIR__ . '/..' . '/bitapps/wp-telemetry/src/Telemetry/Telemetry.php',
-        'BitCode\\BitForm\\BitApps\\WPTelemetry\\Telemetry\\TelemetryConfig' => __DIR__ . '/..' . '/bitapps/wp-telemetry/src/Telemetry/TelemetryConfig.php',
         'BitCode\\BitForm\\Config' => __DIR__ . '/../..' . '/includes/Config.php',
         'BitCode\\BitForm\\Core\\Ajax\\AjaxService' => __DIR__ . '/../..' . '/includes/Core/Ajax/AjaxService.php',
         'BitCode\\BitForm\\Core\\Capability\\Request' => __DIR__ . '/../..' . '/includes/Core/Capability/Request.php',
@@ -244,6 +223,7 @@ class ComposerStaticInit55cd83a724e200f060881e183c2b42e7
         'BitCode\\BitForm\\Core\\Util\\DateTimeHelper' => __DIR__ . '/../..' . '/includes/Core/Util/DateTimeHelper.php',
         'BitCode\\BitForm\\Core\\Util\\Deactivation' => __DIR__ . '/../..' . '/includes/Core/Util/Deactivation.php',
         'BitCode\\BitForm\\Core\\Util\\EntryLimitHelper' => __DIR__ . '/../..' . '/includes/Core/Util/EntryLimitHelper.php',
+        'BitCode\\BitForm\\Core\\Util\\EscapingHelper' => __DIR__ . '/../..' . '/includes/Core/Util/EscapingHelper.php',
         'BitCode\\BitForm\\Core\\Util\\FieldValueHandler' => __DIR__ . '/../..' . '/includes/Core/Util/FieldValueHandler.php',
         'BitCode\\BitForm\\Core\\Util\\FileDownloadProvider' => __DIR__ . '/../..' . '/includes/Core/Util/FileDownloadProvider.php',
         'BitCode\\BitForm\\Core\\Util\\FileHandler' => __DIR__ . '/../..' . '/includes/Core/Util/FileHandler.php',
@@ -275,7 +255,6 @@ class ComposerStaticInit55cd83a724e200f060881e183c2b42e7
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\ConversationalHelpers' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/ConversationalHelpers.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\ConversationalTheme' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/ConversationalTheme.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\DefaultConversationalTheme' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/DefaultConversationalTheme.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\AdvanceFileUpField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/AdvanceFileUpField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\CheckBoxField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/CheckBoxField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\ConversationalFieldHelpers' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/ConversationalFieldHelpers.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\ConversationalInputWrapper' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/ConversationalInputWrapper.php',
@@ -288,16 +267,12 @@ class ComposerStaticInit55cd83a724e200f060881e183c2b42e7
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\HiddenField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/HiddenField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\HtmlSelectField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/HtmlSelectField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\ImageSelectField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/ImageSelectField.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\PayPalField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/PayPalField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\PhoneNumberField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/PhoneNumberField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\RadioBoxField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/RadioBoxField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\RatingField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/RatingField.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\RazorPayField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/RazorPayField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\RecaptchaV2Field' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/RecaptchaV2Field.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\RepeaterField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/RepeaterField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\SectionField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/SectionField.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\SignatureField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/SignatureField.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\StripeField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/StripeField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\TextAreaField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/TextAreaField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Conversational\\Fields\\TextField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Conversational/Fields/TextField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\FieldHelpers' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/FieldHelpers.php',
@@ -305,8 +280,6 @@ class ComposerStaticInit55cd83a724e200f060881e183c2b42e7
         'BitCode\\BitForm\\Frontend\\Form\\View\\FormViewer' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/FormViewer.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\InputWrapper' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/InputWrapper.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\DefaultTheme' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/DefaultTheme.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\AdvanceDateTimeField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/AdvanceDateTimeField.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\AdvanceFileUpField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/AdvanceFileUpField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\ButtonField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/ButtonField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\CheckBoxField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/CheckBoxField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\ClassicFieldHelpers' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/ClassicFieldHelpers.php',
@@ -324,20 +297,14 @@ class ComposerStaticInit55cd83a724e200f060881e183c2b42e7
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\HtmlSelectField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/HtmlSelectField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\ImageField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/ImageField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\ImageSelectField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/ImageSelectField.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\MollieField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/MollieField.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\PayPalField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/PayPalField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\PhoneNumberField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/PhoneNumberField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\RadioBoxField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/RadioBoxField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\RatingField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/RatingField.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\RazorPayField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/RazorPayField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\RecaptchaV2Field' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/RecaptchaV2Field.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\RepeaterField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/RepeaterField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\SectionField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/SectionField.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\ShortcodeField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/ShortcodeField.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\SignatureField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/SignatureField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\SliderField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/SliderField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\SpacerField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/SpacerField.php',
-        'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\StripeField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/StripeField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\TextAreaField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/TextAreaField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\TextField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/TextField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\TitleField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/TitleField.php',
@@ -393,9 +360,9 @@ class ComposerStaticInit55cd83a724e200f060881e183c2b42e7
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit55cd83a724e200f060881e183c2b42e7::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit55cd83a724e200f060881e183c2b42e7::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit55cd83a724e200f060881e183c2b42e7::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit7ef9e4c8707b0fde87e4484f88496b1d::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit7ef9e4c8707b0fde87e4484f88496b1d::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit7ef9e4c8707b0fde87e4484f88496b1d::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -59,7 +59,7 @@ class RecordApiHelper
 
   private function testDate($date)
   {
-    if ($date && date('Y-m-d', strtotime($date)) === $date) {
+    if ($date && gmdate('Y-m-d', strtotime($date)) === $date) {
       return true;
     }
     return false;
@@ -124,6 +124,7 @@ class RecordApiHelper
         }
       }
       if (empty($fieldData['data'][$fieldPair->zohoFormField]) && \in_array($fieldPair->zohoFormField, $required)) {
+        /* translators: %s is the zoho creator field name which is required but not found in the form submission data. */
         $error = new WP_Error('REQ_FIELD_EMPTY', wp_sprintf(__('%s is required for zoho creator', 'bit-form'), $fieldPair->zohoFormField));
         $this->_logResponse->apiResponse($this->_logID, $this->_integrationID, ['type' => 'record', 'type_name' => 'field'], 'validation', $error, $entryDetails);
         return $error;

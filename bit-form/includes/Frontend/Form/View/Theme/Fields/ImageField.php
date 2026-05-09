@@ -12,25 +12,38 @@ class ImageField
     $imgHeight = intval(Helpers::property_exists_nested($field, 'height', '', 1) ? $field->height : 100);
     $imgWidth = intval(Helpers::property_exists_nested($field, 'width', '', 1) ? $field->width : 40);
 
-    $imgSrc = Helpers::property_exists_nested($field, 'bg_img', '', 1) ? $field->bg_img : "https://fakeimg.pl/{$imgWidth}x{$imgHeight}";
+    $imgSrc = Helpers::property_exists_nested($field, 'bg_img', '', 1) ? $field->bg_img : '';
     $alt = Helpers::property_exists_nested($field, 'alt', '', 1) ? $field->alt : '';
-    $img = <<<IMG
-      <img
-        {$fieldHelpers->getCustomAttributes('img')}
-        class="{$fieldHelpers->getAtomicCls('img')} {$fieldHelpers->getCustomClasses('img')}"
-        src="{$fieldHelpers->esc_url($imgSrc)}"
-        alt="{$fieldHelpers->esc_attr($alt)}"
-        width="{$fieldHelpers->esc_attr($imgWidth)}"
-        height="{$fieldHelpers->esc_attr($imgHeight)}"
-      />
-IMG;
-    return <<<IMAGEFIELD
-      <div
-        {$fieldHelpers->getCustomAttributes('fld-wrp')}
-        class="{$fieldHelpers->getAtomicCls('fld-wrp')} {$fieldHelpers->getCustomClasses('fld-wrp')}"
+
+    $img = sprintf(
+      '<img
+        %1$s
+        class="%2$s %3$s"
+        src="%4$s"
+        alt="%5$s"
+        width="%6$s"
+        height="%7$s"
+      />',
+      $fieldHelpers->getCustomAttributes('img'),
+      $fieldHelpers->getAtomicCls('img'),
+      $fieldHelpers->getCustomClasses('img'),
+      $fieldHelpers->esc_url($imgSrc),
+      $fieldHelpers->esc_attr($alt),
+      $fieldHelpers->esc_attr($imgWidth),
+      $fieldHelpers->esc_attr($imgHeight)
+    );
+
+    return sprintf(
+      '<div
+        %1$s
+        class="%2$s %3$s"
       >
-      {$img}
-      </div>
-IMAGEFIELD;
+        %4$s
+      </div>',
+      $fieldHelpers->getCustomAttributes('fld-wrp'),
+      $fieldHelpers->getAtomicCls('fld-wrp'),
+      $fieldHelpers->getCustomClasses('fld-wrp'),
+      $img
+    );
   }
 }

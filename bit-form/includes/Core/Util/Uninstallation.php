@@ -2,6 +2,10 @@
 
 namespace BitCode\BitForm\Core\Util;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 /**
  * Class handling plugin uninstallation.
  *
@@ -50,13 +54,9 @@ final class Uninstallation
         $wpdb->prefix . 'bitforms_workflows_v1',
       ];
 
+      // Schema teardown: table name interpolation only. $wpdb->prepare() cannot parameterize DDL statements.
       foreach ($tableArray as $tablename) {
-        // $wpdb->query("DROP TABLE IF EXISTS $tablename");
-        $wpdb->query(
-          $wpdb->prepare(
-            "DROP TABLE IF EXISTS $tablename"
-          )
-        );
+        $wpdb->query("DROP TABLE IF EXISTS `{$tablename}`");
       }
 
       $this->deleteOptions('bitform_app_config');

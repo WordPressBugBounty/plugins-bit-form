@@ -33,7 +33,7 @@ class BitformBricksWidget extends \Bricks\Element
 
   public function get_label()
   {
-    return esc_html__('Bit Form', 'bricks');
+    return esc_html__('Bit Form', 'bit-form');
   }
 
   public function get_keywords()
@@ -63,7 +63,7 @@ class BitformBricksWidget extends \Bricks\Element
       }
     }
     $this->controls['form-list'] = [
-      'label'       => esc_html__('Form list', 'bricks'),
+      'label'       => esc_html__('Form list', 'bit-form'),
       'type'        => 'select',
       'options'     => $options,
       'inline'      => true,
@@ -76,39 +76,64 @@ class BitformBricksWidget extends \Bricks\Element
     // for custom script
   }
 
-  private function getStyle($formId)
+  private function getStyleContent($formId)
   {
-    $style = '';
-    if (file_exists(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles')) {
-      $cssFile = BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles' . DIRECTORY_SEPARATOR . "bitform-{$formId}-formid" . '.css';
-
-      if (file_exists($cssFile)) {
-        $style = file_get_contents($cssFile);
-      } else {
-        $style = '';
-      }
+    if (!file_exists(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles')) {
+      return '';
     }
-    return "<style>$style</style>";
+    $cssFile = BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles' . DIRECTORY_SEPARATOR . "bitform-{$formId}-formid" . '.css';
+    if (!file_exists($cssFile)) {
+      return '';
+    }
+    $style = file_get_contents($cssFile);
+    return false === $style ? '' : (string) $style;
   }
 
   public function render()
   {
-    echo "<div {$this->render_attributes('_root')}>";
+    $rootAttributes = (string) $this->render_attributes('_root');
+    $allowedRootHtml = [
+      'div' => [
+        'id'       => true,
+        'class'    => true,
+        'style'    => true,
+        'data-*'   => true,
+        'aria-*'   => true,
+        'role'     => true,
+        'tabindex' => true,
+      ],
+    ];
+    echo wp_kses('<div ' . $rootAttributes . '>', $allowedRootHtml);
+
     if (empty($this->settings['form-list'])) {
-      echo $this->render_element_placeholder([	// phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
+      echo wp_kses_post(
+        $this->render_element_placeholder([
+          'icon-class'  => esc_attr($this->icon),
+          'title'       => esc_html__('No form selected', 'bit-form'),
+          'description' => esc_html__('Please select a form from the Form List available in the Bit Form element settings.', 'bit-form'),
 
-        'icon-class'    => $this->icon,
-        'title'         => esc_html__('No form selected', 'bit-form'),
-        'description'   => esc_html__('Please select a form from the Form List available in the Bit Form element settings.', 'bit-form'),
-
-        // Legacy attribute
-        'text'			=> esc_html__('No form selected', 'bit-form')
-      ]);
+          // Legacy attribute
+          'text'        => esc_html__('No form selected', 'bit-form'),
+        ])
+      );
     }
+
     if (!empty($this->settings['form-list'])) {
-      echo $this->getStyle($this->settings['form-list']);
-      echo do_shortcode('[bitform id="' . $this->settings['form-list'] . '"]');
+      $formId = $this->settings['form-list'];
+      $cssContent = $this->getStyleContent($formId);
+      if ('' !== $cssContent) {
+        $styleHandle = 'bitform-bricks-' . sanitize_key((string) $formId);
+        if (!wp_style_is($styleHandle, 'registered')) {
+          wp_register_style($styleHandle, false, [], BITFORMS_VERSION);
+        }
+        if (!wp_style_is($styleHandle, 'enqueued')) {
+          wp_enqueue_style($styleHandle);
+        }
+        wp_add_inline_style($styleHandle, $cssContent);
+      }
+      echo do_shortcode('[bitform id="' . esc_attr($formId) . '"]');
     }
+
     echo '</div>';
   }
 }

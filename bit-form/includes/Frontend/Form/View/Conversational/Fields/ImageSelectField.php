@@ -57,87 +57,96 @@ class ImageSelectField
         $optLblHide = null;
 
         if (!$field->optLblHide) {
-          $optLblHide = <<<OPTLBLHIDE
-          <div
-            class="{$fieldHelpers->getConversationalCls('tc')} {$fieldHelpers->getCustomClasses('tc')}"
-            {$fieldHelpers->getCustomAttributes('tc')}
+          $optLblHide = sprintf(
+            '<div
+            class="%1$s"
+            %2$s
           >
             <span
-              class="{$fieldHelpers->getConversationalCls('img-title')} {$fieldHelpers->getCustomClasses('img-title')}"
-              {$fieldHelpers->getCustomAttributes('img-title')}
+              class="%3$s"
+              %4$s
             >
-              {$fieldHelpers->kses_post($lbl)}
+              %5$s
             </span>
-        </div>
-OPTLBLHIDE;
+          </div>',
+            $fieldHelpers->getConversationalCls('tc') . ' ' . $fieldHelpers->getCustomClasses('tc'),
+            $fieldHelpers->getCustomAttributes('tc'),
+            $fieldHelpers->getConversationalCls('img-title') . ' ' . $fieldHelpers->getCustomClasses('img-title'),
+            $fieldHelpers->getCustomAttributes('img-title'),
+            $fieldHelpers->kses_post($lbl)
+          );
         } else {
           $optLblHide = '';
         }
 
-        $imageOption .= <<<IMAGESELECT
-          <div
-            class="{$fieldHelpers->getConversationalCls('inp-opt')} {$fieldHelpers->getCustomClasses('inp-opt')}"
-            {$fieldHelpers->getCustomAttributes('inp-opt')}
+        $imageOption .= '<div
+            class="' . $fieldHelpers->getConversationalCls('inp-opt') . ' ' . $fieldHelpers->getCustomClasses('inp-opt') . '"
+            ' . $fieldHelpers->getCustomAttributes('inp-opt') . '
           >
             <input
-              class="{$fieldHelpers->getConversationalCls('img-inp')} {$fieldHelpers->getCustomClasses('img-inp')}"
-              type="{$inpType}"
-              id="{$rowID}-{$contentCount}-img-wrp-{$key}"
-              {$name}
-              value="{$fieldHelpers->esc_attr($val)}"
-              {$checked}
-              {$req}
-              {$disabled}
-              {$fieldHelpers->getCustomAttributes('img-inp')}
+              class="' . $fieldHelpers->getConversationalCls('img-inp') . ' ' . $fieldHelpers->getCustomClasses('img-inp') . '"
+              type="' . $inpType . '"
+              id="' . $rowID . '-' . $contentCount . '-img-wrp-' . $key . '"
+              ' . $name . '
+              value="' . $fieldHelpers->esc_attr($val) . '"
+              ' . $checked . '
+              ' . $req . '
+              ' . $disabled . '
+              ' . $fieldHelpers->getCustomAttributes('img-inp') . '
             />
             <label
-              for="{$rowID}-{$contentCount}-img-wrp-{$key}"
-              class="{$fieldHelpers->getConversationalCls('img-wrp')} {$fieldHelpers->getCustomClasses('img-wrp')}"
-              {$fieldHelpers->getCustomAttributes('img-wrp')}
+              for="' . $rowID . '-' . $contentCount . '-img-wrp-' . $key . '"
+              class="' . $fieldHelpers->getConversationalCls('img-wrp') . ' ' . $fieldHelpers->getCustomClasses('img-wrp') . '"
+              ' . $fieldHelpers->getCustomAttributes('img-wrp') . '
             >
               <span
-                class="{$fieldHelpers->getConversationalCls('check-box')} {$fieldHelpers->getCustomClasses('check-box')}"
-              {$fieldHelpers->getCustomAttributes('check-box')}
+                class="' . $fieldHelpers->getConversationalCls('check-box') . ' ' . $fieldHelpers->getCustomClasses('check-box') . '"
+                ' . $fieldHelpers->getCustomAttributes('check-box') . '
               >
                 <img
-                  src="{$checkedImg}"
+                  src="' . $checkedImg . '"
                   alt=""
-                  class="{$fieldHelpers->getConversationalCls('check-img')} {$fieldHelpers->getCustomClasses('check-img')}"
-                  {$fieldHelpers->getCustomAttributes('check-img')}
+                  class="' . $fieldHelpers->getConversationalCls('check-img') . ' ' . $fieldHelpers->getCustomClasses('check-img') . '"
+                  ' . $fieldHelpers->getCustomAttributes('check-img') . '
                 />
               </span>
 
               <span
-                class="{$fieldHelpers->getConversationalCls('img-card-wrp')} {$fieldHelpers->getCustomClasses('img-card-wrp')}"
-                {$fieldHelpers->getCustomAttributes('img-card-wrp')}
+                class="' . $fieldHelpers->getConversationalCls('img-card-wrp') . ' ' . $fieldHelpers->getCustomClasses('img-card-wrp') . '"
+                ' . $fieldHelpers->getCustomAttributes('img-card-wrp') . '
               >
                 <img
-                  src="{$img}"
-                  alt="{$imgAlt}"
-                  aria-label="{$imgAlt}"
-                  class="{$fieldHelpers->getConversationalCls('select-img')} {$fieldHelpers->getCustomClasses('select-img')}"
-                  {$fieldHelpers->getCustomAttributes('select-img')}
+                  src="' . $img . '"
+                  alt="' . $imgAlt . '"
+                  aria-label="' . $imgAlt . '"
+                  class="' . $fieldHelpers->getConversationalCls('select-img') . ' ' . $fieldHelpers->getCustomClasses('select-img') . '"
+                  ' . $fieldHelpers->getCustomAttributes('select-img') . '
                 />
-               {$optLblHide}
+                ' . $optLblHide . '
               </span>
             </label>
           </div>
-IMAGESELECT;
+';
       }
     }
 
-    return <<<IMAGESELECTFIELD
-    <div
-      class="{$fieldHelpers->getConversationalCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
+    return sprintf(
+      '<div
+      class="%1$s"
+      %2$s
     >
       <div
-        class="{$fieldHelpers->getConversationalCls('ic')} {$fieldHelpers->getCustomClasses('ic')}"
-        {$fieldHelpers->getCustomAttributes('ic')}
-        >
-        {$imageOption}
+        class="%3$s"
+        %4$s
+      >
+        %5$s     
       </div>
-    </div>
-IMAGESELECTFIELD;
+    </div>',
+      $fieldHelpers->getConversationalCls('inp-fld-wrp') . ' ' . $fieldHelpers->getCustomClasses('inp-fld-wrp'),
+      $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
+      $fieldHelpers->getConversationalCls('ic') . ' ' . $fieldHelpers->getCustomClasses('ic'),
+      $fieldHelpers->getCustomAttributes('ic'),
+      $imageOption
+    );
   }
 }

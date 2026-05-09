@@ -53,13 +53,15 @@ final class Log
     foreach ($pathArr as $d) {
       $rootDir .= $d . DIRECTORY_SEPARATOR;
       if (!realpath($rootDir)) {
-        mkdir($rootDir);
+        wp_mkdir_p($rootDir);
       }
     }
     $fullPath = $rootDir . $fileName;
-    $file = fopen($fullPath, $fileOpenMode);
-    fwrite($file, $log);
-    fclose($file);
+    if ('a' === $fileOpenMode) {
+      FileHandler::appendFile($fullPath, $log);
+    } else {
+      FileHandler::writeFile($fullPath, $log);
+    }
     return true;
   }
 }

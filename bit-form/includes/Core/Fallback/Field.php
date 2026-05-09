@@ -75,7 +75,7 @@ class Field
               }
             }
             $newID = $newID + 1;
-            $sBtnID = "bf${formID}-${newID}";
+            $sBtnID = "bf{$formID}-{$newID}";
             $lY = 0;
             $mY = 0;
             $sY = 0;
@@ -99,7 +99,7 @@ class Field
             $sY = $sY + $sm->h + 1;
             if (isset($formContent->buttons->rstBtnTxt)) {
               $newID += 1;
-              $rBtnID = "bf${formID}-${newID}";
+              $rBtnID = "bf{$formID}-{$newID}";
 
               if ($fulW) {
                 $btnData['btnTyp'] = 'submit';

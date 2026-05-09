@@ -29,41 +29,45 @@ class HiddenField
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
 
-    $onClickAttr = self::onClickAttr($field, $rowID);
-
-    return <<<HiddenField
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getAtomicCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
-    >
-      <input
-        {$fieldHelpers->getCustomAttributes('fld')}
-        id="{$rowID}-{$contentCount}"
-        class="{$fieldHelpers->getAtomicCls('fld')} {$fieldHelpers->getCustomClasses('fld')}"
-        type="{$field->typ}"
-        {$req}
-        {$disabled}
-        {$readonly}
-        {$ph}
-        {$ac}
-        {$inputMode}
-        {$name}
-        {$value}
-        {$onClickAttr}
-      />
-    </div>
-    {$sugg}
-HiddenField;
-  }
-
-  private static function onClickAttr($field, $rowID)
-  {
-    $onClickAttr = '';
-    $dateType = ['date', 'datetime-local', 'month', 'time', 'week'];
-    //field type check
-    if (in_array($field->typ, $dateType)) {
-      $onClickAttr = "onclick='this.showPicker();'";
-    }
-    return $onClickAttr;
+    return sprintf(
+      '<div
+        %1$s
+        class="%2$s %3$s"
+      >
+        <input
+          %4$s
+          id="%5$s-%6$s"
+          class="%7$s %8$s"
+          type="%9$s"
+          %10$s
+          %11$s
+          %12$s
+          %13$s
+          %14$s
+          %15$s
+          %16$s
+          %17$s
+        />
+      </div>
+      %18$s',
+      $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
+      $fieldHelpers->getAtomicCls('inp-fld-wrp'),
+      $fieldHelpers->getCustomClasses('inp-fld-wrp'),
+      $fieldHelpers->getCustomAttributes('fld'),
+      $rowID,
+      $contentCount,
+      $fieldHelpers->getAtomicCls('fld'),
+      $fieldHelpers->getCustomClasses('fld'),
+      esc_attr($field->typ),
+      $req,
+      $disabled,
+      $readonly,
+      $ph,
+      $ac,
+      $inputMode,
+      $name,
+      $value,
+      $sugg
+    );
   }
 }

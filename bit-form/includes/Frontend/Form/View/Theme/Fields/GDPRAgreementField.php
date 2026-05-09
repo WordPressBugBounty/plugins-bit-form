@@ -34,7 +34,7 @@ class GDPRAgreementField
       $disabled = 'disabled';
     }
 
-    if ($fieldHelpers->property_exists_nested($field, 'valid->checked', true)) {
+    if ($fieldHelpers->property_exists_nested($field, 'valid->checked', true) || $fieldHelpers->isChecked()) {
       $checked = 'checked';
     }
 
@@ -49,59 +49,135 @@ class GDPRAgreementField
       $lbl = $field->info->lbl;
     }
 
-    return <<<GDPRAGREEMENTFIELD
-      <div
-        {$fieldHelpers->getCustomAttributes('cc')}
-        class="{$fieldHelpers->getAtomicCls('cc')} {$fieldHelpers->getCustomClasses('cc')}"
-      >
-        <svg class="{$fieldHelpers->getAtomicCls('cks')}">
-          <symbol id="{$rowID}-ck-svg" viewBox="0 0 12 10">
-            <polyline
-              class="{$fieldHelpers->getAtomicCls('ck-svgline')}"
-              points="1.5 6 4.5 9 10.5 1"
-            ></polyline>
-          </symbol>
-        </svg>
+    // SVG symbol for checkbox tick
+    $svgSymbol = sprintf(
+      '<svg class="%1$s">
+        <symbol id="%2$s-ck-svg" viewBox="0 0 12 10">
+          <polyline
+            class="%3$s"
+            points="1.5 6 4.5 9 10.5 1"
+          ></polyline>
+        </symbol>
+      </svg>',
+      $fieldHelpers->getAtomicCls('cks'),
+      $rowID,
+      $fieldHelpers->getAtomicCls('ck-svgline')
+    );
 
-        <div
-          {$fieldHelpers->getCustomAttributes('cw')}
-          class="{$fieldHelpers->getAtomicCls('cw')} {$fieldHelpers->getCustomClasses('cw')}"
+    // Checkbox input element
+    $inputHtml = sprintf(
+      '<input
+        id="%1$s-%2$s-gdpr"
+        type="checkbox"
+        class="%3$s"
+        %4$s
+        %5$s
+        %6$s
+        %7$s
+        %8$s
+        %9$s
+      />',
+      $rowID,
+      $contentCount,
+      $fieldHelpers->getAtomicCls('ci'),
+      $disabled,
+      $readonly,
+      $req,
+      $name,
+      $checked,
+      $value
+    );
+
+    // Checkbox box with SVG icon
+    $checkBoxHtml = sprintf(
+      '<span
+        %1$s
+        data-bx
+        class="%2$s %2$s"
+      >
+        <svg
+          width="12"
+          height="10"
+          viewBox="0 0 12 10"
+          class="%3$s"
         >
-          <input
-            id="{$rowID}-{$contentCount}-gdpr"
-            type="checkbox"
-            class="{$fieldHelpers->getAtomicCls('ci')}"
-            {$disabled}
-            {$readonly}
-            {$req}
-            {$name}
-            {$checked}
-            {$value}
+          <use
+            data-ck-icn
+            href="#%4$s-ck-svg"
+            class="%5$s"
           />
-          <label
-            {$fieldHelpers->getCustomAttributes('cl')}
-            data-cl
-            for="{$rowID}-{$contentCount}-gdpr"
-            class="{$fieldHelpers->getAtomicCls('cl')}"
-          >
-            <span
-              {$fieldHelpers->getCustomAttributes('bx')}
-              data-bx
-              class="{$fieldHelpers->getAtomicCls('bx')} {$fieldHelpers->getAtomicCls('bx')}"
-            >
-              <svg width="12" height="10" viewBox="0 0 12 10" class="{$fieldHelpers->getAtomicCls('svgwrp')}">
-                <use data-ck-icn href="#{$rowID}-ck-svg" class="{$fieldHelpers->getAtomicCls('ck-icn')}" />
-              </svg>
-            </span>
-            <span
-              {$fieldHelpers->getCustomAttributes('ct')}
-              class="{$fieldHelpers->getAtomicCls('ct')} {$fieldHelpers->getCustomClasses('ct')}"
-            >
-              {$fieldHelpers->kses_post($fieldHelpers->renderHTMR($lbl))}
-            </span>
-          </label>
-        </div>
-      </div>
-GDPRAGREEMENTFIELD;
+        </svg>
+      </span>',
+      $fieldHelpers->getCustomAttributes('bx'),
+      $fieldHelpers->getAtomicCls('bx'),
+      $fieldHelpers->getAtomicCls('svgwrp'),
+      $rowID,
+      $fieldHelpers->getAtomicCls('ck-icn')
+    );
+
+    // Label text span
+    $labelTextHtml = sprintf(
+      '<span
+        %1$s
+        class="%2$s %3$s"
+      >
+        %4$s
+      </span>',
+      $fieldHelpers->getCustomAttributes('ct'),
+      $fieldHelpers->getAtomicCls('ct'),
+      $fieldHelpers->getCustomClasses('ct'),
+      $fieldHelpers->kses_post($fieldHelpers->renderHTMR($lbl))
+    );
+
+    // Label wrapper
+    $labelHtml = sprintf(
+      '<label
+        %1$s
+        data-cl
+        for="%2$s-%3$s-gdpr"
+        class="%4$s"
+      >
+        %5$s
+        %6$s
+      </label>',
+      $fieldHelpers->getCustomAttributes('cl'),
+      $rowID,
+      $contentCount,
+      $fieldHelpers->getAtomicCls('cl'),
+      $checkBoxHtml,
+      $labelTextHtml
+    );
+
+    // Checkbox wrapper div
+    $checkboxWrapperHtml = sprintf(
+      '<div
+        %1$s
+        class="%2$s %3$s"
+      >
+        %4$s
+        %5$s
+      </div>',
+      $fieldHelpers->getCustomAttributes('cw'),
+      $fieldHelpers->getAtomicCls('cw'),
+      $fieldHelpers->getCustomClasses('cw'),
+      $inputHtml,
+      $labelHtml
+    );
+
+    // Final container
+    return sprintf(
+      '<div
+        %1$s
+        class="%2$s %3$s"
+      >
+        %4$s
+        %5$s
+      </div>',
+      $fieldHelpers->getCustomAttributes('cc'),
+      $fieldHelpers->getAtomicCls('cc'),
+      $fieldHelpers->getCustomClasses('cc'),
+      $svgSymbol,
+      $checkboxWrapperHtml
+    );
   }
 }

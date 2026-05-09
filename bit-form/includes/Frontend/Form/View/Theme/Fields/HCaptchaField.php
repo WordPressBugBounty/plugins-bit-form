@@ -23,16 +23,28 @@ class HCaptchaField
     $theme = $field->config->theme;
     $size = $field->config->size;
 
-    return <<<HCAPTCHA_FIELD
-      <div
-        {$fieldHelpers->getCustomAttributes('fld-wrp')}
-        class="{$fieldHelpers->getAtomicCls('fld-wrp')} {$fieldHelpers->getCustomClasses('fld-wrp')}"
+    return sprintf(
+      '<div
+        %1$s
+        class="%2$s %3$s"
       >
-        <div class="$rowID-h-captcha-wrp">
-          <div class="h-captcha $rowID-h-captcha" data-theme="{$theme}" data-size="{$size}" data-sitekey="{$fieldHelpers->esc_attr($siteKey)}">
+        <div class="%4$s-h-captcha-wrp">
+          <div
+            class="h-captcha %4$s-h-captcha"
+            data-theme="%5$s"
+            data-size="%6$s"
+            data-sitekey="%7$s"
+          >
           </div>
         </div>
-      </div>
-HCAPTCHA_FIELD;
+      </div>',
+      $fieldHelpers->getCustomAttributes('fld-wrp'),
+      $fieldHelpers->getAtomicCls('fld-wrp'),
+      $fieldHelpers->getCustomClasses('fld-wrp'),
+      $rowID,
+      $theme,
+      $size,
+      $fieldHelpers->esc_attr($siteKey)
+    );
   }
 }

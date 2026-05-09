@@ -2,6 +2,10 @@
 
 namespace BitCode\BitForm\Frontend\Form;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Admin\Form\AdminFormHandler;
 use BitCode\BitForm\Admin\Form\FrontEndScriptGenerator;
 use BitCode\BitForm\Admin\Form\Helpers;
@@ -9,13 +13,12 @@ use BitCode\BitForm\Core\Database\FormEntryMetaModel;
 use BitCode\BitForm\Core\Database\FormModel;
 use BitCode\BitForm\Core\Form\FormManager;
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
+use BitCode\BitForm\Core\Util\EscapingHelper;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\FileDownloadProvider;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\Core\Util\SmartTags;
-use BitCode\BitForm\Core\Util\Utilities;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
-use BitCode\BitFormPro\Admin\FormSettings\FormAbandonment;
 
 final class FrontendFormHandler
 {
@@ -151,6 +154,9 @@ final class FrontendFormHandler
     }
 
     $frontendScriptGenObj->generateJsFile($formContents, $allFields, $contentIds, $postId, $formIDs, $previewMode);
+    if ('preview' === $previewMode) {
+      return;
+    }
     wp_enqueue_script('bit-form-all-script-test', $this->getJSFileSrc($postId), [], $formUpdateVersion, true);
   }
 
@@ -233,8 +239,9 @@ final class FrontendFormHandler
   private function addInlineScript($code, $handle = '', $position = 'after')
   {
     $scriptHandle = !empty($handle) ? $handle : 'bf-inline-script';
+    $formUpdateVersion = get_option('bit-form_form_update_version');
     if (!wp_script_is($scriptHandle)) {
-      wp_register_script($scriptHandle, '', [], '', true);
+      wp_register_script($scriptHandle, '', [], $formUpdateVersion, true);
       wp_enqueue_script($scriptHandle);
     }
     wp_add_inline_script($scriptHandle, $code, $position);
@@ -243,8 +250,9 @@ final class FrontendFormHandler
   private function addInlineStyle($code, $handle = '')
   {
     $styleHandle = !empty($handle) ? $handle : 'bf-inline-style';
+    $formUpdateVersion = get_option('bit-form_form_update_version');
     if (!wp_style_is($styleHandle)) {
-      wp_register_style($styleHandle, '', [], '', true);
+      wp_register_style($styleHandle, '', [], $formUpdateVersion);
       wp_enqueue_style($styleHandle);
     }
     wp_add_inline_style($styleHandle, $code);
@@ -286,9 +294,10 @@ final class FrontendFormHandler
 
   private function getValuesFromQueryParams()
   {
+    // Read-only: query string parsed to pre-fill form fields. Values are sanitized per field before use.
     $queryParamsValue = [];
     if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
-      $reqField = $_SERVER['QUERY_STRING'];
+      $reqField = sanitize_text_field(wp_unslash($_SERVER['QUERY_STRING']));
       foreach (explode('&', $reqField) as $keyValue) {
         // $pattern = '/([a-zA-Z0-9])([a-zA-Z])\=+/';
         $pattern = '/([^.]+)=(.*?)([^.]+)/';
@@ -317,8 +326,9 @@ final class FrontendFormHandler
     }
     if (isset($atts['entry_id'])) {
       $entryId = intval($atts['entry_id']);
-    } elseif (isset($_GET['bf_entry_id'])) {
-      $entryId = $_GET['bf_entry_id'];
+      // Read-only: entry ID from query string for shortcode render. No state mutation.
+    } elseif (isset($_GET['bf_entry_id']) && !is_array($_GET['bf_entry_id'])) {
+      $entryId = intval(sanitize_text_field(wp_unslash($_GET['bf_entry_id'])));
     } else {
       $entryId = false;
     }
@@ -332,15 +342,12 @@ final class FrontendFormHandler
     }
 
     if (!$this->isExist($formID)) {
+      /* translators: %s: form ID */
       return sprintf(__('#%s no. Form doesn\'t exists', 'bit-form'), $formID);
     }
 
-    // check for abandoned form entry id
-    $isAbandoned = false;
-    if (empty($entryId) && Utilities::isPro() && class_exists('\BitCode\BitFormPro\Admin\FormSettings\FormAbandonment')) {
-      $FormAbandonment = new FormAbandonment($formID);
-      $isAbandoned = $FormAbandonment->checkAbandonedFormEntryId();
-    }
+    // Add-ons may detect whether the current visitor is resuming an abandoned entry.
+    $isAbandoned = (bool) apply_filters('bitform_is_abandoned_entry', false, $formID, $entryId, $atts);
 
     FrontendHelpers::setBfFrontendFormIds($formID);
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
@@ -348,6 +355,7 @@ final class FrontendFormHandler
     $FrontendFormManager = FrontendFormManager::getInstance($formID, $shortCodeCounter);
 
     if (!$FrontendFormManager->checkStatus()) {
+      /* translators: %s: form ID */
       return  sprintf(__('#%s no. Form is not active', 'bit-form'), $formID);
     }
     ob_start();
@@ -359,8 +367,9 @@ final class FrontendFormHandler
       wp_enqueue_style('bf-google-font', $font, '1.0.0', true);
     }
 
+    // Read-only: password reset token from URL for display-time validation. No state written until form is submitted.
     if (!empty($_GET['token']) && !empty($_GET['id'])) {
-      $this->validPassowordResetToken($_GET['token'], $_GET['id'], $formID);
+      $this->validPassowordResetToken(sanitize_text_field(wp_unslash($_GET['token'])), sanitize_text_field(wp_unslash($_GET['id'])), $formID);
     }
 
     $previousValue = $this->getValuesFromQueryParams();
@@ -464,7 +473,9 @@ final class FrontendFormHandler
     if ($captchaV3Settings && !empty($reCAPTCHA->siteKey)) {
       // DANGER: no matter what, DONT CHANGE THE SCRIPT ID OF THIS SCRIPT
       $scriptId = BITFORMS_PREFIX . 'recaptcha';
-      wp_enqueue_script($scriptId, "https://www.google.com/recaptcha/api.js?render={$reCAPTCHA->siteKey}");
+      // External Google reCAPTCHA script; version managed by URL query param. Loaded in header because
+      // standalone form views do not render wp_footer(), making footer enqueue unreliable.
+      wp_enqueue_script($scriptId, "https://www.google.com/recaptcha/api.js?render={$reCAPTCHA->siteKey}", [], null, false);
     }
 
     $configs = [
@@ -543,6 +554,7 @@ final class FrontendFormHandler
     }
 
     $formInfo = $FrontendFormManager->getFormInfo();
+    $bitFormFrontArr['formName'] = $formInfo->formName ?? '';
     if (is_array($layout) && count($layout) > 1) {
       $multiStepSettings = isset($formInfo->multiStepSettings) ? $formInfo->multiStepSettings : null;
       $newTempSettings = (object) [
@@ -570,28 +582,22 @@ final class FrontendFormHandler
       ];
     }
 
-    $bitFormsFront = apply_filters(
-      'bitforms_localized_script',
-      $bitFormFrontArr
-    );
-
     $layout = wp_json_encode($layout);
     $buttons = wp_json_encode($buttons);
     $frontArr = wp_json_encode($bitFormFrontArr);
 
-    $bfGlobals = <<<BFGLOBALS
+    $bfGlobals = sprintf('   
       if(!window.bf_globals) { 
         window.bf_globals = {} 
-      } if(!window.bf_globals.{$FormIdentifier}) { 
-        window.bf_globals.{$FormIdentifier} = {} 
+      } if(!window.bf_globals.%1$s) { 
+        window.bf_globals.%1$s = {} 
       }
-      if(document.getElementById('{$FormIdentifier}')) {
-        window.bf_globals.{$FormIdentifier} = { 
-          ...window.bf_globals.{$FormIdentifier}, 
-          ...{$frontArr}
+      if(document.getElementById("%1$s")) {
+        window.bf_globals.%1$s = { 
+          ...window.bf_globals.%1$s, 
+          ...%2$s
         };
-      }
-BFGLOBALS;
+      }', $FormIdentifier, $frontArr);
 
     if ('conversational' === $formType
     && isset($formContent->formInfo->conversationalSettings->enable)
@@ -608,13 +614,33 @@ BFGLOBALS;
       $formViewObject->html = $html;
       $formViewObject->font = $font;
       $formViewObject->bfGlobals = $bfGlobals;
+      $formViewObject->formContent = $formContent;
       return $formViewObject;
     }
-    $html .= <<<BFGLOBALSSCRIPT
-    <script id="bit-form-bf-globals-{$FormIdentifier}">{$bfGlobals}</script>
-BFGLOBALSSCRIPT;
-    echo trim($html);
+
+    $bfGlobalsHandle = 'bitform-bf-globals-' . sanitize_key($FormIdentifier);
+    $this->addInlineScript($bfGlobals, $bfGlobalsHandle, 'after');
+    $this->emitShowPickerBridge();
+
+    echo wp_kses(trim($html), EscapingHelper::getFormAllowedHtml($formContent));
     return ob_get_clean();
+  }
+
+  /**
+   * Delegated listener that opens the native picker on date/time inputs marked
+   * with data-bf-show-picker. Replaces the legacy hardcoded onclick attribute.
+   * Registered as inline script once per request via wp_add_inline_script so
+   * the markup never travels through wp_kses().
+   */
+  private function emitShowPickerBridge()
+  {
+    static $emitted = false;
+    if ($emitted) {
+      return;
+    }
+    $emitted = true;
+    $code = 'if(!window.__bfShowPickerBound){window.__bfShowPickerBound=true;document.addEventListener("click",function(e){var t=e.target;if(t&&t.matches&&t.matches("input[data-bf-show-picker=\"1\"]")&&typeof t.showPicker==="function"){try{t.showPicker();}catch(_){}}});}';
+    $this->addInlineScript($code, 'bitform-show-picker-bridge', 'after');
   }
 
   private function isExist($formID)
@@ -749,7 +775,7 @@ BFGLOBALSSCRIPT;
         );
         if ($isPageBuilder) {
           $formStyle = file_get_contents(BITFORMS_CONTENT_DIR . '/form-styles/bitform-' . $newFormId . '.css');
-          echo sprintf("<style id='bitform-style-{$newFormId}'>%s</style>", $formStyle);
+          echo '<style id="bitform-style-' . esc_attr((string) $newFormId) . '">' . wp_kses($formStyle, []) . '</style>';
         }
       }
       if (!wp_style_is('bitform-style-custom-' . $formID) && is_readable(BITFORMS_CONTENT_DIR . '/form-styles/bitform-custom-' . $formID . '.css')) {
@@ -761,7 +787,7 @@ BFGLOBALSSCRIPT;
         );
         if ($isPageBuilder) {
           $formStyle = file_get_contents(BITFORMS_CONTENT_DIR . '/form-styles/bitform-custom-' . $formID . '.css');
-          echo sprintf("<style id='bitform-style-custom-{$formID}'>%s</style>", $formStyle);
+          echo '<style id="bitform-style-custom-' . esc_attr((string) $formID) . '">' . wp_kses($formStyle, []) . '</style>';
         }
       }
       // load conversational form css

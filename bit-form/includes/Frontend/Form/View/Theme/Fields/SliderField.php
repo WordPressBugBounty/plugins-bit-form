@@ -73,39 +73,37 @@ class SliderField
 
     $lowerTrackPercentage = ($defaultVal - $minValue) / ($maxValue - $minValue) * 100;
 
-    $wrpperStyle = "style='--bfv-fld-val: \"{$defaultVal}\";'";
-    $inputStyle = "style='--bfv-fill-lower-track: {$lowerTrackPercentage}% !important;'";
+    $wrpperStyle = "style='--bfv-fld-val: \"" . $fieldHelpers->esc_attr($defaultVal) . "\";'";
+    $inputStyle = "style='--bfv-fill-lower-track: " . $fieldHelpers->esc_attr($lowerTrackPercentage) . "% !important;'";
 
-    return <<<TEXTFIELD
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getAtomicCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
-      {$wrpperStyle}
+    return '    <div 
+      ' . $fieldHelpers->getCustomAttributes('inp-fld-wrp') . '
+      class="' . $fieldHelpers->getAtomicCls('inp-fld-wrp') . ' ' . $fieldHelpers->getCustomClasses('inp-fld-wrp') . '"
+      ' . $wrpperStyle . '
     >
       <input
-        {$fieldHelpers->getCustomAttributes('fld')}
-        id="{$rowID}-{$contentCount}"
-        {$list}
-        class="{$fieldHelpers->getAtomicCls('fld')} {$fieldHelpers->getCustomClasses('fld')}"
-        type="{$field->typ}"
-        {$req}
-        {$disabled}
-        {$readonly}
-        {$ph}
-        {$mn}
-        {$mx}
-        {$step}
-        {$ac}
-        {$inputMode}
-        {$name}
-        {$value}
-        {$inputStyle}
+        ' . $fieldHelpers->getCustomAttributes('fld') . '
+        id="' . $rowID . '-' . $contentCount . '"
+        ' . $list . '
+        class="' . $fieldHelpers->getAtomicCls('fld') . ' ' . $fieldHelpers->getCustomClasses('fld') . '"
+        type="' . $fieldHelpers->esc_attr($field->typ) . '"
+        ' . $req . '
+        ' . $disabled . '
+        ' . $readonly . '
+        ' . $ph . '
+        ' . $mn . '
+        ' . $mx . '
+        ' . $step . '
+        ' . $ac . '
+        ' . $inputMode . '
+        ' . $name . '
+        ' . $value . '
+        ' . $inputStyle . '
       />
-      {$prefixIcn}
-      {$suffixIcn}
-      <span class="{$fieldHelpers->getAtomicCls('slider-val')}">Value : </span>
+      ' . $prefixIcn . '
+      ' . $suffixIcn . '
+      <span class="' . $fieldHelpers->getAtomicCls('slider-val') . '">Value : </span>
     </div>
-    {$sugg}
-TEXTFIELD;
+    ' . $sugg . "\n";
   }
 }

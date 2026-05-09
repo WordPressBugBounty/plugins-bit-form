@@ -2,8 +2,6 @@
 
 namespace BitCode\BitForm\Frontend\Form\View\Theme;
 
-use BitCode\BitForm\Frontend\Form\View\Theme\Fields\AdvanceDateTimeField;
-use BitCode\BitForm\Frontend\Form\View\Theme\Fields\AdvanceFileUpField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\ButtonField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\CheckBoxField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\CountryField;
@@ -19,20 +17,14 @@ use BitCode\BitForm\Frontend\Form\View\Theme\Fields\HTMLField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\HtmlSelectField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\ImageField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\ImageSelectField;
-use BitCode\BitForm\Frontend\Form\View\Theme\Fields\MollieField;
-use BitCode\BitForm\Frontend\Form\View\Theme\Fields\PayPalField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\PhoneNumberField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\RadioBoxField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\RatingField;
-use BitCode\BitForm\Frontend\Form\View\Theme\Fields\RazorPayField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\RecaptchaV2Field;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\RepeaterField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\SectionField;
-use BitCode\BitForm\Frontend\Form\View\Theme\Fields\ShortcodeField;
-use BitCode\BitForm\Frontend\Form\View\Theme\Fields\SignatureField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\SliderField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\SpacerField;
-use BitCode\BitForm\Frontend\Form\View\Theme\Fields\StripeField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\TextAreaField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\TextField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\TitleField;
@@ -84,17 +76,16 @@ class ThemeBase
     // ERRORHTML;
     //     }
 
-    return <<<INPUTWRAPPER
-<div class="btcd-fld-itm $rowID $isHidden">
-    $fieldHTML
-</div>
-INPUTWRAPPER;
+    return sprintf('<div class="btcd-fld-itm %1$s %2$s">%3$s</div>', $rowID, $isHidden, $fieldHTML);
 
     // return $fieldHTML;
   }
 
   protected function getField($field, $rowID, $field_name, $form_atomic_Cls_map, $error = null, $value = null, $formID = null)
   {
+    // Pro-only fields ship in the Bit Form Pro plugin. In the free plugin, we avoid rendering Pro implementations.
+    $proMissingHtml = '<div class="bf-pro-field-missing"> <!-- Require Bit Form Pro --> </div>';
+
     switch ($field->typ) {
       case 'text':
       case 'username':
@@ -142,18 +133,33 @@ INPUTWRAPPER;
         // return $this->html($field, $rowID, $field_name, $formID, $error, $value);
         return HTMLField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'shortcode':
-        return ShortcodeField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\ShortcodeField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\ShortcodeField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'hidden':
         return HiddenField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'paypal':
-        return  PayPalField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\PayPalField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\PayPalField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'stripe':
-        return  StripeField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\StripeField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\StripeField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'mollie':
-        return  MollieField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\MollieField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\MollieField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'razorpay':
         // return $this->razorPay($field, $rowID, $field_name, $formID, $error, $value);
-        return RazorPayField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\RazorPayField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\RazorPayField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
         // case 'submit':
         //   return $this->submitBtns($field, $rowID, $field_name, $formID, $error, $value);
       case 'button':
@@ -174,7 +180,10 @@ INPUTWRAPPER;
       case 'phone-number':
         return PhoneNumberField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'advanced-file-up':
-        return AdvanceFileUpField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\AdvanceFileUpField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\AdvanceFileUpField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'image':
         return ImageField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'section':
@@ -182,14 +191,19 @@ INPUTWRAPPER;
       case 'repeater':
         return RepeaterField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $this->_formViewerInstance, $this->_nestedLayout, $error, $value);
       case 'signature':
-        return SignatureField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\SignatureField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\SignatureField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'rating':
         return RatingField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'image-select':
         return ImageSelectField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'advanced-datetime':
-        return AdvanceDateTimeField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
-
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\AdvanceDateTimeField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\AdvanceDateTimeField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       default:
         break;
     }
@@ -197,16 +211,16 @@ INPUTWRAPPER;
 
   protected function setTag($tag, $value, $attr = null)
   {
-    echo "<$tag $attr>" . esc_html($value) . "</$tag>";
+    echo '<' . esc_html($tag) . ' ' . esc_html($attr) . '>' . esc_html($value) . '</' . esc_html($tag) . '>';
   }
 
   protected function setAttribute($attr, $value = null)
   {
-    echo " $attr='" . esc_attr($value) . "' ";
+    echo ' ' . esc_attr($attr) . "='" . esc_attr($value) . "' ";
   }
 
   protected function setSingleValuedAttribute($attr)
   {
-    echo " $attr ";
+    echo ' ' . esc_attr($attr) . ' ';
   }
 }

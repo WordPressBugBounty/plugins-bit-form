@@ -7,6 +7,10 @@
 
 namespace BitCode\BitForm\Core\Integration\MailPoet;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use WP_Error;
 
@@ -45,7 +49,7 @@ class MailPoetHandler
    */
   public static function mailPoetAuthorize()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       if (class_exists(\MailPoet\API\API::class)) {
         wp_send_json_success(true);
       } else {
@@ -76,7 +80,7 @@ class MailPoetHandler
   public static function refreshNeswLetter()
   {
     $response = null;
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       if (class_exists(\MailPoet\API\API::class)) {
         $mailpoet_api = \MailPoet\API\API::MP('v1');
         $newsletterList = $mailpoet_api->getLists();
@@ -114,7 +118,7 @@ class MailPoetHandler
   public static function mailPoetListHeaders()
   {
     $response = null;
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       if (class_exists(\MailPoet\API\API::class)) {
         $mailpoet_api = \MailPoet\API\API::MP('v1');
         $subscriber_form_fields = $mailpoet_api->getSubscriberFields();

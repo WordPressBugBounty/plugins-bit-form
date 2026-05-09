@@ -73,12 +73,10 @@ class AdminFormHandler
 
     if (
       file_exists(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles')
-      && is_writable(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles')
+      && wp_is_writable(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles')
     ) {
-      $createStyleFile = fopen(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles' . DIRECTORY_SEPARATOR . $sheetName, 'w');
-      fwrite($createStyleFile, $styles);
-      fclose($createStyleFile);
-      return true;
+      $filePath = BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles' . DIRECTORY_SEPARATOR . $sheetName;
+      return FileHandler::writeFile($filePath, $styles);
     }
     return false;
   }
@@ -156,12 +154,10 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
     if (
       file_exists(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles')
-      && is_writable(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles')
+      && wp_is_writable(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles')
     ) {
-      $createStyleFile = fopen(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles' . DIRECTORY_SEPARATOR . $sheetName, 'w');
-      fwrite($createStyleFile, $formStyle);
-      fclose($createStyleFile);
-      return true;
+      $filePath = BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles' . DIRECTORY_SEPARATOR . $sheetName;
+      return FileHandler::writeFile($filePath, $formStyle);
     }
     return false;
   }
@@ -195,15 +191,6 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     $formManager = new AdminFormManager($post->form_id);
     if ($formManager->isExist()) {
       return new WP_Error('empty_form', __('Error Occurred, Please Reload', 'bit-form'));
-    }
-
-    if (!class_exists('BitCode\\BitFormPro\\Plugin')) {
-      if (!empty($workFlows) && count($workFlows) > 2) {
-        return new WP_Error(
-          'free_limit',
-          __('You are allowed to add maximum 2 workflows ', 'bit-form')
-        );
-      }
     }
 
     if (isset($post->formStyle) && $post->formStyle) {
@@ -324,6 +311,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     } else {
       FileHandler::createIndexFile(BITFORMS_UPLOAD_DIR . "/$save_status");
       $formID = $save_status;
+      do_action('bitform_admin_form_changed');
       $integartionIDForWorkflow = [];
       // Confiramtion Message [start]
       if (!empty($formSettings->confirmation->type->successMsg)) {
@@ -559,15 +547,6 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
       return new WP_Error('empty_form', 'Can not update empty form.');
     }
 
-    if (!class_exists('BitCode\\BitFormPro\\Plugin')) {
-      if (count($workFlows) > 2) {
-        return new WP_Error(
-          'free_limit',
-          __('You are allowed to add maximum 2 workflows ', 'bit-form')
-        );
-      }
-    }
-
     $form_content = [
       'fields'       => $fields,
       'layout'       => $layout,
@@ -763,10 +742,10 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
       $fieldNames['__user_id'] = __('User', 'bit-form');
       $fieldNames['__user_ip'] = __('IP address', 'bit-form');
       // $fieldNames['__user_location'] = __('');
-      $fieldNames['__referer'] = __('Refer URL');
-      $fieldNames['__user_device'] = __('Device');
-      $fieldNames['__created_at'] = __('Created Time');
-      $fieldNames['__updated_at'] = __('Modified Time');
+      $fieldNames['__referer'] = __('Refer URL', 'bit-form');
+      $fieldNames['__user_device'] = __('Device', 'bit-form');
+      $fieldNames['__created_at'] = __('Created Time', 'bit-form');
+      $fieldNames['__updated_at'] = __('Modified Time', 'bit-form');
 
       $reportIsDefault = null;
       if (isset($form_content['report_id'])) {
@@ -835,6 +814,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
       $formUpdateVersion = (int) $formUpdateVersion + 1;
     }
     update_option('bit-form_form_update_version', $formUpdateVersion);
+    do_action('bitform_admin_form_changed');
 
     $update_status = static::$formModel->update(
       $updateData,
@@ -882,6 +862,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         $errorIN .= empty($errorIN) ? 'reports' : ', reports';
       }
       if (!empty($errorIN)) {
+        /* translators: %s: comma-separated list of areas where error occurred */
         $updated_data['message'] = sprintf(__('Error Occured in saving %s', 'bit-form'), $errorIN);
         return new WP_Error('Form update Error.', $updated_data);
       }
@@ -895,21 +876,21 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function setEmptyMetaValue($fieldkeys)
   {
-    $sqlEscaped = array_map(function ($fld) {
-      return "'" . esc_sql($fld) . "'";
-    }, $fieldkeys);
-    $deletedFldKey = implode(',', $sqlEscaped);
     global $wpdb;
-    $tablename = $wpdb->prefix . 'bitforms_form_entrymeta';
-    $sql = $wpdb->prepare("UPDATE $tablename SET meta_value = %s WHERE meta_key IN ( " . $deletedFldKey . ')', '');
-    $wpdb->query($sql);
+    // Placeholders and arguments built dynamically from $fieldkeys; count matches at runtime.
+    $placeholders = implode(',', array_fill(0, \count($fieldkeys), '%s'));
+    $wpdb->query($wpdb->prepare(
+      "UPDATE `{$wpdb->prefix}bitforms_form_entrymeta` SET meta_value = %s WHERE meta_key IN ($placeholders)",
+      '',
+      ...$fieldkeys
+    ));
   }
 
   public function changeFormStatus($Request, $post)
   {
     if (isset($Request['status']) && $Request['id']) {
-      $status = wp_unslash($Request['status']);
-      $id = wp_unslash($Request['id']);
+      $status = sanitize_text_field(wp_unslash($Request['status']));
+      $id = absint(wp_unslash($Request['id']));
     } else {
       $status = wp_unslash($post->status);
       $id = wp_unslash($post->id);
@@ -945,8 +926,8 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function changeBulkFormStatus($Request, $post)
   {
     if (isset($Request['status']) && $Request['formID']) {
-      $status = wp_unslash($Request['status']);
-      $formID = wp_unslash($Request['formID']);
+      $status = sanitize_text_field(wp_unslash($Request['status']));
+      $formID = array_map('absint', wp_unslash($Request['formID']));
     } else {
       $status = wp_unslash($post->status);
       $formID = wp_unslash($post->formID);
@@ -983,7 +964,11 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   {
     global $wpdb;
 
-    $allForms = $wpdb->get_results("SELECT forms.id,forms.entries as fm_entries,forms.form_name,forms.status,forms.views,forms.created_at,COUNT(entries.id) as entries FROM `{$wpdb->prefix}bitforms_form` as forms LEFT JOIN `{$wpdb->prefix}bitforms_form_entries` as entries ON forms.id = entries.form_id GROUP BY forms.id");
+    // Direct query: table name interpolation only (no user input). $wpdb->prepare() cannot parameterize table names.
+    $allForms = $wpdb->get_results("SELECT forms.id,forms.entries as fm_entries,forms.form_name,forms.status,forms.views,forms.created_at,COUNT(entries.id) as entries
+      FROM `{$wpdb->prefix}bitforms_form` as forms
+      LEFT JOIN `{$wpdb->prefix}bitforms_form_entries` as entries ON forms.id = entries.form_id
+      GROUP BY forms.id");
 
     if (is_wp_error($allForms)) {
       return $allForms;
@@ -997,7 +982,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function getAForm($Request, $post)
   {
     if (isset($Request['id'])) {
-      $formID = wp_unslash($Request['id']);
+      $formID = absint(wp_unslash($Request['id']));
     } else {
       $formID = wp_unslash($post->id);
     }
@@ -1287,7 +1272,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function getAFormV1($Request, $post)
   {
     if (isset($Request['id'])) {
-      $formID = wp_unslash($Request['id']);
+      $formID = absint(wp_unslash($Request['id']));
     } else {
       $formID = wp_unslash($post->id);
     }
@@ -1504,7 +1489,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function deleteAForm($Request, $post)
   {
     if (isset($Request['id'])) {
-      $formID = wp_unslash($Request['id']);
+      $formID = absint(wp_unslash($Request['id']));
     } else {
       $formID = wp_unslash($post->id);
     }
@@ -1521,6 +1506,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         'id' => $formID,
       ]
     );
+    do_action('bitform_admin_form_changed');
 
     $successMessageModel = new SuccessMessageModel();
     $deleteMsgStatus = $successMessageModel->delete(['form_id' => $formID]);
@@ -1579,7 +1565,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function deleteBlukForm($Request, $post)
   {
     if (isset($Request['formID'])) {
-      $formID = wp_unslash($Request['formID']);
+      $formID = array_map('absint', wp_unslash($Request['formID']));
     } else {
       $formID = wp_unslash($post->formID);
     }
@@ -1608,6 +1594,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         'id' => $formID,
       ]
     );
+    do_action('bitform_admin_form_changed');
 
     if (is_wp_error($delete_status)) {
       wp_send_json_error($delete_status->get_error_message(), 400);
@@ -1656,9 +1643,11 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
       );
     }
 
-    // delete entry log and details
-    $sql = 'DELETE em, e FROM wp_bitforms_form_log_details AS em JOIN wp_bitforms_form_entry_log AS e ON em.log_id = e.id WHERE form_id = %d';
-    $wpdb->prepare($sql, $formID);
+    // delete entry log and details; table name interpolation only — $wpdb->prepare() parameterizes the form_id value.
+    $wpdb->query($wpdb->prepare(
+      "DELETE em, e FROM `{$prefix}bitforms_form_log_details` AS em JOIN `{$prefix}bitforms_form_entry_log` AS e ON em.log_id = e.id WHERE e.form_id = %d",
+      $formID
+    ));
 
     $fileHandler = new FileHandler();
     foreach ($formID as $fId) {
@@ -1708,19 +1697,13 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
       // duplicate stylesheet
       $style_dir = BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles' . DIRECTORY_SEPARATOR;
       // layout style copy
-      $mainFormLayStyle = fopen($style_dir . 'bitform-layout-' . $oldFormId . '.css', 'r');
-      $styleStr = fread($mainFormLayStyle, filesize($style_dir . 'bitform-layout-' . $oldFormId . '.css'));
+      $styleStr = FileHandler::readFile($style_dir . 'bitform-layout-' . $oldFormId . '.css');
       $newStyle = str_replace(".bf$oldFormId-", ".bf$newFormId-", $styleStr);
-      $createStyleFile = fopen($style_dir . "bitform-layout-$newFormId.css", 'w');
-      fwrite($createStyleFile, $newStyle);
-      fclose($createStyleFile);
+      FileHandler::writeFile($style_dir . "bitform-layout-$newFormId.css", $newStyle);
       // style copy
-      $mainFormStyle = fopen($style_dir . 'bitform-' . $oldFormId . '.css', 'r');
-      $styleStr = fread($mainFormStyle, filesize($style_dir . 'bitform-' . $oldFormId . '.css'));
+      $styleStr = FileHandler::readFile($style_dir . 'bitform-' . $oldFormId . '.css');
       $newStyle = str_replace("-$oldFormId", "-$newFormId", $styleStr);
-      $createStyleFile = fopen($style_dir . "bitform-$newFormId.css", 'w');
-      fwrite($createStyleFile, $newStyle);
-      fclose($createStyleFile);
+      FileHandler::writeFile($style_dir . "bitform-$newFormId.css", $newStyle);
       $duplicatedForm = $this->getAForm(null, (object) ['id' => $newFormId]);
       $duplicatedForm['message'] = __('Form duplicated successfully', 'bit-form');
       return $duplicatedForm;
@@ -1853,7 +1836,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function getFormEntryLabelAndCount($Request, $post)
   {
     if (isset($Request['id'])) {
-      $id = wp_unslash($Request['id']);
+      $id = absint(wp_unslash($Request['id']));
     } else {
       $id = wp_unslash($post->id);
     }
@@ -1911,7 +1894,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function getFormEntry($Request, $post)
   {
     if (isset($Request['id'])) {
-      $id = wp_unslash($Request['id']);
+      $id = absint(wp_unslash($Request['id']));
       $offset = isset($Request['offset']) ?
         wp_unslash($Request['offset']) : 0;
       $pageSize = isset($Request['pageSize']) ?
@@ -1994,7 +1977,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function getEntriesForReport($Request, $post)
   {
     if (isset($Request['id'])) {
-      $id = wp_unslash($Request['id']);
+      $id = absint(wp_unslash($Request['id']));
       $offset = isset($Request['offset']) ?
         wp_unslash($Request['offset']) : null;
       $pageSize = isset($Request['pageSize']) ?
@@ -2099,8 +2082,8 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function deleteBlukFormEntries($Request, $post)
   {
     if (isset($Request['formID'])) {
-      $formID = wp_unslash($Request['formID']);
-      $entries = wp_unslash($Request['entries']);
+      $formID = absint(wp_unslash($Request['formID']));
+      $entries = array_map('absint', wp_unslash($Request['entries']));
     } else {
       $formID = wp_unslash($post->formID);
       $entries = wp_unslash($post->entries);
@@ -2176,8 +2159,8 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function duplicateFormEntry($Request, $post)
   {
     if (isset($Request['formID'])) {
-      $formID = wp_unslash($Request['formID']);
-      $entries = wp_unslash($Request['entries']);
+      $formID = absint(wp_unslash($Request['formID']));
+      $entries = array_map('absint', wp_unslash($Request['entries']));
     } else {
       $formID = wp_unslash($post->formID);
       $entries = wp_unslash($post->entries);
@@ -2251,8 +2234,8 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function editFormEntry($Request, $post)
   {
     if (isset($Request['formID'])) {
-      $formID = wp_unslash($Request['formID']);
-      $entryID = wp_unslash($Request['entryID']);
+      $formID = absint(wp_unslash($Request['formID']));
+      $entryID = absint(wp_unslash($Request['entryID']));
     } else {
       $formID = wp_unslash($post->formID);
       $entryID = wp_unslash($post->entryID);
@@ -2329,13 +2312,14 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function updateFormEntry($Request, $post)
   {
     if (isset($Request['formID'], $Request['entryID'])) {
-      $formID = wp_unslash($Request['formID']);
-      $entryID = wp_unslash($Request['entryID']);
+      $formID = absint(wp_unslash($Request['formID']));
+      $entryID = absint(wp_unslash($Request['entryID']));
       unset($Request['action'], $Request['formID'], $Request['entryID']);
     }
     $formManager = new AdminFormManager($formID);
     $formManager->fieldNameReplaceOfPost();
-    $updatedValue = wp_unslash($_POST);
+    // Called from AdminAjax handler; nonce already verified at AJAX entry before dispatch.
+    $updatedValue = is_array($post) ? $post : wp_unslash($_POST);
 
     if (is_null($updatedValue) || !is_array($updatedValue)) {
       return new WP_Error('empty_data', __('Failed to update, Data is empty.', 'bit-form'));
@@ -2354,8 +2338,8 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function getLogHistory($Request, $post)
   {
     if (isset($Request['formID'])) {
-      $formID = wp_unslash($Request['formID']);
-      $entryID = wp_unslash($Request['entryID']);
+      $formID = absint(wp_unslash($Request['formID']));
+      $entryID = absint(wp_unslash($Request['entryID']));
     } else {
       $formID = wp_unslash($post->formID);
       $entryID = wp_unslash($post->entryID);
@@ -2378,7 +2362,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function importDataStore($Request, $post)
   {
     if (isset($Request['formID'])) {
-      $formID = wp_unslash($Request['formID']);
+      $formID = absint(wp_unslash($Request['formID']));
     } else {
       $formID = wp_unslash($post->formID);
     }
@@ -2405,8 +2389,8 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function deleteAIntegration($Request, $post)
   {
     if (isset($Request['formID']) && $Request['id']) {
-      $formID = json_decode(wp_unslash($Request['formID']));
-      $id = wp_unslash($Request['id']);
+      $formID = absint(json_decode(wp_unslash($Request['formID'])));
+      $id = absint(wp_unslash($Request['id']));
     } else {
       $formID = wp_unslash($post->formID);
       $id = wp_unslash($post->id);
@@ -2429,8 +2413,8 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function deleteSuccessMessage($Request, $post)
   {
     if (isset($Request['formID']) && $Request['id']) {
-      $formID = json_decode(wp_unslash($Request['formID']));
-      $id = wp_unslash($Request['id']);
+      $formID = absint(json_decode(wp_unslash($Request['formID'])));
+      $id = absint(wp_unslash($Request['id']));
     } else {
       $formID = wp_unslash($post->formID);
       $id = wp_unslash($post->id);
@@ -2452,8 +2436,8 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function deleteAWorkflow($Request, $post)
   {
     if (isset($Request['formID']) && $Request['id']) {
-      $formID = json_decode(wp_unslash($Request['formID']));
-      $id = wp_unslash($Request['id']);
+      $formID = absint(json_decode(wp_unslash($Request['formID'])));
+      $id = absint(wp_unslash($Request['id']));
     } else {
       $formID = wp_unslash($post->formID);
       $id = wp_unslash($post->id);
@@ -2474,8 +2458,8 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function deleteAMailTemplate($Request, $post)
   {
     if (isset($Request['formID']) && $Request['id']) {
-      $formID = json_decode(wp_unslash($Request['formID']));
-      $id = wp_unslash($Request['id']);
+      $formID = absint(json_decode(wp_unslash($Request['formID'])));
+      $id = absint(wp_unslash($Request['id']));
     } else {
       $formID = wp_unslash($post->formID);
       $id = wp_unslash($post->id);
@@ -2496,8 +2480,8 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
   public function duplicateAMailTemplate($Request, $post)
   {
     if (isset($Request['formID']) && $Request['id']) {
-      $formID = json_decode(wp_unslash($Request['formID']));
-      $id = wp_unslash($Request['id']);
+      $formID = absint(json_decode(wp_unslash($Request['formID'])));
+      $id = absint(wp_unslash($Request['id']));
     } else {
       $formID = wp_unslash($post->formID);
       $id = wp_unslash($post->id);
@@ -2846,7 +2830,10 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         );
       }
     } catch (\Exception $e) {
-      Log::debug_log('Error in updateAllFormsErrorMessagesWithGlobalMessages', $e->getMessage());
+      Log::debug_log([
+        'message' => 'Error in updateAllFormsErrorMessagesWithGlobalMessages',
+        'error'   => $e->getMessage(),
+      ]);
     }
   }
 

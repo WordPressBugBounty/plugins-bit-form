@@ -2,6 +2,10 @@
 
 namespace BitCode\BitForm\Core\Util;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 
 /**

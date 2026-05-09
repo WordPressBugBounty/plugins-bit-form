@@ -57,10 +57,10 @@ class FormViewer
     $honeypotInput = '';
     if (Helpers::property_exists_nested($this->_formContents, 'additional->enabled->honeypot', true)) {
       $honeypotInput =
-      <<<HTMLa
-        <input type="text" class="d-none" name="b_h_t" value="{$honeypodFldName}">
-        <input type="text" class="d-none" name="{$honeypodFldName}" required>
-HTMLa;
+        '
+        <input type="text" class="d-none" name="b_h_t" value="' . $honeypodFldName . '">
+        <input type="text" class="d-none" name="' . $honeypodFldName . '" required>
+      ';
       return $honeypotInput;
     }
     return $honeypotInput;
@@ -189,33 +189,34 @@ HTMLa;
     // }
 
     if (!empty($msg)) {
-      $restrictionMsg = <<<MSG
-      <div class="{$this->_form->getAtomicCls("_frm-ovrly-b{$formID}")}">
-      <p class="{$this->_form->getAtomicCls("_frm-ovrly-msg-b{$formID}")}">
-        $msg
+      $restrictionMsg =
+        '
+      <div class="' . $this->_form->getAtomicCls("_frm-ovrly-b{$formID}") . '">
+      <p class="' . $this->_form->getAtomicCls("_frm-ovrly-msg-b{$formID}") . '">
+        ' . $msg . '
       </p>
       </div>
-MSG;
+      ';
     }
     $formHTML =
-      <<<HTMLa
-      <div id="{$formIdentifier}" class="bit-form {$this->_form->getAtomicCls("_frm-bg-b{$formID}")}">
-      $restrictionMsg
-          <form novalidate id="form-{$formIdentifier}" class="_frm-bc{$formID}" $file_upload_tag method='post'>
-              <input type="text" class="d-none" name="csrf" value="{$this->_tokens['csrf']}">
-              <input type="text" class="d-none" name="t_identity" value="{$this->_tokens['t_identity']}">
-              {$this->honeypotField()}
-              <input type="text" class="d-none" name="bitforms_id" value="bitforms_{$this->_form->getFormID()}">
-              <div class="bc{$formID}-steps-container">
-                $welcomePageHtml    
-                $fieldHtml
+      '
+      <div id="' . $formIdentifier . '" class="bit-form ' . $this->_form->getAtomicCls("_frm-bg-b{$formID}") . '">
+      ' . $restrictionMsg . '
+          <form novalidate id="form-' . $formIdentifier . '" class="_frm-bc' . $formID . '" ' . $file_upload_tag . ' method=\'post\'>
+              <input type="text" class="d-none" name="csrf" value="' . $this->_tokens['csrf'] . '">
+              <input type="text" class="d-none" name="t_identity" value="' . $this->_tokens['t_identity'] . '">
+              ' . $this->honeypotField() . '
+              <input type="text" class="d-none" name="bitforms_id" value="bitforms_' . $this->_form->getFormID() . '">
+              <div class="bc' . $formID . '-steps-container">
+                ' . $welcomePageHtml . '    
+                ' . $fieldHtml . '
               </div>
           </form>
-          <div id='bc-form-msg-wrp-{$formIdentifier}' class="bc-form-msg-wrp"></div>
-          $abandonmentMsg
-          $conversationNavigationHtml
+          <div id=\'bc-form-msg-wrp-' . $formIdentifier . '\' class="bc-form-msg-wrp"></div>
+          ' . $abandonmentMsg . '
+          ' . $conversationNavigationHtml . '
       </div>
-HTMLa;
+';
 
     return $formHTML;
   }
@@ -243,30 +244,33 @@ HTMLa;
     } else {
       $formViewHelper = new FormViewHelper($this->_form, $this->_formContents);
 
-      $fieldHtml .= <<<STEPWRPR
-      <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-cntnr")} _frm-b-stp-cntnr'>
-        {$formViewHelper->getStepHeaderHtml()}
-        <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-wrpr")} _frm-b-stp-wrpr'>
-        {$formViewHelper->getProgressBarMarkup()}
-          <div class='{$this->_form->getAtomicCls("_frm-b{$formID}-stp-cntnt-wrpr")} _frm-b-stp-cntnt-wrpr'>
-STEPWRPR;
+      $fieldHtml .=
+        '
+      <div class=\'' . $this->_form->getAtomicCls("_frm-b{$formID}-stp-cntnr") . ' _frm-b-stp-cntnr\'>
+        ' . $formViewHelper->getStepHeaderHtml() . '
+        <div class=\'' . $this->_form->getAtomicCls("_frm-b{$formID}-stp-wrpr") . ' _frm-b-stp-wrpr\'>
+        ' . $formViewHelper->getProgressBarMarkup() . '
+          <div class=\'' . $this->_form->getAtomicCls("_frm-b{$formID}-stp-cntnt-wrpr") . ' _frm-b-stp-cntnt-wrpr\'>
+';
       foreach ($layouts as $key => $lay) {
         $hideOtherSteps = $key > 0 ? 'deactive' : '';
         $step = $key + 1;
-        $fieldHtml .= <<<HTMLa
-          <div class="{$this->_form->getAtomicCls("_frm-b{$formID}-stp-cntnt")} _frm-b-stp-cntnt $hideOtherSteps" data-step="{$step}">
-            <div class="_frm-b{$formID} _frm-b">
-              {$this->getLayoutHtml($lay->layout)}
+        $fieldHtml .=
+          '
+          <div class="' . $this->_form->getAtomicCls("_frm-b{$formID}-stp-cntnt") . ' _frm-b-stp-cntnt ' . $hideOtherSteps . '" data-step="' . $step . '">
+            <div class="_frm-b' . $formID . ' _frm-b">
+              ' . $this->getLayoutHtml($lay->layout) . '
             </div>
-            {$formViewHelper->getStepButtonMarkup()}
+            ' . $formViewHelper->getStepButtonMarkup() . '
           </div>
-HTMLa;
+';
       }
-      $fieldHtml .= <<<CLOSINGTAG
+      $fieldHtml .=
+        '
           </div>
         </div>
       </div>
-CLOSINGTAG;
+';
     }
 
     $confMsg = $this->_form->getSuccessMessageMarkups();
@@ -279,30 +283,31 @@ CLOSINGTAG;
     }
 
     if (!empty($msg)) {
-      $restrictionMsg = <<<MSG
-      <div class="{$this->_form->getAtomicCls("_frm-ovrly-b{$formID}")}">
-      <p class="{$this->_form->getAtomicCls("_frm-ovrly-msg-b{$formID}")}">
-        $msg
+      $restrictionMsg =
+        '
+      <div class="' . $this->_form->getAtomicCls("_frm-ovrly-b{$formID}") . '">
+      <p class="' . $this->_form->getAtomicCls("_frm-ovrly-msg-b{$formID}") . '">
+        ' . $msg . '
       </p>
       </div>
-MSG;
+';
     }
     $formHTML =
-      <<<HTMLa
-      <div id="{$formIdentifier}" class="bit-form {$this->_form->getAtomicCls("_frm-bg-b{$formID}")}">
-      $restrictionMsg
-          <form novalidate id="form-{$formIdentifier}" class="{$this->_form->getAtomicCls("_frm-b{$formID}")}" $file_upload_tag method='post'>
-              <input type="text" class="d-none" name="csrf" value="{$this->_tokens['csrf']}">
-              <input type="text" class="d-none" name="t_identity" value="{$this->_tokens['t_identity']}">
-              {$this->honeypotField()}
-              <input type="text" class="d-none" name="bitforms_id" value="bitforms_{$this->_form->getFormID()}">
-                  $fieldHtml
+      '
+      <div id="' . $formIdentifier . '" class="bit-form ' . $this->_form->getAtomicCls("_frm-bg-b{$formID}") . '">
+      ' . $restrictionMsg . '
+          <form novalidate id="form-' . $formIdentifier . '" class="' . $this->_form->getAtomicCls("_frm-b{$formID}") . '" ' . $file_upload_tag . ' method=\'post\'>
+              <input type="text" class="d-none" name="csrf" value="' . $this->_tokens['csrf'] . '">
+              <input type="text" class="d-none" name="t_identity" value="' . $this->_tokens['t_identity'] . '">
+              ' . $this->honeypotField() . '
+              <input type="text" class="d-none" name="bitforms_id" value="bitforms_' . $this->_form->getFormID() . '">
+                  ' . $fieldHtml . '
           </form>
-          $abandonmentMsg
-          <div id='bf-form-msg-wrp-{$formIdentifier}'></div>
-          $confMsg
+          ' . $abandonmentMsg . '
+          <div id=\'bf-form-msg-wrp-' . $formIdentifier . '\'></div>
+          ' . $confMsg . '
       </div>
-HTMLa;
+';
     return $formHTML;
   }
 }

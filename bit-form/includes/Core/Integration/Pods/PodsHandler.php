@@ -180,8 +180,12 @@ class PodsHandler
     }
 
     $exist_id = $fieldData['post_type'] . '_' . $entryID;
-    $sql = "SELECT * FROM `{$this->_wpdb->prefix}bitforms_form_entrymeta` WHERE `meta_key`='$exist_id' ";
-    $exist_post_id = $this->_wpdb->get_results($sql);
+    $exist_post_id = $this->_wpdb->get_results(
+      $this->_wpdb->prepare(
+        "SELECT * FROM `{$this->_wpdb->prefix}bitforms_form_entrymeta` WHERE `meta_key`=%s",
+        $exist_id
+      )
+    );
     $taxanomyData = $taxonomy->taxonomyData($formFields, $fieldValues);
 
     if ([] === $exist_post_id) {
@@ -199,6 +203,7 @@ class PodsHandler
         }
       }
 
+      // Form entry meta insert; meta_key/meta_value required to map dynamic field data to Pods integration record.
       $this->_wpdb->insert(
         "{$this->_wpdb->prefix}bitforms_form_entrymeta",
         [

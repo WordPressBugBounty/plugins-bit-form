@@ -59,90 +59,163 @@ class ImageSelectField
           $disabled = 'disabled';
         }
 
-        $optLblHide = null;
+        $optLblHide = '';
 
         if (!$field->optLblHide) {
-          $optLblHide = <<<OPTLBLHIDE
-          <div
-            class="{$fieldHelpers->getAtomicCls('tc')} {$fieldHelpers->getCustomClasses('tc')}"
-            {$fieldHelpers->getCustomAttributes('tc')}
-          >
-            <span
-              class="{$fieldHelpers->getAtomicCls('img-title')} {$fieldHelpers->getCustomClasses('img-title')}"
-              {$fieldHelpers->getCustomAttributes('img-title')}
+          $optLblHide = sprintf(
+            '<div
+              class="%1$s %2$s"
+              %3$s
             >
-              {$fieldHelpers->kses_post($lbl)}
-            </span>
-        </div>
-OPTLBLHIDE;
-        } else {
-          $optLblHide = '';
+              <span
+                class="%4$s %5$s"
+                %6$s
+              >
+                %7$s
+              </span>
+            </div>',
+            $fieldHelpers->getAtomicCls('tc'),
+            $fieldHelpers->getCustomClasses('tc'),
+            $fieldHelpers->getCustomAttributes('tc'),
+            $fieldHelpers->getAtomicCls('img-title'),
+            $fieldHelpers->getCustomClasses('img-title'),
+            $fieldHelpers->getCustomAttributes('img-title'),
+            $fieldHelpers->kses_post($lbl)
+          );
         }
 
-        $imageOption .= <<<IMAGESELECT
-          <div
-            class="{$fieldHelpers->getAtomicCls('inp-opt')} {$fieldHelpers->getCustomClasses('inp-opt')}"
-            {$fieldHelpers->getCustomAttributes('inp-opt')}
-          >
-            <input
-              class="{$fieldHelpers->getAtomicCls('img-inp')} {$fieldHelpers->getCustomClasses('img-inp')}"
-              type="{$inpType}"
-              id="{$rowID}-{$contentCount}-img-wrp-{$key}"
-              {$name}
-              value="{$fieldHelpers->esc_attr($val)}"
-              {$checked}
-              {$req}
-              {$disabled}
-              {$fieldHelpers->getCustomAttributes('img-inp')}
-            />
-            <label
-              for="{$rowID}-{$contentCount}-img-wrp-{$key}"
-              class="{$fieldHelpers->getAtomicCls('img-wrp')} {$fieldHelpers->getCustomClasses('img-wrp')}"
-              {$fieldHelpers->getCustomAttributes('img-wrp')}
-            >
-              <span
-                class="{$fieldHelpers->getAtomicCls('check-box')} {$fieldHelpers->getCustomClasses('check-box')}"
-              {$fieldHelpers->getCustomAttributes('check-box')}
-              >
-                <img
-                  src="{$checkedImg}"
-                  alt=""
-                  class="{$fieldHelpers->getAtomicCls('check-img')} {$fieldHelpers->getCustomClasses('check-img')}"
-                  {$fieldHelpers->getCustomAttributes('check-img')}
-                />
-              </span>
+        // Input element
+        $inputHtml = sprintf(
+          '<input
+            class="%1$s %2$s"
+            type="%3$s"
+            id="%4$s-%5$s-img-wrp-%6$s"
+            %7$s
+            value="%8$s"
+            %9$s
+            %10$s
+            %11$s
+            %12$s
+          />',
+          $fieldHelpers->getAtomicCls('img-inp'),
+          $fieldHelpers->getCustomClasses('img-inp'),
+          $inpType,
+          $rowID,
+          $contentCount,
+          $key,
+          $name,
+          $fieldHelpers->esc_attr($val),
+          $checked,
+          $req,
+          $disabled,
+          $fieldHelpers->getCustomAttributes('img-inp')
+        );
 
-              <span
-                class="{$fieldHelpers->getAtomicCls('img-card-wrp')} {$fieldHelpers->getCustomClasses('img-card-wrp')}"
-                {$fieldHelpers->getCustomAttributes('img-card-wrp')}
-              >
-                <img
-                  src="{$img}"
-                  alt="{$imgAlt}"
-                  aria-label="{$imgAlt}"
-                  class="{$fieldHelpers->getAtomicCls('select-img')} {$fieldHelpers->getCustomClasses('select-img')}"
-                  {$fieldHelpers->getCustomAttributes('select-img')}
-                />
-               {$optLblHide}
-              </span>
-            </label>
-          </div>
-IMAGESELECT;
+        // Check box with tick image
+        $checkBoxHtml = sprintf(
+          '<span
+            class="%1$s %2$s"
+            %3$s
+          >
+            <img
+              src="%4$s"
+              alt=""
+              class="%5$s %6$s"
+              %7$s
+            />
+          </span>',
+          $fieldHelpers->getAtomicCls('check-box'),
+          $fieldHelpers->getCustomClasses('check-box'),
+          $fieldHelpers->getCustomAttributes('check-box'),
+          $checkedImg,
+          $fieldHelpers->getAtomicCls('check-img'),
+          $fieldHelpers->getCustomClasses('check-img'),
+          $fieldHelpers->getCustomAttributes('check-img')
+        );
+
+        // Image card wrapper with selectable image
+        $imgCardHtml = sprintf(
+          '<span
+            class="%1$s %2$s"
+            %3$s
+          >
+            <img
+              src="%4$s"
+              alt="%5$s"
+              aria-label="%5$s"
+              class="%6$s %7$s"
+              %8$s
+            />
+            %9$s
+          </span>',
+          $fieldHelpers->getAtomicCls('img-card-wrp'),
+          $fieldHelpers->getCustomClasses('img-card-wrp'),
+          $fieldHelpers->getCustomAttributes('img-card-wrp'),
+          $img,
+          $imgAlt,
+          $fieldHelpers->getAtomicCls('select-img'),
+          $fieldHelpers->getCustomClasses('select-img'),
+          $fieldHelpers->getCustomAttributes('select-img'),
+          $optLblHide
+        );
+
+        // Label wrapper
+        $labelHtml = sprintf(
+          '<label
+            for="%1$s-%2$s-img-wrp-%3$s"
+            class="%4$s %5$s"
+            %6$s
+          >
+            %7$s
+            %8$s
+          </label>',
+          $rowID,
+          $contentCount,
+          $key,
+          $fieldHelpers->getAtomicCls('img-wrp'),
+          $fieldHelpers->getCustomClasses('img-wrp'),
+          $fieldHelpers->getCustomAttributes('img-wrp'),
+          $checkBoxHtml,
+          $imgCardHtml
+        );
+
+        // Full option item
+        $imageOption .= sprintf(
+          '<div
+            class="%1$s %2$s"
+            %3$s
+          >
+            %4$s
+            %5$s
+          </div>',
+          $fieldHelpers->getAtomicCls('inp-opt'),
+          $fieldHelpers->getCustomClasses('inp-opt'),
+          $fieldHelpers->getCustomAttributes('inp-opt'),
+          $inputHtml,
+          $labelHtml
+        );
       }
     }
 
-    return <<<IMAGESELECTFIELD
-    <div
-      class="{$fieldHelpers->getAtomicCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-    >
-      <div
-        class="{$fieldHelpers->getAtomicCls('ic')} {$fieldHelpers->getCustomClasses('ic')}"
-        {$fieldHelpers->getCustomAttributes('ic')}
+    return sprintf(
+      '<div
+        class="%1$s %2$s"
+        %3$s
+      >
+        <div
+          class="%4$s %5$s"
+          %6$s
         >
-        {$imageOption}
-      </div>
-    </div>
-IMAGESELECTFIELD;
+          %7$s
+        </div>
+      </div>',
+      $fieldHelpers->getAtomicCls('inp-fld-wrp'),
+      $fieldHelpers->getCustomClasses('inp-fld-wrp'),
+      $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
+      $fieldHelpers->getAtomicCls('ic'),
+      $fieldHelpers->getCustomClasses('ic'),
+      $fieldHelpers->getCustomAttributes('ic'),
+      $imageOption
+    );
   }
 }

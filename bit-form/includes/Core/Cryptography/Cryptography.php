@@ -27,7 +27,8 @@ class Cryptography
     } catch (Exception $e) {
       // Handle the exception (e.g., log it, rethrow it, or return a meaningful error message)
       Log::debug_log('Encryption failed: ' . $e->getMessage());
-      return new WP_Error('encryption_failed', __($e->getMessage(), 'bit-form'));
+      /* translators: %s: dynamic value. */
+      return new WP_Error('encryption_failed', sprintf(__('Encryption failed: %s', 'bit-form'), esc_html($e->getMessage())));
     }
   }
 
@@ -41,7 +42,8 @@ class Cryptography
     } catch (\Exception $e) {
       // Handle the exception
       Log::debug_log('Decryption failed: ' . $e->getMessage());
-      return new WP_Error('decryption_failed', __($e->getMessage(), 'bit-form'));
+      /* translators: %s: dynamic value. */
+      return new WP_Error('decryption_failed', sprintf(__('Decryption failed: %s', 'bit-form'), esc_html($e->getMessage())));
     }
   }
 }

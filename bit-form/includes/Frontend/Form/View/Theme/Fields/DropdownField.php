@@ -24,34 +24,10 @@ class DropdownField
     $selectedOptImage = '';
     $optionsList = '';
     $activeList = isset($field->config->activeList) ? $field->config->activeList : null;
-    $optionIcon = '';
-    $allowCustomOption = isset($field->config->allowCustomOption) ? $field->config->allowCustomOption : false;
+    $allowCustomOption = apply_filters('bitform_dropdown_allow_custom_option', false, $field);
     $img = htmlentities("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>");
 
-    if ($fh->property_exists_nested($field, 'config->optionIcon', true)) {
-      $optionIcon = <<<OPTIONICON
-      <img
-        {$fh->getCustomAttributes('opt-icn')}
-        class="opt-icn {$fh->getCustomClasses('opt-icn')}"
-        src="{$img}"
-        alt="BD"
-        loading="lazy"
-      />
-
-OPTIONICON;
-    }
-
-    if ($fh->property_exists_nested($field, 'config->selectedOptImage', true)) {
-      $selectedOptImage = <<<SELECTEDoPTIMAGE
-      <img
-        {$fh->getCustomAttributes('selected-opt-img')}
-        class="{$fh->getAtomicCls('selected-opt-img')} placeholder-img {$fh->getCustomClasses('selected-opt-img')}"
-        aria-hidden="true"
-        alt="selected option icon"
-        src="{$img}"
-      >
-SELECTEDoPTIMAGE;
-    }
+    $selectedOptImage = apply_filters('bitform_dropdown_selected_opt_image', '', $field, $fh);
 
     if (property_exists($field, 'optionsList')) {
       foreach ($field->optionsList as $key => $value) {
@@ -60,318 +36,426 @@ SELECTEDoPTIMAGE;
         $listName = array_keys($valueArr)[0];
         $options = array_values($valueArr)[0];
 
-        $optionsList .= <<<OPTIONSLIST
-            <ul
-              {$fh->getCustomAttributes('option-list')}
-              class="{$fh->getAtomicCls('option-list')} {$fh->getCustomClasses('option-list')}"
-              aria-hidden="true"
-              aria-label="Option List"
-              data-list="{$fh->esc_attr($listName)}"
-              data-list-index="{$key}"
-              tabIndex="-1"
-              role="listbox"
-            >
-OPTIONSLIST;
+        $optionsList .= sprintf(
+          '<ul
+            %1$s
+            class="%2$s %3$s"
+            aria-hidden="true"
+            aria-label="Option List"
+            data-list="%4$s"
+            data-list-index="%5$s"
+            tabIndex="-1"
+            role="listbox"
+          >',
+          $fh->getCustomAttributes('option-list'),
+          $fh->getAtomicCls('option-list'),
+          $fh->getCustomClasses('option-list'),
+          $fh->esc_attr($listName),
+          $key
+        );
         if ($allowCustomOption) {
-          $optionsList .= <<<CREATEOPT
-          <li
-          {$fh->getCustomAttributes('option')}
-          data-index={$dataIndex}
-          data-value="create-opt"
-          class="option create-opt {$fh->getCustomClasses('option')}"
-          role="option"
-          aria-selected="false"
-          tabIndex="-1"
-          style="display: none !important;"
-          >
-          <span 
-            {$fh->getCustomAttributes('opt-lbl-wrp')}
-            class="opt-lbl-wrp {$fh->getCustomClasses('opt-lbl-wrp')}" 
-          >
-            <span 
-              {$fh->getCustomAttributes('opt-lbl')}
-              class="opt-lbl {$fh->getCustomClasses('opt-lbl')}" 
-            > 
-              Create: 
-            </span>
-          </span>
-          <span class="opt-prefix"></span>
-        </li>
-CREATEOPT;
+          $optionsList .= sprintf(
+            '<li
+              %1$s
+              data-index=%2$s
+              data-value="create-opt"
+              class="option create-opt %3$s"
+              role="option"
+              aria-selected="false"
+              tabIndex="-1"
+              style="display: none !important;"
+            >
+              <span
+                %4$s
+                class="opt-lbl-wrp %5$s"
+              >
+                <span
+                  %6$s
+                  class="opt-lbl %7$s"
+                >
+                  Create:
+                </span>
+              </span>
+              <span class="opt-prefix"></span>
+            </li>',
+            $fh->getCustomAttributes('option'),
+            $dataIndex,
+            $fh->getCustomClasses('option'),
+            $fh->getCustomAttributes('opt-lbl-wrp'),
+            $fh->getCustomClasses('opt-lbl-wrp'),
+            $fh->getCustomAttributes('opt-lbl'),
+            $fh->getCustomClasses('opt-lbl')
+          );
         }
 
         foreach ($options as $opt) {
           if (isset($opt->type)) {
             $disableOpt = isset($opt->disabled) ? 'disabled-opt' : '';
-            $optionsList .= <<<OPTIOINS
-            <li data-index={$dataIndex}
-              {$fh->getCustomAttributes('option')}
-              class="option opt-group-title {$fh->getCustomClasses('option')} {$disableOpt}"
-            >
-              <span 
-                {$fh->getCustomAttributes('opt-lbl')}
-                class="opt-lbl {$fh->getCustomClasses('opt-lbl')}"
+            $optionsList .= sprintf(
+              '<li
+                data-index=%1$s
+                %2$s
+                class="option opt-group-title %3$s %4$s"
               >
-                {$fh->kses_post($opt->title)}
-              </span>
-            </li>
-            
-OPTIOINS;
+                <span
+                  %5$s
+                  class="opt-lbl %6$s"
+                >
+                  %7$s
+                </span>
+              </li>',
+              $dataIndex,
+              $fh->getCustomAttributes('option'),
+              $fh->getCustomClasses('option'),
+              $disableOpt,
+              $fh->getCustomAttributes('opt-lbl'),
+              $fh->getCustomClasses('opt-lbl'),
+              $fh->kses_post($opt->title)
+            );
             foreach ($opt->childs as $child) {
               $optVal = isset($child->val) ? $child->val : $child->lbl;
               $disableOpt = (isset($opt->disabled) || isset($child->disabled)) ? 'disabled-opt' : '';
               $optImage = '';
               if (isset($child->img)) {
-                $optImage = <<<OPTIMAGE
-                <img
-                  {$fh->getCustomAttributes('opt-icn')}
-                  class="opt-icn {$fh->getCustomClasses('opt-icn')}"
-                  aria-hidden="true"
-                  alt="{$fh->esc_attr($child->lbl)}"
-                  src="{$fh->esc_url($child->img)}"
-                >
-OPTIMAGE;
+                $optImage = sprintf(
+                  '<img
+                    %1$s
+                    class="opt-icn %2$s"
+                    aria-hidden="true"
+                    alt="%3$s"
+                    src="%4$s"
+                  >',
+                  $fh->getCustomAttributes('opt-icn'),
+                  $fh->getCustomClasses('opt-icn'),
+                  $fh->esc_attr($child->lbl),
+                  $fh->esc_url($child->img)
+                );
               }
-              $optionsList .= <<<OPTIONS_CHILDREN
-              <li
-                {$fh->getCustomAttributes('option')}
-                data-index="{$dataIndex}"
-                data-value="{$fh->esc_attr($optVal)}"
-                class="option opt-group-child {$fh->getCustomClasses('option')} {$disableOpt}"
-                role="option"
-                aria-selected="false"
-                tabIndex="-1"
-              >
-                <span 
-                  {$fh->getCustomAttributes('opt-lbl-wrp')}
-                  class="opt-lbl-wrp {$fh->getCustomClasses('opt-lbl-wrp')}" 
+              $optionsList .= sprintf(
+                '<li
+                  %1$s
+                  data-index="%2$s"
+                  data-value="%3$s"
+                  class="option opt-group-child %4$s %5$s"
+                  role="option"
+                  aria-selected="false"
+                  tabIndex="-1"
                 >
-                  {$optImage}
-                  <span 
-                    {$fh->getCustomAttributes('opt-lbl')}
-                    class="opt-lbl {$fh->getCustomClasses('opt-lbl')}" 
+                  <span
+                    %6$s
+                    class="opt-lbl-wrp %7$s"
                   >
-                    {$fh->kses_post($child->lbl)}
+                    %8$s
+                    <span
+                      %9$s
+                      class="opt-lbl %10$s"
+                    >
+                      %11$s
+                    </span>
                   </span>
-                </span>
-                <span class="opt-prefix" />
-              </li>
-OPTIONS_CHILDREN;
+                  <span class="opt-prefix" />
+                </li>',
+                $fh->getCustomAttributes('option'),
+                $dataIndex,
+                $fh->esc_attr($optVal),
+                $fh->getCustomClasses('option'),
+                $disableOpt,
+                $fh->getCustomAttributes('opt-lbl-wrp'),
+                $fh->getCustomClasses('opt-lbl-wrp'),
+                $optImage,
+                $fh->getCustomAttributes('opt-lbl'),
+                $fh->getCustomClasses('opt-lbl'),
+                $fh->kses_post($child->lbl)
+              );
             }
           } else {
             $optVal = isset($opt->val) ? $opt->val : $opt->lbl;
             $disableOpt = isset($opt->disabled) ? 'disabled-opt' : '';
             $optImage = '';
             if (isset($opt->img)) {
-              $optImage = <<<OPTIMAGE
-                <img
-                  {$fh->getCustomAttributes('opt-icn')}
-                  class="opt-icn {$fh->getCustomClasses('opt-icn')}"
+              $optImage = sprintf(
+                '<img
+                  %1$s
+                  class="opt-icn %2$s"
                   aria-hidden="true"
-                  alt="{$fh->esc_attr($opt->lbl)}"
-                  src="{$fh->esc_url($opt->img)}"
-                >
-OPTIMAGE;
+                  alt="%3$s"
+                  src="%4$s"
+                >',
+                $fh->getCustomAttributes('opt-icn'),
+                $fh->getCustomClasses('opt-icn'),
+                $fh->esc_attr($opt->lbl),
+                $fh->esc_url($opt->img)
+              );
             }
-            $optionsList .= <<<OPTIONS
-            <li
-              {$fh->getCustomAttributes('option')}
-              data-index="{$dataIndex}"
-              data-value="{$fh->esc_attr($optVal)}"
-              class="option {$fh->getCustomClasses('option')} {$disableOpt}"
-              role="option"
-              aria-selected="false"
-              tabIndex="-1"
-            >
-              <span 
-                {$fh->getCustomAttributes('opt-lbl-wrp')}
-                class="opt-lbl-wrp {$fh->getCustomClasses('opt-lbl-wrp')}"
+            $optionsList .= sprintf(
+              '<li
+                %1$s
+                data-index="%2$s"
+                data-value="%3$s"
+                class="option %4$s %5$s"
+                role="option"
+                aria-selected="false"
+                tabIndex="-1"
               >
-                {$optImage}
-                <span 
-                  {$fh->getCustomAttributes('opt-lbl')}
-                  class="opt-lbl {$fh->getCustomClasses('opt-lbl')}" 
+                <span
+                  %6$s
+                  class="opt-lbl-wrp %7$s"
                 >
-                  {$fh->kses_post($opt->lbl)}
+                  %8$s
+                  <span
+                    %9$s
+                    class="opt-lbl %10$s"
+                  >
+                    %11$s
+                  </span>
                 </span>
-              </span>
-              <span class="opt-prefix" />
-            </li>
-OPTIONS;
+                <span class="opt-prefix" />
+              </li>',
+              $fh->getCustomAttributes('option'),
+              $dataIndex,
+              $fh->esc_attr($optVal),
+              $fh->getCustomClasses('option'),
+              $disableOpt,
+              $fh->getCustomAttributes('opt-lbl-wrp'),
+              $fh->getCustomClasses('opt-lbl-wrp'),
+              $optImage,
+              $fh->getCustomAttributes('opt-lbl'),
+              $fh->getCustomClasses('opt-lbl'),
+              $fh->kses_post($opt->lbl)
+            );
           }
         }
         $optionsList .= '</ul>';
         $dataIndex++;
       }
 
-      $optionsList .= <<<OPTIONSLIST
-        <ul
-          {$fh->getCustomAttributes('option-list')}
-          class="{$fh->getAtomicCls('option-list')} {$fh->getCustomClasses('option-list')} active-list"
-            aria-hidden="true"
-            aria-label="Option List"
-            tabIndex="-1"
-            role="listbox"
-          >
-        </ul>
-OPTIONSLIST;
+      $optionsList .= sprintf(
+        '<ul
+          %1$s
+          class="%2$s %3$s active-list"
+          aria-hidden="true"
+          aria-label="Option List"
+          tabIndex="-1"
+          role="listbox"
+        >
+        </ul>',
+        $fh->getCustomAttributes('option-list'),
+        $fh->getAtomicCls('option-list'),
+        $fh->getCustomClasses('option-list')
+      );
 
       $multiChipClass = ($fh->property_exists_nested($field, 'config->multipleSelect', true) && $fh->property_exists_nested($field, 'config->showChip', true)) ? 'multi-chip' : '';
 
-      return <<<DROPDOWNFIELD
-    <div class="{$fh->getAtomicCls('dpd-fld-container')} {$fh->getCustomClasses('dpd-fld-container')}">
-      <div
-        {$fh->getCustomAttributes('dpd-fld-wrp')}
-        class="{$fh->getAtomicCls('dpd-fld-wrp')} {$fh->getCustomClasses('dpd-fld-wrp')} {$readonlyCls} {$disabledCls}"
-      >
-        <input
-          {$name}
-          {$req}
-          type="text"
-          title="Dropdown Hidden Input"
-          class="{$fh->getAtomicCls('dpd-hidden-input')} d-none"
-          {$fh->disabled()}
-          {$fh->readonly()}
-          {$val}
-        />
-        <div 
-          {$fh->getCustomAttributes('dpd-wrp')}
-          class="{$fh->getAtomicCls('dpd-wrp')} {$fh->getCustomClasses('dpd-wrp')}"
-          role="combobox"
-          aria-controls=""
-          aria-live="assertive"
-          aria-expanded="false"
-          tabIndex="0"
-          aria-label="Dropdown"
-        >
+      return sprintf(
+        '<div class="%1$s %2$s">
           <div
-            {$fh->getCustomAttributes('selected-opt-wrp')}
-            class="{$fh->getAtomicCls('selected-opt-wrp')} {$fh->getCustomClasses('selected-opt-wrp')}"
+            %3$s
+            class="%4$s %5$s %6$s %7$s"
           >
-          {$selectedOptImage}
+            <input
+              %8$s
+              %9$s
+              type="text"
+              title="Dropdown Hidden Input"
+              class="%10$s d-none"
+              %11$s
+              %12$s
+              %13$s
+            />
+            <div
+              %14$s
+              class="%15$s %16$s"
+              role="combobox"
+              aria-controls=""
+              aria-live="assertive"
+              aria-expanded="false"
+              tabIndex="0"
+              aria-label="Dropdown"
+            >
+              <div
+                %17$s
+                class="%18$s %19$s"
+              >
+                %20$s
                 <span
-                  {$fh->getCustomAttributes('selected-opt-lbl')}
+                  %21$s
                   aria-label="Selected Option Label"
-                  class="{$fh->getAtomicCls('selected-opt-lbl')} {$multiChipClass} {$fh->getCustomClasses('selected-opt-lbl')}"
+                  class="%22$s %23$s %24$s"
                 >
-                  {$fh->esc_html($ph)}
+                  %25$s
                 </span>
-          </div>
-          <div
-            {$fh->getCustomAttributes('dpd-btn-wrp')}
-            class="{$fh->getAtomicCls('dpd-btn-wrp')} {$fh->getCustomClasses('dpd-btn-wrp')}"
-          >
-            <button
-              {$fh->getCustomAttributes('selected-opt-clear-btn')}
-              type="button"
-              aria-label="Clear selected option value"
-              class="{$fh->getAtomicCls('selected-opt-clear-btn')} {$fh->getCustomClasses('selected-opt-clear-btn')}"
-            >
-              <svg
-                width="15"
-                height="15"
-                role="img"
-                title="Cross icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+              </div>
+              <div
+                %26$s
+                class="%27$s %28$s"
               >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-            <div 
-              {$fh->getCustomAttributes('dpd-down-btn')}
-              class="{$fh->getAtomicCls('dpd-down-btn')} {$fh->getCustomClasses('dpd-down-btn')}"
-            >
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                title="Down icon"
-                role="img"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </div>
-          </div>
-        </div>
-        <div 
-          {$fh->getCustomAttributes('option-wrp')}
-          class="{$fh->getAtomicCls('option-wrp')} {$fh->getCustomClasses('option-wrp')}"
-        >
-          <div 
-            {$fh->getCustomAttributes('option-inner-wrp')}
-            class="{$fh->getAtomicCls('option-inner-wrp')} {$fh->getCustomClasses('option-inner-wrp')}"
-          >
-            <div 
-              {$fh->getCustomAttributes('option-search-wrp')}
-              class="{$fh->getAtomicCls('option-search-wrp')} {$fh->getCustomClasses('option-search-wrp')}"
-            >
-              <input
-                {$fh->getCustomAttributes('opt-search-input')}
-                type="search"
-                class="{$fh->getAtomicCls('opt-search-input')} {$fh->getCustomClasses('opt-search-input')}"
-                placeholder="Search Country"
-                aria-label="Search Options"
-                aria-hidden="true"
-                tabIndex="-1"
-              />
-              <svg
-                {$fh->getCustomAttributes('opt-search-icn')}
-                class="{$fh->getAtomicCls('icn')} {$fh->getAtomicCls('opt-search-icn')} {$fh->getCustomClasses('opt-search-icn')}"
-                aria-hidden="true"
-                width="22"
-                height="22"
-                role="img"
-                title="Search icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <button
-                {$fh->getCustomAttributes('search-clear-btn')}
-                type="button"
-                aria-label="Clear search"
-                class="{$fh->getAtomicCls('icn')} {$fh->getAtomicCls('search-clear-btn')} {$fh->getCustomClasses('search-clear-btn')}"
-                tabIndex="-1"
-              >
-                <svg
-                  width="13"
-                  height="13"
-                  role="img"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                <button
+                  %29$s
+                  type="button"
+                  aria-label="Clear selected option value"
+                  class="%30$s %31$s"
                 >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
+                  <svg
+                    width="15"
+                    height="15"
+                    role="img"
+                    title="Cross icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+                <div
+                  %32$s
+                  class="%33$s %34$s"
+                >
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    title="Down icon"
+                    role="img"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </div>
+              </div>
             </div>
-            {$optionsList}
+            <div
+              %35$s
+              class="%36$s %37$s"
+            >
+              <div
+                %38$s
+                class="%39$s %40$s"
+              >
+                <div
+                  %41$s
+                  class="%42$s %43$s"
+                >
+                  <input
+                    %44$s
+                    type="search"
+                    class="%45$s %46$s"
+                    placeholder="Search Country"
+                    aria-label="Search Options"
+                    aria-hidden="true"
+                    tabIndex="-1"
+                    inert
+                  />
+                  <svg
+                    %47$s
+                    class="%48$s %49$s %50$s"
+                    aria-hidden="true"
+                    width="22"
+                    height="22"
+                    role="img"
+                    title="Search icon"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  <button
+                    %51$s
+                    type="button"
+                    aria-label="Clear search"
+                    class="%52$s %53$s %54$s"
+                    tabIndex="-1"
+                  >
+                    <svg
+                      width="13"
+                      height="13"
+                      role="img"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+                </div>
+                %55$s
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-DROPDOWNFIELD;
+        </div>',
+        $fh->getAtomicCls('dpd-fld-container'),         // 1
+        $fh->getCustomClasses('dpd-fld-container'),     // 2
+        $fh->getCustomAttributes('dpd-fld-wrp'),        // 3
+        $fh->getAtomicCls('dpd-fld-wrp'),               // 4
+        $fh->getCustomClasses('dpd-fld-wrp'),           // 5
+        $readonlyCls,                                   // 6
+        $disabledCls,                                   // 7
+        $name,                                          // 8
+        $req,                                           // 9
+        $fh->getAtomicCls('dpd-hidden-input'),          // 10
+        $fh->disabled(),                                // 11
+        $fh->readonly(),                                // 12
+        $val,                                           // 13
+        $fh->getCustomAttributes('dpd-wrp'),            // 14
+        $fh->getAtomicCls('dpd-wrp'),                   // 15
+        $fh->getCustomClasses('dpd-wrp'),               // 16
+        $fh->getCustomAttributes('selected-opt-wrp'),   // 17
+        $fh->getAtomicCls('selected-opt-wrp'),          // 18
+        $fh->getCustomClasses('selected-opt-wrp'),      // 19
+        $selectedOptImage,                              // 20
+        $fh->getCustomAttributes('selected-opt-lbl'),   // 21
+        $fh->getAtomicCls('selected-opt-lbl'),          // 22
+        $multiChipClass,                                // 23
+        $fh->getCustomClasses('selected-opt-lbl'),      // 24
+        $fh->esc_html($ph),                             // 25
+        $fh->getCustomAttributes('dpd-btn-wrp'),        // 26
+        $fh->getAtomicCls('dpd-btn-wrp'),               // 27
+        $fh->getCustomClasses('dpd-btn-wrp'),           // 28
+        $fh->getCustomAttributes('selected-opt-clear-btn'), // 29
+        $fh->getAtomicCls('selected-opt-clear-btn'),    // 30
+        $fh->getCustomClasses('selected-opt-clear-btn'), // 31
+        $fh->getCustomAttributes('dpd-down-btn'),       // 32
+        $fh->getAtomicCls('dpd-down-btn'),              // 33
+        $fh->getCustomClasses('dpd-down-btn'),          // 34
+        $fh->getCustomAttributes('option-wrp'),         // 35
+        $fh->getAtomicCls('option-wrp'),                // 36
+        $fh->getCustomClasses('option-wrp'),            // 37
+        $fh->getCustomAttributes('option-inner-wrp'),   // 38
+        $fh->getAtomicCls('option-inner-wrp'),          // 39
+        $fh->getCustomClasses('option-inner-wrp'),      // 40
+        $fh->getCustomAttributes('option-search-wrp'),  // 41
+        $fh->getAtomicCls('option-search-wrp'),         // 42
+        $fh->getCustomClasses('option-search-wrp'),     // 43
+        $fh->getCustomAttributes('opt-search-input'),   // 44
+        $fh->getAtomicCls('opt-search-input'),          // 45
+        $fh->getCustomClasses('opt-search-input'),      // 46
+        $fh->getCustomAttributes('opt-search-icn'),     // 47
+        $fh->getAtomicCls('icn'),                        // 48
+        $fh->getAtomicCls('opt-search-icn'),            // 49
+        $fh->getCustomClasses('opt-search-icn'),        // 50
+        $fh->getCustomAttributes('search-clear-btn'),   // 51
+        $fh->getAtomicCls('icn'),                        // 52
+        $fh->getAtomicCls('search-clear-btn'),          // 53
+        $fh->getCustomClasses('search-clear-btn'),      // 54
+        $optionsList                                    // 55
+      );
     }
   }
 }

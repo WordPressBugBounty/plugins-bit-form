@@ -62,7 +62,12 @@ class AcfHandler
 
     $existId = $postData['post_type'] . '_' . $entryID;
 
-    $existPostId = $this->_wpdb->get_results("SELECT * FROM `{$this->_wpdb->prefix}bitforms_form_entrymeta` WHERE `meta_key`='$existId' ");
+    $existPostId = $this->_wpdb->get_results(
+      $this->_wpdb->prepare(
+        "SELECT * FROM `{$this->_wpdb->prefix}bitforms_form_entrymeta` WHERE `meta_key`=%s",
+        $existId
+      )
+    );
 
     $taxonomies = $taxonomy->taxonomyData($formFields, $fieldValues);
 
@@ -89,6 +94,7 @@ class AcfHandler
         }
       }
 
+      // Form entry meta insert; meta_key/meta_value required to map dynamic field data to ACF integration record.
       $this->_wpdb->insert(
         "{$this->_wpdb->prefix}bitforms_form_entrymeta",
         [

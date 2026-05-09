@@ -7,6 +7,10 @@
 
 namespace BitCode\BitForm\Core\Integration\Twilio;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\HttpHelper;
 use BitCode\BitForm\GlobalHelper;
@@ -34,14 +38,11 @@ final class TwilioHandler
 
   public static function checkAuthorization()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
-      // $inputJSON = file_get_contents('php://input');
-      // $tokenRequestParams = json_decode($inputJSON);
-
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       GlobalHelper::requirePostMethod();
 
       try {
-        $tokenRequestParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $tokenRequestParams = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }

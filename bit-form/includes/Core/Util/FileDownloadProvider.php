@@ -2,8 +2,49 @@
 
 namespace BitCode\BitForm\Core\Util;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 final class FileDownloadProvider
 {
+  private function isAuthorizedFileRequest($formID, $entryID)
+  {
+    if (!is_user_logged_in()) {
+      return false;
+    }
+
+    $currentUserId = get_current_user_id();
+    if (empty($currentUserId)) {
+      return false;
+    }
+
+    // If a nonce is provided, verify it. If it's missing/invalid, fall back to an ownership/capability check.
+    $nonce = isset($_GET['nonce']) && is_scalar($_GET['nonce']) ? sanitize_text_field(wp_unslash((string) $_GET['nonce'])) : '';
+    $nonceAction = 'bitforms_file_download_' . $formID . '_' . $entryID;
+    if (!empty($nonce) && wp_verify_nonce($nonce, $nonceAction)) {
+      return true;
+    }
+
+    // Capability bypass.
+    if (current_user_can('manage_bitform') || current_user_can('manage_options')) {
+      return true;
+    }
+
+    // Ownership check: non-admin users may only download their own entry files.
+    $entryModel = new \BitCode\BitForm\Core\Database\FormEntryModel();
+    $entry = $entryModel->get(
+      'id',
+      [
+        'id'      => $entryID,
+        'form_id' => $formID,
+        'user_id' => $currentUserId,
+      ]
+    );
+
+    return !is_wp_error($entry) && !empty($entry);
+  }
+
   public function register()
   {
     add_action('template_redirect', [$this, 'authCheckandFrceDownloadHelper']);
@@ -12,6 +53,7 @@ final class FileDownloadProvider
 
   public function handleFileDownload()
   {
+    // File download: form/entry/file IDs read from query string; authorization enforced via isAuthorizedFileRequest() below.
     if (!isset($_GET['formID']) || !isset($_GET['entryID']) || !isset($_GET['fileID'])) {
       global $wp_query;
       $wp_query->set_404();
@@ -19,13 +61,19 @@ final class FileDownloadProvider
       get_template_part(404);
       exit();
     }
-    $formID = intval(sanitize_text_field($_GET['formID']));
-    $entryID = intval(sanitize_text_field($_GET['entryID']));
-    $fileID = sanitize_file_name($_GET['fileID']);
+    $formID = intval(sanitize_text_field(wp_unslash($_GET['formID'])));
+    $entryID = intval(sanitize_text_field(wp_unslash($_GET['entryID'])));
+    $fileID = sanitize_file_name(wp_unslash($_GET['fileID']));
+    if (!$this->isAuthorizedFileRequest($formID, $entryID)) {
+      $this->show404();
+    }
+
     $filePath = FileHandler::getEntriesFileUploadDir($formID, $entryID) . DIRECTORY_SEPARATOR . $fileID;
 
     if (is_readable($filePath)) {
       $this->fileDownloadORView($filePath, true);
+    } else {
+      $this->show404();
     }
   }
 
@@ -104,12 +152,18 @@ final class FileDownloadProvider
 
   private function isRequestedFileExists()
   {
+    // File download: IDs read from query string; authorization enforced via isAuthorizedFileRequest() below.
     if (!isset($_GET['formID']) || !isset($_GET['entryID']) || !isset($_GET['fileID'])) {
       return false;
     }
-    $formID = intval(sanitize_text_field($_GET['formID']));
-    $entryID = intval(sanitize_text_field($_GET['entryID']));
-    $fileID = sanitize_file_name($_GET['fileID']);
+    $formID = intval(sanitize_text_field(wp_unslash($_GET['formID'])));
+    $entryID = intval(sanitize_text_field(wp_unslash($_GET['entryID'])));
+    $fileID = sanitize_file_name(wp_unslash($_GET['fileID']));
+
+    if (!$this->isAuthorizedFileRequest($formID, $entryID)) {
+      return false;
+    }
+
     $filePath = FileHandler::getEntriesFileUploadDir($formID, $entryID) . DIRECTORY_SEPARATOR . $fileID;
     if (is_readable($filePath)) {
       return $filePath;
@@ -131,7 +185,7 @@ final class FileDownloadProvider
       if ($fileInfo['type'] && $fileInfo['ext']) {
         $content_types = $fileInfo['type'];
         $ext = $fileInfo['ext'];
-        if (in_array($ext[1], ['txt', 'php', 'html', 'xhtml', 'json'])) {
+        if (in_array($ext, ['txt', 'php', 'html', 'xhtml', 'json'], true)) {
           $content_types = 'text/plain';
         }
       }
@@ -145,6 +199,7 @@ final class FileDownloadProvider
     header('Content-Length: ' . filesize($filePath));
     header('Content-Transfer-Encoding: binary ');
     flush();
+    // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Streaming binary download; WP_Filesystem has no streaming equivalent and get_contents() would load entire file into memory.
     readfile($filePath);
     die();
   }

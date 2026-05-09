@@ -30,25 +30,39 @@ class TextAreaField
     $contentCount = count($bfFrontendFormIds);
 
     // {...'disabled' in attr.valid && { readOnly: attr.valid.disabled }}
-    return <<<TEXTAREAFIELD
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getAtomicCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
-    >
+
+    return sprintf(
+      '<div %1$s class="%2$s %3$s">
       <textarea
-        {$fieldHelpers->getCustomAttributes('fld')}
-        id="{$rowID}-{$contentCount}"
-        class="{$fieldHelpers->getAtomicCls('fld')} {$fieldHelpers->getCustomClasses('fld')}"
-        {$req}
-        {$disabled}
-        {$readonly}
-        {$ph}
-        {$ac}
-        {$name}
-      >{$fieldHelpers->esc_textarea($value)}</textarea>
-      {$prefixIcn}
-      {$suffixIcn}
-    </div>
-TEXTAREAFIELD;
+        %4$s
+        id="%5$s"
+        class="%6$s %7$s"
+        %8$s
+        %9$s
+        %10$s
+        %11$s
+        %12$s
+        %13$s
+      >%14$s</textarea>
+      %15$s
+      %16$s
+    </div>',
+      $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
+      $fieldHelpers->getAtomicCls('inp-fld-wrp'),
+      $fieldHelpers->getCustomClasses('inp-fld-wrp'),
+      $fieldHelpers->getCustomAttributes('fld'),
+      "{$rowID}-{$contentCount}",
+      $fieldHelpers->getAtomicCls('fld'),
+      $fieldHelpers->getCustomClasses('fld'),
+      $req,
+      $disabled,
+      $readonly,
+      $ph,
+      $ac,
+      $name,
+      $fieldHelpers->esc_textarea($value),
+      $prefixIcn,
+      $suffixIcn
+    );
   }
 }

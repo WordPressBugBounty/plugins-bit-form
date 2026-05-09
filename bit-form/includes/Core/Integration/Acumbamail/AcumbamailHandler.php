@@ -2,6 +2,10 @@
 
 namespace BitCode\BitForm\Core\Integration\Acumbamail;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\HttpHelper;
 use BitCode\BitForm\GlobalHelper;
@@ -33,16 +37,14 @@ class AcumbamailHandler
 
   public static function fetchAllLists()
   {
-    if (!isset($_REQUEST['_ajax_nonce']) && !wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (!isset($_REQUEST['_ajax_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       wp_send_json_error(__('Token expired', 'bit-form'), 401);
     }
 
-    // $inputJSON = file_get_contents('php://input');
-    // $requestParams = json_decode($inputJSON);
     GlobalHelper::requirePostMethod();
 
     try {
-      $requestParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+      $requestParams = GlobalHelper::formatRequestData();
     } catch (\InvalidArgumentException $e) {
       wp_send_json_error($e->getMessage(), 400);
     }
@@ -76,16 +78,13 @@ class AcumbamailHandler
 
   public static function acumbamailAuthAndFetchSubscriberList()
   {
-    if (!isset($_REQUEST['_ajax_nonce']) && !wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (!isset($_REQUEST['_ajax_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       wp_send_json_error(__('Token expired', 'bit-form'), 401);
     }
 
-    // $inputJSON = file_get_contents('php://input');
-    // $requestParams = json_decode($inputJSON);
-
     GlobalHelper::requirePostMethod();
     try {
-      $requestParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+      $requestParams = GlobalHelper::formatRequestData();
     } catch (\InvalidArgumentException $e) {
       wp_send_json_error($e->getMessage(), 400);
     }
@@ -118,17 +117,14 @@ class AcumbamailHandler
 
   public static function acumbamailRefreshFields()
   {
-    if (!isset($_REQUEST['_ajax_nonce']) && !wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (!isset($_REQUEST['_ajax_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       wp_send_json_error(__('Token expired', 'bit-form'), 401);
     }
-
-    // $inputJSON = file_get_contents('php://input');
-    // $refreshFieldsRequestParams = json_decode($inputJSON);
 
     GlobalHelper::requirePostMethod();
 
     try {
-      $refreshFieldsRequestParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+      $refreshFieldsRequestParams = GlobalHelper::formatRequestData();
     } catch (\InvalidArgumentException $e) {
       wp_send_json_error($e->getMessage(), 400);
     }

@@ -2,6 +2,10 @@
 
 namespace BitCode\BitForm\Core\Util;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Core\Database\DB;
 use BitCode\BitForm\Core\Database\FormModel;
@@ -65,7 +69,6 @@ final class Activation
       wp_mkdir_p(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'form-styles');
     }
     if (file_exists(BITFORMS_UPLOAD_DIR) && !file_exists(BITFORMS_UPLOAD_DIR . DIRECTORY_SEPARATOR . '.htaccess')) {
-      $htaccessFile = fopen(BITFORMS_UPLOAD_DIR . DIRECTORY_SEPARATOR . '.htaccess', 'w');
       $rules = '
             <IfDefine php_flag>
                 php_flag engine off
@@ -75,20 +78,13 @@ final class Activation
             Deny from all
             Require all denied
             ';
-      fwrite($htaccessFile, $rules);
-      fclose($htaccessFile);
+      FileHandler::writeFile(BITFORMS_UPLOAD_DIR . DIRECTORY_SEPARATOR . '.htaccess', $rules);
     }
     if (file_exists(BITFORMS_UPLOAD_DIR) && !file_exists(BITFORMS_UPLOAD_DIR . DIRECTORY_SEPARATOR . 'index.php')) {
-      $indexFile = fopen(BITFORMS_UPLOAD_DIR . DIRECTORY_SEPARATOR . 'index.php', 'w');
-      $code = "<?php\n";
-      fwrite($indexFile, $code);
-      fclose($indexFile);
+      FileHandler::writeFile(BITFORMS_UPLOAD_DIR . DIRECTORY_SEPARATOR . 'index.php', "<?php\n");
     }
     if (file_exists(BITFORMS_CONTENT_DIR) && !file_exists(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'index.php')) {
-      $indexFile = fopen(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'index.php', 'w');
-      $code = "<?php\n";
-      fwrite($indexFile, $code);
-      fclose($indexFile);
+      FileHandler::writeFile(BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'index.php', "<?php\n");
     }
   }
 

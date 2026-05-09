@@ -38,6 +38,7 @@ final class FrontendHelpers
     }
     $postId = $post->ID;
     $shortcodeFormIds = [];
+    // postmeta table name from $wpdb->postmeta (WordPress-managed, not user input). post_id parameterized via %d.
     $bfMetaValues = $wpdb->get_results(
       $wpdb->prepare(
         'SELECT meta_value FROM `' . $wpdb->postmeta . '` WHERE `post_id`=%d',
@@ -89,7 +90,8 @@ final class FrontendHelpers
     }
     $postId = $post->ID;
     $shortcodeViewIds = [];
-    $bfMetaValues = $wpdb->get_results('SELECT meta_value FROM `' . $wpdb->postmeta . "` WHERE `post_id`={$postId}");
+    // postmeta table name from $wpdb->postmeta (WordPress-managed, not user input). post_id parameterized via %d.
+    $bfMetaValues = $wpdb->get_results($wpdb->prepare('SELECT meta_value FROM `' . $wpdb->postmeta . '` WHERE `post_id` = %d', $postId));
     $postContent = $post->post_content;
 
     $bfMetaValues[] = (object) ['meta_value' => $postContent];
@@ -168,9 +170,10 @@ final class FrontendHelpers
   public static function isRestRequest()
   {
     $prefix = rest_get_url_prefix();
+    // Read-only check to detect REST requests for routing; no state change performed here.
     if (defined('REST_REQUEST') && REST_REQUEST
-    || isset($_GET['rest_route'])
-    && 0 === strpos(trim($_GET['rest_route'], '\\/'), $prefix, 0)) {
+    || (isset($_GET['rest_route'])
+    && 0 === strpos(trim(sanitize_text_field(wp_unslash($_GET['rest_route'])), '\\/'), $prefix, 0))) {
       return true;
     }
     global $wp_rewrite;
@@ -191,12 +194,12 @@ final class FrontendHelpers
       return true;
     }
 
-    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 'xmlhttprequest' === strtolower($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && 'xmlhttprequest' === strtolower(sanitize_text_field(wp_unslash($_SERVER['HTTP_X_REQUESTED_WITH'])))) {
       return true;
     }
-    if (isset($_SERVER['HTTP_SEC_FETCH_MODE'],$_SERVER['HTTP_SEC_FETCH_DEST'])) {
-      $destination = strtolower($_SERVER['HTTP_SEC_FETCH_DEST']);
-      $mode = strtolower($_SERVER['HTTP_SEC_FETCH_MODE']);
+    if (isset($_SERVER['HTTP_SEC_FETCH_MODE'], $_SERVER['HTTP_SEC_FETCH_DEST'])) {
+      $destination = strtolower(sanitize_text_field(wp_unslash($_SERVER['HTTP_SEC_FETCH_DEST'])));
+      $mode = strtolower(sanitize_text_field(wp_unslash($_SERVER['HTTP_SEC_FETCH_MODE'])));
       if (('empty' === $destination && in_array($mode, ['cors', 'same-origin'], true))) {
         return true;
       }

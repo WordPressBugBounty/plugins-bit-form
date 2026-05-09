@@ -2,9 +2,12 @@
 
 namespace BitCode\BitForm\Core\Hooks;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Admin\Admin_Bar;
 use BitCode\BitForm\API\Route\Routes;
-use BitCode\BitForm\BfAnalytics;
 use BitCode\BitForm\Core\Ajax\AjaxService;
 use BitCode\BitForm\Core\Capability\Request;
 use BitCode\BitForm\Core\Database\FormModel;
@@ -24,8 +27,8 @@ class Hooks
   {
     add_action('init', [PostType::class, 'registerBitformsPostType']);
     add_action('init', [PostType::class, 'registerCustomPostType']);
+    add_action('update_option_bitform_custom_post_types', [PostType::class, 'scheduleRewriteFlush']);
     add_action('bitforms_exec_integrations', [Integrations::class, 'integrationExecutionHelper'], 1, 5);
-    // add_action('init', [Hooks::class, 'localization_setup']);
     add_action('init', [Hooks::class, 'init_classes']);
     add_action('init', [Hooks::class, 'versionUpdateRunFallbacks']);
     add_action('rest_api_init', [Hooks::class, 'registerRoutes']);
@@ -34,15 +37,12 @@ class Hooks
     add_action('bitform_dequeue_styles', [Hooks::class, 'dequeueStyles'], 1000, 100);
     add_action('init', [ConversationalFormView::class, 'conversationalFormView']);
     add_action('init', [StandaloneFormView::class, 'standaloneFormView']);
+    add_action('bitform_admin_form_changed', [Hooks::class, 'invalidateCustomUrlCache']);
     add_action('wp_footer', [Hooks::class, 'updateBitFormVersion'], 9999, 0);
 
     // Register the BitForm widget for Gutenberg, and Bricks Builder
     add_action('init', [new RegisterGutenBlock(), 'register']);
     add_action('init', [RegisterBitformBricksWidget::class, 'register_widgets'], 11);
-
-    // modify data for telemetry
-    add_filter(BITFORMS_PREFIX . 'telemetry_additional_data', [new BfAnalytics(), 'modifyTelemetryData'], 10, 1);
-
     // Add Bit Form menu to admin bar by "manage_bitform" capability
     add_filter('bitforms_form_access_capability', [Hooks::class, 'bitformMenuAccessCapability']);
   }
@@ -94,11 +94,6 @@ class Hooks
     }
   }
 
-  public static function localization_setup()
-  {
-    load_plugin_textdomain('bit-form', false, dirname(BITFORMS_PLUGIN_BASENAME) . '/languages');
-  }
-
   public static function init_classes()
   {
     if (Request::Check('admin')) {
@@ -130,10 +125,10 @@ class Hooks
 
   public static function plugin_action_links($links)
   {
-    $links[] = '<a href="https://bit-form.com/wp-docs/" target="_blank">' . __('Docs') . '</a>';
-    if (!Utilities::isPro()) {
-      $links[] = '<a href="https://bit-form.com/#pricing" target="_blank"><strong>' . __('Upgrade to Pro') . '</strong></a>';
-      // $links[] = '<a href="https://bitapps.pro/christmas-wordpress-plugin-deal/#bit-form-pricing?link_type=promo&utm_source=bit-form&utm_medium=update_button&utm_campaign=christmas&utm_content=plugins_list_directory" target="_blank"><strong>' . __('Get 50% Off! Christmas Deal.') . '</strong></a>';
+    $links[] = '<a href="https://bit-form.com/wp-docs/" target="_blank">' . __('Docs', 'bit-form') . '</a>';
+    if (!Utilities::isProLicensed()) {
+      $links[] = '<a href="https://bit-form.com/#pricing" target="_blank"><strong>' . __('Upgrade to Pro', 'bit-form') . '</strong></a>';
+      // $links[] = '<a href="https://bitapps.pro/christmas-wordpress-plugin-deal/#bit-form-pricing?link_type=promo&utm_source=bit-form&utm_medium=update_button&utm_campaign=christmas&utm_content=plugins_list_directory" target="_blank"><strong>' . __('Get 50% Off! Christmas Deal.', 'bit-form') . '</strong></a>';
     }
     return $links;
   }
@@ -164,6 +159,12 @@ class Hooks
       $bitform_dequeued_styles = [];
     }
     $bitform_dequeued_styles = array_merge($bitform_dequeued_styles, $formIds);
+  }
+
+  public static function invalidateCustomUrlCache()
+  {
+    delete_transient('bitform_standalone_url_map');
+    delete_transient('bitform_conversational_url_map');
   }
 
   public static function bitformMenuAccessCapability()

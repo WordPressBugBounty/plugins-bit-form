@@ -16,25 +16,42 @@ class TitleField
     $text = FieldValueHandler::replaceSmartTagWithValue($text);
     $fieldHelpers = new ClassicFieldHelpers($field, $fk, $form_atomic_Cls_map);
 
-    return <<<TITLEGENERATOR
-      <{$tag} class="{$fieldHelpers->getAtomicCls($cls)} {$fieldHelpers->getCustomClasses($cls)}">
-      {$preIcn}
-      {$fieldHelpers->kses_post($text)}
-      {$sufIcn}
-      </{$tag}>
-TITLEGENERATOR;
+    $allowedTags = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span', 'div'];
+    $tag = is_string($tag) ? strtolower($tag) : '';
+    if (!in_array($tag, $allowedTags, true)) {
+      $tag = 'h2';
+    }
+
+    return sprintf(
+      '      <%1$s class="%2$s %3$s">
+      %4$s
+      %5$s
+      %6$s
+      </%1$s>',
+      $tag,
+      $fieldHelpers->getAtomicCls($cls),
+      $fieldHelpers->getCustomClasses($cls),
+      $preIcn,
+      $fieldHelpers->kses_post($text),
+      $sufIcn
+    );
   }
 
   private static function iconImg($field, $object, $element, $fieldHelpers, $alt, $fk)
   {
-    return <<<ICONIMG
-      <img 
-        {$fieldHelpers->getCustomAttributes($element)}
-        class="{$fieldHelpers->getAtomicCls($element)} {$fieldHelpers->getCustomClasses($element)}"
-        src="{$fieldHelpers->esc_url($field->$object)}" 
-        alt="{$fieldHelpers->esc_attr($alt)}" 
-      />
-ICONIMG;
+    return sprintf(
+      '<img 
+        %1$s
+        class="%2$s %3$s"
+        src="%4$s" 
+        alt="%5$s" 
+      />',
+      $fieldHelpers->getCustomAttributes($element),
+      $fieldHelpers->getAtomicCls($element),
+      $fieldHelpers->getCustomClasses($element),
+      $fieldHelpers->esc_url($field->$object),
+      $fieldHelpers->esc_attr($alt)
+    );
   }
 
   private static function field($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error = null, $value = null)
@@ -74,20 +91,29 @@ ICONIMG;
       $subtitleHide = self::titleGenerator($field->subTitleTag, $field->subtitle, 'sub-titl', $subTitlPreIcn, $subTitlSufIcn, $rowID, $field, $form_atomic_Cls_map);
     }
 
-    return <<<TITLEFIELD
-    <div 
-      {$fieldHelpers->getCustomAttributes('fld-wrp')}
-      class="{$fieldHelpers->getAtomicCls('fld-wrp')} {$fieldHelpers->getCustomClasses('fld-wrp')}"
+    return sprintf(
+      '<div 
+      %1$s
+      class="%2$s %3$s"
     >
-     {$logo}
+     %4$s
       <div
-        {$fieldHelpers->getCustomAttributes('titl-wrp')}
-        class="{$fieldHelpers->getAtomicCls('titl-wrp')} {$fieldHelpers->getCustomClasses('titl-wrp')}"
+        %5$s
+        class="%6$s %7$s"
       >
-        {$titleHide}
-        {$subtitleHide}
+        %8$s
+        %9$s
       </div>
-    </div>
-TITLEFIELD;
+    </div>',
+      $fieldHelpers->getCustomAttributes('fld-wrp'),
+      $fieldHelpers->getAtomicCls('fld-wrp'),
+      $fieldHelpers->getCustomClasses('fld-wrp'),
+      $logo,
+      $fieldHelpers->getCustomAttributes('titl-wrp'),
+      $fieldHelpers->getAtomicCls('titl-wrp'),
+      $fieldHelpers->getCustomClasses('titl-wrp'),
+      $titleHide,
+      $subtitleHide
+    );
   }
 }

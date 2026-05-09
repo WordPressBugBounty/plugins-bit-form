@@ -19,7 +19,6 @@ class WpFileHandler
 
   public function uploadFeatureImg($file, $entryID, $postID)
   {
-    require_once ABSPATH . 'wp-load.php';
     $_upload_dir = FileHandler::getEntriesFileUploadDir($this->_formID, $entryID);
     $files = is_string($file) ? json_decode($file) : $file;
     $IMGFileName = $files[0];
@@ -52,7 +51,6 @@ class WpFileHandler
   public function singleFileMoveWpMedia($entryID, $fileValues, $post_id)
   {
     $_upload_dir = FileHandler::getEntriesFileUploadDir($this->_formID, $entryID);
-    require_once ABSPATH . 'wp-load.php';
     $files = is_string($fileValues) ? json_decode($fileValues) : $fileValues;
 
     $IMGFileName = $files[0];
@@ -85,7 +83,6 @@ class WpFileHandler
   public function multiFileMoveWpMedia($entryID, $fileValues, $post_id)
   {
     $_upload_dir = FileHandler::getEntriesFileUploadDir($this->_formID, $entryID);
-    require_once ABSPATH . 'wp-load.php';
     $attachMentId = [];
     $files = is_string($fileValues) ? json_decode($fileValues) : $fileValues;
     foreach ($files as $file) {

@@ -45,82 +45,114 @@ class HtmlSelectField
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
     if ($fieldHelpers->property_exists_nested($field, 'phHide', true)) {
-      $phHide = <<<PHHIDE
-        <option
-          {$fieldHelpers->getCustomAttributes('slct-optn')}
-          class="{$fieldHelpers->getConversationalCls('slct-optn')} {$fieldHelpers->getCustomClasses('slct-optn')}"
+      $phHide = sprintf(
+        '<option
+          %1$s
+          class="%2$s"
           value
         >
-          {$fieldHelpers->kses_post($field->ph)}
-        </option>
-PHHIDE;
+          %3$s
+        </option>',
+        $fieldHelpers->getCustomAttributes('slct-optn'),
+        $fieldHelpers->getConversationalCls('slct-optn') . ' ' . $fieldHelpers->getCustomClasses('slct-optn'),
+        $fieldHelpers->kses_post($field->ph)
+      );
     }
 
     if (property_exists($field, 'opt')) {
       foreach ($field->opt as $opt) {
         $disabled = property_exists($opt, 'disabled') ? 'disabled' : '';
         if (property_exists($opt, 'type')) {
-          $optionsHTML .= <<<OPTGRP
-            <optgroup
-              {$fieldHelpers->getCustomAttributes('slct-opt-grp')}
-              class="{$fieldHelpers->getConversationalCls('slct-opt-grp')} {$fieldHelpers->getCustomClasses('slct-opt-grp')}"
-              label="{$fieldHelpers->esc_attr($opt->title)}"
-              {$disabled}
-            >
-OPTGRP;
+          $optionsHTML .= sprintf(
+            '<optgroup
+              %1$s
+              class="%2$s"
+              label="%3$s"
+              %4$s
+            >',
+            $fieldHelpers->getCustomAttributes('slct-opt-grp'),
+            $fieldHelpers->getConversationalCls('slct-opt-grp') . ' ' . $fieldHelpers->getCustomClasses('slct-opt-grp'),
+            $fieldHelpers->esc_attr($opt->title),
+            $disabled
+          );
           foreach ($opt->childs as $child) {
             $val = isset($child->val) ? $child->val : $child->lbl;
             $selected = self::checkSelected($child, $value);
             $disabled = property_exists($child, 'disabled') ? 'disabled' : '';
-            $optionsHTML .= <<<OPT
-              <option
-                {$fieldHelpers->getCustomAttributes('slct-optn')}
-                class="{$fieldHelpers->getConversationalCls('slct-optn')} {$fieldHelpers->getCustomClasses('slct-optn')}"
-                value="{$fieldHelpers->esc_attr($val)}"
-                {$selected}
-                {$disabled}
+            $optionsHTML .= sprintf(
+              '<option
+                %1$s
+                class="%2$s"
+                value="%3$s"
+                %4$s
+                %5$s
               >
-                {$fieldHelpers->kses_post($child->lbl)}
-              </option>
-OPT;
+                %6$s
+              </option>',
+              $fieldHelpers->getCustomAttributes('slct-optn'),
+              $fieldHelpers->getConversationalCls('slct-optn') . ' ' . $fieldHelpers->getCustomClasses('slct-optn'),
+              $fieldHelpers->esc_attr($val),
+              $selected,
+              $disabled,
+              $fieldHelpers->kses_post($child->lbl)
+            );
           }
           $optionsHTML .= '</optgroup>';
         } else {
           $selected = self::checkSelected($opt, $value);
           $val = isset($opt->val) ? $opt->val : $opt->lbl;
-          $optionsHTML .= <<<OPT
-            <option
-              {$fieldHelpers->getCustomAttributes('slct-optn')}
-              class="{$fieldHelpers->getConversationalCls('slct-optn')} {$fieldHelpers->getCustomClasses('slct-optn')}"
-              value="{$fieldHelpers->esc_attr($val)}"
-              {$selected}
-              {$disabled}
+          $optionsHTML .= sprintf(
+            '<option
+              %1$s
+              class="%2$s"
+              value="%3$s"
+              %4$s
+              %5$s
             >
-              {$fieldHelpers->kses_post($opt->lbl)}
-            </option>
-OPT;
+              %6$s
+            </option>',
+            $fieldHelpers->getCustomAttributes('slct-optn'),
+            $fieldHelpers->getConversationalCls('slct-optn') . ' ' . $fieldHelpers->getCustomClasses('slct-optn'),
+            $fieldHelpers->esc_attr($val),
+            $selected,
+            $disabled,
+            $fieldHelpers->kses_post($opt->lbl)
+          );
         }
       }
     }
 
-    return <<<HTMLSELECTFIELD
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getConversationalCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
-    >
-      <select
-        {$fieldHelpers->getCustomAttributes('fld')}
-        id="{$rowID}-{$contentCount}"
-        class="{$fieldHelpers->getConversationalCls('fld')} {$fieldHelpers->getCustomClasses('fld')} {$readonlyCls}"
-        {$readonly}
-        {$disabled}
-        {$name}
-        value="{$fieldHelpers->esc_attr($value)}"
+    return sprintf(
+      '<div
+      %1$s
+      class="%2$s"
       >
-        {$phHide}
-        {$optionsHTML}
-      </select>
-    </div>
-HTMLSELECTFIELD;
+          <select
+            %3$s
+            id="%4$s-%5$s"
+            class="%6$s %7$s"
+            %8$s
+            %9$s
+            %10$s
+            value="%11$s"
+          >
+             %12$s
+             %13$s
+          </select>
+      </div>',
+      $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
+      $fieldHelpers->getConversationalCls('inp-fld-wrp') . ' ' . $fieldHelpers->getCustomClasses('inp-fld-wrp'),
+      $fieldHelpers->getCustomAttributes('fld'),
+      $rowID,
+      $contentCount,
+      $fieldHelpers->getConversationalCls('fld') . ' ' . $fieldHelpers->getCustomClasses('fld'),
+      $readonlyCls,
+      $readonly,
+      $disabled,
+      $name,
+      $fieldHelpers->esc_attr($value),
+      $phHide,
+      $optionsHTML
+    );
   }
 }

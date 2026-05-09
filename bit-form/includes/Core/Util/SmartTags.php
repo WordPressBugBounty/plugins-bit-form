@@ -65,9 +65,9 @@ final class SmartTags
   {
     $post = [];
     if (($referer || FrontendHelpers::isAjaxRequest()) && isset($_SERVER['HTTP_REFERER'])) {
-      $postId = url_to_postid($_SERVER['HTTP_REFERER']);
+      $postId = url_to_postid(esc_url_raw(wp_unslash($_SERVER['HTTP_REFERER'])));
     } else {
-      $postId = url_to_postid($_SERVER['REQUEST_URI']);
+      $postId = url_to_postid(isset($_SERVER['REQUEST_URI']) ? esc_url_raw(wp_unslash($_SERVER['REQUEST_URI'])) : '');
     }
 
     if ($postId) {
@@ -97,11 +97,12 @@ final class SmartTags
     }
     switch ($key) {
       case '_bf_custom_date_format':
-        $smartTags['_bf_custom_date_format'] = date($customValue);
+        $smartTags['_bf_custom_date_format'] = wp_date($customValue);
         return $smartTags;
         break;
       case '_bf_query_param':
-        $smartTags['_bf_query_param'] = isset($_GET[$customValue]) ? urldecode(stripslashes($_GET[$customValue])) : '';
+        // Read-only URL query param for Smart Tag pre-fill; value is sanitized before use and escaped at output.
+        $smartTags['_bf_query_param'] = (isset($_GET[$customValue]) && is_string($_GET[$customValue])) ? sanitize_text_field(urldecode(wp_unslash($_GET[$customValue]))) : '';
         return $smartTags;
         break;
       case '_bf_user_meta_key':
@@ -149,7 +150,7 @@ final class SmartTags
     $userDetail = IpTool::getUserDetail();
     $device = explode('|', $userDetail['device']);
 
-    global $bf_entry_id;
+    global $bitform_entry_id;
     global $wp;
 
     if (is_array($device)) {
@@ -182,7 +183,7 @@ final class SmartTags
       '_bf_date.d-M, Y'        => wp_date('d-M, Y'),
       '_bf_time'               => wp_date(get_option('time_format')),
       '_bf_weekday'            => wp_date('l'),
-      '_bf_http_referer_url'   => isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '',
+      '_bf_http_referer_url'   => isset($_SERVER['HTTP_REFERER']) ? esc_url_raw(wp_unslash($_SERVER['HTTP_REFERER'])) : '',
       '_bf_ip_address'         => IpTool::getIP(),
       '_bf_browser_name'       => isset($browser) ? $browser : '',
       '_bf_operating_system'   => isset($operating) ? $operating : '',
@@ -211,7 +212,7 @@ final class SmartTags
       '_bf_post_modified_date' => (is_object($data['post']) ? $data['post']->post_modified : ''),
       '_bf_post_url'           => (is_object($data['post']) ? strval(get_permalink($data['post']->ID)) : ''),
       '_bf_is_user_logged_in'  => is_user_logged_in() ? 'logged_in' : 'logged_out',
-      '_bf_entry_id'           => $bf_entry_id ? $bf_entry_id : '',
+      '_bf_entry_id'           => $bitform_entry_id ? $bitform_entry_id : '',
       '_bf_back_view'          => home_url($wp->request),
     ];
 

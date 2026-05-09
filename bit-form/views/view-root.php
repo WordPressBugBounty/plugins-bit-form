@@ -1,4 +1,9 @@
-<?php if (!defined('ABSPATH') && !defined('BITFORMS_ASSET_URI')) {
+<?php
+// This file is included via require_once inside Admin_Bar::RootPage(); $logoUrl is in that method's local scope, not global namespace.
+if (!defined('ABSPATH')) {
+  exit;
+}
+if (!defined('BITFORMS_ASSET_URI')) {
   exit;
 }
 
@@ -43,4 +48,3 @@ const {
 document.querySelector('#wpbody').style.backgroundColor = backgroundColor
 document.querySelector('#wpcontent').style.paddingLeft = 0
 </script>
-<script defer type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.8/xlsx.full.min.js"></script>

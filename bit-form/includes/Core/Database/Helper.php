@@ -70,7 +70,7 @@ final class Helper
     if (isset($timeInterval[$operator])) {
       $data = explode('_', $timeInterval[$operator]);
       if (is_array($data) && count($data) > 0) {
-        $value = date($data[0], strtotime($data[1]));
+        $value = gmdate($data[0], strtotime($data[1]));
       }
     }
 
@@ -135,7 +135,7 @@ final class Helper
 
   public function fieldQueryByDate($fld, $operator, $value, $logic)
   {
-    $currentYear = date('Y');
+    $currentYear = gmdate('Y');
 
     $sql = '';
 

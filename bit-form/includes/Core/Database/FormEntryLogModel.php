@@ -49,7 +49,11 @@ class FormEntryLogModel extends Model
     if (is_null($entry_id)) {
       return new WP_Error('empty_data', __('Form data is empty', 'bit-form'));
     }
-    $sql = "SELECT api_type, response_obj FROM `{$this->app_db->prefix}bitforms_form_entry_log` as el JOIN `{$this->app_db->prefix}bitforms_form_log_details` as ld ON ld.log_id = el.id WHERE form_entry_id = {$entry_id}  AND integration_id = {$integ_id} AND ld.response_type = 'success' ORDER BY el.id DESC LIMIT 1";
+    $sql = $this->app_db->prepare(
+      "SELECT api_type, response_obj FROM `{$this->app_db->prefix}bitforms_form_entry_log` as el JOIN `{$this->app_db->prefix}bitforms_form_log_details` as ld ON ld.log_id = el.id WHERE form_entry_id = %d AND integration_id = %d AND ld.response_type = 'success' ORDER BY el.id DESC LIMIT 1",
+      $entry_id,
+      $integ_id
+    );
 
     return $this->app_db->get_results($sql);
   }
@@ -80,7 +84,10 @@ class FormEntryLogModel extends Model
 
   public function get_form_value($form_id = '')
   {
-    $sql = "SELECT `meta_key`,`meta_value` FROM `{$this->app_db->prefix}bitforms_form_entrymeta` where bitforms_form_entry_id=$form_id";
+    $sql = $this->app_db->prepare(
+      "SELECT `meta_key`,`meta_value` FROM `{$this->app_db->prefix}bitforms_form_entrymeta` WHERE bitforms_form_entry_id=%d",
+      $form_id
+    );
     return $this->execute($sql)->getResult();
   }
 
@@ -89,7 +96,11 @@ class FormEntryLogModel extends Model
     if (empty($logID)) {
       return false;
     }
-    $sql = "UPDATE `{$this->app_db->prefix}bitforms_form_entry_log` SET content='$updateValue' WHERE id=$logID";
+    $sql = $this->app_db->prepare(
+      "UPDATE `{$this->app_db->prefix}bitforms_form_entry_log` SET content=%s WHERE id=%d",
+      $updateValue,
+      $logID
+    );
     return $this->execute($sql)->getResult();
   }
 }

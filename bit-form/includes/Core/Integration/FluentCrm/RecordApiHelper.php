@@ -32,7 +32,10 @@ class RecordApiHelper
 
   public function insertRecord($data, $actions)
   {
-    $contact = Arr::only($data, ['first_name', 'last_name', 'email']);
+    // $contact = Arr::only($data, ['first_name', 'last_name', 'email']);
+
+    $contact = $data;
+    unset($contact['list_id'], $contact['tags']);
 
     // for full name
     if (!$contact['first_name'] && !$contact['last_name']) {
@@ -57,66 +60,37 @@ class RecordApiHelper
         'messages' => 'Contact already exists!'
       ];
     } else {
-      // for subscirber
+      $hasDoubleOptIn = isset($actions->double_opt_in) && $actions->double_opt_in;
+      $forceSubscribed = false;
+
       if (!$subscriber) {
-        if (isset($actions->double_opt_in) && $actions->double_opt_in) {
-          $contact['status'] = 'pending';
-        } else {
-          $contact['status'] = 'subscribed';
-        }
-
-        if ($listId = Arr::get($data, 'list_id')) {
-          $contact['lists'] = [$listId];
-        }
-        $contact['tags'] = $data['tags'];
-
-        $subscriber = FluentCrmApi('contacts')->createOrUpdate($contact, false, false);
-
-        if ('pending' === $subscriber->status) {
-          $subscriber->sendDoubleOptinEmail();
-        }
-        if ($subscriber) {
-          $response = [
-            'success'  => true,
-            'messages' => 'Insert successfully!'
-          ];
-        } else {
-          $response = [
-            'success'  => false,
-            'messages' => 'Somthing wrong!'
-          ];
-        }
+        $contact['status'] = $hasDoubleOptIn ? 'pending' : 'subscribed';
       } else {
-        if ($listId = Arr::get($data, 'list_id')) {
-          $contact['lists'] = [$listId];
-        }
-
-        $contact['tags'] = $data['tags'];
-
-        $hasDouBleOptIn = isset($actions->double_opt_in) && $actions->double_opt_in;
-
-        $forceSubscribed = !$hasDouBleOptIn && ('subscribed' !== $subscriber->status);
-
+        $forceSubscribed = !$hasDoubleOptIn && ('subscribed' !== $subscriber->status);
         if ($forceSubscribed) {
           $contact['status'] = 'subscribed';
         }
-        $subscriber = FluentCrmApi('contacts')->createOrUpdate($contact, $forceSubscribed, false);
-
-        if ($hasDouBleOptIn && ('pending' === $subscriber->status || 'unsubscribed' === $subscriber->status)) {
-          $subscriber->sendDoubleOptinEmail();
-        }
-        if ($subscriber) {
-          $response = [
-            'success'  => true,
-            'messages' => 'Insert successfully!'
-          ];
-        } else {
-          $response = [
-            'success'  => false,
-            'messages' => 'Something wrong!'
-          ];
-        }
       }
+
+      if ($listId = Arr::get($data, 'list_id')) {
+        $contact['lists'] = [$listId];
+      }
+      $contact['tags'] = $data['tags'];
+
+      $isNewSubscriber = !$subscriber;
+      $subscriber = FluentCrmApi('contacts')->createOrUpdate($contact, $forceSubscribed, false);
+
+      $shouldSendDoubleOptIn = $isNewSubscriber
+        ? ('pending' === $subscriber->status)
+        : ($hasDoubleOptIn && in_array($subscriber->status, ['pending', 'unsubscribed'], true));
+
+      if ($shouldSendDoubleOptIn) {
+        $subscriber->sendDoubleOptinEmail();
+      }
+
+      $response = $subscriber
+        ? ['success' => true, 'messages' => 'Insert successfully!']
+        : ['success' => false, 'messages' => 'Something wrong!'];
     }
     return $response;
   }

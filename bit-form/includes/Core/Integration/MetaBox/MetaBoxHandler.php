@@ -60,7 +60,12 @@ class MetaBoxHandler
 
     $id = $postData['post_type'] . '_' . $entryID;
 
-    $existPostId = $this->_wpdb->get_results("SELECT * FROM `{$this->_wpdb->prefix}bitforms_form_entrymeta` WHERE `meta_key`='$id' ");
+    $existPostId = $this->_wpdb->get_results(
+      $this->_wpdb->prepare(
+        "SELECT * FROM `{$this->_wpdb->prefix}bitforms_form_entrymeta` WHERE `meta_key`=%s",
+        $id
+      )
+    );
 
     $metaBoxFields = rwmb_get_object_fields($postData['post_type']);
 
@@ -89,6 +94,7 @@ class MetaBoxHandler
         }
       }
 
+      // Form entry meta insert; meta_key/meta_value required to map dynamic field data to MetaBox integration record.
       $this->_wpdb->insert(
         "{$this->_wpdb->prefix}bitforms_form_entrymeta",
         [

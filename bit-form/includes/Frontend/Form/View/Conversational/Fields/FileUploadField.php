@@ -31,14 +31,18 @@ class FileUploadField
     $contentCount = count($bfFrontendFormIds);
 
     if ($fh->property_exists_nested($field, 'config->showSelectStatus', true)) {
-      $showSelectStatus = <<<SHOWSELSTATUS
-      <div
-        {$fh->getCustomAttributes('file-select-status')}
-        class="{$fh->getConversationalMultiCls('file-select-status')} {$fh->getCustomClasses('file-select-status')}"
-      >
-        No Choosen File
-      </div>
-SHOWSELSTATUS;
+      $showSelectStatus = sprintf(
+        '<div
+        %1$s
+        class="%2$s %3$s"
+        >
+           No Choosen File
+        </div>
+',
+        $fh->getCustomAttributes('file-select-status'),
+        $fh->getConversationalMultiCls('file-select-status'),
+        $fh->getCustomClasses('file-select-status')
+      );
     }
 
     if (
@@ -48,69 +52,72 @@ SHOWSELSTATUS;
       && 0 !== $field->config->maxSize
     ) {
       $maxSizeLbl = $fh->property_exists_nested($field, 'config->maxSizeLabel', '', 1) ? $field->config->maxSizeLabel : "(Max {$maxSize} ${sizeUnit})";
-      $maxSizeSection = <<<MAXSIZE
-      <small
-        {$fh->getCustomAttributes('max-size-lbl')}
-        class="{$fh->getConversationalMultiCls('max-size-lbl')} {$fh->getCustomClasses('max-size-lbl')}"
-      >
-      {$fh->esc_html($maxSizeLbl)}
-      </small>
-MAXSIZE;
+      $maxSizeSection = sprintf(
+        '<small
+        %1$s
+        class="%2$s %3$s"
+        >
+          %4$s
+        </small>
+',
+        $fh->getCustomAttributes('max-size-lbl'),
+        $fh->getConversationalMultiCls('max-size-lbl'),
+        $fh->getCustomClasses('max-size-lbl'),
+        $fh->esc_html($maxSizeLbl)
+      );
     }
 
-    return <<<FILEUPLOADFIELD
-    <div 
-      {$fh->getCustomAttributes('file-up-container')}
-      class="{$fh->getConversationalMultiCls('file-up-container')} {$fh->getCustomClasses('file-up-container')}"
+    return '    <div 
+      ' . $fh->getCustomAttributes('file-up-container') . '
+      class="' . $fh->getConversationalMultiCls('file-up-container') . ' ' . $fh->getCustomClasses('file-up-container') . '"
     >
       <div
-        {$fh->getCustomAttributes('file-up-wrpr')}
-        class="{$fh->getConversationalMultiCls('file-up-wrpr')} {$fh->getCustomClasses('file-up-wrpr')} {$readonlyCls} {$disabledCls}"
+        ' . $fh->getCustomAttributes('file-up-wrpr') . '
+        class="' . $fh->getConversationalMultiCls('file-up-wrpr') . ' ' . $fh->getCustomClasses('file-up-wrpr') . ' ' . $readonlyCls . ' ' . $disabledCls . '"
       >
         <div
-          {$fh->getCustomAttributes('file-input-wrpr')}
-          class="{$fh->getConversationalMultiCls('file-input-wrpr')} {$fh->getCustomClasses('file-input-wrpr')}"
+          ' . $fh->getCustomAttributes('file-input-wrpr') . '
+          class="' . $fh->getConversationalMultiCls('file-input-wrpr') . ' ' . $fh->getCustomClasses('file-input-wrpr') . '"
         >
           <div
-            {$fh->getCustomAttributes('btn-wrpr')}
-            class="{$fh->getConversationalMultiCls('btn-wrpr')} {$fh->getCustomClasses('btn-wrpr')}"
+            ' . $fh->getCustomAttributes('btn-wrpr') . '
+            class="' . $fh->getConversationalMultiCls('btn-wrpr') . ' ' . $fh->getCustomClasses('btn-wrpr') . '"
           >
             <button
-              {$fh->getCustomAttributes('inp-btn')}
+              ' . $fh->getCustomAttributes('inp-btn') . '
               type="button"
-              class="{$fh->getConversationalMultiCls('inp-btn')} {$fh->getCustomClasses('inp-btn')}"
+              class="' . $fh->getConversationalMultiCls('inp-btn') . ' ' . $fh->getCustomClasses('inp-btn') . '"
             >
-             {$prefixIcn}
+             ' . $prefixIcn . '
               <span
-                {$fh->getCustomAttributes('btn-txt')}
-                class="{$fh->getConversationalMultiCls('btn-txt')} {$fh->getCustomClasses('btn-txt')}"
+                ' . $fh->getCustomAttributes('btn-txt') . '
+                class="' . $fh->getConversationalMultiCls('btn-txt') . ' ' . $fh->getCustomClasses('btn-txt') . '"
               >
-                {$fh->kses_post($btnTxt)}
+                ' . $fh->kses_post($btnTxt) . '
               </span>
-              {$suffixIcn}
+              ' . $suffixIcn . '
             </button>
-            {$showSelectStatus}
-            {$maxSizeSection}
+            ' . $showSelectStatus . '
+            ' . $maxSizeSection . '
             <input
-              {$fh->getCustomAttributes('file-upload-input')}
+              ' . $fh->getCustomAttributes('file-upload-input') . '
               type="file"
-              class="{$fh->getConversationalMultiCls('file-upload-input')} {$fh->getCustomClasses('file-upload-input')}"
-              id="{$rowID}-{$contentCount}"
-              {$name}
-              {$req}
-              {$fh->disabled()}
-              {$fh->readonly()}
+              class="' . $fh->getConversationalMultiCls('file-upload-input') . ' ' . $fh->getCustomClasses('file-upload-input') . '"
+              id="' . $rowID . '-' . $contentCount . '"
+              ' . $name . '
+              ' . $req . '
+              ' . $fh->disabled() . '
+              ' . $fh->readonly() . '
               aria-disabled="true"
               tabindex="-1"
             />
           </div>
           <div 
-            {$fh->getCustomAttributes('err-wrp')}
-            class="err-wrp {$fh->getCustomClasses('err-wrp')}"
+            ' . $fh->getCustomAttributes('err-wrp') . '
+            class="err-wrp ' . $fh->getCustomClasses('err-wrp') . '"
           ></div>
         </div>
       </div>
-    </div>
-FILEUPLOADFIELD;
+    </div>';
   }
 }

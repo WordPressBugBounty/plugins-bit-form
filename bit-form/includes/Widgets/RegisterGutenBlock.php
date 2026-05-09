@@ -2,6 +2,10 @@
 
 namespace BitCode\BitForm\Widgets;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Form\FormHandler;
 
 final class RegisterGutenBlock
@@ -18,6 +22,7 @@ final class RegisterGutenBlock
       wp_enqueue_script(
         'bitforms-gutenberg-block',
         BITFORMS_ROOT_URI . '/assets/gutenberg-shortcode-block.js',
+        [],
         BITFORMS_VERSION,
         true
       );
@@ -43,6 +48,7 @@ final class RegisterGutenBlock
     wp_enqueue_script(
       'bitforms-gutenberg-block',
       BITFORMS_ROOT_URI . '/assets/gutenberg-shortcode-block.js',
+      [],
       BITFORMS_VERSION,
       true
     );
@@ -83,11 +89,9 @@ final class RegisterGutenBlock
         // }
 
         if ($content) {
-          echo $content;
-          return '';
+          return $content;
         }
-        $shortCode = '[bitform id=\'' . $formId . '\']';
-        // error_log('shortcode' . $shortCode);
+        $shortCode = '[bitform id=\'' . esc_attr($formId) . '\']';
         return do_shortcode($shortCode);
       },
       'attributes' => [

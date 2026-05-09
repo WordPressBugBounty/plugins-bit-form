@@ -61,7 +61,7 @@ final class IpTool
     } elseif (getenv('HTTP_FORWARDED')) {
       $ip = getenv('HTTP_FORWARDED');
     } else {
-      $ip = $_SERVER['REMOTE_ADDR'];
+      $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
     }
     return IpTool::validateIpAddress($ip);
   }
@@ -74,7 +74,7 @@ final class IpTool
   private static function _checkDevice()
   {
     if (isset($_SERVER, $_SERVER['HTTP_USER_AGENT'])) {
-      $user_agent = $_SERVER['HTTP_USER_AGENT'];
+      $user_agent = sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT']));
     } else {
       $user_agent = '';
     }

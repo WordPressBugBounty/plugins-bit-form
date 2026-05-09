@@ -52,17 +52,8 @@ final class MigrateForms
     global $wpdb;
     $deleteTable = "{$wpdb->prefix}bitforms_{$deletedTableName}";
     $renameTable = "{$wpdb->prefix}bitforms_{$renamedTableName}";
-    // $wpdb->query("DROP TABLE IF EXISTS $deleteTable");
-    // $wpdb->query("RENAME TABLE $renameTable TO $deleteTable");
-    $wpdb->query(
-      $wpdb->prepare(
-        "DROP TABLE IF EXISTS $deleteTable"
-      )
-    );
-    $wpdb->query(
-      $wpdb->prepare(
-        "RENAME TABLE $renameTable TO $deleteTable"
-      )
-    );
+    // Schema migration: table name interpolation only. $wpdb->prepare() cannot parameterize DDL statements.
+    $wpdb->query("DROP TABLE IF EXISTS `{$deleteTable}`");
+    $wpdb->query("RENAME TABLE `{$renameTable}` TO `{$deleteTable}`");
   }
 }

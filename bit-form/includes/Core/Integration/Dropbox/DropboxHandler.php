@@ -2,6 +2,10 @@
 
 namespace BitCode\BitForm\Core\Integration\Dropbox;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Integration\Dropbox\RecordApiHelper as DropboxRecordApiHelper;
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\ApiResponse;
@@ -41,17 +45,14 @@ class DropboxHandler
    */
   public static function checkAuthorization()
   {
-    if (!isset($_REQUEST['_ajax_nonce']) && !wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (!isset($_REQUEST['_ajax_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       wp_send_json_error(__('Token expired', 'bit-form'), 401);
     }
-
-    // $inputJSON = file_get_contents('php://input');
-    // $queryParams = json_decode($inputJSON);
 
     GlobalHelper::requirePostMethod();
 
     try {
-      $queryParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+      $queryParams = GlobalHelper::formatRequestData();
     } catch (\InvalidArgumentException $e) {
       wp_send_json_error($e->getMessage(), 400);
     }
@@ -84,17 +85,14 @@ class DropboxHandler
    */
   public static function getAllFolders()
   {
-    if (!isset($_REQUEST['_ajax_nonce']) && !wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (!isset($_REQUEST['_ajax_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       wp_send_json_error(__('Token expired', 'bit-form'), 401);
     }
-
-    // $inputJSON = file_get_contents('php://input');
-    // $queryParams = json_decode($inputJSON);
 
     GlobalHelper::requirePostMethod();
 
     try {
-      $queryParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+      $queryParams = GlobalHelper::formatRequestData();
     } catch (\InvalidArgumentException $e) {
       wp_send_json_error($e->getMessage(), 400);
     }

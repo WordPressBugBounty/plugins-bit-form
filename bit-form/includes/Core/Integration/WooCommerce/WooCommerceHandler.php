@@ -7,6 +7,10 @@
 
 namespace BitCode\BitForm\Core\Integration\WooCommerce;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\ApiResponse as UtilApiResponse;
 use BitCode\BitForm\GlobalHelper;
@@ -49,7 +53,7 @@ class WooCommerceHandler
    */
   public static function authorizeWC()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       include_once ABSPATH . 'wp-admin/includes/plugin.php';
       if (is_plugin_active('woocommerce/woocommerce.php')) {
         wp_send_json_success(true, 200);
@@ -119,14 +123,11 @@ class WooCommerceHandler
   public static function refreshFieldsAjaxHelper()
   {
     $required = null;
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
-      // $inputJSON = file_get_contents('php://input');
-      // $queryParams = json_decode($inputJSON);
-
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       GlobalHelper::requirePostMethod();
 
       try {
-        $queryParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $queryParams = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -474,13 +475,11 @@ class WooCommerceHandler
 
   public function searchProjectsAjaxHelper()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
-      // $inputJSON = file_get_contents('php://input');
-      // $queryParams = json_decode($inputJSON);
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       GlobalHelper::requirePostMethod();
 
       try {
-        $queryParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $queryParams = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }

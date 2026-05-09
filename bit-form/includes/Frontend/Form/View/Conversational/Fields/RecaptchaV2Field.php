@@ -23,16 +23,27 @@ class RecaptchaV2Field
     $theme = $field->config->theme;
     $size = $field->config->size;
 
-    return <<<RECAPTCHAV2FIELD
-      <div
-        {$fieldHelpers->getCustomAttributes('fld-wrp')}
-        class="{$fieldHelpers->getConversationalCls('fld-wrp')} {$fieldHelpers->getCustomClasses('fld-wrp')}"
+    return sprintf(
+      '<div
+        %1$s
+        class="%2$s"
       >
-        <div class="$rowID-recaptcha-wrp">
-          <div class="g-recaptcha" data-theme="{$theme}" data-size="{$size}" data-sitekey="{$fieldHelpers->esc_attr($siteKey)}">
+        <div class="%3$s-recaptcha-wrp">
+          <div
+            class="g-recaptcha"
+            data-theme="%4$s"
+            data-size="%5$s"
+            data-sitekey="%6$s"
+          >
           </div>
         </div>
-      </div>
-RECAPTCHAV2FIELD;
+      </div>',
+      $fieldHelpers->getCustomAttributes('fld-wrp'),
+      $fieldHelpers->getConversationalCls('fld-wrp') . ' ' . $fieldHelpers->getCustomClasses('fld-wrp'),
+      $rowID,
+      $theme,
+      $size,
+      $fieldHelpers->esc_attr($siteKey)
+    );
   }
 }

@@ -97,20 +97,16 @@ class BitFormElementorWidget extends Widget_Base
 
     wp_dequeue_style('bitform-style-css');
 
-    if (is_admin() && \Elementor\Plugin::$instance->editor->is_edit_mode()) {
-      echo "<link rel='stylesheet' id='bitform-style-css' href='{$css_path}' type='text/css' media='all' />";
-    } else {
-      wp_enqueue_style('bitform-style', $css_path, [], time());
-    }
-
-    $form_html = do_shortcode("[bitform id='$form_id']");
+    $formUpdateVersion = get_option('bit-form_form_update_version');
+    wp_register_style('bitform-elementor-style-' . (int) $form_id, $css_path, [], $formUpdateVersion);
+    wp_enqueue_style('bitform-elementor-style-' . (int) $form_id);
 
     if (\Elementor\Plugin::$instance->editor->is_edit_mode()) {
       echo '<div class="bitform-preview">';
-      echo $form_html;
+      echo do_shortcode('[bitform id="' . esc_attr($form_id) . '"]');
       echo '</div>';
     } else {
-      echo $form_html;
+      echo do_shortcode('[bitform id="' . esc_attr($form_id) . '"]');
     }
   }
 }

@@ -12,5 +12,4 @@ return array(
     'Jcof\\' => array($vendorDir . '/arif-un/jcof/src'),
     'BitCode\\BitForm\\ComposerScripts\\' => array($baseDir . '/composer'),
     'BitCode\\BitForm\\' => array($baseDir . '/includes'),
-    'BitApps\\WPTelemetry\\' => array($vendorDir . '/bitapps/wp-telemetry/src'),
 );

@@ -2,19 +2,12 @@
 
 namespace BitCode\BitForm\Admin\Form;
 
-use BitCode\BitForm\Admin\Form\InitJs\HCaptcha;
-use BitCode\BitForm\Admin\Form\InitJs\Paypal;
-use BitCode\BitForm\Admin\Form\InitJs\Razorpay;
-use BitCode\BitForm\Admin\Form\InitJs\Recaptcha;
-use BitCode\BitForm\Admin\Form\InitJs\RecaptchaV3;
-use BitCode\BitForm\Admin\Form\InitJs\ScriptLoader;
-use BitCode\BitForm\Admin\Form\InitJs\Stripe;
-use BitCode\BitForm\Admin\Form\InitJs\Turnstile;
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Util\FileHandler;
 use BitCode\BitForm\Core\Util\Log;
-use BitCode\BitForm\Core\Util\Utilities;
-use BitCode\BitForm\Core\WorkFlow\WorkFlowHandler;
-use BitCode\BitFormPro\Admin\FormSettings\FormAbandonment;
 use WP_Error;
 
 class FrontEndScriptGenerator
@@ -38,9 +31,8 @@ class FrontEndScriptGenerator
   private static function generateBfGlobalObjJS($contentIds = [])
   {
     $contentidArray = wp_json_encode($contentIds);
-    return <<<GLOBALOBJ
-    if(!window.bf_globals){ window.bf_globals = {};}
-    $contentidArray.forEach(function(contentId){
+    return '    if(!window.bf_globals){ window.bf_globals = {};}
+    ' . $contentidArray . '.forEach(function(contentId){
       const form = document.getElementById(contentId);
       if(!form){ 
         delete window.bf_globals[contentId];
@@ -53,8 +45,7 @@ class FrontEndScriptGenerator
         window.bf_globals[contentId].contentId = contentId;
       }
       
-    });
-GLOBALOBJ;
+    });';
   }
 
   private static function isValidationNeeded($fldData)
@@ -94,6 +85,9 @@ GLOBALOBJ;
 
     // for hidden Field when cache plugin on
     $this->jsHiddenFieldScript();
+
+    // for recaptcha v3 (form-level setting)
+    $this->jsRecaptchaV3Scripts();
 
     // for form abandonment scripts
     $this->jsFormAbandonmentScripts();
@@ -146,52 +140,21 @@ GLOBALOBJ;
 
   private function jsFormAbandonmentScripts()
   {
-    if (!Utilities::isPro() || !class_exists('\BitCode\BitFormPro\Admin\FormSettings\FormAbandonment')) {
+    /**
+     * Add-ons can inject required script files here.
+     *
+     * @param array $files Array of file arrays: ['priority' => int, 'filename' => string]
+     * @param array $formContents
+     * @param array $fields
+     */
+    $files = apply_filters('bitform_form_abandonment_script_files', [], $this->_formContents, $this->_fields);
+    if (empty($files) || !is_array($files)) {
       return;
     }
-    //  check if any of the form has form abandonment enabled
-    $allFiles = [];
-    foreach ($this->_formContents as $formContent) {
-      $formAbandonmentSettings = FormAbandonment::getFormAbandonmentSettings($formContent->formId);
-      if (!empty($formAbandonmentSettings->saveFormDraft)) {
-        $neededFiles = ScriptFilePriorityManager::formAbandonmentNeededFiles('autoSave');
-        $allFiles = array_merge($allFiles, $neededFiles);
-        break;
+    foreach ($files as $jsFile) {
+      if (!empty($jsFile['filename']) && !empty($jsFile['priority'])) {
+        $this->addScriptInLoadedScriptsList($jsFile);
       }
-
-      $workflowHandler = new WorkFlowHandler($formContent->formId);
-      $allWorkflows = $workflowHandler->getAllworkFlow();
-      foreach ($allWorkflows as $workflow) {
-        foreach ($workflow['conditions'] as $cond) {
-          if (!empty($cond->actions) && !empty($cond->actions->fields)) {
-            foreach ($cond->actions->fields as $fldAction) {
-              if (empty($fldAction->field) || empty($fldAction->action)) {
-                continue;
-              }
-              if ('_bf_form' === $fldAction->field && 'save_draft' === $fldAction->action) {
-                $neededFiles = ScriptFilePriorityManager::formAbandonmentNeededFiles();
-                $allFiles = array_merge($allFiles, $neededFiles);
-              }
-            }
-          }
-        }
-      }
-    }
-    if (isset($this->_fields['button'])) {
-      foreach ($this->_fields['button'] as $button) {
-        if ('save-draft' === $button['field']->btnTyp) {
-          $neededFiles = ScriptFilePriorityManager::formAbandonmentNeededFiles();
-          $allFiles = array_merge($allFiles, $neededFiles);
-          break;
-        }
-      }
-    }
-    //
-    if (empty($allFiles)) {
-      return;
-    }
-    foreach ($allFiles as $jsFile) {
-      $this->addScriptInLoadedScriptsList($jsFile);
     }
   }
 
@@ -222,19 +185,9 @@ GLOBALOBJ;
     $script = '';
     foreach ($this->_loadedScriptsList as $scriptFileArr) {
       $fileNam = $scriptFileArr['filename'];
-      if (!isset($scriptFileArr['scriptTyp']) || 'script' === $scriptFileArr['scriptTyp']) {
-        if (self::getFileFromAssetsJs($fileNam)) {
-          $script .= self::getFileFromAssetsJs($fileNam);
-          continue;
-        }
-        continue;
-      }
-      if ('custom' === $scriptFileArr['scriptTyp']) {
-        $fileInstance = $scriptFileArr['source'] . $fileNam;
-        if (!class_exists($fileInstance)) {
-          continue;
-        } // when class not found, skip load script
-        $script .= $fileInstance::init($scriptFileArr['fk'], $scriptFileArr['field'], $scriptFileArr['contentId']);
+      $fileContent = self::getFileFromAssetsJs($fileNam);
+      if ($fileContent) {
+        $script .= $fileContent;
       }
     }
     return $script;
@@ -298,6 +251,7 @@ GLOBALOBJ;
 
   private function jsFieldsNeededFile()
   {
+    $filePondPluginList = apply_filters('bitform_filepond_plugins_list', []);
     foreach ($this->_fields as $typ => $flds) {
       if (!array_key_exists($typ, $this->_jsFilesNeeded)) {
         continue;
@@ -309,24 +263,17 @@ GLOBALOBJ;
           $configs = $fld['field']->config;
           foreach ($configs as $configKey => $config) {
             if ($configs->$configKey) {
-              $filepondPlugin = ScriptFilePriorityManager::filePondPlugins($configKey);
-              if ($filepondPlugin) {
-                $this->addScriptInLoadedScriptsList($filepondPlugin);
+              if (array_key_exists($configKey, $filePondPluginList)) {
+                $this->addScriptInLoadedScriptsList($filePondPluginList[$configKey]);
               }
             }
           }
         }
         foreach ($fldScriptArr as $scriptFile) {
-          if (!isset($scriptFile['scriptTyp'])) {
-            $this->addScriptInLoadedScriptsList($scriptFile);
+          if (isset($scriptFile['path']) && !Helpers::property_exists_nested($fld['field'], $scriptFile['path'], true)) {
             continue;
           }
-          if ('custom' === $scriptFile['scriptTyp'] && Helpers::property_exists_nested($fld['field'], $scriptFile['path'], true)) {
-            $scriptFile['field'] = $fld['field'];
-            $scriptFile['fk'] = $fld['fk'];
-            $scriptFile['contentId'] = $fld['contentId'];
-            $this->addScriptInLoadedScriptsList($scriptFile);
-          }
+          $this->addScriptInLoadedScriptsList($scriptFile);
         }
       }
     }
@@ -452,8 +399,8 @@ GLOBALOBJ;
 
     $customFldConfigPaths = [];
 
+    $allConfs = ScriptFilePriorityManager::getAllFldConfs();
     foreach ($customFldsInForms as $customFldTyp) {
-      $allConfs = ScriptFilePriorityManager::getAllFldConfs();
       if (isset($allConfs[$customFldTyp])) {
         $customFldConfigPaths[$customFldTyp] = $allConfs[$customFldTyp];
       } else {
@@ -464,101 +411,43 @@ GLOBALOBJ;
     $customFldConfigPaths = wp_json_encode($customFldConfigPaths);
     $containers = wp_json_encode($containers);
 
-    $scriptLoaderFields = ['paypal', 'razorpay', 'stripe', 'recaptcha', 'turnstile', 'hcaptcha'];
-    $scriptLoadedNeeded = array_intersect($scriptLoaderFields, $customFldsInForms) || $recaptchaV3Enabled;
-    if ($scriptLoadedNeeded) {
-      $scriptLoaderJs = ScriptLoader::init();
-    } else {
-      $scriptLoaderJs = '';
-    }
-
-    if (in_array('paypal', $customFldsInForms)) {
-      $paypalInitJs = Paypal::init();
-    } else {
-      $paypalInitJs = '';
-    }
-
-    if (in_array('razorpay', $customFldsInForms)) {
-      $razorpayInitJs = Razorpay::init();
-    } else {
-      $razorpayInitJs = '';
-    }
-
-    if (in_array('stripe', $customFldsInForms)) {
-      $stripeInitJs = Stripe::init();
-    } else {
-      $stripeInitJs = '';
-    }
-
-    if (in_array('mollie', $customFldsInForms)) {
-      $mollieInitJs = Stripe::init();
-    } else {
-      $mollieInitJs = '';
-    }
-
-    if (in_array('recaptcha', $customFldsInForms)) {
-      $recaptchaInitJs = Recaptcha::init();
-    } else {
-      $recaptchaInitJs = '';
-    }
-
-    if (in_array('turnstile', $customFldsInForms)) {
-      $turnstileInitJs = Turnstile::init();
-    } else {
-      $turnstileInitJs = '';
-    }
-
-    if (in_array('hcaptcha', $customFldsInForms)) {
-      $hCaptchaInitJs = HCaptcha::init();
-    } else {
-      $hCaptchaInitJs = '';
-    }
-
-    if ($recaptchaV3Enabled) {
-      $recaptchaV3InitJs = RecaptchaV3::init();
-    } else {
-      $recaptchaV3InitJs = '';
-    }
-
-    $script = <<<FIELDCONFIGJS
-    const customFldConfigPaths = $customFldConfigPaths;
-    const fldContainers = $containers;
-    
-    $scriptLoaderJs;
+    $script = '    const customFldConfigPaths = ' . $customFldConfigPaths . ';
+    const fldContainers = ' . $containers . ';
     
     function initAllCustomFlds (formContentId = null) {
       const allContendIds = formContentId ? [formContentId] : Object.keys(bf_globals);
       allContendIds.forEach((contentId) => {
         const contentData = bf_globals[contentId];
+        if(!contentData?.inits) contentData.inits = {};
         const flds = bf_globals[contentId]?.fields || {};
         const fldKeys = Object.keys(flds).reverse();
         fldKeys.forEach((fldKey) => {
           const fldData = flds[fldKey];
           const fldType = fldData.typ;
-          if(fldType === 'paypal') {
-            $paypalInitJs;
-          } else if(fldType === 'razorpay') {
-            $razorpayInitJs;
-          } else if(fldType === 'recaptcha') {
-            $recaptchaInitJs;
-          } else if(fldType === 'turnstile') {
-            $turnstileInitJs;
-          } else if(fldType === 'hcaptcha') {
-            $hCaptchaInitJs;
-          } else if(fldType === 'stripe') {
-            $stripeInitJs;
+          if(fldType === \'paypal\') {
+            initPaypalFld(contentId, fldKey, fldData, fldType);
+          } else if(fldType === \'razorpay\') {
+            initRazorpayFld(contentId, fldKey, fldType);
+          } else if(fldType === \'recaptcha\') {
+            initRecaptchaFld(contentId, fldKey, fldType);
+          } else if(fldType === \'turnstile\') {
+            initTurnstileFld(contentId, fldKey);
+          } else if(fldType === \'hcaptcha\') {
+            initHCaptchaFld(contentId, fldKey, fldType);
+          } else if(fldType === \'stripe\' || fldType === \'mollie\') {
+            initStripeFld(contentId, fldKey, fldType);
           } else if (customFldConfigPaths[fldType]) {
             contentData.inits[fldKey] = getFldInstance(contentId, fldKey, fldType);
           }
         });
-        if(contentData.gRecaptchaVersion === 'v3' && contentData.gRecaptchaSiteKey){
-          $recaptchaV3InitJs;
+        if(contentData.gRecaptchaVersion === \'v3\' && contentData.gRecaptchaSiteKey){
+          initRecaptchaV3Fld(contentId, contentData);
         }
       });
     };
-    function getFldInstance(contentId, fldKey, fldTyp, nestedSelector = '') {
-      const fldClass = this['bit_'+fldTyp.replace(/-/g, '_')+'_field'];
-      const selector = '#form-'+contentId+' '+nestedSelector+fldContainers[fldTyp].replace("__\$fk__", fldKey);
+    function getFldInstance(contentId, fldKey, fldTyp, nestedSelector = \'\') {
+      const fldClass = this[\'bit_\'+fldTyp.replace(/-/g, \'_\')+\'_field\'];
+      const selector = \'#form-\'+contentId+\' \'+nestedSelector+fldContainers[fldTyp].replace("__$fk__", fldKey);
       if(!fldClass || !bfSelect(selector)) return;
       return new fldClass(selector, getFldConf(contentId, fldKey, fldTyp));
     };
@@ -581,11 +470,11 @@ GLOBALOBJ;
             value = getDataFromNestedPath(fldData, fldPath.path);
           }
         }
-        if (!value && fldPath.val) {
+        if (!value && "val" in fldPath) {
           value = fldPath.val;
-          if(typeof value === 'string') {
+          if(typeof value === \'string\') {
             Object.entries(varData).forEach(([key, val]) => {
-              value = value.replace("__\$"+key+"__", val);
+              value = value.replace("__$"+key+"__", val);
             });
           }
         }
@@ -613,8 +502,7 @@ GLOBALOBJ;
       });
       current[lastKey] = value;
       return current;
-    }
-FIELDCONFIGJS;
+    }';
 
     return $script;
   }
@@ -658,6 +546,17 @@ FIELDCONFIGJS;
       $fileArr = ScriptFilePriorityManager::frontendScriptFile()['hidden-token-field'];
       $this->addScriptInLoadedScriptsList($fileArr);
       return;
+    }
+  }
+
+  private function jsRecaptchaV3Scripts()
+  {
+    foreach ($this->_formContents as $content) {
+      if (isset($content->additional->enabled->recaptchav3) && $content->additional->enabled->recaptchav3) {
+        $this->addScriptInLoadedScriptsList(['priority' => 302, 'filename' => 'scriptLoader.min.js']);
+        $this->addScriptInLoadedScriptsList(['priority' => 303, 'filename' => 'initRecaptchaV3Fld.min.js']);
+        return;
+      }
     }
   }
 

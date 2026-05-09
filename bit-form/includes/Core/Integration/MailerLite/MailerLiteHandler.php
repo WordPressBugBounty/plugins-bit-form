@@ -6,6 +6,10 @@
 
 namespace BitCode\BitForm\Core\Integration\MailerLite;
 
+if (!defined('ABSPATH')) {
+  exit;
+}
+
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\HttpHelper;
 use BitCode\BitForm\GlobalHelper;
@@ -37,14 +41,11 @@ class MailerLiteHandler
 
   public static function fetchAllGroups()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
-      // $inputJSON = file_get_contents('php://input');
-      // $requestParams = json_decode($inputJSON);
-
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       GlobalHelper::requirePostMethod();
 
       try {
-        $requestParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $requestParams = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -64,33 +65,22 @@ class MailerLiteHandler
         $apiEndpoints = self::$_baseUrlV2 . 'groups/';
         $apiKey = $requestParams->auth_token;
         $header = [
-          'Authorization: Bearer ' . $apiKey
+          'Authorization' => 'Bearer ' . $apiKey
         ];
-
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-          CURLOPT_URL            => $apiEndpoints,
-          CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_ENCODING       => '',
-          CURLOPT_MAXREDIRS      => 10,
-          CURLOPT_TIMEOUT        => 0,
-          CURLOPT_FOLLOWLOCATION => true,
-          CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-          CURLOPT_CUSTOMREQUEST  => 'GET',
-          CURLOPT_HTTPHEADER     => $header,
+        $response = wp_remote_get($apiEndpoints, [
+          'headers' => $header,
+          'timeout' => 10,
         ]);
-        $data = curl_exec($curl);
-        curl_close($curl);
-        $response = json_decode($data);
-
+        $data = wp_remote_retrieve_body($response);
+        $responseObj = json_decode($data);
         $formattedResponse = [];
-
-        foreach ($response->data as $value) {
-          $formattedResponse[] =
-              [
-                'group_id' => $value->id,
-                'name'     => $value->name,
-              ];
+        if (isset($responseObj->data)) {
+          foreach ($responseObj->data as $value) {
+            $formattedResponse[] = [
+              'group_id' => $value->id,
+              'name'     => $value->name,
+            ];
+          }
         }
       } else {
         $apiEndpoints = self::$_baseUrlV1 . 'groups/';
@@ -125,13 +115,10 @@ class MailerLiteHandler
 
   public static function mailerliteRefreshFields()
   {
-    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce($_REQUEST['_ajax_nonce'], 'bitforms_save')) {
-      // $inputJSON = file_get_contents('php://input');
-      // $requestParams = json_decode($inputJSON);
-
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       GlobalHelper::requirePostMethod();
       try {
-        $requestParams = GlobalHelper::formatRequestData($_POST['data'] ?? []);
+        $requestParams = GlobalHelper::formatRequestData();
       } catch (\InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }

@@ -54,7 +54,7 @@ class RecordApiHelper
         $dataFinal[$actionValue] = $value->customValue;
       } elseif (!is_null($data[$triggerValue])) {
         if (strtotime($data[$triggerValue])) {
-          $dataFinal[$actionValue] = date('Y-m-d', strtotime($data[$triggerValue]));
+          $dataFinal[$actionValue] = gmdate('Y-m-d', strtotime($data[$triggerValue]));
         } else {
           $dataFinal[$actionValue] = $data[$triggerValue];
         }

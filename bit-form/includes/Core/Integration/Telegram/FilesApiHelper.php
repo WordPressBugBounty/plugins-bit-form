@@ -71,26 +71,13 @@ final class FilesApiHelper
     if ('photo' !== $param) {
       unset($data['photo']);
     }
-    $curl = curl_init();
-    curl_setopt_array(
-      $curl,
-      [
-        CURLOPT_URL            => $uploadFileEndpoint,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING       => '',
-        CURLOPT_MAXREDIRS      => 10,
-        CURLOPT_TIMEOUT        => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST  => 'POST',
-        CURLOPT_POSTFIELDS     => $data,
-      ]
-    );
-
-    $uploadResponse = curl_exec($curl);
-
-    curl_close($curl);
-    return $uploadResponse;
+    $args = [
+      'body'    => $data,
+      'timeout' => 30,
+      'headers' => $this->_defaultHeader,
+    ];
+    $response = wp_remote_post($uploadFileEndpoint, $args);
+    return wp_remote_retrieve_body($response);
   }
 
   public function uploadMultipleFiles($apiEndPoint, $data)
@@ -134,28 +121,15 @@ final class FilesApiHelper
       unset($data['media']);
     }
 
-    $curl = curl_init();
-    curl_setopt_array(
-      $curl,
-      [
-        CURLOPT_URL            => $uploadMultipleFileEndpoint,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING       => '',
-        CURLOPT_MAXREDIRS      => 10,
-        CURLOPT_TIMEOUT        => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST  => 'POST',
-        CURLOPT_POSTFIELDS     => $postFields,
-        CURLOPT_HTTPHEADER     => [
-          'Content-Type: multipart/form-data'
-        ],
-      ]
-    );
-
-    $uploadResponse = curl_exec($curl);
-    curl_close($curl);
-    return $uploadResponse;
+    $args = [
+      'body'    => $postFields,
+      'timeout' => 30,
+      'headers' => [
+        'Content-Type' => 'multipart/form-data'
+      ],
+    ];
+    $response = wp_remote_post($uploadMultipleFileEndpoint, $args);
+    return wp_remote_retrieve_body($response);
   }
 
   private function getFileNameWithExtension($url)

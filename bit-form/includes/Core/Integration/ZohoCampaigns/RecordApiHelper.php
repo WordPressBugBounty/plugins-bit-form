@@ -67,6 +67,7 @@ class RecordApiHelper
         }
       }
       if (empty($fieldData[$fieldPair->zohoFormField]) && \in_array($fieldPair->zohoFormField, $required)) {
+        /* translators: %s is the zoho campaigns field name which is required but not found in the form submission data. */
         $error = new WP_Error('REQ_FIELD_EMPTY', wp_sprintf(__('%s is required for zoho campaigns', 'bit-form'), $fieldPair->zohoFormField));
         $this->_logResponse->apiResponse($this->_logID, $this->_integrationID, ['type' => 'record', 'type_name' => 'field'], 'validation', $error, $entryDetails);
         return $error;

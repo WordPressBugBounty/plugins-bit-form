@@ -33,42 +33,50 @@ class PhoneNumberField
     $val = $fh->value();
 
     if ($fh->property_exists_nested($field, 'config->selectedFlagImage', true)) {
-      $selectedFlagImage = <<<FLAGIMAGE
-      <div class="{$fh->getConversationalMultiCls('selected-country-wrp')}">
-        <img
-          {$fh->getCustomAttributes('selected-phone-img')}
-          alt="Selected Country image"
-          aria-hidden="true"
-          class="{$fh->getConversationalMultiCls('selected-country-img')} {$fh->getCustomClasses('selected-country-img')}"
-          src="{$img}"
-        />
-    </div>
-FLAGIMAGE;
+      $selectedFlagImage = sprintf(
+        '<div class="%1$s">
+           <img
+             %2$s
+             alt="Selected Country image"
+             aria-hidden="true"
+             class="%3$s"
+             src="%4$s"
+           />
+      </div>
+',
+        $fh->getConversationalMultiCls('selected-country-wrp'),
+        $fh->getCustomAttributes('selected-phone-img'),
+        $fh->getConversationalMultiCls('selected-country-img') . ' ' . $fh->getCustomClasses('selected-country-img'),
+        $img
+      );
     }
 
     if ($fh->property_exists_nested($field, 'config->selectedCountryClearable', true)) {
-      $selectedCountryClearable = <<<CLEARABLE
-      <button
-        {$fh->getCustomAttributes('input-clear-btn')}
+      $selectedCountryClearable = sprintf(
+        '<button
+        %1$s
         type="button"
         title="Clear value"
-        class="{$fh->getConversationalMultiCls('input-clear-btn')} {$fh->getCustomClasses('input-clear-btn')}"
+        class="%2$s"
       >
-        <svg
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
       </button>
-CLEARABLE;
+',
+        $fh->getCustomAttributes('input-clear-btn'),
+        $fh->getConversationalMultiCls('input-clear-btn') . ' ' . $fh->getCustomClasses('input-clear-btn')
+      );
     }
 
     if ($fh->property_exists_nested($field, 'config->searchPlaceholder', '', 1)) {
@@ -76,12 +84,12 @@ CLEARABLE;
     }
 
     if ($fh->property_exists_nested($field, 'config->searchClearable', true)) {
-      $searchClearable = <<<CLEARABLE
-      <button
-        {$fh->getCustomAttributes('search-clear-btn')}
+      $searchClearable = sprintf(
+        '<button
+        %1$s
         type="button"
         aria-label="Clear search"
-        class="{$fh->getConversationalMultiCls('icn')} {$fh->getConversationalMultiCls('search-clear-btn')} {$fh->getCustomClasses('search-clear-btn')}"
+        class="%2$s"
         tabIndex="-1"
       >
         <svg
@@ -98,36 +106,38 @@ CLEARABLE;
           <line x1="6" y1="6" x2="18" y2="18" />
         </svg>
       </button>
-CLEARABLE;
+',
+        $fh->getCustomAttributes('search-clear-btn'),
+        $fh->getConversationalMultiCls('icn') . ' ' . $fh->getConversationalMultiCls('search-clear-btn') . ' ' . $fh->getCustomClasses('search-clear-btn')
+      );
     }
 
-    return <<<PHONENUMBERFIELD
-    <div class="{$fh->getConversationalMultiCls('phone-fld-container')}">
-      <div 
-        {$fh->getCustomAttributes('phone-fld-wrp')}
-        class="{$fh->getConversationalMultiCls('phone-fld-wrp')} {$fh->getCustomClasses('phone-fld-wrp')} {$readonly} {$disabled}"
+    return '<div class="' . $fh->getConversationalMultiCls('phone-fld-container') . '">
+      <div
+        ' . $fh->getCustomAttributes('phone-fld-wrp') . '
+        class="' . $fh->getConversationalMultiCls('phone-fld-wrp') . ' ' . $fh->getCustomClasses('phone-fld-wrp') . ' ' . $readonly . ' ' . $disabled . '"
       >
         <input
-          {$name}
-          {$req}
+          ' . $name . '
+          ' . $req . '
           type="text"
           title="Phone-number Hidden Input"
-          class="{$fh->getConversationalMultiCls('phone-hidden-input')} d-none"
-          {$fh->disabled()}
-          {$fh->readonly()}
-          {$val}
+          class="' . $fh->getConversationalMultiCls('phone-hidden-input') . ' d-none"
+          ' . $fh->disabled() . '
+          ' . $fh->readonly() . '
+          ' . $val . '
         />
-        <div class="{$fh->getConversationalMultiCls('phone-inner-wrp')}">
+        <div class="' . $fh->getConversationalMultiCls('phone-inner-wrp') . '">
           <div
-            class="{$fh->getConversationalMultiCls('dpd-wrp')}"
+            class="' . $fh->getConversationalMultiCls('dpd-wrp') . '"
             role="combobox"
             aria-live="assertive"
             aria-labelledby="country-label-2"
             aria-expanded="false"
-            tabIndex={$tabIndx}
+            tabIndex=' . $tabIndx . '
           >
-            {$selectedFlagImage}
-            <div class="{$fh->getConversationalMultiCls('dpd-down-btn')}">
+            ' . $selectedFlagImage . '
+            <div class="' . $fh->getConversationalMultiCls('dpd-down-btn') . '">
               <svg
                 width="15"
                 height="15"
@@ -145,37 +155,37 @@ CLEARABLE;
             </div>
           </div>
           <input
-            {$fh->getCustomAttributes('phone-number-input')}
+            ' . $fh->getCustomAttributes('phone-number-input') . '
             aria-label="Phone Number"
             type="tel"
-            class="{$fh->getConversationalMultiCls('phone-number-input')} {$fh->getCustomClasses('phone-number-input')}"
+            class="' . $fh->getConversationalMultiCls('phone-number-input') . ' ' . $fh->getCustomClasses('phone-number-input') . '"
             autoComplete="tel"
-            {$ph}
-            tabIndex={$tabIndx}
+            ' . $ph . '
+            tabIndex=' . $tabIndx . '
           />
-          {$selectedCountryClearable}
+          ' . $selectedCountryClearable . '
         </div>
-        <div 
-          {$fh->getCustomAttributes('option-wrp')}
-          class="{$fh->getConversationalMultiCls('option-wrp')} {$fh->getCustomClasses('option-wrp')}"
+        <div
+          ' . $fh->getCustomAttributes('option-wrp') . '
+          class="' . $fh->getConversationalMultiCls('option-wrp') . ' ' . $fh->getCustomClasses('option-wrp') . '"
         >
-          <div class="{$fh->getConversationalMultiCls('option-inner-wrp')}">
-            <div 
-              {$fh->getCustomAttributes('option-search-wrp')}
-              class="{$fh->getConversationalMultiCls('option-search-wrp')} {$fh->getCustomClasses('option-search-wrp')}"
+          <div class="' . $fh->getConversationalMultiCls('option-inner-wrp') . '">
+            <div
+              ' . $fh->getCustomAttributes('option-search-wrp') . '
+              class="' . $fh->getConversationalMultiCls('option-search-wrp') . ' ' . $fh->getCustomClasses('option-search-wrp') . '"
             >
               <input
-                {$fh->getCustomAttributes('opt-search-input')}
+                ' . $fh->getCustomAttributes('opt-search-input') . '
                 aria-label="Search for countries"
                 type="search"
-                class="{$fh->getConversationalMultiCls('opt-search-input')} {$fh->getCustomClasses('opt-search-icn')}"
-                placeholder="{$fh->esc_attr($searchPlaceholder)}"
+                class="' . $fh->getConversationalMultiCls('opt-search-input') . ' ' . $fh->getCustomClasses('opt-search-icn') . '"
+                placeholder="' . $fh->esc_attr($searchPlaceholder) . '"
                 autoComplete="off"
                 tabIndex="-1"
               />
               <svg
-                {$fh->getCustomAttributes('opt-search-icn')}
-                class="{$fh->getConversationalMultiCls('icn')} {$fh->getConversationalMultiCls('opt-search-icn')} {$fh->getCustomClasses('opt-search-icn')}"
+                ' . $fh->getCustomAttributes('opt-search-icn') . '
+                class="' . $fh->getConversationalMultiCls('icn') . ' ' . $fh->getConversationalMultiCls('opt-search-icn') . ' ' . $fh->getCustomClasses('opt-search-icn') . '"
                 aria-hidden="true"
                 width="22"
                 height="22"
@@ -189,21 +199,20 @@ CLEARABLE;
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
-              {$searchClearable}
+              ' . $searchClearable . '
             </div>
             <ul
-              {$fh->getCustomAttributes('option-list')}
-              class="{$fh->getConversationalMultiCls('option-list')} {$fh->getCustomClasses('option-list')}"
+              ' . $fh->getCustomAttributes('option-list') . '
+              class="' . $fh->getConversationalMultiCls('option-list') . ' ' . $fh->getCustomClasses('option-list') . '"
               tabIndex="-1"
               role="listbox"
               aria-label="country list"
             >
-              {$options}
+              ' . $options . '
             </ul>
           </div>
         </div>
       </div>
-    </div>
-PHONENUMBERFIELD;
+    </div>';
   }
 }

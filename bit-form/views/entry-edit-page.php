@@ -1,6 +1,43 @@
 <?php
-if (!defined('ABSPATH') && !defined('BITFORMS_ASSET_URI')) {
+
+// This file is included via Render::view() using extract(); all variables below are in the calling method's local scope, not global namespace.
+
+use BitCode\BitForm\Core\Util\EscapingHelper;
+
+if (!defined('ABSPATH')) {
   exit;
+}
+if (!defined('BITFORMS_ASSET_URI')) {
+  exit;
+}
+
+$formUpdateVersion = get_option('bit-form_form_update_version');
+$formIdSafe = sanitize_key((string) $formID);
+
+$bitformCssUrl = BITFORMS_UPLOAD_BASE_URL . '/form-styles/bitform-' . $formID . '.css';
+$bitformFormIdCssUrl = BITFORMS_UPLOAD_BASE_URL . '/form-styles/bitform-' . $formID . '-formid.css';
+$customCssSubPath = "/form-styles/bitform-custom-{$formID}.css";
+
+wp_register_style('bitform-entry-edit-base-' . $formIdSafe, $bitformCssUrl, [], $formUpdateVersion);
+wp_register_style('bitform-entry-edit-formid-' . $formIdSafe, $bitformFormIdCssUrl, [], $formUpdateVersion);
+wp_enqueue_style('bitform-entry-edit-base-' . $formIdSafe);
+wp_enqueue_style('bitform-entry-edit-formid-' . $formIdSafe);
+
+if (file_exists(BITFORMS_CONTENT_DIR . $customCssSubPath)) {
+  wp_register_style('bitform-entry-edit-custom-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $customCssSubPath, [], $formUpdateVersion);
+  wp_enqueue_style('bitform-entry-edit-custom-' . $formIdSafe);
+}
+
+if (isset($font) && '' !== $font) {
+  wp_register_style('bitform-entry-edit-font-' . $formIdSafe, $font, [], $formUpdateVersion);
+  wp_enqueue_style('bitform-entry-edit-font-' . $formIdSafe);
+}
+
+$previewJsPath = BITFORMS_UPLOAD_BASE_URL . '/form-scripts/preview-' . $formID . '.js';
+wp_register_script('bitform-entry-edit-' . $formIdSafe, $previewJsPath, [], $formUpdateVersion, true);
+wp_enqueue_script('bitform-entry-edit-' . $formIdSafe);
+if (isset($bfGlobals) && '' !== $bfGlobals) {
+  wp_add_inline_script('bitform-entry-edit-' . $formIdSafe, (string) $bfGlobals, 'before');
 }
 ?>
 
@@ -26,45 +63,25 @@ if (!defined('ABSPATH') && !defined('BITFORMS_ASSET_URI')) {
     /* background-color: #f1f1f1; */
   }
 
-  ._frm-bg-b<?php echo esc_html($formID) ?> {
+  ._frm-bg-b<?php echo esc_html($formID); ?> {
     width: 600px;
     margin-block: 100px;
   }
   </style>
-  <?php
-  $formUpdateVersion = get_option('bit-form_form_update_version');
-$bitformCssUrl = BITFORMS_UPLOAD_BASE_URL . '/form-styles/bitform-' . $formID . '.css?bfv=' . $formUpdateVersion;
-?>
-  <link rel="stylesheet" href="<?php echo esc_url($bitformCssUrl) ?>" />
-  <?php
-$customCssSubPath = "/form-styles/bitform-custom-{$formID}.css";
-
-$customJsPath = BITFORMS_UPLOAD_BASE_URL . $customCssSubPath . '?ver=' . $formUpdateVersion;
-?>
-  <?php if(file_exists(BITFORMS_CONTENT_DIR . $customCssSubPath)) : ?>
-  <link rel="stylesheet" href="<?php echo esc_url($customJsPath) ?>" />
-  <?php endif; ?>
-
-  <?php if (isset($font) && '' !== $font): ?>
+  <?php if (isset($font) && '' !== $font) : ?>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="<?php echo esc_url($font)?>" />
   <?php endif; ?>
-
+  <?php 
+    wp_enqueue_emoji_styles();
+    wp_print_styles(); 
+  ?>
 </head>
 
 <body>
-  <?php echo $formHTML ?>
+  <?php echo wp_kses($formHTML, EscapingHelper::getFormAllowedHtml(isset($formContent) ? $formContent : null)); ?>
 
-  <script>
-  <?php echo $bfGlobals?>;
-
-  <?php
-  $previewJsPath = BITFORMS_UPLOAD_BASE_URL . '/form-scripts/preview-' . $formID . '.js';
-?>
-  </script>
-  <script src="<?php echo esc_url($previewJsPath) ?>"></script>
-
+  <?php wp_print_scripts(); ?>
 </body>
 
 </html>

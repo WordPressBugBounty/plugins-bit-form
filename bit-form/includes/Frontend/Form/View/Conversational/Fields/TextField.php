@@ -19,69 +19,55 @@ class TextField
 
     $prefixIcn = $fieldHelpers->icon('prefixIcn', 'pre-i');
     $suffixIcn = $fieldHelpers->icon('suffixIcn', 'suf-i');
-    $sugg = '';
     $req = $fieldHelpers->required();
     $disabled = $fieldHelpers->disabled();
     $readonly = $fieldHelpers->readonly();
-    $inputMode = '';
+    $inputMode = apply_filters('bitform_field_inputmode_attr', '', $field);
     $name = $fieldHelpers->name();
     $ac = $fieldHelpers->autocomplete();
-    $mx = '';
-    $mn = '';
+    $mx = apply_filters('bitform_field_max_attr', '', $field);
+    $mn = apply_filters('bitform_field_min_attr', '', $field);
     $ph = $fieldHelpers->placeholder();
     $value = $fieldHelpers->value();
     $list = '';
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
+    $sugg = apply_filters('bitform_field_suggestions_datalist', '', $field, $rowID, $contentCount);
 
     if (property_exists($field, 'suggestions') && count($field->suggestions) > 0) {
       $list = "list='{$rowID}-{$contentCount}-datalist'";
-      $sugg .= "<datalist id='{$rowID}-{$contentCount}-datalist'>";
-      foreach ($field->suggestions as $suggestion) {
-        $val = (isset($suggestion->val) && !empty($suggestion->val)) ? $suggestion->val : $suggestion->lbl;
-        $sugg .= "<option value='{$fieldHelpers->esc_attr($val)}'>{$fieldHelpers->esc_html($suggestion->lbl)}</option>";
-      }
-      $sugg .= '</datalist>';
     }
 
-    if (property_exists($field, 'mn') && '' !== $field->mn) {
-      $mn = "min='{$fieldHelpers->esc_attr($field->mn)}'";
-    }
+    $inputWrapperCustomAttributes = $fieldHelpers->getCustomAttributes('inp-fld-wrp');
+    $inputWrapperClass = $fieldHelpers->getConversationalCls('inp-fld-wrp') . ' ' . $fieldHelpers->getCustomClasses('inp-fld-wrp');
+    $fieldCustomAttributes = $fieldHelpers->getCustomAttributes('fld');
+    $fieldClass = $fieldHelpers->getConversationalCls('focus-elm') . ' ' . $fieldHelpers->getConversationalMultiCls('fld') . ' ' . $fieldHelpers->getCustomClasses('fld');
+    $id = "{$rowID}-{$contentCount}";
 
-    if (property_exists($field, 'mx') && '' !== $field->mx) {
-      $mx = "max='{$fieldHelpers->esc_attr($field->mx)}'";
-    }
-
-    if (property_exists($field, 'inputMode') && '' !== $field->inputMode) {
-      $inputMode = "inputMode='{$fieldHelpers->esc_attr($field->inputMode)}'";
-    }
-
-    return <<<TEXTFIELD
-    <div 
-      {$fieldHelpers->getCustomAttributes('inp-fld-wrp')}
-      class="{$fieldHelpers->getConversationalCls('inp-fld-wrp')} {$fieldHelpers->getCustomClasses('inp-fld-wrp')}"
+    return '<div
+      ' . $inputWrapperCustomAttributes . '
+      class="' . $inputWrapperClass . '"
     >
       <input
-        {$fieldHelpers->getCustomAttributes('fld')}
-        id="{$rowID}-{$contentCount}"
-        {$list}
-        class="{$fieldHelpers->getConversationalCls('focus-elm')} {$fieldHelpers->getConversationalMultiCls('fld')} {$fieldHelpers->getCustomClasses('fld')}"
-        type="{$field->typ}"
-        {$req}
-        {$disabled}
-        {$readonly}
-        {$ph}
-        {$mn}
-        {$mx}
-        {$ac}
-        {$inputMode}
-        {$name}
-        {$value}
+        ' . $fieldCustomAttributes . '
+        id="' . $id . '"
+        ' . $list . '
+        class="' . $fieldClass . '"
+        type="' . $field->typ . '"
+        ' . $req . '
+        ' . $disabled . '
+        ' . $readonly . '
+        ' . $ph . '
+        ' . $mn . '
+        ' . $mx . '
+        ' . $ac . '
+        ' . $inputMode . '
+        ' . $name . '
+        ' . $value . '
       />
-      {$prefixIcn}
-      {$suffixIcn}
+      ' . $prefixIcn . '
+      ' . $suffixIcn . '
     </div>
-    {$sugg}
-TEXTFIELD;
+    ' . $sugg;
   }
 }

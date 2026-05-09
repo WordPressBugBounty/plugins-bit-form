@@ -46,51 +46,52 @@ class CheckBoxField
         if ($fieldHelpers->property_exists_nested($opt, 'req', true)) {
           $req = 'required';
         }
-        if ($fieldHelpers->property_exists_nested($field, 'valid->disabled', true)
-        || $fieldHelpers->property_exists_nested($opt, 'disabled', true)) {
+        if (
+          $fieldHelpers->property_exists_nested($field, 'valid->disabled', true)
+          || $fieldHelpers->property_exists_nested($opt, 'disabled', true)
+        ) {
           $disabled = "disabled='disabled'";
         }
 
-        $checkBoxOptions .= <<<CHECKBOXOPTIONS
-        <div
-          {$fieldHelpers->getCustomAttributes('cw')}
-          class="{$fieldHelpers->getConversationalCls('cw')} {$fieldHelpers->getCustomClasses('cw')}"
-        >
-          <input
-            id="{$rowID}-{$contentCount}-chk-{$key}"
-            type="checkbox"
-            class="{$fieldHelpers->getConversationalCls('ci')} {$fieldHelpers->getCustomClasses('ci')}"
-            {$disabled}
-            value="{$value}"
-            {$check}
-            {$req}
-            {$name}
-          />
-
-          <label
-            {$fieldHelpers->getCustomAttributes('cl')}
-            data-cl
-            for="{$rowID}-{$contentCount}-chk-{$key}"
-            class="{$fieldHelpers->getConversationalCls('cl')} {$fieldHelpers->getCustomClasses('cl')}"
+        $checkBoxOptions .=
+          '<div
+          ' . $fieldHelpers->getCustomAttributes('cw') . '
+          class="' . $fieldHelpers->getConversationalCls('cw') . ' ' . $fieldHelpers->getCustomClasses('cw') . '"
           >
-            
-            <span
-            {$fieldHelpers->getCustomAttributes('bx')}
-            data-bx
-            class="{$fieldHelpers->getConversationalCls('bx')} {$fieldHelpers->getCustomClasses('bx')}"
-            >
-              <span class="{$fieldHelpers->getConversationalCls('opt-key-lbl')}">Key</span>
-              <span class="{$fieldHelpers->getConversationalCls('opt-key')}">{$keyChar}</span>
-            </span>
-            <span
-              {$fieldHelpers->getCustomAttributes('ct')}
-              class="{$fieldHelpers->getConversationalCls('ct')} {$fieldHelpers->getCustomClasses('ct')}"
-            >
-              {$fieldHelpers->kses_post($fieldHelpers->renderHTMR($opt->lbl))}
-            </span>
-          </label>
-        </div>
-CHECKBOXOPTIONS;
+               <input
+                 id="' . $rowID . '-' . $contentCount . '-chk-' . $key . '"
+                 type="checkbox"
+                 class="' . $fieldHelpers->getConversationalCls('ci') . ' ' . $fieldHelpers->getCustomClasses('ci') . '"
+                 ' . $disabled . '
+                 value="' . $value . '"
+                 ' . $check . '
+                 ' . $req . '
+                 ' . $name . '
+               />
+     
+               <label
+                 ' . $fieldHelpers->getCustomAttributes('cl') . '
+                 data-cl
+                 for="' . $rowID . '-' . $contentCount . '-chk-' . $key . '"
+                 class="' . $fieldHelpers->getConversationalCls('cl') . ' ' . $fieldHelpers->getCustomClasses('cl') . '"
+               >
+                 <span
+                 ' . $fieldHelpers->getCustomAttributes('bx') . '
+                 data-bx
+                 class="' . $fieldHelpers->getConversationalCls('bx') . ' ' . $fieldHelpers->getCustomClasses('bx') . '"
+                 >
+                   <span class="' . $fieldHelpers->getConversationalCls('opt-key-lbl') . '">Key</span>
+                   <span class="' . $fieldHelpers->getConversationalCls('opt-key') . '">' . $keyChar . '</span>
+                 </span>
+                 <span
+                   ' . $fieldHelpers->getCustomAttributes('ct') . '
+                   class="' . $fieldHelpers->getConversationalCls('ct') . ' ' . $fieldHelpers->getCustomClasses('ct') . '"
+                 >
+                   ' . $fieldHelpers->kses_post($fieldHelpers->renderHTMR($opt->lbl)) . '
+                 </span>
+               </label>
+          </div>
+';
       }
     }
 
@@ -101,68 +102,75 @@ CHECKBOXOPTIONS;
     $inpReq = isset($field->valid->otherOptReq) ? ($field->valid->otherOptReq ? 'required' : '') : '';
     if (property_exists($field, 'addOtherOpt') && $field->addOtherOpt) {
       $keyChar = chr(65 + count($field->opt));
-      $checkBoxOptions .= <<<CHECKBOXOPTIONS
-      <div
-          {$fieldHelpers->getCustomAttributes('cw')}
-          class="{$fieldHelpers->getConversationalCls('cw')} {$fieldHelpers->getCustomClasses('cw')}"
+      $checkBoxOptions .=
+        '      <div
+          ' . $fieldHelpers->getCustomAttributes('cw') . '
+          class="' . $fieldHelpers->getConversationalCls('cw') . ' ' . $fieldHelpers->getCustomClasses('cw') . '"
         >
           <input
-            id="{$rowID}-{$contentCount}-chk-{$optCount}"
-            data-oopt="{$rowID}"
+            id="' . $rowID . '-' . $contentCount . '-chk-' . $optCount . '"
+            data-oopt="' . $rowID . '"
             type="checkbox"
-            class="{$fieldHelpers->getConversationalCls('ci')} {$fieldHelpers->getCustomClasses('ci')}"
-            {$disabled}
+            class="' . $fieldHelpers->getConversationalCls('ci') . ' ' . $fieldHelpers->getCustomClasses('ci') . '"
+            ' . $disabled . '
             value=""
-            {$name}
+            ' . $name . '
           />
           <label
-            {$fieldHelpers->getCustomAttributes('cl')}
+            ' . $fieldHelpers->getCustomAttributes('cl') . '
             data-cl
-            for="{$rowID}-{$contentCount}-chk-{$optCount}"
-            class="{$fieldHelpers->getConversationalCls('cl')} {$fieldHelpers->getCustomClasses('cl')}"
+            for="' . $rowID . '-' . $contentCount . '-chk-' . $optCount . '"
+            class="' . $fieldHelpers->getConversationalCls('cl') . ' ' . $fieldHelpers->getCustomClasses('cl') . '"
           >
             <span
-              {$fieldHelpers->getCustomAttributes('ck')}
+              ' . $fieldHelpers->getCustomAttributes('ck') . '
               data-bx
-              class="{$fieldHelpers->getConversationalCls('bx')} {$fieldHelpers->getConversationalCls('ck')} {$fieldHelpers->getCustomClasses('ck')}"
+              class="' . $fieldHelpers->getConversationalCls('bx') . ' ' . $fieldHelpers->getConversationalCls('ck') . ' ' . $fieldHelpers->getCustomClasses('ck') . '"
             >
-              <span class="{$fieldHelpers->getConversationalCls('opt-key')}">{$keyChar}</span>
+              <span class="' . $fieldHelpers->getConversationalCls('opt-key') . '">' . $keyChar . '</span>
             </span>
             <span
-              {$fieldHelpers->getCustomAttributes('ct')}
-              class="{$fieldHelpers->getConversationalCls('ct')} {$fieldHelpers->getCustomClasses('ct')}"
+              ' . $fieldHelpers->getCustomAttributes('ct') . '
+              class="' . $fieldHelpers->getConversationalCls('ct') . ' ' . $fieldHelpers->getCustomClasses('ct') . '"
             >
-              {$otherOptLbl}
+              ' . $otherOptLbl . '
             </span>
           </label>
-          <div data-oinp-wrp class="{$fieldHelpers->getConversationalCls('other-inp-wrp')}">
+          <div data-oinp-wrp class="' . $fieldHelpers->getConversationalCls('other-inp-wrp') . '">
             <input
-              data-bf-other-inp='{$rowID}-chk-{$optCount}'
+              data-bf-other-inp="' . $rowID . '-chk-' . $optCount . '"
               type="text"
-              class="{$fieldHelpers->getConversationalCls('other-inp')} {$fieldHelpers->getCustomClasses('other-inp')}"
-              {$inpReq}
-              {$inputPh}
+              class="' . $fieldHelpers->getConversationalCls('other-inp') . ' ' . $fieldHelpers->getCustomClasses('other-inp') . '"
+              ' . $inpReq . '
+              ' . $inputPh . '
             />
           </div>
         </div>
-CHECKBOXOPTIONS;
+';
     }
 
-    return <<<CHECKBOXFIELD
-<div
-  {$fieldHelpers->getCustomAttributes('cc')}
-  class="{$fieldHelpers->getConversationalCls('cc')} {$fieldHelpers->getCustomClasses('cc')}"
->
-  <svg class="{$fieldHelpers->getConversationalCls('cks')}">
-    <symbol id="{$rowID}-ck-svg" viewBox="0 0 12 10">
-      <polyline
-        class="{$fieldHelpers->getConversationalCls('ck-svgline')}"
-        points="1.5 6 4.5 9 10.5 1"
-      ></polyline>
-    </symbol>
-  </svg>
-  {$checkBoxOptions}
-</div>
-CHECKBOXFIELD;
+    return sprintf(
+      '<div' . "\n"
+      . '  %1$s' . "\n"
+      . '  class="%2$s %3$s"' . "\n"
+      . '>' . "\n"
+      . '  <svg class="%4$s">' . "\n"
+      . '    <symbol id="%5$s-ck-svg" viewBox="0 0 12 10">' . "\n"
+      . '      <polyline' . "\n"
+      . '        class="%6$s"' . "\n"
+      . '        points="1.5 6 4.5 9 10.5 1"' . "\n"
+      . '      ></polyline>' . "\n"
+      . '    </symbol>' . "\n"
+      . '  </svg>' . "\n"
+      . '  %7$s' . "\n"
+      . '</div>',
+      $fieldHelpers->getCustomAttributes('cc'),
+      $fieldHelpers->getConversationalCls('cc'),
+      $fieldHelpers->getCustomClasses('cc'),
+      $fieldHelpers->getConversationalCls('cks'),
+      $rowID,
+      $fieldHelpers->getConversationalCls('ck-svgline'),
+      $checkBoxOptions
+    );
   }
 }

@@ -22,6 +22,7 @@ final class FormFieldValidator
 
   private function removeUnnecessaryField()
   {
+    // CSRF verified upstream via FrontendFormManager::verifySubmissionNonce() before this validator is instantiated.
     if (!isset($_POST)) {
       return;
     }
@@ -301,7 +302,7 @@ final class FormFieldValidator
     if (false === strpos($value, '://')) {
       $value = 'http://' . $value; // Add scheme if missing
     }
-    $urlParts = parse_url($value);
+    $urlParts = wp_parse_url($value);
     if (isset($urlParts['host'])) {
       if (function_exists('idn_to_ascii')) {
         $asciiHost = idn_to_ascii($urlParts['host'], IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);

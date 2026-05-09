@@ -2,7 +2,6 @@
 
 namespace BitCode\BitForm\Frontend\Form\View\Conversational;
 
-use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\AdvanceFileUpField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\CheckBoxField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\CountryField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\CurrencyField;
@@ -13,16 +12,12 @@ use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\GDPRAgreementField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\HiddenField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\HtmlSelectField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\ImageSelectField;
-use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\PayPalField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\PhoneNumberField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\RadioBoxField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\RatingField;
-use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\RazorPayField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\RecaptchaV2Field;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\RepeaterField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\SectionField;
-use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\SignatureField;
-use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\StripeField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\TextAreaField;
 use BitCode\BitForm\Frontend\Form\View\Conversational\Fields\TextField;
 
@@ -59,12 +54,19 @@ class ConversationalTheme
     $fieldHTML = $this->getField($field, $rowID, $field_name, $form_atomic_Cls_map, $error, $value, $formID);
     $stepBtnHTML = $isNestedField ? '' : $this->_conversationalHelpers->getStepButtonsView($field, $stepSettings);
     $minHeightCls = $isNestedField ? "bc{$formID}-min-height" : '';
-    $fieldContent = <<<FIELDCONTENT
-            <div class="btcd-fld-itm $rowID $minHeightCls $isHidden">
-                $fieldHTML
-                $stepBtnHTML
+    $fieldContent = sprintf(
+      '
+    <div class="btcd-fld-itm %1$s %2$s %3$s">
+                %4$s
+                %5$s
             </div>
-FIELDCONTENT;
+    ',
+      $rowID,
+      $minHeightCls,
+      $isHidden,
+      $fieldHTML,
+      $stepBtnHTML
+    );
 
     $imageContent = $this->_conversationalHelpers->conversationalSettingsIcon($stepSettings, 'layoutImage', 'step-img', 'Field Image');
     $convStepLayout = empty($stepSettings->layout) ? 'normal-layout' : $stepSettings->layout;
@@ -75,6 +77,9 @@ FIELDCONTENT;
 
   public function getField($field, $rowID, $field_name, $form_atomic_Cls_map, $error, $value, $formID)
   {
+    // Pro-only fields ship in the Bit Form Pro plugin. In the free plugin, we avoid rendering Pro implementations.
+    $proMissingHtml = '<div class="bf-pro-field-missing"> <!-- Require Bit Form Pro --> </div>';
+
     switch ($field->typ) {
       case 'text':
       case 'username':
@@ -116,11 +121,20 @@ FIELDCONTENT;
       case 'hidden':
         return HiddenField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'paypal':
-        return  PayPalField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Conversational\Fields\PayPalField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Conversational\Fields\PayPalField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'stripe':
-        return  StripeField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Conversational\Fields\StripeField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Conversational\Fields\StripeField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'razorpay':
-        return RazorPayField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Conversational\Fields\RazorPayField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Conversational\Fields\RazorPayField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'country':
         return CountryField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'currency':
@@ -128,13 +142,19 @@ FIELDCONTENT;
       case 'phone-number':
         return PhoneNumberField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'advanced-file-up':
-        return AdvanceFileUpField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Conversational\Fields\AdvanceFileUpField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Conversational\Fields\AdvanceFileUpField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'section':
         return SectionField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $this->_formViewerInstance, $this->_nestedLayout, $error, $value);
       case 'repeater':
         return RepeaterField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $this->_formViewerInstance, $this->_nestedLayout, $error, $value);
       case 'signature':
-        return SignatureField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Conversational\Fields\SignatureField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Conversational\Fields\SignatureField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'rating':
         return RatingField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'image-select':

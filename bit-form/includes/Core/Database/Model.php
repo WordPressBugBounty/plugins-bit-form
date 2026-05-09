@@ -38,7 +38,7 @@ class Model
   public function insert($data = [])
   {
     if (is_null($data)) {
-      return new WP_Error('empty_data', __('Form data is empty', 'bit-form'));
+      return new WP_Error('empty_data', 'Form data is empty');
     }
     $result = $this->app_db->insert(
       $this->table_name,
@@ -57,13 +57,15 @@ class Model
    */
   public function get($item = '*', $condition = [], $limit = null, $offset = null, $order_by = null, $order_follow = null)
   {
-    $checkIfTableExists = $this->app_db->get_var(
-      $this->app_db->prepare(
-        'SHOW TABLES LIKE %s',
-        $this->table_name
-      )
-    );
-    if (is_null($checkIfTableExists)) {
+    static $tableExistsCache = [];
+    if (!isset($tableExistsCache[$this->table_name])) {
+      $tableExistsCache[$this->table_name] = !is_null(
+        $this->app_db->get_var(
+          $this->app_db->prepare('SHOW TABLES LIKE %s', $this->table_name)
+        )
+      );
+    }
+    if (!$tableExistsCache[$this->table_name]) {
       return [];
     }
     if (\is_array($item)) {
@@ -136,7 +138,7 @@ class Model
       }
       $result = $this->app_db->query(
         $this->app_db->prepare(
-          "SELECT COUNT(*) as count FROM `$this->table_name`"
+          "SELECT COUNT(*) as count FROM `{$this->table_name}`"
               . $condition_to_check,
           $all_values
         )
@@ -146,7 +148,7 @@ class Model
       if ($this->app_db->last_error) {
         return new WP_Error('db_error', $this->app_db->last_error);
       }
-      return new WP_Error('db_error', __('Result is empty', 'bit-form'));
+      return new WP_Error('db_error', 'Result is empty');
     } else {
       return $this->app_db->last_result;
     }
@@ -171,7 +173,7 @@ class Model
     } else {
       return new WP_Error(
         'update_error',
-        __('Nothing to update', 'bit-form')
+        'Nothing to update'
       );
     }
     $update_condition = (!\is_null($condition) &&
@@ -203,7 +205,7 @@ class Model
     } else {
       return new WP_Error(
         'update_error',
-        __('Nothing to update', 'bit-form')
+        'Nothing to update'
       );
     }
 
@@ -230,7 +232,7 @@ class Model
     }
     $result = $this->app_db->query(
       $this->app_db->prepare(
-        "UPDATE $this->table_name SET $update_fields $condition_to_check",
+        "UPDATE `{$this->table_name}` SET $update_fields $condition_to_check",
         $all_values
       )
     );
@@ -255,7 +257,7 @@ class Model
         && array_keys($duplicate) === range(0, count($duplicate) - 1))) {
       return new WP_Error(
         'duplicate_error',
-        __('Nothing to duplicate', 'bit-form')
+        'Nothing to duplicate'
       );
     }
 
@@ -282,8 +284,8 @@ class Model
       $condition_to_check = $formatted_conditions['conditions'];
       $all_values = array_merge($all_values, $formatted_conditions['values']);
     }
-    $query = "INSERT INTO $this->table_name ($insCol)
-        SELECT $dupCol FROM $this->table_name $condition_to_check";
+    $query = "INSERT INTO `{$this->table_name}` ($insCol)
+        SELECT $dupCol FROM `{$this->table_name}` $condition_to_check";
     $this->execute($query, $all_values);
     return $this->getResult();
   }
@@ -299,7 +301,7 @@ class Model
     } else {
       return new WP_Error(
         'deletion_error',
-        __('At least 1 condition needed', 'bit-form')
+        'At least 1 condition needed'
       );
     }
     $update_condition = (!\is_null($condition) &&
@@ -323,7 +325,7 @@ class Model
     } else {
       return new WP_Error(
         'deletion_error',
-        __('At least 1 condition needed', 'bit-form')
+        'At least 1 condition needed'
       );
     }
     $result = $this->app_db->delete(
@@ -344,7 +346,7 @@ class Model
     } else {
       return new WP_Error(
         'deletion_error',
-        __('At least 1 condition needed', 'bit-form')
+        'At least 1 condition needed'
       );
     }
     // $formatted_conditions = $this->getFormatedCondition($delete_condition, $check_operator);
@@ -356,12 +358,12 @@ class Model
       $condition_to_check = null;
       return new WP_Error(
         'deletion_error',
-        __('At least 1 condition needed', 'bit-form')
+        'At least 1 condition needed'
       );
     }
     $result = $this->app_db->query(
       $this->app_db->prepare(
-        "DELETE FROM $this->table_name $condition_to_check",
+        "DELETE FROM `{$this->table_name}` $condition_to_check",
         $all_values
       )
     );
@@ -451,7 +453,7 @@ class Model
     }
     // echo " Q S " . $preparedQuery . " Q  EE";
     if (empty($preparedQuery)) {
-      $this->db_response = new WP_Error('null_query', __('prepared query is empty', 'bit-form'));
+      $this->db_response = new WP_Error('null_query', 'prepared query is empty');
     } else {
       $this->db_response = false !== stripos($preparedQuery, 'DELETE') ? $this->app_db->query($preparedQuery)
           : $this->app_db->get_results($preparedQuery, OBJECT_K);
@@ -473,7 +475,7 @@ class Model
       if (is_wp_error($db_response)) {
         $response = $db_response;
       }
-      $response = new WP_Error('result_empty', __('Result is empty', 'bit-form'));
+      $response = new WP_Error('result_empty', 'Result is empty');
     } elseif (is_array($this->app_db->last_result) && !empty($this->app_db->last_result)) {
       $response = $this->app_db->last_result;
     } elseif ($this->app_db->insert_id) {
@@ -492,7 +494,7 @@ class Model
    */
   public function lastId()
   {
-    $sql = "SELECT id FROM {$this->table_name}
+    $sql = "SELECT id FROM `{$this->table_name}`
     ORDER BY id DESC LIMIT 1";
     $result = $this->execute($sql)->getResult();
     if (is_wp_error($result)) {

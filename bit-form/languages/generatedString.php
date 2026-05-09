@@ -1,6 +1,9 @@
 <?php
 /* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */
-$i18n_strings = array(
+if (!defined('ABSPATH')) {
+  exit;
+}
+$bitforms_i18n_strings = array(
     '404' => __('404', 'bit-form'),
 
     'Bit Form' => __('Bit Form', 'bit-form'),
@@ -533,6 +536,7 @@ $i18n_strings = array(
 
     'Spreadsheet refreshed' => __('Spreadsheet refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Spreadsheet refresh failed Cause: %s. please try again' => __('Spreadsheet refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Spreadsheet refresh failed. please try again' => __('Spreadsheet refresh failed. please try again', 'bit-form'),
@@ -725,12 +729,14 @@ $i18n_strings = array(
 
     'Audience list refreshed' => __('Audience list refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Audience list refresh failed Cause: %s. please try again' => __('Audience list refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Audience list failed. please try again' => __('Audience list failed. please try again', 'bit-form'),
 
     'Audience tags refreshed' => __('Audience tags refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Audience tags refresh failed Cause: %s. please try again' => __('Audience tags refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Audience tags failed. please try again' => __('Audience tags failed. please try again', 'bit-form'),
@@ -933,12 +939,14 @@ $i18n_strings = array(
 
     'List refreshed' => __('List refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'List refresh failed Cause: %s. please try again' => __('List refresh failed Cause: %s. please try again', 'bit-form'),
 
     'List failed. please try again' => __('List failed. please try again', 'bit-form'),
 
     'Templates refreshed' => __('Templates refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Templates refresh failed Cause: %s. please try again' => __('Templates refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Templates failed. please try again' => __('Templates failed. please try again', 'bit-form'),
@@ -1133,6 +1141,7 @@ $i18n_strings = array(
 
     'Modules refreshed' => __('Modules refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Modules refresh failed Cause: %s. please try again' => __('Modules refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Modules refresh failed. please try again' => __('Modules refresh failed. please try again', 'bit-form'),
@@ -1279,6 +1288,7 @@ $i18n_strings = array(
 
     'Layouts refreshed' => __('Layouts refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Layouts refresh failed Cause: %s. please try again' => __('Layouts refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Layouts refresh failed. please try again' => __('Layouts refresh failed. please try again', 'bit-form'),
@@ -1339,6 +1349,7 @@ $i18n_strings = array(
 
     'Departments refreshed' => __('Departments refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Departments refresh failed Cause: %s. please try again' => __('Departments refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Departments refresh failed. please try again' => __('Departments refresh failed. please try again', 'bit-form'),
@@ -1399,8 +1410,10 @@ $i18n_strings = array(
 
     'Create' => __('Create', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     '%s Owner' => __('%s Owner', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Add an owner to %s  pushed to Zoho Projects.' => __('Add an owner to %s  pushed to Zoho Projects.', 'bit-form'),
 
     'Task Layout' => __('Task Layout', 'bit-form'),
@@ -1421,6 +1434,7 @@ $i18n_strings = array(
 
     'Add a group to project pushed to Zoho Projects.' => __('Add a group to project pushed to Zoho Projects.', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     '%s Flag' => __('%s Flag', 'bit-form'),
 
     'Add a flag to' => __('Add a flag to', 'bit-form'),
@@ -1433,26 +1447,37 @@ $i18n_strings = array(
 
     'Add followers to issue pushed to Zoho Projects' => __('Add followers to issue pushed to Zoho Projects', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Issue %s' => __('Issue %s', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Add %s to issue pushed to Zoho Projects' => __('Add %s to issue pushed to Zoho Projects', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     '%s Attachments' => __('%s Attachments', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     '%s Time Log' => __('%s Time Log', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Add time log to %s pushed to Zoho Projects.' => __('Add time log to %s pushed to Zoho Projects.', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     '%s Recurrence' => __('%s Recurrence', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Add recurrence to %s pushed to Zoho Projects.' => __('Add recurrence to %s pushed to Zoho Projects.', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     '%s Reminder' => __('%s Reminder', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Add reminder to %s pushed to Zoho Projects.' => __('Add reminder to %s pushed to Zoho Projects.', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     '%s Tags' => __('%s Tags', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Add tags to %s pushed to Zoho Projects.' => __('Add tags to %s pushed to Zoho Projects.', 'bit-form'),
 
     'Refresh Portal Users' => __('Refresh Portal Users', 'bit-form'),
@@ -1537,12 +1562,14 @@ $i18n_strings = array(
 
     'No Portal Found' => __('No Portal Found', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Portals refresh failed Cause: %s. please try again' => __('Portals refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Projects refreshed' => __('Projects refreshed', 'bit-form'),
 
     'No Project Found' => __('No Project Found', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Projects refresh failed Cause: %s. please try again' => __('Projects refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Projects refresh failed. please try again' => __('Projects refresh failed. please try again', 'bit-form'),
@@ -1551,6 +1578,7 @@ $i18n_strings = array(
 
     'No Milestone Found' => __('No Milestone Found', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Milestones refresh failed Cause: %s. please try again' => __('Milestones refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Milestones refresh failed. please try again' => __('Milestones refresh failed. please try again', 'bit-form'),
@@ -1559,6 +1587,7 @@ $i18n_strings = array(
 
     'No Tasklist Found' => __('No Tasklist Found', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Tasklists refresh failed Cause: %s. please try again' => __('Tasklists refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Tasklists refresh failed. please try again' => __('Tasklists refresh failed. please try again', 'bit-form'),
@@ -1567,20 +1596,24 @@ $i18n_strings = array(
 
     'No Task Found' => __('No Task Found', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Tasks refresh failed Cause: %s. please try again' => __('Tasks refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Tasks refresh failed. please try again' => __('Tasks refresh failed. please try again', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Fields refresh failed Cause: %s. please try again' => __('Fields refresh failed Cause: %s. please try again', 'bit-form'),
 
     'No Owner Found' => __('No Owner Found', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Owners refresh failed Cause: %s. please try again' => __('Owners refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Task Layouts refreshed' => __('Task Layouts refreshed', 'bit-form'),
 
     'No Task Layout Found' => __('No Task Layout Found', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Task Layouts refresh failed Cause: %s. please try again' => __('Task Layouts refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Task Layouts refresh failed. please try again' => __('Task Layouts refresh failed. please try again', 'bit-form'),
@@ -1589,12 +1622,14 @@ $i18n_strings = array(
 
     'No Project Group Found' => __('No Project Group Found', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Project Groups refresh failed Cause: %s. please try again' => __('Project Groups refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Project Groups refresh failed. please try again' => __('Project Groups refresh failed. please try again', 'bit-form'),
 
     'No Tag Found' => __('No Tag Found', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Tags refresh failed Cause: %s. please try again' => __('Tags refresh failed Cause: %s. please try again', 'bit-form'),
 
     'please map mandatory fields' => __('please map mandatory fields', 'bit-form'),
@@ -1603,6 +1638,7 @@ $i18n_strings = array(
 
     'to create a subtask you must select a task or create a new task' => __('to create a subtask you must select a task or create a new task', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'to create a %s under milestone you must select a tasklist or create a new tasklist' => __('to create a %s under milestone you must select a tasklist or create a new tasklist', 'bit-form'),
 
     'Refresh Projects Portals' => __('Refresh Projects Portals', 'bit-form'),
@@ -1671,10 +1707,12 @@ $i18n_strings = array(
 
     'Note Types refreshed' => __('Note Types refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Note Types refresh failed Cause: %s. please try again' => __('Note Types refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Note Types refresh failed. please try again' => __('Note Types refresh failed. please try again', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'RelatedLists refresh failed Cause: %s. please try again' => __('RelatedLists refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Share Workbook' => __('Share Workbook', 'bit-form'),
@@ -1683,6 +1721,7 @@ $i18n_strings = array(
 
     'Workbooks refreshed' => __('Workbooks refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Workbooks refresh failed Cause: %s. please try again' => __('Workbooks refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Workbooks refresh failed. please try again' => __('Workbooks refresh failed. please try again', 'bit-form'),
@@ -1695,6 +1734,7 @@ $i18n_strings = array(
 
     'Template Details refreshed' => __('Template Details refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Template Details refresh failed Cause: %s. please try again' => __('Template Details refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Template Details refresh failed. please try again' => __('Template Details refresh failed. please try again', 'bit-form'),
@@ -1741,16 +1781,19 @@ $i18n_strings = array(
 
     'Teams refreshed' => __('Teams refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Teams refresh failed Cause: %s. please try again' => __('Teams refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Teams refresh failed. please try again' => __('Teams refresh failed. please try again', 'bit-form'),
 
     'Folders refreshed' => __('Folders refreshed', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Folders refresh failed Cause: %s. please try again' => __('Folders refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Folders refresh failed. please try again' => __('Folders refresh failed. please try again', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
     'Users refresh failed Cause: %s. please try again' => __('Users refresh failed Cause: %s. please try again', 'bit-form'),
 
     'Team:' => __('Team:', 'bit-form'),
@@ -1801,7 +1844,7 @@ $i18n_strings = array(
 
     'Your account has been rejected.' => __('Your account has been rejected.', 'bit-form'),
 
-    '<p>Your account has been rejected by admin.</p>' => __('<p>Your account has been rejected by admin.</p>', 'bit-form'),
+    'Your account has been rejected by admin.' => __('Your account has been rejected by admin.', 'bit-form'),
 
     'You have been successfully logged in.' => __('You have been successfully logged in.', 'bit-form'),
 
@@ -1850,8 +1893,6 @@ $i18n_strings = array(
     'Accept And Continue' => __('Accept And Continue', 'bit-form'),
 
     'What\'s New?' => __('What\'s New?', 'bit-form'),
-
-    'Accept and continue to share usage data for improvements, or skip for using the plugin.' => __('Accept and continue to share usage data for improvements, or skip for using the plugin.', 'bit-form'),
 
     'Capture' => __('Capture', 'bit-form'),
 
@@ -2105,11 +2146,11 @@ $i18n_strings = array(
 
     'Active Options' => __('Active Options', 'bit-form'),
 
-    'Show Selected Option Image' => __('Show Selected Option Image', 'bit-form'),
-
     'Selected Option Clearable:' => __('Selected Option Clearable:', 'bit-form'),
 
     'Search Clearable:' => __('Search Clearable:', 'bit-form'),
+
+    'Show Selected Option Image' => __('Show Selected Option Image', 'bit-form'),
 
     'Option Icon/Image:' => __('Option Icon/Image:', 'bit-form'),
 
@@ -2189,11 +2230,11 @@ $i18n_strings = array(
 
     'File Select Status' => __('File Select Status', 'bit-form'),
 
-    'Show Maximum Size' => __('Show Maximum Size', 'bit-form'),
-
     'Allow Maximum Upload Size' => __('Allow Maximum Upload Size', 'bit-form'),
 
     'Total Maximum Size' => __('Total Maximum Size', 'bit-form'),
+
+    'Show Maximum Size' => __('Show Maximum Size', 'bit-form'),
 
     'Show File List' => __('Show File List', 'bit-form'),
 
@@ -2363,6 +2404,8 @@ $i18n_strings = array(
 
     'Tax (%)' => __('Tax (%)', 'bit-form'),
 
+    'Select Description Field' => __('Select Description Field', 'bit-form'),
+
     'Default Phone Number' => __('Default Phone Number', 'bit-form'),
 
     'Input Format Option' => __('Input Format Option', 'bit-form'),
@@ -2427,13 +2470,13 @@ $i18n_strings = array(
 
     'Value :' => __('Value :', 'bit-form'),
 
+    'Button View:' => __('Button View:', 'bit-form'),
+
     'Default Row:' => __('Default Row:', 'bit-form'),
 
     'Minimum Row:' => __('Minimum Row:', 'bit-form'),
 
     'Maximum Row:' => __('Maximum Row:', 'bit-form'),
-
-    'Button View:' => __('Button View:', 'bit-form'),
 
     'Allow Other Option:' => __('Allow Other Option:', 'bit-form'),
 
@@ -2795,7 +2838,7 @@ $i18n_strings = array(
 
     'Appearance' => __('Appearance', 'bit-form'),
 
-    '<p style="margin:0">Successfully Submitted.</p>' => __('<p style="margin:0">Successfully Submitted.</p>', 'bit-form'),
+    'Successfully Submitted.' => __('Successfully Submitted.', 'bit-form'),
 
     'Are you sure to delete this message ?' => __('Are you sure to delete this message ?', 'bit-form'),
 
@@ -4014,10 +4057,6 @@ $i18n_strings = array(
     'Conditional Logics' => __('Conditional Logics', 'bit-form'),
 
     'Add Conditional Logic' => __('Add Conditional Logic', 'bit-form'),
-
-    'For' => __('For', 'bit-form'),
-
-    'UNLIMITED' => __('UNLIMITED', 'bit-form'),
 
     'Conditional Logics are triggered based on the order of the logic groups. The higher the logic group, the higher the priority. If you want to change the priority, you can sort by drag and drop the logic group.' => __('Conditional Logics are triggered based on the order of the logic groups. The higher the logic group, the higher the priority. If you want to change the priority, you can sort by drag and drop the logic group.', 'bit-form'),
 
