@@ -63,7 +63,7 @@ class RecordApiHelper
     $apiEndpoints = $this->_baseUrl . "subscribers/$email";
 
     $response = HttpHelper::get($apiEndpoints, null, $this->_defaultHeader);
-    if (property_exists($response, 'error') || 'Resource not found.' === $response->message) {
+    if (property_exists($response, 'error') || (isset($response->message) && in_array($response->message, ['Resource does not exist.', 'Resource not found.'], true))) {
       return false;
     } else {
       return true;

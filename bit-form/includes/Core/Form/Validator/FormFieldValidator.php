@@ -2,6 +2,7 @@
 
 namespace BitCode\BitForm\Core\Form\Validator;
 
+use BitCode\BitForm\Core\Form\FormManager;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
 
@@ -36,7 +37,6 @@ final class FormFieldValidator
     }
     $hidden_fields = isset($this->_submitted_fields['hidden_fields']) ? $this->_submitted_fields['hidden_fields'] : '';
     unset($this->_submitted_fields['hidden_fields'], $this->_submitted_fields['workflow']);
-
     foreach ($this->_form_fields as $field_name => $field_data) {
       $submittedFieldData = isset($this->_submitted_fields[$field_name]) ? $this->_submitted_fields[$field_name] : null;
 
@@ -45,7 +45,7 @@ final class FormFieldValidator
       }
       if (isset($field_data['repeated']) && $field_data['repeated'] && is_array($submittedFieldData)) {
         foreach (array_keys($submittedFieldData) as $rowIndex) {
-          $this->validateRepeatedField($field_name, $field_data, $hidden_fields, $rowIndex);
+          $this->validateRepeatedField($field_name, $field_data, $hidden_fields, $rowIndex, $formID);
         }
         continue;
       }
@@ -147,6 +147,18 @@ final class FormFieldValidator
             }
             break;
           }
+          case 'select':
+          case 'html-select':
+          case 'check':
+          case 'radio': {
+            if (!$this->validateOptionField($this->_submitted_fields[$field_name], $field_name, $formID)) {
+              $this->_messages[$field_name]
+                  = !empty($field_data['valid']['typMsg']) ?
+                  $field_data['valid']['typMsg'] :
+                  $field_data['label'] . __(' contains invalid option.', 'bit-form');
+            }
+            break;
+          }
           default:
             break;
         }
@@ -169,7 +181,7 @@ final class FormFieldValidator
     }
   }
 
-  public function validateRepeatedField($field_name, $field_data, $hidden_fields, $rowIndex)
+  public function validateRepeatedField($field_name, $field_data, $hidden_fields, $rowIndex, $formID)
   {
     if (isset($this->_submitted_fields[$field_name][$rowIndex])) {
       $values = $this->_submitted_fields[$field_name][$rowIndex];
@@ -266,6 +278,18 @@ final class FormFieldValidator
           }
           break;
         }
+        case 'select':
+        case 'html-select':
+        case 'check':
+        case 'radio': {
+          if (!$this->validateOptionField($this->_submitted_fields[$field_name][$rowIndex], $field_name, $formID)) {
+            $this->_messages[$messageKey]
+                = !empty($field_data['valid']['typMsg']) ?
+                $field_data['valid']['typMsg'] :
+                $field_data['label'] . __(' contains invalid option.', 'bit-form');
+          }
+          break;
+        }
         default:
           break;
       }
@@ -321,5 +345,125 @@ final class FormFieldValidator
   {
     $date = date_create_from_format('Y-m-d', $value);
     return $date && $date->format('Y-m-d') === $value;
+  }
+
+  private function validateOptionField($value, $fieldKey, $formID)
+  {
+    if (FieldValueHandler::isEmpty($value)) {
+      return true;
+    }
+
+    $fieldDetails = $this->getFieldDetails($fieldKey, $formID);
+    if (empty($fieldDetails) || empty($fieldDetails->typ)) {
+      return true;
+    }
+
+    if ($this->allowCustomOption($fieldDetails)) {
+      return true;
+    }
+
+    $allowedOptions = $this->getAllowedOptionValues($fieldDetails);
+    if (empty($allowedOptions)) {
+      return true;
+    }
+
+    $submittedValues = $this->normalizeSubmittedOptionValues($value);
+    if (empty($submittedValues)) {
+      return true;
+    }
+
+    foreach ($submittedValues as $submittedValue) {
+      if (!in_array((string) $submittedValue, $allowedOptions, true)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  private function getFieldDetails($fieldKey, $formID)
+  {
+    $form = FormManager::getInstance($formID);
+    $content = $form->getFieldsContent();
+    $decodedContent = json_decode($content);
+    $fields = (is_object($decodedContent) && isset($decodedContent->fields)) ? $decodedContent->fields : null;
+
+    return isset($fields->{$fieldKey}) ? $fields->{$fieldKey} : null;
+  }
+
+  private function allowCustomOption($fieldDetails)
+  {
+    if (in_array($fieldDetails->typ, ['check', 'radio'], true)) {
+      return !empty($fieldDetails->addOtherOpt);
+    }
+
+    if (in_array($fieldDetails->typ, ['select', 'html-select'], true)) {
+      return !empty($fieldDetails->config->allowCustomOption);
+    }
+
+    return false;
+  }
+
+  private function getAllowedOptionValues($fieldDetails)
+  {
+    if (in_array($fieldDetails->typ, ['check', 'radio', 'html-select'], true)) {
+      return $this->flattenOptions(isset($fieldDetails->opt) ? $fieldDetails->opt : []);
+    }
+
+    if (!in_array($fieldDetails->typ, ['select'], true) || empty($fieldDetails->optionsList)) {
+      return [];
+    }
+
+    $activeListIndex = isset($fieldDetails->config->activeList) ? (int) $fieldDetails->config->activeList : 0;
+    $optionsList = is_array($fieldDetails->optionsList) ? $fieldDetails->optionsList : (array) $fieldDetails->optionsList;
+    if (!isset($optionsList[$activeListIndex])) {
+      return [];
+    }
+
+    $activeList = (array) $optionsList[$activeListIndex];
+    $options = empty($activeList) ? [] : array_values($activeList)[0];
+
+    return $this->flattenOptions($options);
+  }
+
+  private function flattenOptions($options)
+  {
+    $flatOptions = [];
+    $options = is_array($options) ? $options : (array) $options;
+
+    foreach ($options as $option) {
+      if (empty($option)) {
+        continue;
+      }
+
+      $option = (object) $option;
+      if (isset($option->type, $option->childs)) {
+        $flatOptions = array_merge($flatOptions, $this->flattenOptions($option->childs));
+        continue;
+      }
+
+      if (isset($option->val) || isset($option->lbl)) {
+        $flatOptions[] = (string) (isset($option->val) ? $option->val : $option->lbl);
+      }
+    }
+
+    return $flatOptions;
+  }
+
+  private function normalizeSubmittedOptionValues($value)
+  {
+    if (is_array($value)) {
+      return array_map('strval', array_filter($value, static function ($item) {
+        return !FieldValueHandler::isEmpty($item);
+      }));
+    }
+
+    if (is_string($value) && false !== strpos($value, BITFORMS_BF_SEPARATOR)) {
+      return array_map('strval', array_filter(explode(BITFORMS_BF_SEPARATOR, $value), static function ($item) {
+        return !FieldValueHandler::isEmpty($item);
+      }));
+    }
+
+    return [(string) $value];
   }
 }

@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Bit Form 2.22.2\n"
+"Project-Id-Version: Bit Form 2.22.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/bit-form\n"
 "Last-Translator: developer@bitcode.pro\n"
 "Language-Team: support@bitcode.pro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-06T12:23:13+00:00\n"
+"POT-Creation-Date: 2026-05-18T05:44:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: bit-form\n"
@@ -773,39 +773,44 @@ msgstr ""
 
 #: includes/Core/Form/Validator/FormFieldValidator.php:71
 #: includes/Core/Form/Validator/FormFieldValidator.php:91
-#: includes/Core/Form/Validator/FormFieldValidator.php:193
-#: includes/Core/Form/Validator/FormFieldValidator.php:210
+#: includes/Core/Form/Validator/FormFieldValidator.php:205
+#: includes/Core/Form/Validator/FormFieldValidator.php:222
 msgid " is required."
 msgstr ""
 
 #: includes/Core/Form/Validator/FormFieldValidator.php:101
-#: includes/Core/Form/Validator/FormFieldValidator.php:220
+#: includes/Core/Form/Validator/FormFieldValidator.php:232
 msgid " should be an email. please provide a valid email address."
 msgstr ""
 
 #: includes/Core/Form/Validator/FormFieldValidator.php:110
-#: includes/Core/Form/Validator/FormFieldValidator.php:229
+#: includes/Core/Form/Validator/FormFieldValidator.php:241
 msgid " should be Time Format"
 msgstr ""
 
 #: includes/Core/Form/Validator/FormFieldValidator.php:119
-#: includes/Core/Form/Validator/FormFieldValidator.php:238
+#: includes/Core/Form/Validator/FormFieldValidator.php:250
 msgid " should be a phone number"
 msgstr ""
 
 #: includes/Core/Form/Validator/FormFieldValidator.php:128
-#: includes/Core/Form/Validator/FormFieldValidator.php:247
+#: includes/Core/Form/Validator/FormFieldValidator.php:259
 msgid " should be a number"
 msgstr ""
 
 #: includes/Core/Form/Validator/FormFieldValidator.php:137
-#: includes/Core/Form/Validator/FormFieldValidator.php:256
+#: includes/Core/Form/Validator/FormFieldValidator.php:268
 msgid " should be an URL"
 msgstr ""
 
 #: includes/Core/Form/Validator/FormFieldValidator.php:146
-#: includes/Core/Form/Validator/FormFieldValidator.php:265
+#: includes/Core/Form/Validator/FormFieldValidator.php:277
 msgid " should be a date"
+msgstr ""
+
+#: includes/Core/Form/Validator/FormFieldValidator.php:158
+#: includes/Core/Form/Validator/FormFieldValidator.php:289
+msgid " contains invalid option."
 msgstr ""
 
 #: includes/Core/Hooks/Hooks.php:128

@@ -1,7 +1,7 @@
 === Bit Form - Custom Contact Form, Multi Step, Conversational Form & Payment Form builder ===
 Plugin Name: Bit Form
-Version: 2.22.2
-Stable tag: 2.22.2
+Version: 2.22.3
+Stable tag: 2.22.3
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin, akaioum 
@@ -677,6 +677,12 @@ Yes, Bit Form has built-in spam protection better than any other Contact Form Bu
 6. Response table to view form entries
 
 == Changelog ==
+= 2.22.3 =
+*Release Date: 13 May, 2026*
+*Fix:
+    1. Resolved Delete Entry and Delete Form action issues in the Entry Details View.
+
+
 = 2.22.2 =
 *Release Date: 5th May, 2026*
 *Improvements:

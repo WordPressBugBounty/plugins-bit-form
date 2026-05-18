@@ -9,7 +9,7 @@ namespace BitCode\BitForm\Core\Database;
 use BitCode\BitForm\Core\Util\FileHandler;
 
 /**
- * Undocumented class
+ * Manages entry meta (per-field values) for each form submission.
  */
 
 class FormEntryMetaModel extends Model
@@ -52,7 +52,7 @@ class FormEntryMetaModel extends Model
       $updatedData[$upKey] = is_string($upValue) ?
         $upValue :
         wp_json_encode($upValue);
-      if (!\in_array($upKey, $oldEntriesKey)) {
+      if (!in_array($upKey, $oldEntriesKey, true)) {
         $this->insert(
           [
             'bitforms_form_entry_id' => $entryID,
@@ -76,7 +76,7 @@ class FormEntryMetaModel extends Model
     foreach ($data as $key => $value) {
       $value = is_string($value) ? $value : wp_json_encode($value);
       $case_part .= "
-            WHEN '$key' THEN " . $this->getFieldFormat($value);
+            WHEN '" . esc_sql($key) . "' THEN " . $this->getFieldFormat($value);
       $all_values[] = $value;
     }
     $formattedCondition = $this->getFormatedCondition($condition);
@@ -120,9 +120,15 @@ class FormEntryMetaModel extends Model
     $dateQuery = $dbHelper->dateQueryList();
 
     $validCondtions = $this->validQueryCondition($conditions);
+    $safeOperators = ['=', '!=', '>', '<', '>=', '<=', 'LIKE', 'NOT LIKE'];
 
     foreach ($validCondtions as $condition) {
       if (is_object($condition)) {
+        $field = sanitize_key($condition->field);
+        if (empty($field)) {
+          continue;
+        }
+
         if (is_array($condition->val)) {
           $value = $dbHelper->arrValueModifyByLogic($condition->logic, $condition->val);
         } else {
@@ -130,17 +136,21 @@ class FormEntryMetaModel extends Model
         }
 
         $operator = $dbHelper->convertToSqlOperator($condition->logic);
+        if (!in_array($operator, $safeOperators, true)) {
+          continue;
+        }
+
         if (!is_array($condition->val) && isset($dateQuery[$condition->val])) {
-          $sql .= $dbHelper->fieldQueryByDate($condition->field, $operator, $value, $condition->logic);
+          $sql .= $dbHelper->fieldQueryByDate($field, $operator, $value, $condition->logic);
         } else {
           if (!is_int($value)) {
-            $value = "'" . $value . "'";
+            $value = "'" . esc_sql($value) . "'";
           }
 
-          $sql .= "`$condition->field` $operator $value";
+          $sql .= "`{$field}` $operator $value";
         }
-      } else {
-        $sql .= ' ' . $condition;
+      } elseif (in_array(strtoupper(trim((string) $condition)), ['AND', 'OR'], true)) {
+        $sql .= ' ' . strtoupper(trim((string) $condition));
       }
     }
 
@@ -159,10 +169,12 @@ class FormEntryMetaModel extends Model
     return $countResult[0]->count;
   }
 
-  public function selectedEntryMeta($formFields, $fieldCount)
+  public function selectedEntryMeta($formFields, $fieldCount, $filter = null)
   {
     $all_values = [];
     $formFieldsNames = [];
+    $globalFilterString = '';
+    $globalFilterValues = [];
     $metaChecker = 0;
     $selectedMeta = '`bitforms_form_entry_id` as entry_id,';
     $selectedMeta .= "e.user_id as '__user_id',";
@@ -179,7 +191,8 @@ class FormEntryMetaModel extends Model
     }
 
     foreach ($formFields as $fieldDetails) {
-      $fieldFormat = $this->getFieldFormat($fieldDetails['key']);
+      $safeFieldKey = sanitize_key($fieldDetails['key']);
+      $fieldFormat = $this->getFieldFormat($safeFieldKey);
       $selectedMeta .= "GROUP_CONCAT(
                 CASE
                   `meta_key`
@@ -187,30 +200,31 @@ class FormEntryMetaModel extends Model
                 END
               ) AS '$fieldFormat'";
       $metaChecker += 1;
-      $all_values[] = $fieldDetails['key'];
-      $all_values[] = $fieldDetails['key'];
-      $formFieldsNames[] = $fieldDetails['key'];
+      $all_values[] = $safeFieldKey;
+      $all_values[] = $safeFieldKey;
+      $formFieldsNames[] = $safeFieldKey;
       if ($metaChecker < $fieldCount) {
         $selectedMeta .= ',';
       }
-      //#unused  code commented by me##
-      // if ( !empty( $filter['global'] ) ) {
-      //     $globalFilterString .= " `" . $fieldDetails['key'] . "` LIKE '%%" . $this->getFieldFormat( $filter['global'] ) . "%%' ";
-      //     if ( $metaChecker < $fieldCount ) {
-      //         $globalFilterString .= " OR ";
-      //     }
-      //     $globalFilterValues[] = $filter['global'];
-      // }
+      if (!empty($filter['global'])) {
+        $globalFilterString .= ' `' . $safeFieldKey . '` LIKE %s ';
+        if ($metaChecker < $fieldCount) {
+          $globalFilterString .= ' OR ';
+        }
+        $globalFilterValues[] = '%' . $this->app_db->esc_like($filter['global']) . '%';
+      }
     }
 
     return [
-      'selected_meta'     => $selectedMeta,
-      'form_fields_names' => $formFieldsNames,
-      'all_values'        => $all_values,
+      'selected_meta'        => $selectedMeta,
+      'form_fields_names'    => $formFieldsNames,
+      'all_values'           => $all_values,
+      'global_filter_string' => $globalFilterString,
+      'global_filter_values' => $globalFilterValues,
     ];
   }
 
-  public function groupedCondition($condition, $all_values, $fieldConditions)
+  public function groupedCondition($condition, $all_values, $fieldConditions, $filter = null, $globalFilterString = '', $globalFilterValues = [])
   {
     $isFldCondition = false;
     $formattedCondition = $this->getFormatedCondition($condition);
@@ -221,49 +235,21 @@ class FormEntryMetaModel extends Model
     } else {
       $groupedCondition = null;
     }
-    //#unused  code commented by me##
-    //$isRecount = false;
-
-    // if ( !empty( $filter['field'] ) ) {
-    //     $isRecount = true;
-    //     $filterFieldCount = count( $filter['field'] );
-    //     $filterFieldChecker = 0;
-    //     if ( $filterFieldCount > 0 ) {
-    //         $groupedCondition .= " HAVING ";
-    //     }
-    //     foreach ( $filter['field'] as $filterFieldKey => $filterFieldDetails ) {
-    //         $groupedCondition .= " `$filterFieldDetails->id` ='%%" . $this->getFieldFormat( $filterFieldDetails->value ) . "%%'";
-    //         $all_values[] = $filterFieldDetails->value;
-    //         if ( $filterFieldChecker < $filterFieldCount ) {
-    //             $groupedCondition .= " AND ";
-    //         }
-    //     }
-    // }
-
-    // if ( !empty( $filter['global'] ) && !empty( $globalFilterString ) && !empty( $globalFilterValues ) ) {
-    //     $isRecount = true;
-    //     if ( !empty( $filter['field'] ) ) {
-    //         $groupedCondition .= " AND (" . $globalFilterString . ") ";
-    //     } else {
-    //         $groupedCondition .= " HAVING $globalFilterString ";
-    //     }
-    //     $offset = 0;
-    //     $all_values = array_merge( $all_values, $globalFilterValues );
-    // }
-
-    // if ( !empty( $dateBetweenFilter ) && !empty( $dateBetweenFilter->start_date ) && !empty( $dateBetweenFilter->end_date ) ) {
-    //     if ( strpos( $groupedCondition, 'HAVING' ) !== false ) {
-    //         $groupedCondition .= " AND  `__created_at` BETWEEN '" . $dateBetweenFilter->start_date . "' AND '" . $dateBetweenFilter->end_date . "' ";
-    //     } else {
-    //         $groupedCondition .= " HAVING  `__created_at` BETWEEN '" . $dateBetweenFilter->start_date . "' AND '" . $dateBetweenFilter->end_date . "' ";
-    //     }
-    // }
+    if (!empty($filter['global']) && !empty($globalFilterString) && !empty($globalFilterValues)) {
+      $isFldCondition = true;
+      if ($groupedCondition && false !== strpos($groupedCondition, 'HAVING')) {
+        $groupedCondition .= ' AND (' . $globalFilterString . ') ';
+      } else {
+        $groupedCondition .= ' HAVING (' . $globalFilterString . ') ';
+      }
+      $all_values = array_merge($all_values, $globalFilterValues);
+    }
 
     $sqlQryByFldCondtion = $this->sqlQryGenerateByFldCondition($fieldConditions);
 
     if (!empty($sqlQryByFldCondtion)) {
       $isFldCondition = true;
-      if (false !== strpos($groupedCondition, 'HAVING')) {
+      if ($groupedCondition && false !== strpos($groupedCondition, 'HAVING')) {
         $groupedCondition .= ' AND (' . $sqlQryByFldCondtion . ') ';
       } else {
         $groupedCondition .= ' HAVING (' . $sqlQryByFldCondtion . ') ';
@@ -287,10 +273,10 @@ class FormEntryMetaModel extends Model
       }
       $orderList = '';
       foreach ($sortBy as $sortableFieldKey => $sortableFieldDetails) {
-        // $orderCondition .=" ".$this->getFieldFormat($sortableFieldDetails->id);
         $sortableFieldChecker += 1;
-        if (in_array($sortableFieldDetails->id, $formFieldsNames)) {
-          $orderList .= " `$sortableFieldDetails->id` ";
+        if (in_array($sortableFieldDetails->id, $formFieldsNames, true)) {
+          $safeId = sanitize_key($sortableFieldDetails->id);
+          $orderList .= " `$safeId` ";
           $orderFollow = $sortableFieldDetails->desc ? ' DESC ' : ' ASC ';
           $orderList .= ' ' . $orderFollow;
           if ($sortableFieldChecker < $sortableFieldCount) {
@@ -327,17 +313,16 @@ class FormEntryMetaModel extends Model
   {
     $entry_table = $this->app_db->prefix . 'bitforms_form_entries';
     $fieldCount = count($formFields);
-    $getSelectedMetaFldValue = $this->selectedEntryMeta($formFields, $fieldCount);
+    $getSelectedMetaFldValue = $this->selectedEntryMeta($formFields, $fieldCount, $filter);
     $selectedMeta = $getSelectedMetaFldValue['selected_meta'];
     $formFieldsNames = $getSelectedMetaFldValue['form_fields_names'];
     $all_values = $getSelectedMetaFldValue['all_values'];
+    $globalFilterString = $getSelectedMetaFldValue['global_filter_string'];
+    $globalFilterValues = $getSelectedMetaFldValue['global_filter_values'];
     $entryIDs = [];
     $entryCount = count($entries);
-    // $paginateEntry = empty($sortBy) && empty($filter['field']) && empty($filter['global']);
-    // $entries = $paginateEntry ? array_slice($entries, $offset, $limit) : $entries;
-    $paginateEntry = false;
     foreach ($entries as $entryDetail) {
-      $entryIDs[] = isset($entryDetail->id) ? $entryDetail->id : $entryDetail;
+      $entryIDs[] = $entryDetail->id ?? $entryDetail;
     }
     if (empty($entryIDs)) {
       return [
@@ -346,48 +331,47 @@ class FormEntryMetaModel extends Model
       ];
     }
     $condition['bitforms_form_entry_id'] = $entryIDs;
-    $group = $this->groupedCondition($condition, $all_values, $fieldConditions);
+    $group = $this->groupedCondition($condition, $all_values, $fieldConditions, $filter, $globalFilterString, $globalFilterValues);
     $groupedCondition = $group['groupedCondition'];
     $all_values = $group['all_values'];
     $isFldCondition = $group['isFldCondition'];
     $orderCondition = $this->orderCondition($formFieldsNames, (array) $sortBy);
 
     $paginate = null;
-    if (!\is_null($limit)) {
-      $limit = \intval($limit);
+    if (!is_null($limit)) {
+      $limit = intval($limit);
       $paginate .= " LIMIT $limit ";
     }
-    if (!\is_null($offset)) {
-      $offset = \intval($offset);
-      $paginate .= " OFFSET  $offset ";
+    if (!is_null($offset)) {
+      $offset = intval($offset);
+      $paginate .= " OFFSET $offset ";
     }
+
     $sql = "SELECT $selectedMeta FROM `$this->table_name` em";
     $sql .= " INNER JOIN $entry_table e on e.id = em.bitforms_form_entry_id ";
     if ($dateBetweenFilter) {
-      $startDate = $dateBetweenFilter->start_date;
-      $endDate = $dateBetweenFilter->end_date;
+      $startDate = sanitize_text_field($dateBetweenFilter->start_date ?? '');
+      $endDate = sanitize_text_field($dateBetweenFilter->end_date ?? '');
+
       if ($startDate && $endDate) {
-        $sql .= " AND DATE(e.created_at) BETWEEN '$startDate' AND '$endDate' ";
+        $sql .= $this->app_db->prepare(' AND e.created_at BETWEEN %s AND %s', $startDate . ' 00:00:00', $endDate . ' 23:59:59');
       } elseif ($startDate) {
-        $sql .= " AND DATE(e.created_at) >= '$startDate' ";
+        $sql .= $this->app_db->prepare(' AND e.created_at >= %s', $startDate . ' 00:00:00');
       } elseif ($endDate) {
-        $sql .= " AND DATE(e.created_at) <= '$endDate' ";
+        $sql .= $this->app_db->prepare(' AND e.created_at <= %s', $endDate . ' 23:59:59');
       }
     }
     $sql .= $groupedCondition . $orderCondition . $paginate;
     $result = $this->execute($sql, $all_values)->getResult();
     if (is_wp_error($result)) {
       return [
-        'count'   => $paginateEntry ? $entryCount : 0,
+        'count'   => 0,
         'entries' => [],
         'error'   => $result->get_error_message()
       ];
     }
     if ($isFldCondition) {
-      $condition['bitforms_form_entry_id'] = $entryIDs;
-      $group = $this->groupedCondition($condition, $all_values, $fieldConditions);
-      $all_values = $group['all_values'];
-      $entryCount = $this->queryRecount($selectedMeta, $group['groupedCondition'], $orderCondition, $all_values);
+      $entryCount = $this->queryRecount($selectedMeta, $groupedCondition, $orderCondition, $all_values);
     }
     $resultedEntries = [
       'count'   => $entryCount,
@@ -420,33 +404,27 @@ class FormEntryMetaModel extends Model
     return $result;
   }
 
-  private function csvInjectionPrevent($value)
+  private static function csvInjectionPrevent($value)
   {
     $formula = ['=', '-', '+', '@', "\t", "\r"];
     $valueFilter = preg_replace('/[\]["]/i', '', $value);
-    if (\in_array(substr($value, 0, 1), $formula, true)) {
+    if (in_array(substr($value, 0, 1), $formula, true)) {
       $valueFilter = "'" . trim($valueFilter);
     }
 
     return $valueFilter;
   }
 
-  private function unescapeString($str)
+  private static function unescapeString($str)
   {
-    // return preg_replace_callback(
-    //   '/\\\\u([0-9a-fA-F]{4})/',
-    //   fn ($match) => mb_convert_encoding(pack('H*', $match[1]), 'UTF-8', 'UCS-2BE'),
-    //   $str
-    // );
     if (is_string($str) && '' !== $str) {
-      // Handle JSON-style escaping
       $decoded = json_decode('"' . str_replace('"', '\\"', $str) . '"');
       return (null !== $decoded) ? $decoded : $str;
     }
     return $str;
   }
 
-  private function formatRepeaterValue($rawValue, $fieldMap)
+  private static function formatRepeaterValue($rawValue, $fieldMap)
   {
     if (empty($rawValue)) {
       return '';
@@ -502,17 +480,16 @@ class FormEntryMetaModel extends Model
     ];
     $all_values = [];
     if ([] === $formFields) {
-      $data = [
+      return [
         'count'   => 0,
         'entries' => [],
       ];
-      wp_send_json_success($data, 200);
     }
     $fieldCount = count($formFields) - count(array_intersect($formFields, $entryInfo));
     $formFieldsNames = [];
     foreach ($formFields as $fldKey) {
       $formFieldsNames[] = $fldKey;
-      if (in_array($fldKey, $entryInfo)) {
+      if (in_array($fldKey, $entryInfo, true)) {
         continue;
       }
       $fieldFormat = $this->getFieldFormat($fldKey);
@@ -540,43 +517,37 @@ class FormEntryMetaModel extends Model
       ];
     }
     $condition['bitforms_form_entry_id'] = $entryIDs;
-    $formattedCondition = $this->getFormatedCondition($condition);
-    $groupedCondition = null;
     $grpCon = $this->groupedCondition($condition, $all_values, $entryConditions);
     $groupedCondition = $grpCon['groupedCondition'];
     $all_values = $grpCon['all_values'];
 
-    // if ($formattedCondition) {
-    //   $groupedCondition = $formattedCondition['conditions'] . ' GROUP BY
-    //         `bitforms_form_entry_id` ';
-    //   $all_values = array_merge($all_values, $formattedCondition['values']);
-    // }
     $order = 'DESC' === $sortBy ? 'DESC ' : 'ASC ';
-    $orderField = \is_null($sortByField) ? 'bitforms_form_entry_id' : "`$sortByField`";
+    $validSortFields = array_column($fieldLabels, 'key');
+    $orderField = (!is_null($sortByField) && in_array($sortByField, $validSortFields, true))
+      ? '`' . sanitize_key($sortByField) . '`'
+      : '`bitforms_form_entry_id`';
 
     $orderCondition = "ORDER BY $orderField $order ";
-    // if (!\is_null($limit)) {
-    //   $limitInt = \intval($limit);
-    //   $limit = " LIMIT $limitInt ";
-    // }
     $limitClause = '';
-    if (!\is_null($limit)) {
-      $limitInt = \intval($limit);
+    if (!is_null($limit)) {
+      $limitInt = intval($limit);
       $limitClause = " LIMIT $limitInt ";
-      if (!\is_null($offset)) {
-        $offsetInt = \intval($offset);
+      if (!is_null($offset)) {
+        $offsetInt = intval($offset);
         $limitClause .= " OFFSET $offsetInt ";
       }
     }
 
+    $this->app_db->query('SET SESSION group_concat_max_len = 10000');
     $sql = "SELECT $selectedEntryMeta FROM `$this->table_name` em";
     $sql .= " INNER JOIN $entry_table e on e.id = em.bitforms_form_entry_id ";
     $sql .= $groupedCondition . $orderCondition . $limitClause;
     $result = $this->execute($sql, $all_values)->getResult();
+    if (is_wp_error($result)) {
+      return new \WP_Error('db_error', 'Internal server error');
+    }
+
     $allData = [];
-    $entry_id = 'entry_id';
-    $users = get_users(['fields' => ['ID', 'display_name']]);
-    $userNames = [];
     $entryStatus = [
       '0' => 'Read',
       '1' => 'Unread',
@@ -584,87 +555,80 @@ class FormEntryMetaModel extends Model
       '3' => 'Confirmed',
       '9' => 'Draft',
     ];
-    foreach ($users as $key => $value) {
-      $userNames[$value->ID] = $value->display_name;
+    $userIds = array_unique(array_filter(
+      array_map(static fn ($row) => (int) $row->__user_id, (array) $result),
+      static fn ($id) => $id > 0
+    ));
+    $userNames = [];
+    if (!empty($userIds)) {
+      $users = get_users(['include' => $userIds, 'fields' => ['ID', 'display_name']]);
+      foreach ($users as $user) {
+        $userNames[$user->ID] = $user->display_name;
+      }
     }
     foreach ($result as $key => $value) {
       foreach ($formFieldsNames as $formFieldName) {
-        $allData[$key]['entry_id'] = preg_replace('/[\]["]/i', '', $value->$entry_id);
+        $allData[$key]['entry_id'] = preg_replace('/[\]["]/i', '', $value->entry_id);
         if ('__user_id' === $formFieldName && intval($value->$formFieldName) > 0) {
-          $allData[$key][$formFieldName] = $userNames[$value->$formFieldName];
+          $allData[$key][$formFieldName] = $userNames[$value->$formFieldName] ?? '';
         } elseif ('__user_ip' === $formFieldName) {
           $allData[$key][$formFieldName] = long2ip((int) $value->$formFieldName);
         } elseif ('__entry_status' === $formFieldName) {
-          // replace numeric marker for status with actual status text
-          $allData[$key][$formFieldName] = $entryStatus[$value->{$formFieldName}];
+          $allData[$key][$formFieldName] = $entryStatus[$value->{$formFieldName}] ?? '';
         } else {
           $allData[$key][$formFieldName] = preg_replace('/[\]["]/i', '', $value->$formFieldName);
         }
       }
     }
 
-    if (is_wp_error($result)) {
-      wp_send_json_error('Internal server error', 500);
-    } else {
-      // Create mappings:
-      $fieldMap = [];       // fieldKey => fieldData
-      $repeaterFields = []; // repeater fieldKeys
-      $fileFields = [];
-      $downloadableFieldType = ['file-up', 'signature', 'advanced-file-up'];
+    $fieldMap = [];
+    $repeaterFields = [];
+    $fileFields = [];
+    $downloadableFieldType = ['file-up', 'signature', 'advanced-file-up'];
 
-      foreach ($fieldLabels as $field) {
-        $key = $field['key'];
-        $fieldMap[$key] = $field;
-        if ('repeater' === $field['type']) {
-          $repeaterFields[] = $key;
-        } elseif (in_array($field['type'], $downloadableFieldType, true)) {
-          $fileFields[] = $key;
-        }
+    foreach ($fieldLabels as $field) {
+      $key = $field['key'];
+      $fieldMap[$key] = $field;
+      if ('repeater' === $field['type']) {
+        $repeaterFields[] = $key;
+      } elseif (in_array($field['type'], $downloadableFieldType, true)) {
+        $fileFields[] = $key;
       }
-
-      // Step 4: Process all entries efficiently
-      foreach ($allData as &$entry) {
-        // Process all fields with unified unescaping
-        foreach ($entry as $key => &$value) {
-          if (is_string($value)) {
-            $value = self::unescapeString($value);
-          }
-
-          // Process repeater fields
-          if (in_array($key, $repeaterFields, true)) {
-            $value = self::formatRepeaterValue($value, $fieldMap);
-          }
-        }
-
-        unset($value); // Break reference
-      }
-      unset($entry, $value); // Break references
-
-      // Process file fields (existing logic optimized)
-      foreach ($allData as $index => &$entry) {
-        $entryId = $entry['entry_id'];
-        $_upload_dir = FileHandler::getEntriesFileUploadDir($formId, $entryId);
-        foreach ($fileFields as $fileKey) {
-          if (empty($entry[$fileKey])) {
-            continue;
-          }
-
-          $fileIds = explode(',', $entry[$fileKey]);
-          $urls = [];
-
-          foreach ($fileIds as $fileId) {
-            $path = "bitforms/bitforms-file/?formID=$formId&entryID=$entryId&fileID=$fileId";
-            if (file_exists($_upload_dir . DIRECTORY_SEPARATOR . $fileId)) {
-              $urls[] = site_url($path);
-            }
-          }
-
-          $entry[$fileKey] = implode(',', $urls);
-        }
-      }
-
-      unset($entry); // Break reference
-      wp_send_json_success($allData, 200);
     }
+
+    foreach ($allData as &$entry) {
+      foreach ($entry as $key => &$value) {
+        if (is_string($value)) {
+          $value = self::csvInjectionPrevent(self::unescapeString($value));
+        }
+        if (in_array($key, $repeaterFields, true)) {
+          $value = self::formatRepeaterValue($value, $fieldMap);
+        }
+      }
+      unset($value);
+    }
+    unset($entry, $value);
+
+    foreach ($allData as &$entry) {
+      $entryId = $entry['entry_id'];
+      $_upload_dir = FileHandler::getEntriesFileUploadDir($formId, $entryId);
+      foreach ($fileFields as $fileKey) {
+        if (empty($entry[$fileKey])) {
+          continue;
+        }
+        $fileIds = explode(',', $entry[$fileKey]);
+        $urls = [];
+        foreach ($fileIds as $fileId) {
+          $path = "bitforms/bitforms-file/?formID=$formId&entryID=$entryId&fileID=$fileId";
+          if (file_exists($_upload_dir . DIRECTORY_SEPARATOR . $fileId)) {
+            $urls[] = site_url($path);
+          }
+        }
+        $entry[$fileKey] = implode(',', $urls);
+      }
+    }
+    unset($entry);
+
+    return $allData;
   }
 }

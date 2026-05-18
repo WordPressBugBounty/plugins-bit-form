@@ -41,7 +41,7 @@ class CountryField
       $img = $img_url . $selectedItm->img;
       $ph = $selectedItm->lbl;
     } else {
-      $img = htmlentities("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>");
+      $img = esc_url(includes_url('images/blank.gif'));
       $ph = isset($field->ph) ? $field->ph : '';
     }
 

@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'bitcode/bitform',
-        'pretty_version' => 'dev-13c37ad7118d67ce1986cd99efc4b69b0cb3ae70',
-        'version' => 'dev-13c37ad7118d67ce1986cd99efc4b69b0cb3ae70',
-        'reference' => '13c37ad7118d67ce1986cd99efc4b69b0cb3ae70',
+        'pretty_version' => 'dev-ce5877f2cd1878f3b929641deaa8539e2639e773',
+        'version' => 'dev-ce5877f2cd1878f3b929641deaa8539e2639e773',
+        'reference' => 'ce5877f2cd1878f3b929641deaa8539e2639e773',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -20,9 +20,9 @@
             'dev_requirement' => false,
         ),
         'bitcode/bitform' => array(
-            'pretty_version' => 'dev-13c37ad7118d67ce1986cd99efc4b69b0cb3ae70',
-            'version' => 'dev-13c37ad7118d67ce1986cd99efc4b69b0cb3ae70',
-            'reference' => '13c37ad7118d67ce1986cd99efc4b69b0cb3ae70',
+            'pretty_version' => 'dev-ce5877f2cd1878f3b929641deaa8539e2639e773',
+            'version' => 'dev-ce5877f2cd1878f3b929641deaa8539e2639e773',
+            'reference' => 'ce5877f2cd1878f3b929641deaa8539e2639e773',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

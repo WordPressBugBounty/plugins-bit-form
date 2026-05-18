@@ -981,7 +981,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function getAForm($Request, $post)
   {
-    if (isset($Request['id'])) {
+    if (!empty($Request['id'])) {
       $formID = absint(wp_unslash($Request['id']));
     } else {
       $formID = wp_unslash($post->id);
@@ -1271,7 +1271,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function getAFormV1($Request, $post)
   {
-    if (isset($Request['id'])) {
+    if (!empty($Request['id'])) {
       $formID = absint(wp_unslash($Request['id']));
     } else {
       $formID = wp_unslash($post->id);
@@ -1488,7 +1488,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function deleteAForm($Request, $post)
   {
-    if (isset($Request['id'])) {
+    if (!empty($Request['id'])) {
       $formID = absint(wp_unslash($Request['id']));
     } else {
       $formID = wp_unslash($post->id);
@@ -1564,7 +1564,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function deleteBlukForm($Request, $post)
   {
-    if (isset($Request['formID'])) {
+    if (!empty($Request['formID'])) {
       $formID = array_map('absint', wp_unslash($Request['formID']));
     } else {
       $formID = wp_unslash($post->formID);
@@ -1835,7 +1835,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function getFormEntryLabelAndCount($Request, $post)
   {
-    if (isset($Request['id'])) {
+    if (!empty($Request['id'])) {
       $id = absint(wp_unslash($Request['id']));
     } else {
       $id = wp_unslash($post->id);
@@ -1893,7 +1893,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function getFormEntry($Request, $post)
   {
-    if (isset($Request['id'])) {
+    if (!empty($Request['id'])) {
       $id = absint(wp_unslash($Request['id']));
       $offset = isset($Request['offset']) ?
         wp_unslash($Request['offset']) : 0;
@@ -1976,7 +1976,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function getEntriesForReport($Request, $post)
   {
-    if (isset($Request['id'])) {
+    if (!empty($Request['id'])) {
       $id = absint(wp_unslash($Request['id']));
       $offset = isset($Request['offset']) ?
         wp_unslash($Request['offset']) : null;
@@ -2081,7 +2081,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function deleteBlukFormEntries($Request, $post)
   {
-    if (isset($Request['formID'])) {
+    if (!empty($Request['formID'])) {
       $formID = absint(wp_unslash($Request['formID']));
       $entries = array_map('absint', wp_unslash($Request['entries']));
     } else {
@@ -2158,7 +2158,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function duplicateFormEntry($Request, $post)
   {
-    if (isset($Request['formID'])) {
+    if (!empty($Request['formID'])) {
       $formID = absint(wp_unslash($Request['formID']));
       $entries = array_map('absint', wp_unslash($Request['entries']));
     } else {
@@ -2233,7 +2233,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function editFormEntry($Request, $post)
   {
-    if (isset($Request['formID'])) {
+    if (!empty($Request['formID'])) {
       $formID = absint(wp_unslash($Request['formID']));
       $entryID = absint(wp_unslash($Request['entryID']));
     } else {
@@ -2337,7 +2337,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function getLogHistory($Request, $post)
   {
-    if (isset($Request['formID'])) {
+    if (!empty($Request['formID'])) {
       $formID = absint(wp_unslash($Request['formID']));
       $entryID = absint(wp_unslash($Request['entryID']));
     } else {
@@ -2361,7 +2361,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function importDataStore($Request, $post)
   {
-    if (isset($Request['formID'])) {
+    if (!empty($Request['formID'])) {
       $formID = absint(wp_unslash($Request['formID']));
     } else {
       $formID = wp_unslash($post->formID);
@@ -2388,7 +2388,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function deleteAIntegration($Request, $post)
   {
-    if (isset($Request['formID']) && $Request['id']) {
+    if (!empty($Request['formID']) && !empty($Request['id'])) {
       $formID = absint(json_decode(wp_unslash($Request['formID'])));
       $id = absint(wp_unslash($Request['id']));
     } else {
@@ -2412,7 +2412,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function deleteSuccessMessage($Request, $post)
   {
-    if (isset($Request['formID']) && $Request['id']) {
+    if (!empty($Request['formID']) && !empty($Request['id'])) {
       $formID = absint(json_decode(wp_unslash($Request['formID'])));
       $id = absint(wp_unslash($Request['id']));
     } else {
@@ -2435,7 +2435,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function deleteAWorkflow($Request, $post)
   {
-    if (isset($Request['formID']) && $Request['id']) {
+    if (!empty($Request['formID']) && !empty($Request['id'])) {
       $formID = absint(json_decode(wp_unslash($Request['formID'])));
       $id = absint(wp_unslash($Request['id']));
     } else {
@@ -2457,7 +2457,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function deleteAMailTemplate($Request, $post)
   {
-    if (isset($Request['formID']) && $Request['id']) {
+    if (!empty($Request['formID']) && !empty($Request['id'])) {
       $formID = absint(json_decode(wp_unslash($Request['formID'])));
       $id = absint(wp_unslash($Request['id']));
     } else {
@@ -2479,7 +2479,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
   public function duplicateAMailTemplate($Request, $post)
   {
-    if (isset($Request['formID']) && $Request['id']) {
+    if (!empty($Request['formID']) && !empty($Request['id'])) {
       $formID = absint(json_decode(wp_unslash($Request['formID'])));
       $id = absint(wp_unslash($Request['id']));
     } else {
