@@ -1,7 +1,7 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.0.0
-Stable tag: 3.0.0
+Version: 3.0.1
+Stable tag: 3.0.1
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin, akaioum 
@@ -16,19 +16,18 @@ Contact Form Builder for WordPress with payment forms, multistep forms, conversa
 
 == Description ==
 
-= Best Contact Form Builder Plugin for WordPress =
+Bit Form WordPress form builder makes form building easy for beginners and flexible for advanced users.
 
-Bit Form WordPress form builder makes form building easy for beginners and flexible for advanced users. Build mobile-responsive forms with a **no-code drag-and-drop builder**, powerful features, and **highly customizable** design controls for any use cases.
+Build mobile-responsive forms with a **no-code drag-and-drop builder**, powerful features, and **highly customizable** design controls for any use cases.
 
 You can use Bit Form to build a contact form, support form, lead generation form, registration form, file upload form, order form, booking form, survey form, payment form, calculator form, conversational form, and multistep form from one clean interface.
 
-#### Bit Form keeps forms lightweight and only loads 20KB JS & CSS for simple contact forms.
+### Bit Form keeps forms lightweight and only loads 20KB JS & CSS for simple contact forms.
 
 Bit Form is built for both beginners and advanced WordPress users. If you need a simple contact form, you can create one quickly.
 
 If you need a complex form with **conditional logic, calculations, payment fields, file upload, PDF attachments, email notifications, integrations, and entry management,** Bit Form gives you the tools to build it with minimum effort.
 
-#### A Powerful WordPress Form Builder - Bit Forms | Jeffrey @ Lytbox
 [youtube https://youtu.be/BUX6-BIPfSA]
 
 [Try Demo](https://towp.io/) | [Documentation](https://bit-form.com/wp-docs/) | [Bit Form Repository](https://github.com/Bit-Apps-Pro/bit-form-frontend) | [Youtube Channel](https://www.youtube.com/@bit-apps) | [Support Chat](https://tawk.to/chat/60eac4b6d6e7610a49aab375/1faah0r3e) | [Facebook Community](https://www.facebook.com/groups/bitapps)
@@ -68,7 +67,9 @@ Bit Form Free includes:
 ### Bit Form V3 Highlights
 
 Bit Form V3 brings a cleaner dashboard, redesigned builder, two-column field list, organized field settings, and an inline Add Field button for faster and easier form creation.
+
 It also adds WordPress **multisite support, email OTP verification**, responsive preview modes, improved entry filtering, and better export control.
+
 For design, V3 improves the style editor with **custom theme management, export/import options, organized style layers, and hover/focus styling**.
 
 ### 51 Form Fields Available in Bit Form
@@ -138,7 +139,6 @@ The following fields require Bit Form Pro:
 
 These fields help you create many types of WordPress forms without depending on multiple form plugins.
 
-#### The Most Powerful Form Builder for WordPress [INCREDIBLE] | Mr Web
 [youtube https://youtu.be/GCBwWCBD-yA]
 
 == Bit Form Pro Features ==
@@ -190,7 +190,6 @@ Bit Form is more than a basic contact form plugin. You can create many types of 
 
 Whether you need one simple form or many advanced forms, Bit Form gives you a flexible form plugin that works for real WordPress use cases.
 
-### Is This The Most Advanced Contact From Builder? [Bit Form Tutorial] | WP Simple Hacks
 [youtube https://youtu.be/afyqmwFL3zA]
 
 
@@ -261,7 +260,9 @@ Bit Form includes an intuitive drag-and-drop form builder. You can **add fields,
 ### Fast and Lightweight Form Builder
 
 Bit Form is designed to work as a fast form builder for WordPress. 
+
 For simple contact forms, Bit Form loads only **20KB JS & CSS**. The exact load depends on the fields and settings you use, but the plugin is built to keep form performance clean and lightweight.
+
 Bit Form still handles advanced forms in a well-optimized way. It gives you both: simple form creation for beginners and **advanced form control for power users**.
 
 ### Form Settings for Better Control
@@ -280,7 +281,6 @@ Bit Form gives you detailed form settings so you can control how your forms beha
 - Capture Google Ads Click ID or GCLID
 
 
-#### Bit Forms - The Best Form Plugin | WZ WP 4U
 [youtube https://youtu.be/yCEUoJ8KtNY]
 
 
@@ -298,6 +298,7 @@ This makes Bit Form useful for quote forms, calculator forms, booking forms, pay
 ### Email Notifications and Email Templates
 
 Bit Form lets you send email notifications after form submission. You can create custom email templates, add smart tags, insert form field values, map all fields into the email body, and send different messages based on form data.
+
 Bit Form Pro also supports advanced **email notifications with PDF attachments**, giving you more control over documents, receipts, confirmations, and internal records.
 
 ### Built-in Style Editor
@@ -326,13 +327,17 @@ Bit Form also supports conversational forms. A conversational form shows questio
 ### Entry Management, Data Views, and Reports
 
 Bit Form stores form submissions inside the dashboard.
+
 You can review form entries, manage submitted data, filter responses, and use entry-related features for internal workflows.
+
 With Bit Form Pro, Data Views & Edit lets you control which users can view or edit entries from the front end. You can allow users to view their own entries, allow selected roles to view others’ entries, and create front-end data views for submitted form data.
 
 
 ### Landing Forms and Direct Form Sharing
 
-Bit Form Pro supports landing forms and standalone form pages. You can create a form page with its own direct URL and share it without embedding the form on a normal WordPress page. You can also share conversational form links or embed forms using HTML embed code.
+Bit Form Pro supports landing forms and standalone form pages. You can create a form page with its own direct URL and share it without embedding the form on a normal WordPress page.
+
+You can also share conversational form links or embed forms using HTML embed code.
 
 
 ### PDF Templates and Attachments
@@ -372,17 +377,21 @@ You can show a warning message, save drafts for logged-in users, repopulate prev
 ### WordPress Authentication Forms
 
 Bit Form Pro includes WordPress authentication features. You can create forms for:
+
 * User registration
 * User login
 * Forgot password
 * Reset password
+
 You can map form fields to WordPress user fields, assign user roles, set approval methods, send user and admin notifications, redirect users after submission, and map user meta fields.
+
 This makes Bit Form useful for membership sites, course sites, private communities, customer portals, and user onboarding flows.
 
 
 ### Why Choose Bit Form?
 
 Bit Form gives you a clean form-building experience without making the workflow feel complicated. Bit Form is useful for:
+
 * Beginners who want to create a contact form without code
 * Small businesses that need lead generation forms and support forms
 * Agencies that build forms for client websites
@@ -397,6 +406,7 @@ Bit Form keeps simple form creation easy while still giving advanced users enoug
 ### Build Simple Forms or Advanced Form Workflows
 
 You can start with a basic form and later build more complex forms with file upload, conditional logic, multistep form, conversational form, payment form fields, booking form workflows, order form confirmations, support form notifications, CRM integrations, and PDF attachments.
+
 Bit Form gives you a flexible form-building system inside WordPress with a beginner-friendly interface and advanced form-building capabilities.
 
 
@@ -408,7 +418,7 @@ Bit Form connects to external services only when:
 
 Data is sent to external servers only when integrations are active (captcha/icon search are exceptions when those features are used). Enabling an integration sends form data to that service per your configuration — for example, connecting Mailchimp will send subscriber data on form submission.
 
-For a full reference with additional details see: https://github.com/bit-apps-pro/bit-form-frontend/blob/main/external-services.md
+For a full reference with additional details see: [External Services](https://github.com/bit-apps-pro/bit-form-frontend/blob/main/external-services.md)
 
 
 
@@ -466,8 +476,13 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.0.1=
+*Release Date: 22 May, 2026*
+*Fix:
+    1. Replace Wordpress static screenshot images.
+
 = 3.0.0 =
-*Release Date: 21 May, 2026*
+*Release Date: 22 May, 2026*
 *New:
     1. UI/UX: Redesigned the Bit Form dashboard, form builder and every interface following modern design principles for improved user experience.
     2. Multi-Site Support: Added compatibility for WordPress multisite installations, allowing network-wide bit form management.
