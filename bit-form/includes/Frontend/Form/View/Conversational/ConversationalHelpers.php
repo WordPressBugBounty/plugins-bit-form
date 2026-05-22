@@ -9,6 +9,12 @@ class ConversationalHelpers
   private $_formId;
   private $_conversationalSettings;
   private $_stepListObject;
+  private static $_isPreviewMode = false;
+
+  public static function setPreviewMode(bool $isPreview): void
+  {
+    self::$_isPreviewMode = $isPreview;
+  }
 
   public function __construct($formId, $conversationalSettings)
   {
@@ -79,25 +85,29 @@ class ConversationalHelpers
     $brandingMarkup = '';
     $navBtnMarkup = '';
 
-    if ($navigationSettings->showProgressLabel) {
+    $isPreview = self::$_isPreviewMode;
+
+    if ($navigationSettings->showProgressLabel || $isPreview) {
+      $hiddenCls = ($isPreview && !$navigationSettings->showProgressLabel) ? ' bc-live-hidden' : '';
       $progressLabelMarkup =
-        '      <div class="bc' . $formId . '-progress-lbl-wrpr">' . "\n"
+        '      <div class="bc' . $formId . '-progress-lbl-wrpr' . $hiddenCls . '">' . "\n"
         . '        <span class="bc' . $formId . '-progress-lbl">' . "\n"
         . '          ' . $navigationSettings->progressLabel . "\n"
         . '        </span>' . "\n"
         . '      </div>';
     }
 
-    if ($navigationSettings->showProgressBar) {
+    if ($navigationSettings->showProgressBar || $isPreview) {
+      $hiddenCls = ($isPreview && !$navigationSettings->showProgressBar) ? ' bc-live-hidden' : '';
       $progressBarMarkup =
-        '      <div class="bc' . $formId . '-progress-bar-wrpr">' . "\n"
+        '      <div class="bc' . $formId . '-progress-bar-wrpr' . $hiddenCls . '">' . "\n"
         . '        <div class="bc' . $formId . '-progress-bar">' . "\n"
-        . '          <div class="bc' . $formId . '-progress-fill" style="width: 40%"></div>' . "\n"
+        . '          <div class="bc' . $formId . '-progress-fill" style="width: 0%"></div>' . "\n"
         . '        </div>' . "\n"
         . '      </div>';
     }
 
-    if ($navigationSettings->showProgressBar || $navigationSettings->showProgressLabel) {
+    if ($navigationSettings->showProgressBar || $navigationSettings->showProgressLabel || $isPreview) {
       $progressMarkup =
         '        <div class="bc' . $formId . '-progress-wrpr">' . "\n"
         . '          <div class="bc' . $formId . '-progress-cntnt" >' . "\n"
@@ -107,21 +117,22 @@ class ConversationalHelpers
         . '        </div>';
     }
 
-    if ($navigationSettings->showBranding) {
+    if ($navigationSettings->showBranding || $isPreview) {
+      $hiddenCls = ($isPreview && !$navigationSettings->showBranding) ? ' bc-live-hidden' : '';
       $brandingMarkup =
-        '          <div class="bc' . $formId . '-branding-wrpr">' . "\n"
-        . '            <div class="bc' . $formId . '-branding-cntnt">' . "\n"
-        . '              <div class="bc' . $formId . '-branding-lbl">' . "\n"
-        . '                <span class="bc' . $formId . '-prowered-by-lbl">Powered by</span>' . "\n"
-        . '                <span class="bc' . $formId . '-bit-form-lbl">Bit Form</span>' . "\n"
-        . '              </div>' . "\n"
-        . '            </div> ' . "\n"
-        . '          </div>';
+        '        <div class="bc' . $formId . '-branding-wrpr' . $hiddenCls . '">' . "\n"
+        . '          <div class="bc' . $formId . '-branding-cntnt">' . "\n"
+        . '            <div class="bc' . $formId . '-branding-lbl">' . "\n"
+        . '              <span class="bc' . $formId . '-prowered-by-lbl">Powered by</span> <span class="bc' . $formId . '-bit-form-lbl">BitForm</span>' . "\n"
+        . '            </div>' . "\n"
+        . '          </div>' . "\n"
+        . '        </div>';
     }
 
-    if ($navigationSettings->showNavigateBtn) {
+    if ($navigationSettings->showNavigateBtn || $isPreview) {
+      $hiddenCls = ($isPreview && !$navigationSettings->showNavigateBtn) ? ' bc-live-hidden' : '';
       $navBtnMarkup =
-        '      <div class="bc' . $formId . '-nav-btn-wrpr">' . "\n"
+        '      <div class="bc' . $formId . '-nav-btn-wrpr' . $hiddenCls . '">' . "\n"
         . '        <div class="bc' . $formId . '-nav-btn-cntnt">' . "\n"
         . '          <button class="bc' . $formId . '-nav-btn bc' . $formId . '-nav-btn-up" type="button">' . "\n"
         . '            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>' . "\n"
@@ -133,21 +144,22 @@ class ConversationalHelpers
         . '      </div>';
     }
     $navBtnContainer = '';
-    if ($navigationSettings->showNavigateBtn || $navigationSettings->showBranding) {
+    if ($navigationSettings->showNavigateBtn || $isPreview) {
       $navBtnContainer =
         '      <div class="bc' . $formId . '-nav-btn-container">' . "\n"
-        . '        ' . $brandingMarkup . "\n"
         . '        ' . $navBtnMarkup . "\n"
         . '      </div>';
     }
 
-    if ($navigationSettings->show) {
+    if ($navigationSettings->show || $isPreview) {
+      $hiddenCls = ($isPreview && !$navigationSettings->show) ? ' bc-live-hidden' : '';
       return
-        '      <div class="bc' . $formId . '-nav-wrpr">' . "\n"
+        '      <div class="bc' . $formId . '-nav-wrpr' . $hiddenCls . '">' . "\n"
         . '        <div class="bc' . $formId . '-nav-wrpr-cntnt">' . "\n"
         . '          ' . $progressMarkup . "\n"
         . '          ' . $navBtnContainer . "\n"
         . '        </div>' . "\n"
+        . '        ' . $brandingMarkup . "\n"
         . '      </div>';
     }
     return '';
@@ -158,16 +170,20 @@ class ConversationalHelpers
     $formId = $this->_formId;
     $isFieldRequired = !empty($fieldData->valid->req) && $fieldData->valid->req;
     $btnTxt = $isFieldRequired ? $stepSettings->nextBtnTxt : $stepSettings->btnTxt;
-    $btnPreIcn = $this->conversationalSettingsIcon($stepSettings, 'btnPreIcn', 'btn-pre-icon', 'Button Leading Icon');
-    $btnSufIcn = $this->conversationalSettingsIcon($stepSettings, 'btnSufIcn', 'btn-suf-icon', 'Button Trailing Icon');
+    $btnPreIcn = $this->conversationalSettingsIcon($stepSettings, 'btnPreIcn', 'btn-pre-icon', 'Button Prefix Icon');
+    $btnSufIcn = $this->conversationalSettingsIcon($stepSettings, 'btnSufIcn', 'btn-suf-icon', 'Button Suffix Icon');
     $hiddenClass = $isFieldRequired ? 'bc-grid-hide' : '';
     $stepHints = !empty($stepSettings->stepHints) ? $stepSettings->stepHints : '';
+
+    $dataBtnTxt = esc_attr(!empty($stepSettings->btnTxt) ? $stepSettings->btnTxt : 'Skip');
+    $dataNextBtnTxt = esc_attr(!empty($stepSettings->nextBtnTxt) ? $stepSettings->nextBtnTxt : 'Next');
 
     $btnWrapperMarkup =
       '    <div class="' . $hiddenClass . ' bc' . $formId . '-step-btn-wrpr">' . "\n"
       . '      <div class="bc' . $formId . '-step-btn-inner-wrpr">' . "\n"
       . '        <div class="bc' . $formId . '-step-btn-cntnt">' . "\n"
-      . '          <button class="bc' . $formId . '-btn bc' . $formId . '-btn-ok" type="button">' . "\n"
+      . '          <button class="bc' . $formId . '-btn bc' . $formId . '-btn-ok" type="button"'
+      . ' data-btn-txt="' . $dataBtnTxt . '" data-next-btn-txt="' . $dataNextBtnTxt . '">' . "\n"
       . '            ' . $btnPreIcn . "\n"
       . '            ' . $btnTxt . "\n"
       . '            ' . $btnSufIcn . "\n"
@@ -190,7 +206,8 @@ class ConversationalHelpers
       . '        ' . $imageContent . "\n"
       . '      </picture>' . "\n"
       . '    </div>';
-    $imageContentWrapper = 'normal-layout' === $layoutName ? '' : $imageContentWrapper;
+    $noImageLayouts = ['normal-layout', 'centered-card-layout'];
+    $imageContentWrapper = in_array($layoutName, $noImageLayouts, true) ? '' : $imageContentWrapper;
 
     return
       '    <div class="bc' . $formID . '-step-wrapper bc' . $formID . '-step bc-step-deactive ' . $layoutClassNames . '">' . "\n"

@@ -10,6 +10,7 @@ use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Core\Database\DB;
 use BitCode\BitForm\Core\Database\FormModel;
 use WP_Error;
+use WP_Site;
 
 /**
  * Class handling plugin activation.
@@ -28,9 +29,34 @@ final class Activation
   public function activate()
   {
     add_action('bitforms_activation', [$this, 'install']);
+    add_action('wp_initialize_site', [$this, 'initializeNewSite'], 120, 1);
   }
 
-  public function install()
+  public function install($networkWide)
+  {
+    if ($networkWide && \function_exists('is_multisite') && is_multisite()) {
+      $sites = get_sites(['fields' => 'ids', 'network_id' => get_current_network_id()]);
+      foreach ($sites as $site) {
+        switch_to_blog($site);
+        $this->installOnCurrentBlog();
+        restore_current_blog();
+      }
+    } else {
+      $this->installOnCurrentBlog();
+    }
+  }
+
+  public function initializeNewSite(WP_Site $site)
+  {
+    switch_to_blog($site->blog_id);
+    $plugin = plugin_basename(BITFORMS_PLUGIN_MAIN_FILE);
+    if (!is_plugin_active_for_network($plugin)) {
+      do_action('bitforms_activation', false);
+    }
+    restore_current_blog();
+  }
+
+  public function installOnCurrentBlog()
   {
     $installed = get_option('bitforms_installed');
 
@@ -57,7 +83,10 @@ final class Activation
     update_option('bitforms_version', BITFORMS_VERSION);
     $this->layoutUpdate();
     $this->createUploadDir();
-    $this->createFrontendPages();
+
+    if (!defined('WP_TESTS_DOMAIN')) {
+      $this->createFrontendPages();
+    }
   }
 
   private function createUploadDir()

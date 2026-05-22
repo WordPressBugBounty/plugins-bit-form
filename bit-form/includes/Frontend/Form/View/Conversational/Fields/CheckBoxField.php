@@ -19,6 +19,9 @@ class CheckBoxField
 
     $req = $fieldHelpers->required();
     $name = $fieldHelpers->name();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
+    $labelId = $fieldHelpers->getLabelId();
     $checkBoxOptions = '';
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
@@ -153,20 +156,25 @@ class CheckBoxField
       '<div' . "\n"
       . '  %1$s' . "\n"
       . '  class="%2$s %3$s"' . "\n"
+      . '  role="group" ' . "\n"
+      . '  aria-labelledby="%4$s" ' . "\n"
+      . '  %5$s ' . "\n"
       . '>' . "\n"
-      . '  <svg class="%4$s">' . "\n"
-      . '    <symbol id="%5$s-ck-svg" viewBox="0 0 12 10">' . "\n"
+      . '  <svg class="%6$s" aria-hidden="true">' . "\n"
+      . '    <symbol id="%7$s-ck-svg" viewBox="0 0 12 10">' . "\n"
       . '      <polyline' . "\n"
-      . '        class="%6$s"' . "\n"
+      . '        class="%8$s"' . "\n"
       . '        points="1.5 6 4.5 9 10.5 1"' . "\n"
       . '      ></polyline>' . "\n"
       . '    </symbol>' . "\n"
       . '  </svg>' . "\n"
-      . '  %7$s' . "\n"
+      . '  %9$s' . "\n"
       . '</div>',
       $fieldHelpers->getCustomAttributes('cc'),
       $fieldHelpers->getConversationalCls('cc'),
       $fieldHelpers->getCustomClasses('cc'),
+      $labelId,
+      $ariaDescribedBy,
       $fieldHelpers->getConversationalCls('cks'),
       $rowID,
       $fieldHelpers->getConversationalCls('ck-svgline'),

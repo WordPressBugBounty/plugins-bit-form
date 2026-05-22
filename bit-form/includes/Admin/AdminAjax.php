@@ -94,6 +94,15 @@ class AdminAjax
     // common (get post type) for integration
     add_action('wp_ajax_bitforms_get_post_type', [$this, 'postTypeByUser']);
 
+    // WP users and roles (lazy-loaded, not inlined on page load)
+    add_action('wp_ajax_bitforms_get_wp_users',   [$this, 'getWPUsers']);
+    add_action('wp_ajax_bitforms_get_user_roles', [$this, 'getUserRoles']);
+
+    // transient invalidation when users change
+    add_action('user_register',  [$this, 'clearUsersTransient']);
+    add_action('deleted_user',   [$this, 'clearUsersTransient']);
+    add_action('profile_update', [$this, 'clearUsersTransient']);
+
     // Meta Box INTEGRATION
     add_action('wp_ajax_bitforms_get_metabox_fields', [$this, 'getMetaBoxFields']);
 
@@ -102,6 +111,7 @@ class AdminAjax
 
     // Notice Options
     add_action('wp_ajax_bitforms_handle_notice', [$this, 'handleNotice']);
+    add_action('wp_ajax_bitforms_dismiss_pro_notice', [$this, 'dismissProUpgradeNotice']);
 
     // conversational
     add_action('wp_ajax_bitforms_save_conversational_css', [$this, 'saveConversationalCSS']);
@@ -481,6 +491,13 @@ class AdminAjax
         401
       );
     }
+  }
+
+  public function dismissProUpgradeNotice()
+  {
+    check_ajax_referer('bitforms_dismiss_pro_notice', 'nonce');
+    update_user_meta(get_current_user_id(), 'bitforms_dismiss_pro_upgrade_notice', BITFORMS_REQUIRED_BITFORMPRO_VERSION);
+    wp_die();
   }
 
   private function formatFormContentForUpdate($formContents)
@@ -2127,6 +2144,52 @@ class AdminAjax
         401
       );
     }
+  }
+
+  public function getWPUsers()
+  {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
+
+      $users = get_transient('bitforms_admin_users_list');
+      if (false === $users) {
+        $rawUsers = get_users(['fields' => ['ID', 'user_nicename', 'user_email', 'display_name']]);
+        $userMail = [];
+        $userNames = [];
+        foreach ($rawUsers as $key => $value) {
+          $userMail[$key] = [
+            'label' => !empty($value->display_name) ? $value->display_name : '',
+            'value' => !empty($value->user_email) ? $value->user_email : '',
+            'id'    => $value->ID,
+          ];
+          $userNames[$value->ID] = [
+            'name' => $value->display_name,
+            'url'  => admin_url('user-edit.php?user_id=' . absint($value->ID)),
+          ];
+        }
+        $users = ['userMail' => $userMail, 'user' => $userNames];
+        set_transient('bitforms_admin_users_list', $users, 10 * MINUTE_IN_SECONDS);
+      }
+
+      wp_send_json_success($users, 200);
+    } else {
+      wp_send_json_error(__('Token expired', 'bit-form'), 401);
+    }
+  }
+
+  public function getUserRoles()
+  {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
+      wp_send_json_success(['userRoles' => get_editable_roles()], 200);
+    } else {
+      wp_send_json_error(__('Token expired', 'bit-form'), 401);
+    }
+  }
+
+  public function clearUsersTransient(): void
+  {
+    delete_transient('bitforms_admin_users_list');
   }
 
   private function getPostTypes()

@@ -80,6 +80,7 @@ final class DB
                 `workflow_run` varchar(50) NOT NULL,
                 `workflow_behaviour` varchar(25) NOT NULL,
                 `workflow_condition` longtext DEFAULT NULL,
+                `workflow_info` longtext DEFAULT NULL,
                 `workflow_order` int(11) unsigned DEFAULT NULL,
                 `workflow_status` tinyint(1) DEFAULT 1,/* 0 disable, 1 enable,  2 enable in field settings */
                 `form_id` bigint(20) unsigned DEFAULT NULL,
@@ -208,7 +209,7 @@ final class DB
       foreach ($table_schema as $table) {
         dbDelta($table);
       }
-      $installed_db_version = get_site_option('bitforms_db_version');
+      $installed_db_version = get_option('bitforms_db_version');
       if ($installed_db_version && version_compare('1.1', $installed_db_version, '>=')) {
         // if new db version is equal or higher than 1.1
         // Schema migration: table name interpolation only (no user input). $wpdb->prepare() cannot parameterize DDL statements.
@@ -277,10 +278,18 @@ final class DB
         }
       }
 
-      update_site_option(
-        'bitforms_db_version',
-        $bitforms_db_version
-      );
+      // add workflow_info column if not exists
+      if ($installed_db_version && version_compare('3.0', $installed_db_version, '>=')) {
+        $table_name = $wpdb->prefix . 'bitforms_workflows';
+        if (null === $wpdb->get_var("SHOW COLUMNS FROM `{$table_name}` LIKE 'workflow_info'")) {
+          $wpdb->query(
+            "ALTER TABLE `{$table_name}`
+                ADD COLUMN `workflow_info` LONGTEXT NULL AFTER `workflow_condition`"
+          );
+        }
+      }
+
+      update_option('bitforms_db_version', $bitforms_db_version, true);
     } catch (\Exception $e) {
       // Log the error to a file or the database
       Log::debug_log('Error during DB migration: ' . $e->getMessage());

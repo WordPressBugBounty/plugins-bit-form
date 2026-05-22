@@ -7,7 +7,7 @@ if (!defined('BITFORMS_ASSET_URI')) {
   exit;
 }
 
-$logoUrl = BITFORMS_ASSET_URI . '/logo.svg';
+$logoUrl = BITFORMS_ASSET_URI . '/logo-black.svg';
 
 ?>
 
@@ -23,6 +23,7 @@ $logoUrl = BITFORMS_ASSET_URI . '/logo.svg';
 
 .__root-logo {
   margin-inline: auto;
+  border-radius: 8px;
 }
 
 .__root-title {

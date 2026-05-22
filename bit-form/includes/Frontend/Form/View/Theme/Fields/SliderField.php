@@ -31,6 +31,8 @@ class SliderField
     $step = '';
     $ph = $fieldHelpers->placeholder();
     $value = $fieldHelpers->value();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
     $list = '';
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
@@ -88,6 +90,8 @@ class SliderField
         class="' . $fieldHelpers->getAtomicCls('fld') . ' ' . $fieldHelpers->getCustomClasses('fld') . '"
         type="' . $fieldHelpers->esc_attr($field->typ) . '"
         ' . $req . '
+        ' . $ariaRequired . '
+        ' . $ariaDescribedBy . '
         ' . $disabled . '
         ' . $readonly . '
         ' . $ph . '

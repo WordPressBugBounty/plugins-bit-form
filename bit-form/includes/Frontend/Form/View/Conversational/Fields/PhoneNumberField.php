@@ -20,6 +20,10 @@ class PhoneNumberField
     $readonly = $fh->readonly();
     $name = $fh->name();
     $ph = $fh->placeholder();
+    $ariaDescribedBy = $fh->ariaDescribedBy();
+    $ariaRequired = $fh->ariaRequired();
+    // Get dynamic label ID to properly link the combobox to its label for screen readers
+    $labelId = $fh->getLabelId();
     $selectedFlagImage = '';
     $tabIndx = isset($field->disabled) ? -1 : 0;
     $selectedCountryClearable = '';
@@ -28,7 +32,7 @@ class PhoneNumberField
     $options = '';
     $readonlyCls = isset($field->readonly) ? 'readonly' : '';
     $disabledCls = isset($field->disabled) ? 'disabled' : '';
-    $img = htmlentities("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'></svg>");
+    $img = esc_url(includes_url('images/blank.gif'));
 
     $val = $fh->value();
 
@@ -120,6 +124,8 @@ class PhoneNumberField
         <input
           ' . $name . '
           ' . $req . '
+          ' . $ariaRequired . '
+          ' . $ariaDescribedBy . '
           type="text"
           title="Phone-number Hidden Input"
           class="' . $fh->getConversationalMultiCls('phone-hidden-input') . ' d-none"
@@ -131,8 +137,9 @@ class PhoneNumberField
           <div
             class="' . $fh->getConversationalMultiCls('dpd-wrp') . '"
             role="combobox"
+            aria-haspopup="listbox"
             aria-live="assertive"
-            aria-labelledby="country-label-2"
+            aria-labelledby="{$labelId}"
             aria-expanded="false"
             tabIndex=' . $tabIndx . '
           >
@@ -158,6 +165,7 @@ class PhoneNumberField
             ' . $fh->getCustomAttributes('phone-number-input') . '
             aria-label="Phone Number"
             type="tel"
+            inputmode="tel"            
             class="' . $fh->getConversationalMultiCls('phone-number-input') . ' ' . $fh->getCustomClasses('phone-number-input') . '"
             autoComplete="tel"
             ' . $ph . '

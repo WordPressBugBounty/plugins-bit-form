@@ -472,10 +472,10 @@ class Helpers
 
   public static function csrfEecrypted()
   {
-    $secretKey = get_option('bf_csrf_secret');
+    $secretKey = get_option('bitform_csrf_secret');
     if (!$secretKey) {
       $secretKey = 'bf-' . time();
-      update_option('bf_csrf_secret', $secretKey);
+      update_option('bitform_csrf_secret', $secretKey);
     }
     $tIdenty = base64_encode(\random_bytes(32));
     $csrf = \base64_encode(\hash_hmac('sha256', $tIdenty, $secretKey, true));
@@ -484,7 +484,7 @@ class Helpers
 
   public static function csrfDecrypted($identy, $token)
   {
-    $secretKey = get_option('bf_csrf_secret');
+    $secretKey = get_option('bitform_csrf_secret');
     return \hash_equals(
       \base64_encode(\hash_hmac('sha256', $identy, $secretKey, true)),
       $token

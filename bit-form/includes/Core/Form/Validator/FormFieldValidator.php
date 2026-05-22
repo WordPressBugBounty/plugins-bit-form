@@ -40,7 +40,7 @@ final class FormFieldValidator
     foreach ($this->_form_fields as $field_name => $field_data) {
       $submittedFieldData = isset($this->_submitted_fields[$field_name]) ? $this->_submitted_fields[$field_name] : null;
 
-      if ('file-up' === $field_data['type'] || 'advanced-file-up' === $field_data['type'] && isset($this->_submitted_files[$field_name]['name'])) {
+      if (('file-up' === $field_data['type'] || 'advanced-file-up' === $field_data['type']) && isset($this->_submitted_files[$field_name]['name'])) {
         $submittedFieldData = $this->_submitted_files[$field_name]['name'];
       }
       if (isset($field_data['repeated']) && $field_data['repeated'] && is_array($submittedFieldData)) {
@@ -100,6 +100,11 @@ final class FormFieldValidator
                   $field_data['valid']['typMsg'] :
                   $field_data['label'] . __(' should be an email. please provide a valid email address.', 'bit-form');
             }
+            $this->validateConfirmField($field_name, $field_data);
+            break;
+          }
+          case 'password': {
+            $this->validateConfirmField($field_name, $field_data);
             break;
           }
           case 'time': {
@@ -301,9 +306,41 @@ final class FormFieldValidator
     return $this->_messages;
   }
 
+  private function validateConfirmField($field_name, $field_data)
+  {
+    if (is_array($this->_submitted_fields[$field_name])) {
+      $primaryValue = $this->_submitted_fields[$field_name]['primary'];
+      $confirmValue = $this->_submitted_fields[$field_name]['confirm'];
+      $confirmFieldKey = $field_data['childFields'][0]->fldKey ?? null;
+      $confirmFldData = $this->_form_fields[$confirmFieldKey] ?? null;
+      if (!$this->matchConfirmation($primaryValue, $confirmValue)) {
+        if ($confirmFldData && !$confirmFldData['isDeactive']) {
+          $this->_messages[$confirmFieldKey]
+               = !empty($confirmFldData['valid']['confMsg']) ?
+               $confirmFldData['valid']['confMsg'] :
+                __('The entered values do not match.', 'bit-form');
+        }
+      } else {
+        if (!isset($field_data['parentFieldKey'])) {
+          $_POST[$field_name] = $primaryValue;
+        }
+      }
+    }
+  }
+
   private function validateEmail($value)
   {
-    return preg_match("/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/", $value);
+    if (is_array($value)) {
+      $value = $value['primary'];
+    }
+    $validEmailPattern = "/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/";
+
+    return preg_match($validEmailPattern, $value);
+  }
+
+  private function matchConfirmation($value, $confirmValue)
+  {
+    return $value === $confirmValue;
   }
 
   private function validateTime($value)
@@ -372,8 +409,10 @@ final class FormFieldValidator
       return true;
     }
 
+    $allowedOptions = array_map([$this, 'normalizeOptionValueForComparison'], $allowedOptions);
+
     foreach ($submittedValues as $submittedValue) {
-      if (!in_array((string) $submittedValue, $allowedOptions, true)) {
+      if (!in_array($this->normalizeOptionValueForComparison($submittedValue), $allowedOptions, true)) {
         return false;
       }
     }
@@ -465,5 +504,13 @@ final class FormFieldValidator
     }
 
     return [(string) $value];
+  }
+
+  private function normalizeOptionValueForComparison($value)
+  {
+    $value = html_entity_decode((string) $value, ENT_QUOTES, 'UTF-8');
+    $value = preg_replace('/\s+/u', ' ', $value);
+
+    return trim((string) $value);
   }
 }

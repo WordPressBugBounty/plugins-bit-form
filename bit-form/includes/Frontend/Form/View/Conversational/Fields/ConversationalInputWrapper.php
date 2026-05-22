@@ -80,16 +80,19 @@ class ConversationalInputWrapper extends InputWrapper
     }
 
     // for pre required icon
+    // aria-hidden="true" hides the asterisk from screen readers since the input
+    // already has aria-required="true" which properly announces the required state.
     if (
       $this->_fieldHelpers->property_exists_nested($this->_fieldData, 'valid->req')
       && $this->_fieldHelpers->property_exists_nested($this->_fieldData, 'valid->reqShow', true)
       && $this->_fieldHelpers->property_exists_nested($this->_fieldData, 'valid->reqPos', 'before')
     ) {
       $_reqPre = sprintf(
-        '      <span 
+        '<span 
 	        %1$s
 	        class="%2$s %3$s" 
-      >
+          aria-hidden="true"
+        >
 	        *
 	      </span>',
         $this->_fieldHelpers->getCustomAttributes('req-smbl'),
@@ -98,16 +101,18 @@ class ConversationalInputWrapper extends InputWrapper
       );
     }
     // for post required icon
+    // Same as pre required icon - hide from assistive technology to prevent redundancy.
     if (
       $this->_fieldHelpers->property_exists_nested($this->_fieldData, 'valid->req')
       && $this->_fieldHelpers->property_exists_nested($this->_fieldData, 'valid->reqShow', true)
       && $this->_fieldHelpers->property_exists_nested($this->_fieldData, 'valid->reqPos', 'before', 1)
     ) {
       $_reqPost = sprintf(
-        '      <span 
+        '<span 
 	        %1$s
 	        class="%2$s %3$s" 
-      >
+          aria-hidden="true"
+        >
 	        *
 	      </span>',
         $this->_fieldHelpers->getCustomAttributes('req-smbl'),
@@ -124,27 +129,30 @@ class ConversationalInputWrapper extends InputWrapper
     ) {
       $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
       $contentCount = count($bfFrontendFormIds);
+      $labelId = $this->_fieldHelpers->getLabelId();
       $_label = sprintf(
-        '      <label 
-	        %1$s 
-	        class="%2$s %3$s"
-        for="%4$s-%5$s">
-        %6$s
-        %7$s
-        %8$s
-        %9$s
-	        %10$s
+        '<label 
+          id="%1$s"
+	        %2$s 
+	        class="%3$s %4$s"
+          for="%5$s-%6$s">
+          %7$s
+          %8$s
+          %9$s
+          %10$s
+	        %11$s
 	      </label>',
-        $this->_fieldHelpers->getCustomAttributes('lbl'), // 1
-        $this->_fieldHelpers->getConversationalMultiCls('lbl'), // 2
-        $this->_fieldHelpers->getCustomClasses('lbl'), // 3
-        $this->_fieldKey, // 4
-        $contentCount, // 5
-        $_reqPre, // 6
-        $_lblPreIcn, // 7
-        $_lbl, // 8
-        $_lblSufIcn, // 9
-        $_reqPost // 10
+        $labelId, // 1
+        $this->_fieldHelpers->getCustomAttributes('lbl'), // 2
+        $this->_fieldHelpers->getConversationalMultiCls('lbl'), // 3
+        $this->_fieldHelpers->getCustomClasses('lbl'), // 4
+        $this->_fieldKey, // 5
+        $contentCount, // 6
+        $_reqPre, // 7
+        $_lblPreIcn, // 8
+        $_lbl, // 9
+        $_lblSufIcn, // 10
+        $_reqPost // 11
       );
     }
 
@@ -194,15 +202,18 @@ class ConversationalInputWrapper extends InputWrapper
     }
 
     if (property_exists($this->_fieldData, 'helperTxt') && $this->_fieldData->helperTxt) {
+      $helperTextId = $this->_fieldHelpers->getHelperTextId();
       $_helperTxt = sprintf(
-        '      <div 
-	        %1$s
-        class="%2$s %3$s" 
-      >
-        %4$s
-	        %5$s
+        '<div 
+          id="%1$s"
+	        %2$s
+          class="%3$s %4$s" 
+        >
+          %5$s
 	        %6$s
+	        %7$s
 	      </div>',
+        $helperTextId,
         $this->_fieldHelpers->getCustomAttributes('hlp-txt'),
         $this->_fieldHelpers->getConversationalMultiCls('hlp-txt'),
         $this->_fieldHelpers->getCustomClasses('hlp-txt'),
@@ -228,6 +239,7 @@ class ConversationalInputWrapper extends InputWrapper
       $_style = 'margin-top: 5px !important; height: 9px !important;';
     }
 
+    $errorId = $this->_fieldHelpers->getErrorId();
     $errMsgStart = '';
     $errMsgEnd = '';
     $msgStyle = "style='display: none !important;'";
@@ -244,30 +256,33 @@ class ConversationalInputWrapper extends InputWrapper
     }
 
     return sprintf(
-      '    <div class="%1$s" style="%2$s">
-	    <div class="%3$s">
-	      %4$s
-        %5$s
-        <div %6$s %7$s class="%8$s %9$s %10$s %11$s" %12$s>%13$s</div>
-        %14$s
-      %15$s
-      </div>
+      '<div class="%1$s" role="alert" aria-atomic="true" aria-live="assertive"  style="%2$s">
+        <div class="%3$s">
+          %4$s
+          %5$s
+          <div id="%6$s" %7$s %8$s class="%9$s %10$s %11$s %12$s " %13$s>
+            %14$s
+          </div>
+          %15$s
+          %16$s
+        </div>
 	    </div>',
       $this->_fieldHelpers->getConversationalMultiCls('err-wrp'), // 1
       $_style, // 2
       $this->_fieldHelpers->getConversationalCls('err-inner'), // 3
       $errMsgStart, // 4
       $_errorPreIcn, // 5
-      $this->_fieldHelpers->getCustomAttributes('err-txt'), // 6
-      $errMsgCustomAttr, // 7
-      $errMsgAtomicCls, // 8
-      $errMsgCustomCls, // 9
-      $this->_fieldHelpers->getConversationalMultiCls('err-txt'), // 10
-      $this->_fieldHelpers->getCustomClasses('err-txt'), // 11
-      $msgStyle, // 12
-      $_error, // 13
-      $_errorSufIcn, // 14
-      $errMsgEnd // 15
+      $errorId, // 6
+      $this->_fieldHelpers->getCustomAttributes('err-txt'), // 7
+      $errMsgCustomAttr, // 8
+      $errMsgAtomicCls, // 9
+      $errMsgCustomCls, // 10
+      $this->_fieldHelpers->getConversationalMultiCls('err-txt'), // 11
+      $this->_fieldHelpers->getCustomClasses('err-txt'), // 12
+      $msgStyle, // 13
+      $_error, // 14
+      $_errorSufIcn, // 15
+      $errMsgEnd // 16
     );
   }
 
@@ -276,11 +291,12 @@ class ConversationalInputWrapper extends InputWrapper
     if ($this->_fieldHelpers->property_exists_nested($this->_fieldData, $icnPropName, '', 1)) {
       return sprintf(
         '<img
-	  %1$s
-	  class="%2$s %3$s"
-  src="%4$s"
-  alt=""
-	/>
+          %1$s
+          class="%2$s %3$s"
+          src="%4$s"
+          alt=""
+          aria-hidden="true"
+        />
 	',
         $this->_fieldHelpers->getCustomAttributes($element),
         $this->_fieldHelpers->getConversationalCls($element),
@@ -289,5 +305,14 @@ class ConversationalInputWrapper extends InputWrapper
       );
     }
     return '';
+  }
+
+  /**
+   * Get the field helpers instance for external access
+   * @return ConversationalFieldHelpers
+   */
+  public function getFieldHelpers()
+  {
+    return $this->_fieldHelpers;
   }
 }

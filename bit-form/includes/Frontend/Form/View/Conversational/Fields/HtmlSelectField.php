@@ -32,6 +32,8 @@ class HtmlSelectField
     $disabled = $fieldHelpers->disabled();
     $readonly = $fieldHelpers->readonly();
     $name = $fieldHelpers->name();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
     $value = '';
     if ($val) {
       $value = $val;
@@ -124,8 +126,8 @@ class HtmlSelectField
 
     return sprintf(
       '<div
-      %1$s
-      class="%2$s"
+        %1$s
+        class="%2$s"
       >
           <select
             %3$s
@@ -134,10 +136,12 @@ class HtmlSelectField
             %8$s
             %9$s
             %10$s
-            value="%11$s"
+            %11$s
+            %12$s
+            value="%13$s"
           >
-             %12$s
-             %13$s
+             %14$s
+             %15$s
           </select>
       </div>',
       $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
@@ -147,6 +151,8 @@ class HtmlSelectField
       $contentCount,
       $fieldHelpers->getConversationalCls('fld') . ' ' . $fieldHelpers->getCustomClasses('fld'),
       $readonlyCls,
+      $ariaRequired,
+      $ariaDescribedBy,
       $readonly,
       $disabled,
       $name,

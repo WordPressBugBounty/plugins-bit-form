@@ -19,6 +19,9 @@ class ImageSelectField
 
     $name = $fieldHelpers->name();
     $req = $fieldHelpers->required();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
+    $labelId = $fieldHelpers->getLabelId();
 
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
@@ -132,20 +135,25 @@ class ImageSelectField
 
     return sprintf(
       '<div
-      class="%1$s"
-      %2$s
-    >
-      <div
-        class="%3$s"
-        %4$s
+        class="%1$s"
+        %2$s
       >
-        %5$s     
-      </div>
-    </div>',
+        <div
+          class="%3$s"
+          %4$s
+          role="group"
+          aria-labelledby="%5$s"
+          %6$s
+        >
+          %7$s     
+        </div>
+      </div>',
       $fieldHelpers->getConversationalCls('inp-fld-wrp') . ' ' . $fieldHelpers->getCustomClasses('inp-fld-wrp'),
       $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
       $fieldHelpers->getConversationalCls('ic') . ' ' . $fieldHelpers->getCustomClasses('ic'),
       $fieldHelpers->getCustomAttributes('ic'),
+      $labelId,
+      $ariaDescribedBy,
       $imageOption
     );
   }

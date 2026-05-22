@@ -351,7 +351,7 @@ final class FileHandler
       // return ['message' => __('No file uploaded.', 'bit-form'), 'error_type' => 'file_missing'];
       return null;
     }
-    if (!isset($file['error']) || UPLOAD_ERR_OK !== $file['error']) {
+    if (!isset($file['error']) || UPLOAD_ERR_OK !== (int)$file['error']) {
       return ['message' => __('Upload failed', 'bit-form'), 'error_type' => 'file_upload_error'];
     }
     if (!is_uploaded_file($file['tmp_name'])) {

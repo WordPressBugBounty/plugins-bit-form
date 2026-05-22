@@ -32,6 +32,8 @@ class HtmlSelectField
     $disabled = $fieldHelpers->disabled();
     $readonly = $fieldHelpers->readonly();
     $name = $fieldHelpers->name();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
     $value = '';
     if ($v) {
       $value = $v;
@@ -138,10 +140,12 @@ class HtmlSelectField
           %10$s
           %11$s
           %12$s
-          value="%13$s"
-        >
+          %13$s
           %14$s
-          %15$s
+          value="%15$s"
+        >
+          %16$s
+          %17$s
         </select>
       </div>',
       $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
@@ -153,6 +157,8 @@ class HtmlSelectField
       $fieldHelpers->getAtomicCls('fld'),
       $fieldHelpers->getCustomClasses('fld'),
       $readonlyCls,
+      $ariaRequired,
+      $ariaDescribedBy,
       $readonly,
       $disabled,
       $name,

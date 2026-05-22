@@ -73,6 +73,7 @@ final class WorkFlowHandler
         'workflow_run',
         'workflow_behaviour',
         'workflow_condition',
+        'workflow_info',
         'workflow_order',
         'workflow_status',
       ],
@@ -95,6 +96,7 @@ final class WorkFlowHandler
       $workFlow['action_run'] = $value->workflow_run;
       $workFlow['action_behaviour'] = $value->workflow_behaviour;
       $workFlow['conditions'] = json_decode($value->workflow_condition);
+      $workFlow['info'] = json_decode($value->workflow_info);
       $workFlow['status'] = (int) $value->workflow_status;
       foreach ($workFlow['conditions'] as $conIndex => $condition) {
         if (property_exists($condition, 'logics')) {
@@ -185,6 +187,7 @@ final class WorkFlowHandler
         'workflow_run'       => $workFlowDetails->action_run,
         'workflow_behaviour' => $workFlowDetails->action_behaviour,
         'workflow_condition' => wp_json_encode($conditions),
+        'workflow_info'      => wp_json_encode($workFlowDetails->info),
         // "workflow_action" => wp_json_encode($workFlowActions),
         'workflow_order'     => $workFlowOrder,
         'workflow_status'    => $workFlowDetails->status,
@@ -266,6 +269,7 @@ final class WorkFlowHandler
         'workflow_run'       => $workFlowDetails->action_run,
         'workflow_behaviour' => $workFlowDetails->action_behaviour,
         'workflow_condition' => wp_json_encode($conditions),
+        'workflow_info'      => wp_json_encode($workFlowDetails->info),
         'workflow_order'     => $workFlowOrder,
         'workflow_status'    => isset($workFlowDetails->status) ? $workFlowDetails->status : 1,
         'form_id'            => static::$_formID,
@@ -352,7 +356,7 @@ final class WorkFlowHandler
   {
     $workFlowCols = [
       'workflow_name', 'workflow_type', 'workflow_run', 'workflow_behaviour',
-      'workflow_condition', 'workflow_action', 'workflow_status', 'form_id', 'user_id',
+      'workflow_condition', 'workflow_info', 'workflow_action', 'workflow_status', 'form_id', 'user_id',
       'user_ip', 'user_location', 'user_device', 'created_at', 'updated_at',
     ];
     $dupData = [
@@ -361,6 +365,7 @@ final class WorkFlowHandler
       'workflow_run',
       'workflow_behaviour',
       'workflow_condition',
+      'workflow_info',
       'workflow_action',
       'workflow_status',
       static::$_formID,

@@ -370,7 +370,16 @@ class FormManager
       if (isset($field->customType)) {
         $field_details[$key]['customType'] = $field->customType;
       }
-
+      // fields with confirm field
+      if (isset($field->childFields)) {
+        $field_details[$key]['childFields'] = $field->childFields;
+      }
+      if (isset($field->parentFieldKey)) {
+        $field_details[$key]['parentFieldKey'] = $field->parentFieldKey;
+        if (isset($field->isDeactive)) {
+          $field_details[$key]['isDeactive'] = $field->isDeactive;
+        }
+      }
       if (isset($field->err)) {
         if (isset($field->err->entryUnique)) {
           $field_details[$key]['entryUnique'] = $field->err->entryUnique;
@@ -576,20 +585,78 @@ class FormManager
       }
       $field_data = $form_fields->{$key};
       $field_type = $field_data->typ;
+      $normalizedParentValue = $this->normalizeSubmittedValue($value);
+      $parentFieldName = isset($field_data->fieldName) ? $field_data->fieldName : '';
+      if (!empty($field_data->childFields) && is_array($field_data->childFields)) {
+        foreach ($field_data->childFields as $childFieldRef) {
+          $childFieldKey = isset($childFieldRef->fldKey) ? $childFieldRef->fldKey : '';
+          if (empty($childFieldKey) || !isset($form_fields->{$childFieldKey})) {
+            continue;
+          }
+
+          $childFieldData = $form_fields->{$childFieldKey};
+          $childFieldName = isset($childFieldData->fieldName) ? $childFieldData->fieldName : '';
+          $childFieldName = str_replace(['[', ']', $parentFieldName], '', $childFieldName);
+          if (empty($childFieldName)) {
+            continue;
+          }
+
+          $childValue = $this->extractChildValueFromParentValue($normalizedParentValue, $childFieldName, $childFieldKey);
+          if (null !== $childValue) {
+            $submitted_data[$childFieldKey] = $childValue;
+          }
+        }
+      }
+
+      if ($this->isRepeatedField($key) && in_array($field_type, ['name', 'address'])) {
+        $submitted_data[$key] = $this->normalizeRepeatedCompositeFieldInput($normalizedParentValue);
+      }
+
       if ('select' === $field_type && !empty($field_data->config->multipleSelect)) {
         $valueArr = [];
-        if ($this->isRepeatedField($key)) {
-          foreach ($value as $index => $v) {
+        if ($this->isRepeatedField($key) && is_array($normalizedParentValue)) {
+          foreach ($normalizedParentValue as $index => $v) {
             $valueArr[$index] = explode(BITFORMS_BF_SEPARATOR, $v);
           }
         } else {
-          $valueArr = explode(BITFORMS_BF_SEPARATOR, $value);
+          $valueArr = explode(BITFORMS_BF_SEPARATOR, (string) $value);
         }
         $submitted_data[$key] = $valueArr;
       }
     }
     $submitted_data = apply_filters('bitform_filter_format_submitted_data', $submitted_data, $this->form_id);
     return $submitted_data;
+  }
+
+  private function normalizeSubmittedValue($value)
+  {
+    if (!is_string($value)) {
+      return $value;
+    }
+
+    $decoded = json_decode($value, true);
+    return (JSON_ERROR_NONE === json_last_error()) ? $decoded : $value;
+  }
+
+  private function extractChildValueFromParentValue($parentValue, $childFieldName, $childFieldKey)
+  {
+    if (is_object($parentValue)) {
+      $parentValue = (array) $parentValue;
+    }
+
+    if (!is_array($parentValue)) {
+      return null;
+    }
+
+    if (array_key_exists($childFieldName, $parentValue)) {
+      return $parentValue[$childFieldName];
+    }
+
+    if (array_key_exists($childFieldKey, $parentValue)) {
+      return $parentValue[$childFieldKey];
+    }
+
+    return null;
   }
 
   private function addNewFilePathToFiles($form_id, $entry_id, $file_fields = [])
@@ -1222,18 +1289,70 @@ class FormManager
     foreach ($fields as $fieldKey => $fieldData) {
       if (array_key_exists('name', $fieldData)) {
         $fldName = $fieldData['name'];
+        $catchChildFldNamePattern = '/\[(.*?)\]/';
+        // catching the child field name for confirm field, name field's child
+        // preg_match_all($catchChildFldNamePattern, $fldName, $matches);
+        $fldName = preg_replace($catchChildFldNamePattern, '', $fldName);
         $fldName = str_replace(['.', ' '], '_', $fldName);
-        if (array_key_exists($fldName, $_POST)) {
-          $postData = wp_unslash($_POST[$fldName]);
-          unset($_POST[$fldName]);
-          $_POST[$fieldKey] = $postData;
-        } elseif (array_key_exists($fldName, $_FILES)) {
-          $temp = $_FILES[$fldName];
-          unset($_FILES[$fldName]);
-          $_FILES[$fieldKey] = $temp;
+        if (!empty($fldName)) {
+          if (array_key_exists($fldName, $_POST)) {
+            $temp = $this->sanitize_text_recursive($_POST[$fldName]);
+            unset($_POST[$fldName]);
+            $_POST[$fieldKey] = $temp;
+          } elseif (array_key_exists($fldName, $_FILES)) {
+            $temp = $this->sanitize_text_recursive($_FILES[$fldName], false);
+            unset($_FILES[$fldName]);
+            $_FILES[$fieldKey] = $temp;
+          }
+          // Convert _session_id suffix (used by email-otp and similar fields)
+          if (array_key_exists($fldName . '_session_id', $_POST)) {
+            $temp = sanitize_text_field(wp_unslash($_POST[$fldName . '_session_id']));
+            unset($_POST[$fldName . '_session_id']);
+            $_POST[$fieldKey . '_session_id'] = $temp;
+          }
         }
       }
     }
+  }
+
+  private function sanitize_text_recursive($input, $unslash = true)
+  {
+    if (is_array($input)) {
+      return array_map(fn ($item) => $this->sanitize_text_recursive($item, $unslash), $input);
+    }
+
+    return sanitize_text_field($unslash ? wp_unslash($input) : $input);
+  }
+
+  private function normalizeRepeatedCompositeFieldInput($value)
+  {
+    if (!is_array($value) || empty($value)) {
+      return $value;
+    }
+
+    $hasNestedArray = false;
+    foreach ($value as $childValues) {
+      if (!is_array($childValues)) {
+        return $value;
+      }
+      $hasNestedArray = true;
+    }
+
+    if (!$hasNestedArray) {
+      return $value;
+    }
+
+    $formattedValue = [];
+    foreach ($value as $childKey => $childValues) {
+      foreach ($childValues as $repeatIndex => $repeatValue) {
+        if (!isset($formattedValue[$repeatIndex]) || !is_array($formattedValue[$repeatIndex])) {
+          $formattedValue[$repeatIndex] = [];
+        }
+        $formattedValue[$repeatIndex][$childKey] = $repeatValue;
+      }
+    }
+
+    return $formattedValue;
   }
 
   public function setSubmissionCount($countStep = 1)

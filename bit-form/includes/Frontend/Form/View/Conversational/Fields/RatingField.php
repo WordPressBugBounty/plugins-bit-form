@@ -19,6 +19,9 @@ class RatingField
 
     $name = $fieldHelpers->name();
     $req = $fieldHelpers->required();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
+    $labelId = $fieldHelpers->getLabelId();
 
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
@@ -121,27 +124,33 @@ class RatingField
     }
 
     return sprintf(
-      '<div
-      %1$s
-      class="%2$s"
+      '
+      <div
+          %1$s
+          class="%2$s"
       >
-           <div
-             %3$s
-             class="%4$s"
-             tabindex="0"
-           >
-             %5$s      
-           </div>
-           <span
-             class="%6$s"
-             %7$s
-           >
-           </span>
+        <div
+          %3$s
+          class="%4$s"
+          role="radiogroup"
+          aria-labelledby="%5$s"
+          %6$s
+          tabindex="-1"
+        >
+          %7$s      
+        </div>
+        <span
+          class="%8$s"
+          %9$s
+        >
+        </span>
     </div>',
       $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
       $fieldHelpers->getConversationalMultiCls('inp-fld-wrp') . ' ' . $fieldHelpers->getCustomClasses('inp-fld-wrp'),
       $fieldHelpers->getCustomAttributes('rating-wrp'),
       $fieldHelpers->getConversationalMultiCls('rating-wrp') . ' ' . $fieldHelpers->getCustomClasses('rating-wrp'),
+      $labelId,
+      $ariaDescribedBy,
       $ratingOption,
       $fieldHelpers->getConversationalMultiCls('rating-msg') . ' ' . $fieldHelpers->getCustomClasses('rating-msg'),
       $fieldHelpers->getCustomAttributes('rating-msg')

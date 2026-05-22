@@ -1812,8 +1812,6 @@ $bitforms_i18n_strings = array(
 
     'Saving API key...' => __('Saving API key...', 'bit-form'),
 
-    'Available On Pro' => __('Available On Pro', 'bit-form'),
-
     'API Integration' => __('API Integration', 'bit-form'),
 
     'Learn more about Bit Form API' => __('Learn more about Bit Form API', 'bit-form'),
@@ -1860,15 +1858,15 @@ $bitforms_i18n_strings = array(
 
     'How to setup WP Authentication:' => __('How to setup WP Authentication:', 'bit-form'),
 
-    'Available On' => __('Available On', 'bit-form'),
-
-    'Premium' => __('Premium', 'bit-form'),
-
     'Enable' => __('Enable', 'bit-form'),
 
     'Note :' => __('Note :', 'bit-form'),
 
     'When the login, forgot password or reset password any of these feature enabled in the form, the entries will not be saved in the WP database.' => __('When the login, forgot password or reset password any of these feature enabled in the form, the entries will not be saved in the WP database.', 'bit-form'),
+
+    'Sync Field Order Across Breakpoints' => __('Sync Field Order Across Breakpoints', 'bit-form'),
+
+    'When enabled, all layouts will automatically sync with and follow the active breakpoint’s field order.' => __('When enabled, all layouts will automatically sync with and follow the active breakpoint’s field order.', 'bit-form'),
 
     'Get $10 Cashback' => __('Get $10 Cashback', 'bit-form'),
 
@@ -1891,6 +1889,8 @@ $bitforms_i18n_strings = array(
     'Skip' => __('Skip', 'bit-form'),
 
     'Accept And Continue' => __('Accept And Continue', 'bit-form'),
+
+    'Changelog' => __('Changelog', 'bit-form'),
 
     'What\'s New?' => __('What\'s New?', 'bit-form'),
 
@@ -1956,18 +1956,6 @@ $bitforms_i18n_strings = array(
 
     'Back to fields list' => __('Back to fields list', 'bit-form'),
 
-    'Form Background' => __('Form Background', 'bit-form'),
-
-    'Form style' => __('Form style', 'bit-form'),
-
-    'Field Block' => __('Field Block', 'bit-form'),
-
-    'Field Style' => __('Field Style', 'bit-form'),
-
-    'Label Style' => __('Label Style', 'bit-form'),
-
-    'Button Style' => __('Button Style', 'bit-form'),
-
     'Left' => __('Left', 'bit-form'),
 
     'Center' => __('Center', 'bit-form'),
@@ -1994,11 +1982,25 @@ $bitforms_i18n_strings = array(
 
     'Admin Label' => __('Admin Label', 'bit-form'),
 
+    'Below' => __('Below', 'bit-form'),
+
+    'Inline' => __('Inline', 'bit-form'),
+
+    'Name fields' => __('Name fields', 'bit-form'),
+
     'Edit Custom Error Message' => __('Edit Custom Error Message', 'bit-form'),
 
     'Edit Decision Box Label' => __('Edit Decision Box Label', 'bit-form'),
 
+    'Enable confirm' => __('Enable confirm', 'bit-form'),
+
+    'Include show/hide password icon' => __('Include show/hide password icon', 'bit-form'),
+
     'Show Error Message' => __('Show Error Message', 'bit-form'),
+
+    'Check the box to enable the custom error message.' => __('Check the box to enable the custom error message.', 'bit-form'),
+
+    'Note: You can edit the message by clicking on edit icon.' => __('Note: You can edit the message by clicking on edit icon.', 'bit-form'),
 
     'Custom Error Message' => __('Custom Error Message', 'bit-form'),
 
@@ -2012,7 +2014,7 @@ $bitforms_i18n_strings = array(
 
     'Field name cannot be empty' => __('Field name cannot be empty', 'bit-form'),
 
-    'Name' => __('Name', 'bit-form'),
+    'Name Attribute' => __('Name Attribute', 'bit-form'),
 
     'Read-only' => __('Read-only', 'bit-form'),
 
@@ -2037,6 +2039,8 @@ $bitforms_i18n_strings = array(
     'Button Alignment:' => __('Button Alignment:', 'bit-form'),
 
     'Required' => __('Required', 'bit-form'),
+
+    'By enabling this feature, user will see the error message when input is empty' => __('By enabling this feature, user will see the error message when input is empty', 'bit-form'),
 
     'Show Asterisk Symbol' => __('Show Asterisk Symbol', 'bit-form'),
 
@@ -2174,6 +2178,12 @@ $bitforms_i18n_strings = array(
 
     'Key:' => __('Key:', 'bit-form'),
 
+    'No field found with this key.' => __('No field found with this key.', 'bit-form'),
+
+    'The field you are trying to access does not exist or has been removed.' => __('The field you are trying to access does not exist or has been removed.', 'bit-form'),
+
+    'Please select a valid field to customize its settings.' => __('Please select a valid field to customize its settings.', 'bit-form'),
+
     'Advanced Configuration' => __('Advanced Configuration', 'bit-form'),
 
     'Basic Configuration' => __('Basic Configuration', 'bit-form'),
@@ -2277,6 +2287,12 @@ $bitforms_i18n_strings = array(
     'Edit the HTML field content by clicking on edit icon' => __('Edit the HTML field content by clicking on edit icon', 'bit-form'),
 
     'Add/Edit Options' => __('Add/Edit Options', 'bit-form'),
+
+    'Download & save' => __('Download & save', 'bit-form'),
+
+    'Are you sure you want to delete this icon? This icon will not be available in the forms where it has been used.' => __('Are you sure you want to delete this icon? This icon will not be available in the forms where it has been used.', 'bit-form'),
+
+    'Okay' => __('Okay', 'bit-form'),
 
     'Allow Multiple' => __('Allow Multiple', 'bit-form'),
 
@@ -2478,6 +2494,8 @@ $bitforms_i18n_strings = array(
 
     'Maximum Row:' => __('Maximum Row:', 'bit-form'),
 
+    'Name' => __('Name', 'bit-form'),
+
     'Allow Other Option:' => __('Allow Other Option:', 'bit-form'),
 
     'Multiple Select:' => __('Multiple Select:', 'bit-form'),
@@ -2489,6 +2507,10 @@ $bitforms_i18n_strings = array(
     'Pro' => __('Pro', 'bit-form'),
 
     'Set maximum number to be selected for dropdown option' => __('Set maximum number to be selected for dropdown option', 'bit-form'),
+
+    'Available On' => __('Available On', 'bit-form'),
+
+    'Premium' => __('Premium', 'bit-form'),
 
     'Enter the shortcode in this Input.' => __('Enter the shortcode in this Input.', 'bit-form'),
 
@@ -2529,6 +2551,8 @@ $bitforms_i18n_strings = array(
     'Step:' => __('Step:', 'bit-form'),
 
     'Step Settings' => __('Step Settings', 'bit-form'),
+
+    'Step Icon' => __('Step Icon', 'bit-form'),
 
     'Step Label' => __('Step Label', 'bit-form'),
 
@@ -2595,16 +2619,6 @@ $bitforms_i18n_strings = array(
     'Solid' => __('Solid', 'bit-form'),
 
     'Gradient' => __('Gradient', 'bit-form'),
-
-    'Note: This feature is only available to BitForm Pro users.' => __('Note: This feature is only available to BitForm Pro users.', 'bit-form'),
-
-    'Upgrade now' => __('Upgrade now', 'bit-form'),
-
-    'to unlock it. Check out our' => __('to unlock it. Check out our', 'bit-form'),
-
-    'documentation' => __('documentation', 'bit-form'),
-
-    'to learn more about BitForm Pro.' => __('to learn more about BitForm Pro.', 'bit-form'),
 
     'Phone View' => __('Phone View', 'bit-form'),
 
@@ -2844,6 +2858,8 @@ $bitforms_i18n_strings = array(
 
     'Add More Alternative Success Message' => __('Add More Alternative Success Message', 'bit-form'),
 
+    'Add' => __('Add', 'bit-form'),
+
     'Message Styles' => __('Message Styles', 'bit-form'),
 
     'Message Type' => __('Message Type', 'bit-form'),
@@ -2860,17 +2876,169 @@ $bitforms_i18n_strings = array(
 
     'Be sure to configure conditional logic for displaying Success/Error messages and Redirect Page. If no conditional logic is set, the default confirmation will be displayed.' => __('Be sure to configure conditional logic for displaying Success/Error messages and Redirect Page. If no conditional logic is set, the default confirmation will be displayed.', 'bit-form'),
 
+    'Theme Colors' => __('Theme Colors', 'bit-form'),
+
+    'Customize the overall look and feel of your form' => __('Customize the overall look and feel of your form', 'bit-form'),
+
+    'Accent Color' => __('Accent Color', 'bit-form'),
+
+    'Main color used for buttons and interactive elements' => __('Main color used for buttons and interactive elements', 'bit-form'),
+
+    'Background color for the entire form page' => __('Background color for the entire form page', 'bit-form'),
+
+    'Typography' => __('Typography', 'bit-form'),
+
+    'Control text colors throughout your form' => __('Control text colors throughout your form', 'bit-form'),
+
+    'Label Text Color' => __('Label Text Color', 'bit-form'),
+
+    'Color of question labels shown to users' => __('Color of question labels shown to users', 'bit-form'),
+
+    'Input Text Color' => __('Input Text Color', 'bit-form'),
+
+    'Color of text typed into input fields' => __('Color of text typed into input fields', 'bit-form'),
+
+    'Subtitle Color' => __('Subtitle Color', 'bit-form'),
+
+    'Color of subtitle / description text under labels' => __('Color of subtitle / description text under labels', 'bit-form'),
+
+    'Helper Text Color' => __('Helper Text Color', 'bit-form'),
+
+    'Color of helper / hint text shown below inputs' => __('Color of helper / hint text shown below inputs', 'bit-form'),
+
+    'Label Font Size' => __('Label Font Size', 'bit-form'),
+
+    'Font size of question labels (e.g. 2rem, 32px)' => __('Font size of question labels (e.g. 2rem, 32px)', 'bit-form'),
+
+    'Input Font Size' => __('Input Font Size', 'bit-form'),
+
+    'Font size for input field text (e.g. 1.5rem, 24px)' => __('Font size for input field text (e.g. 1.5rem, 24px)', 'bit-form'),
+
+    'Subtitle Font Size' => __('Subtitle Font Size', 'bit-form'),
+
+    'Font size of subtitle / description text (e.g. 1rem, 16px)' => __('Font size of subtitle / description text (e.g. 1rem, 16px)', 'bit-form'),
+
+    'Helper Text Font Size' => __('Helper Text Font Size', 'bit-form'),
+
+    'Font size of helper / hint text (e.g. 1rem, 14px)' => __('Font size of helper / hint text (e.g. 1rem, 14px)', 'bit-form'),
+
+    'Applying changes to' => __('Applying changes to', 'bit-form'),
+
+    'Select "All Steps" to set global defaults, or pick a specific step to override those defaults for that step only' => __('Select "All Steps" to set global defaults, or pick a specific step to override those defaults for that step only', 'bit-form'),
+
+    'Changes apply as a default for all steps — individual step settings take priority' => __('Changes apply as a default for all steps — individual step settings take priority', 'bit-form'),
+
+    'Changes apply to this step only, without affecting other steps' => __('Changes apply to this step only, without affecting other steps', 'bit-form'),
+
+    'Step Configuration' => __('Step Configuration', 'bit-form'),
+
+    'Default layout and background applied to all steps' => __('Default layout and background applied to all steps', 'bit-form'),
+
+    'Layout and background overrides for the selected step' => __('Layout and background overrides for the selected step', 'bit-form'),
+
+    'Toggle visibility of this step in the form flow' => __('Toggle visibility of this step in the form flow', 'bit-form'),
+
+    'Choose how the step content is arranged on screen' => __('Choose how the step content is arranged on screen', 'bit-form'),
+
+    'Transition Type' => __('Transition Type', 'bit-form'),
+
+    'Animation style when moving between steps. Applies to all steps.' => __('Animation style when moving between steps. Applies to all steps.', 'bit-form'),
+
+    'Heading shown on the welcome page' => __('Heading shown on the welcome page', 'bit-form'),
+
+    'Content' => __('Content', 'bit-form'),
+
+    'Rich text content displayed on the welcome page' => __('Rich text content displayed on the welcome page', 'bit-form'),
+
+    'Step Background' => __('Step Background', 'bit-form'),
+
+    'Background color for this step' => __('Background color for this step', 'bit-form'),
+
+    'Layout Image' => __('Layout Image', 'bit-form'),
+
+    'Image shown alongside the form content in non-normal layouts' => __('Image shown alongside the form content in non-normal layouts', 'bit-form'),
+
+    'Button Settings' => __('Button Settings', 'bit-form'),
+
+    'Default button appearance and text for all steps' => __('Default button appearance and text for all steps', 'bit-form'),
+
+    'Button appearance and text overrides for the selected step' => __('Button appearance and text overrides for the selected step', 'bit-form'),
+
+    'Button Text Color' => __('Button Text Color', 'bit-form'),
+
+    'Text color of the action buttons' => __('Text color of the action buttons', 'bit-form'),
+
+    'Button Background Color' => __('Button Background Color', 'bit-form'),
+
+    'Background color of the action buttons' => __('Background color of the action buttons', 'bit-form'),
+
+    'Button text' => __('Button text', 'bit-form'),
+
+    'Text for the skip/start button' => __('Text for the skip/start button', 'bit-form'),
+
+    'Next Button text' => __('Next Button text', 'bit-form'),
+
+    'Text for the "next step" button' => __('Text for the "next step" button', 'bit-form'),
+
+    'Step Hints' => __('Step Hints', 'bit-form'),
+
+    'Hint text shown near the button (e.g. keyboard shortcut)' => __('Hint text shown near the button (e.g. keyboard shortcut)', 'bit-form'),
+
+    'Navigation Controls' => __('Navigation Controls', 'bit-form'),
+
+    'Configure navigation behavior' => __('Configure navigation behavior', 'bit-form'),
+
+    'Enable Navigation' => __('Enable Navigation', 'bit-form'),
+
+    'Show or hide the navigation bar on the form' => __('Show or hide the navigation bar on the form', 'bit-form'),
+
+    'Show Navigate Button' => __('Show Navigate Button', 'bit-form'),
+
+    'Display up/down navigation buttons for moving between steps' => __('Display up/down navigation buttons for moving between steps', 'bit-form'),
+
+    'Scroll Navigation' => __('Scroll Navigation', 'bit-form'),
+
+    'Move to next/previous step by scrolling outside input fields (mouse wheel & touch swipe)' => __('Move to next/previous step by scrolling outside input fields (mouse wheel & touch swipe)', 'bit-form'),
+
+    'Auto-Advance' => __('Auto-Advance', 'bit-form'),
+
+    'Auto-advance to next step after a radio or single-select answer is chosen' => __('Auto-advance to next step after a radio or single-select answer is chosen', 'bit-form'),
+
+    'Progress Indicators' => __('Progress Indicators', 'bit-form'),
+
+    'Configure how users track their progress' => __('Configure how users track their progress', 'bit-form'),
+
+    'Show Progress Label' => __('Show Progress Label', 'bit-form'),
+
+    'Display a text label showing completion progress' => __('Display a text label showing completion progress', 'bit-form'),
+
+    'Label Format' => __('Label Format', 'bit-form'),
+
+    'Format string for the progress label. Use ${bc-percent}, ${bc-step}, ${bc-total-steps}' => __('Format string for the progress label. Use ${bc-percent}, ${bc-step}, ${bc-total-steps}', 'bit-form'),
+
+    'Display a visual progress bar at the bottom of each step' => __('Display a visual progress bar at the bottom of each step', 'bit-form'),
+
+    'Branding' => __('Branding', 'bit-form'),
+
+    'Control branding visibility' => __('Control branding visibility', 'bit-form'),
+
+    'Show Branding' => __('Show Branding', 'bit-form'),
+
+    'Show or hide the Bit Form branding on the form' => __('Show or hide the Bit Form branding on the form', 'bit-form'),
+
+    'Steps' => __('Steps', 'bit-form'),
+
+    'Navigation' => __('Navigation', 'bit-form'),
+
     'Conversational Form Settings' => __('Conversational Form Settings', 'bit-form'),
 
     'Note: In the Conversational Form feature, certain fields such as Captcha, Payments, HTML, etc are currently not supported.' => __('Note: In the Conversational Form feature, certain fields such as Captcha, Payments, HTML, etc are currently not supported.', 'bit-form'),
 
     'How to setup Conversational form:' => __('How to setup Conversational form:', 'bit-form'),
 
-    'Theme settings' => __('Theme settings', 'bit-form'),
+    'Youtube' => __('Youtube', 'bit-form'),
 
-    'Conversational Steps settings' => __('Conversational Steps settings', 'bit-form'),
-
-    'Navigation' => __('Navigation', 'bit-form'),
+    'Documentations' => __('Documentations', 'bit-form'),
 
     'Add New Post Type' => __('Add New Post Type', 'bit-form'),
 
@@ -3004,8 +3172,6 @@ $bitforms_i18n_strings = array(
 
     'Cancel' => __('Cancel', 'bit-form'),
 
-    'Add' => __('Add', 'bit-form'),
-
     'Mollie' => __('Mollie', 'bit-form'),
 
     'Transaction ID' => __('Transaction ID', 'bit-form'),
@@ -3056,13 +3222,19 @@ $bitforms_i18n_strings = array(
 
     'Move' => __('Move', 'bit-form'),
 
-    'Style' => __('Style', 'bit-form'),
-
     'Settings' => __('Settings', 'bit-form'),
 
     'Clone' => __('Clone', 'bit-form'),
 
+    'Add Field' => __('Add Field', 'bit-form'),
+
     'Remove' => __('Remove', 'bit-form'),
+
+    'Send OTP' => __('Send OTP', 'bit-form'),
+
+    'Wait ${bf_resend_countdown}s to Resend' => __('Wait ${bf_resend_countdown}s to Resend', 'bit-form'),
+
+    'Verify OTP' => __('Verify OTP', 'bit-form'),
 
     'Mollie API key is missing' => __('Mollie API key is missing', 'bit-form'),
 
@@ -3080,7 +3252,15 @@ $bitforms_i18n_strings = array(
 
     'Please select property you want to import with form' => __('Please select property you want to import with form', 'bit-form'),
 
+    'Preview Form' => __('Preview Form', 'bit-form'),
+
     'Preview' => __('Preview', 'bit-form'),
+
+    'Custom CSS/JS' => __('Custom CSS/JS', 'bit-form'),
+
+    'How to add Custom CSS/JS:' => __('How to add Custom CSS/JS:', 'bit-form'),
+
+    'You can write your custom CSS/JS her. This CSS/JS will be applied in this form only.' => __('You can write your custom CSS/JS her. This CSS/JS will be applied in this form only.', 'bit-form'),
 
     'In order to repopulate form fields, it is necessary to store the submitted data in the database. Please make sure to turn off the "disable storing form submission data" option in the form settings.' => __('In order to repopulate form fields, it is necessary to store the submitted data in the database. Please make sure to turn off the "disable storing form submission data" option in the form settings.', 'bit-form'),
 
@@ -3156,13 +3336,15 @@ $bitforms_i18n_strings = array(
 
     'Google Ads Manager Account' => __('Google Ads Manager Account', 'bit-form'),
 
-    'Saving Generel Settings...' => __('Saving Generel Settings...', 'bit-form'),
+    'Saving General Settings...' => __('Saving General Settings...', 'bit-form'),
 
     'Global Settings' => __('Global Settings', 'bit-form'),
 
-    'Validation Error/Invalid Message' => __('Validation Error/Invalid Message', 'bit-form'),
+    'Validation Error/Invalid Message.' => __('Validation Error/Invalid Message.', 'bit-form'),
 
     'Generate Token after page load to prevent conflict with cache plugins.' => __('Generate Token after page load to prevent conflict with cache plugins.', 'bit-form'),
+
+    'Other Settings' => __('Other Settings', 'bit-form'),
 
     'Delete all data table when delete plugin.' => __('Delete all data table when delete plugin.', 'bit-form'),
 
@@ -3432,6 +3614,12 @@ $bitforms_i18n_strings = array(
 
     'Multi step settings' => __('Multi step settings', 'bit-form'),
 
+    'Layouts are in sync' => __('Layouts are in sync', 'bit-form'),
+
+    'Layouts will sync on breakpoint switch or form update.' => __('Layouts will sync on breakpoint switch or form update.', 'bit-form'),
+
+    'Layout sync settings' => __('Layout sync settings', 'bit-form'),
+
     'All fields are required' => __('All fields are required', 'bit-form'),
 
     'Saving Payment Setting...' => __('Saving Payment Setting...', 'bit-form'),
@@ -3614,7 +3802,9 @@ $bitforms_i18n_strings = array(
 
     'tab to proceed.' => __('tab to proceed.', 'bit-form'),
 
-    'Publish' => __('Publish', 'bit-form'),
+    'Copy Shortcode' => __('Copy Shortcode', 'bit-form'),
+
+    'Embed' => __('Embed', 'bit-form'),
 
     'Razorpay Settings' => __('Razorpay Settings', 'bit-form'),
 
@@ -3634,7 +3824,7 @@ $bitforms_i18n_strings = array(
 
     'Select Form Field' => __('Select Form Field', 'bit-form'),
 
-    'Add More Alternative URl' => __('Add More Alternative URl', 'bit-form'),
+    'Add More Alternative URL' => __('Add More Alternative URL', 'bit-form'),
 
     'Filter Entries between Dates' => __('Filter Entries between Dates', 'bit-form'),
 
@@ -3653,6 +3843,14 @@ $bitforms_i18n_strings = array(
     'Are you sure to delete this report' => __('Are you sure to delete this report', 'bit-form'),
 
     'Deleting ...' => __('Deleting ...', 'bit-form'),
+
+    'Filter List' => __('Filter List', 'bit-form'),
+
+    'Search filters...' => __('Search filters...', 'bit-form'),
+
+    'New Filter' => __('New Filter', 'bit-form'),
+
+    'No matching filter found' => __('No matching filter found', 'bit-form'),
 
     'Equal' => __('Equal', 'bit-form'),
 
@@ -3756,13 +3954,13 @@ $bitforms_i18n_strings = array(
 
     'Empty form cannot be submitted.' => __('Empty form cannot be submitted.', 'bit-form'),
 
+    'Validate form input on focus lost' => __('Validate form input on focus lost', 'bit-form'),
+
     'Allow single entry for each IP address' => __('Allow single entry for each IP address', 'bit-form'),
 
     'Require user to be logged in for submit form' => __('Require user to be logged in for submit form', 'bit-form'),
 
     'Prevent empty form submission' => __('Prevent empty form submission', 'bit-form'),
-
-    'Validate form input on focus lost' => __('Validate form input on focus lost', 'bit-form'),
 
     'Disable entry storing in WordPress database' => __('Disable entry storing in WordPress database', 'bit-form'),
 
@@ -3812,9 +4010,13 @@ $bitforms_i18n_strings = array(
 
     'Blocked IP list' => __('Blocked IP list', 'bit-form'),
 
+    'Add Blocked IP' => __('Add Blocked IP', 'bit-form'),
+
     'Allowed IP' => __('Allowed IP', 'bit-form'),
 
     'By enabling this option only listed IP can submit this form.' => __('By enabling this option only listed IP can submit this form.', 'bit-form'),
+
+    'Add Allowed IP' => __('Add Allowed IP', 'bit-form'),
 
     'Capture Google Ads (Click ID)' => __('Capture Google Ads (Click ID)', 'bit-form'),
 
@@ -3872,13 +4074,65 @@ $bitforms_i18n_strings = array(
 
     'Stripe Developer Dashboard' => __('Stripe Developer Dashboard', 'bit-form'),
 
-    'Spacing' => __('Spacing', 'bit-form'),
-
     'Transparant' => __('Transparant', 'bit-form'),
+
+    'Add Property' => __('Add Property', 'bit-form'),
+
+    'Override theme and common styles' => __('Override theme and common styles', 'bit-form'),
+
+    'Multi Step Quick Tweaks' => __('Multi Step Quick Tweaks', 'bit-form'),
+
+    'Step Container' => __('Step Container', 'bit-form'),
+
+    'Step Header Wrapper' => __('Step Header Wrapper', 'bit-form'),
+
+    'Step Header' => __('Step Header', 'bit-form'),
+
+    'Step Header Label' => __('Step Header Label', 'bit-form'),
+
+    'Step Header Subtitle' => __('Step Header Subtitle', 'bit-form'),
+
+    'Step Wrapper' => __('Step Wrapper', 'bit-form'),
+
+    'Step Progress Wrapper' => __('Step Progress Wrapper', 'bit-form'),
+
+    'Step Progress Bar' => __('Step Progress Bar', 'bit-form'),
+
+    'Step Content' => __('Step Content', 'bit-form'),
+
+    'Step Button Wrapper' => __('Step Button Wrapper', 'bit-form'),
+
+    'Step Button' => __('Step Button', 'bit-form'),
+
+    'Step Label Prefix Icon' => __('Step Label Prefix Icon', 'bit-form'),
+
+    'Step Label Suffix Icon' => __('Step Label Suffix Icon', 'bit-form'),
+
+    'Step Subtitle Prefix Icon' => __('Step Subtitle Prefix Icon', 'bit-form'),
+
+    'Step Subtitle Suffix Icon' => __('Step Subtitle Suffix Icon', 'bit-form'),
+
+    'Previous Button Prefix Icon' => __('Previous Button Prefix Icon', 'bit-form'),
+
+    'Previous Button Suffix Icon' => __('Previous Button Suffix Icon', 'bit-form'),
+
+    'Next Button Prefix Icon' => __('Next Button Prefix Icon', 'bit-form'),
+
+    'Next Button Suffix Icon' => __('Next Button Suffix Icon', 'bit-form'),
+
+    'Theme Customization' => __('Theme Customization', 'bit-form'),
+
+    'Multi Step Customize' => __('Multi Step Customize', 'bit-form'),
+
+    'Multi step quick tweaks is not available. this feature will coming soon.' => __('Multi step quick tweaks is not available. this feature will coming soon.', 'bit-form'),
 
     'Transparent' => __('Transparent', 'bit-form'),
 
-    'Reset Style' => __('Reset Style', 'bit-form'),
+    'Go to Theme Gallery Settings' => __('Go to Theme Gallery Settings', 'bit-form'),
+
+    'Add important rule to all styles to override the conflicting styles in frontend.' => __('Add important rule to all styles to override the conflicting styles in frontend.', 'bit-form'),
+
+    'Add prefix to atomic class names to avoid conflicts.' => __('Add prefix to atomic class names to avoid conflicts.', 'bit-form'),
 
     'Transition' => __('Transition', 'bit-form'),
 
@@ -3896,9 +4150,9 @@ $bitforms_i18n_strings = array(
 
     'Use Template' => __('Use Template', 'bit-form'),
 
-    'See Demo' => __('See Demo', 'bit-form'),
-
     'Go to Payment Settings' => __('Go to Payment Settings', 'bit-form'),
+
+    'Search Template' => __('Search Template', 'bit-form'),
 
     'Import Form' => __('Import Form', 'bit-form'),
 
@@ -3906,11 +4160,249 @@ $bitforms_i18n_strings = array(
 
     'No Template Found' => __('No Template Found', 'bit-form'),
 
+    'Prefix Icon' => __('Prefix Icon', 'bit-form'),
+
+    'Suffix Icon' => __('Suffix Icon', 'bit-form'),
+
+    'Always (default)' => __('Always (default)', 'bit-form'),
+
+    'Interaction Only' => __('Interaction Only', 'bit-form'),
+
+    'Container Class' => __('Container Class', 'bit-form'),
+
+    'Show Option Flag Image' => __('Show Option Flag Image', 'bit-form'),
+
+    'Button Texts' => __('Button Texts', 'bit-form'),
+
+    'Customize the label text shown on the Send, Resend, and Verify buttons.' => __('Customize the label text shown on the Send, Resend, and Verify buttons.', 'bit-form'),
+
+    'Resend OTP' => __('Resend OTP', 'bit-form'),
+
+    'Resend OTP Countdown Text' => __('Resend OTP Countdown Text', 'bit-form'),
+
+    'Text shown while the user waits to resend. Use ${bf_resend_countdown} as a placeholder for the live countdown number.' => __('Text shown while the user waits to resend. Use ${bf_resend_countdown} as a placeholder for the live countdown number.', 'bit-form'),
+
+    'Use ${bf_resend_countdown} as placeholder for the resend countdown number.' => __('Use ${bf_resend_countdown} as placeholder for the resend countdown number.', 'bit-form'),
+
+    'Maximum OTP Verification Attempts' => __('Maximum OTP Verification Attempts', 'bit-form'),
+
+    'Limits the number of OTP verification attempts on the frontend. Once the maximum limit is reached, the field will be locked until the page is reloaded.' => __('Limits the number of OTP verification attempts on the frontend. Once the maximum limit is reached, the field will be locked until the page is reloaded.', 'bit-form'),
+
+    'OTP Expiration Time (Minutes)' => __('OTP Expiration Time (Minutes)', 'bit-form'),
+
+    'How long the OTP remains valid in minutes. The expiration is verified on the server during form submission.' => __('How long the OTP remains valid in minutes. The expiration is verified on the server during form submission.', 'bit-form'),
+
+    'Defines how long the OTP remains valid. The expiration is verified on the server during form submission.' => __('Defines how long the OTP remains valid. The expiration is verified on the server during form submission.', 'bit-form'),
+
+    'When enabled, the OTP will be automatically sent if the user attempts to submit the form or move to the next step without clicking "Send OTP" first.' => __('When enabled, the OTP will be automatically sent if the user attempts to submit the form or move to the next step without clicking "Send OTP" first.', 'bit-form'),
+
+    'Automatically Send OTP on Validation' => __('Automatically Send OTP on Validation', 'bit-form'),
+
+    'When enabled, OTP verification is triggered automatically once the user has entered all digits (via typing, pasting, or autofill).' => __('When enabled, OTP verification is triggered automatically once the user has entered all digits (via typing, pasting, or autofill).', 'bit-form'),
+
+    'Automatically Verify OTP on Input' => __('Automatically Verify OTP on Input', 'bit-form'),
+
+    'OTP Code Length' => __('OTP Code Length', 'bit-form'),
+
+    'Set how many digits the OTP code will contain. Accepted range: 4 – 8.' => __('Set how many digits the OTP code will contain. Accepted range: 4 – 8.', 'bit-form'),
+
+    'Allowed range: 4 to 8 digits.' => __('Allowed range: 4 to 8 digits.', 'bit-form'),
+
+    'OTP Resend Delay (Seconds)' => __('OTP Resend Delay (Seconds)', 'bit-form'),
+
+    'Sets the waiting time (in seconds) before the "Resend OTP" button becomes active again.' => __('Sets the waiting time (in seconds) before the "Resend OTP" button becomes active again.', 'bit-form'),
+
+    'Email Template' => __('Email Template', 'bit-form'),
+
+    'Available placeholders: ${bf_otp_code}, ${bf_expiry_minutes}' => __('Available placeholders: ${bf_otp_code}, ${bf_expiry_minutes}', 'bit-form'),
+
+    'Note: To send OTP emails, SMTP must be configured on your site. You can set it up in Bit Form' => __('Note: To send OTP emails, SMTP must be configured on your site. You can set it up in Bit Form', 'bit-form'),
+
+    'section.' => __('section.', 'bit-form'),
+
+    'Edit OTP Email Template' => __('Edit OTP Email Template', 'bit-form'),
+
+    'Placeholders: ${bf_otp_code} — the OTP code, ${bf_expiry_minutes} — expiry time in minutes' => __('Placeholders: ${bf_otp_code} — the OTP code, ${bf_expiry_minutes} — expiry time in minutes', 'bit-form'),
+
+    'Email OTP Receiver Email is missing' => __('Email OTP Receiver Email is missing', 'bit-form'),
+
+    'Receiver Email' => __('Receiver Email', 'bit-form'),
+
+    'The email address where the OTP will be sent. Choose "Dynamic" to use an Email field from your form, or "Static" to enter a fixed address.' => __('The email address where the OTP will be sent. Choose "Dynamic" to use an Email field from your form, or "Static" to enter a fixed address.', 'bit-form'),
+
+    'Dynamic (Email Field)' => __('Dynamic (Email Field)', 'bit-form'),
+
+    'Static (Fixed Email)' => __('Static (Fixed Email)', 'bit-form'),
+
+    'Email Address' => __('Email Address', 'bit-form'),
+
+    'Enter a email here..' => __('Enter a email here..', 'bit-form'),
+
+    '-- Select Email Field --' => __('-- Select Email Field --', 'bit-form'),
+
+    'Mollie Description is Required' => __('Mollie Description is Required', 'bit-form'),
+
+    'Select Account' => __('Select Account', 'bit-form'),
+
+    'Razorpay Dynamic Amount Field is not Selected' => __('Razorpay Dynamic Amount Field is not Selected', 'bit-form'),
+
+    'Rating Icon' => __('Rating Icon', 'bit-form'),
+
+    'Rounded' => __('Rounded', 'bit-form'),
+
+    'Min/Max Text Length:' => __('Min/Max Text Length:', 'bit-form'),
+
+    'Min Length:' => __('Min Length:', 'bit-form'),
+
+    'By enabling this feature, user will see the error message when input length is less than' => __('By enabling this feature, user will see the error message when input length is less than', 'bit-form'),
+
+    'Max Length:' => __('Max Length:', 'bit-form'),
+
+    'By enabling this feature, user will see the error message when input length is greater than' => __('By enabling this feature, user will see the error message when input length is greater than', 'bit-form'),
+
+    'Min Word:' => __('Min Word:', 'bit-form'),
+
+    'By enabling this feature, user will see the error message when word count is less than' => __('By enabling this feature, user will see the error message when word count is less than', 'bit-form'),
+
+    'Max Word:' => __('Max Word:', 'bit-form'),
+
+    'By enabling this feature, user will see the error message when word count is greater than' => __('By enabling this feature, user will see the error message when word count is greater than', 'bit-form'),
+
+    'No fields available' => __('No fields available', 'bit-form'),
+
+    'You haven’t added any fields to this form or step yet.' => __('You haven’t added any fields to this form or step yet.', 'bit-form'),
+
+    'Please add fields from the Form Fields panel.' => __('Please add fields from the Form Fields panel.', 'bit-form'),
+
+    'No field key provided' => __('No field key provided', 'bit-form'),
+
+    'Advanced' => __('Advanced', 'bit-form'),
+
+    'Conditional Logic' => __('Conditional Logic', 'bit-form'),
+
+    'Individual Customize' => __('Individual Customize', 'bit-form'),
+
+    'Global Customize' => __('Global Customize', 'bit-form'),
+
+    'Select Your Theme' => __('Select Your Theme', 'bit-form'),
+
+    'Reset' => __('Reset', 'bit-form'),
+
+    'Import' => __('Import', 'bit-form'),
+
+    'Rename' => __('Rename', 'bit-form'),
+
+    'Reset Theme Style' => __('Reset Theme Style', 'bit-form'),
+
+    'Update Theme Style' => __('Update Theme Style', 'bit-form'),
+
+    'Save as New Theme' => __('Save as New Theme', 'bit-form'),
+
+    'Click to Highlight Element in Builder' => __('Click to Highlight Element in Builder', 'bit-form'),
+
+    'Enable Conditional Logic' => __('Enable Conditional Logic', 'bit-form'),
+
+    'Configure when this field should be shown or hidden' => __('Configure when this field should be shown or hidden', 'bit-form'),
+
+    'Hide' => __('Hide', 'bit-form'),
+
+    'Show' => __('Show', 'bit-form'),
+
+    'this field if' => __('this field if', 'bit-form'),
+
+    'And' => __('And', 'bit-form'),
+
+    'Or' => __('Or', 'bit-form'),
+
+    'Need Advanced Conditional Logic?' => __('Need Advanced Conditional Logic?', 'bit-form'),
+
+    'Switch now' => __('Switch now', 'bit-form'),
+
+    'Theme Quick Tweaks' => __('Theme Quick Tweaks', 'bit-form'),
+
+    'Global Elements' => __('Global Elements', 'bit-form'),
+
+    'Multi-Step Elements' => __('Multi-Step Elements', 'bit-form'),
+
+    'Individual Elements' => __('Individual Elements', 'bit-form'),
+
+    'found' => __('found', 'bit-form'),
+
+    'Search fields..' => __('Search fields..', 'bit-form'),
+
+    'Search results for:' => __('Search results for:', 'bit-form'),
+
+    'No fields found' => __('No fields found', 'bit-form'),
+
+    'We couldn\'t find any fields matching' => __('We couldn\'t find any fields matching', 'bit-form'),
+
+    'Try searching with different keywords' => __('Try searching with different keywords', 'bit-form'),
+
+    'Name Field' => __('Name Field', 'bit-form'),
+
+    'Email OTP' => __('Email OTP', 'bit-form'),
+
+    'A verification code will be sent to the specified email address.' => __('A verification code will be sent to the specified email address.', 'bit-form'),
+
+    'Please verify your email OTP before submitting.' => __('Please verify your email OTP before submitting.', 'bit-form'),
+
+    'Resend available in ${bf_resend_countdown}s.' => __('Resend available in ${bf_resend_countdown}s.', 'bit-form'),
+
+    'Create New Theme' => __('Create New Theme', 'bit-form'),
+
+    'Click to upload' => __('Click to upload', 'bit-form'),
+
+    'or drag and drop' => __('or drag and drop', 'bit-form'),
+
+    'Import from Form' => __('Import from Form', 'bit-form'),
+
+    'Import from File' => __('Import from File', 'bit-form'),
+
+    'Import Theme (Style)' => __('Import Theme (Style)', 'bit-form'),
+
+    'Customize' => __('Customize', 'bit-form'),
+
+    'Applied Styles' => __('Applied Styles', 'bit-form'),
+
+    'Your customizations apply only to this form\'s styling. To preserve changes, create or update a custom theme from the Options menu.' => __('Your customizations apply only to this form\'s styling. To preserve changes, create or update a custom theme from the Options menu.', 'bit-form'),
+
+    'App Themes' => __('App Themes', 'bit-form'),
+
+    'Custom Themes' => __('Custom Themes', 'bit-form'),
+
+    'Please write form name' => __('Please write form name', 'bit-form'),
+
+    'Search forms here...' => __('Search forms here...', 'bit-form'),
+
+    'No forms found' => __('No forms found', 'bit-form'),
+
+    'Search fields...' => __('Search fields...', 'bit-form'),
+
+    'Clear search' => __('Clear search', 'bit-form'),
+
+    'No fields available in this category' => __('No fields available in this category', 'bit-form'),
+
+    'Recent' => __('Recent', 'bit-form'),
+
+    'No fields found by your search keywords:' => __('No fields found by your search keywords:', 'bit-form'),
+
+    'fields found for' => __('fields found for', 'bit-form'),
+
+    'Any field order change on this breakpoint will be reflected in other breakpoints after switching views or updating the form.' => __('Any field order change on this breakpoint will be reflected in other breakpoints after switching views or updating the form.', 'bit-form'),
+
+    'Dismiss warning' => __('Dismiss warning', 'bit-form'),
+
+    'Update Form' => __('Update Form', 'bit-form'),
+
+    'Save Form' => __('Save Form', 'bit-form'),
+
     'Please fix the errors' => __('Please fix the errors', 'bit-form'),
 
     'Sorry' => __('Sorry', 'bit-form'),
 
     'Please add a submit button' => __('Please add a submit button', 'bit-form'),
+
+    'Could not sync layouts before save. Form will be saved with current layout state' => __('Could not sync layouts before save. Form will be saved with current layout state', 'bit-form'),
 
     'ctrl + s' => __('ctrl + s', 'bit-form'),
 
@@ -3923,6 +4415,12 @@ $bitforms_i18n_strings = array(
     'Other' => __('Other', 'bit-form'),
 
     'Send' => __('Send', 'bit-form'),
+
+    'Upgrade to Pro' => __('Upgrade to Pro', 'bit-form'),
+
+    'This feature' => __('This feature', 'bit-form'),
+
+    'is available in Pro' => __('is available in Pro', 'bit-form'),
 
     'Thank you for using our product! We\'re sorry,' => __('Thank you for using our product! We\'re sorry,', 'bit-form'),
 
@@ -3939,6 +4437,8 @@ $bitforms_i18n_strings = array(
     'Demo' => __('Demo', 'bit-form'),
 
     'to see what can you do with Pro version.' => __('to see what can you do with Pro version.', 'bit-form'),
+
+    'Available On Pro' => __('Available On Pro', 'bit-form'),
 
     'Do You want Deplicate these' => __('Do You want Deplicate these', 'bit-form'),
 
@@ -3975,10 +4475,6 @@ $bitforms_i18n_strings = array(
     'Readonly' => __('Readonly', 'bit-form'),
 
     'Writeable' => __('Writeable', 'bit-form'),
-
-    'Hide' => __('Hide', 'bit-form'),
-
-    'Show' => __('Show', 'bit-form'),
 
     'Not Required' => __('Not Required', 'bit-form'),
 
@@ -4058,7 +4554,7 @@ $bitforms_i18n_strings = array(
 
     'Add Conditional Logic' => __('Add Conditional Logic', 'bit-form'),
 
-    'Conditional Logics are triggered based on the order of the logic groups. The higher the logic group, the higher the priority. If you want to change the priority, you can sort by drag and drop the logic group.' => __('Conditional Logics are triggered based on the order of the logic groups. The higher the logic group, the higher the priority. If you want to change the priority, you can sort by drag and drop the logic group.', 'bit-form'),
+    'Conditional logics execute according to the sequence of their logic groups. A group placed higher will have greater priority. To adjust the priority, simply drag and drop the logic groups as needed.' => __('Conditional logics execute according to the sequence of their logic groups. A group placed higher will have greater priority. To adjust the priority, simply drag and drop the logic groups as needed.', 'bit-form'),
 
     'Additional Actions' => __('Additional Actions', 'bit-form'),
 
@@ -4152,19 +4648,13 @@ $bitforms_i18n_strings = array(
 
     'Entries' => __('Entries', 'bit-form'),
 
-    'Short Code' => __('Short Code', 'bit-form'),
-
     'Views' => __('Views', 'bit-form'),
 
     'Completion Rate' => __('Completion Rate', 'bit-form'),
 
-    'Responses' => __('Responses', 'bit-form'),
-
     'Created' => __('Created', 'bit-form'),
 
     'Edit Form' => __('Edit Form', 'bit-form'),
-
-    'Conditional Logic' => __('Conditional Logic', 'bit-form'),
 
     'Data Table' => __('Data Table', 'bit-form'),
 
@@ -4250,6 +4740,8 @@ $bitforms_i18n_strings = array(
 
     'Setting' => __('Setting', 'bit-form'),
 
+    'Style' => __('Style', 'bit-form'),
+
     'Table Caption' => __('Table Caption', 'bit-form'),
 
     'Column Mapping' => __('Column Mapping', 'bit-form'),
@@ -4326,6 +4818,14 @@ $bitforms_i18n_strings = array(
 
     'Go Home' => __('Go Home', 'bit-form'),
 
+    'Warning' => __('Warning', 'bit-form'),
+
+    'Are you sure you want to leave the form? Unsaved data will be lost.' => __('Are you sure you want to leave the form? Unsaved data will be lost.', 'bit-form'),
+
+    'Are you sure you want to switch forms? Unsaved data will be lost.' => __('Are you sure you want to switch forms? Unsaved data will be lost.', 'bit-form'),
+
+    'Switch Form' => __('Switch Form', 'bit-form'),
+
     'Are you sure to duplicate this entry?' => __('Are you sure to duplicate this entry?', 'bit-form'),
 
     'View Repeater Data' => __('View Repeater Data', 'bit-form'),
@@ -4346,7 +4846,31 @@ $bitforms_i18n_strings = array(
 
     'WP Auth' => __('WP Auth', 'bit-form'),
 
+    'Entries are loading...' => __('Entries are loading...', 'bit-form'),
+
+    'Advance Field Wise Report' => __('Advance Field Wise Report', 'bit-form'),
+
+    'Please select fields to view reports individually' => __('Please select fields to view reports individually', 'bit-form'),
+
+    'Thank you for using Bit Form. If you like the plugin, please give us a' => __('Thank you for using Bit Form. If you like the plugin, please give us a', 'bit-form'),
+
+    'review' => __('review', 'bit-form'),
+
+    'on WordPress.org to help us spread more.' => __('on WordPress.org to help us spread more.', 'bit-form'),
+
+    'Filter Options' => __('Filter Options', 'bit-form'),
+
+    'All filters below will get entries based on analytics report' => __('All filters below will get entries based on analytics report', 'bit-form'),
+
+    'Filter by Date' => __('Filter by Date', 'bit-form'),
+
+    'Entry Status' => __('Entry Status', 'bit-form'),
+
     'Select Fields for Report:' => __('Select Fields for Report:', 'bit-form'),
+
+    'Other Info' => __('Other Info', 'bit-form'),
+
+    'Total Entry:' => __('Total Entry:', 'bit-form'),
 
     'Loading...' => __('Loading...', 'bit-form'),
 
@@ -4383,6 +4907,10 @@ $bitforms_i18n_strings = array(
     'You cannot add' => __('You cannot add', 'bit-form'),
 
     '<p style="font-size: 16px">To use' => __('<p style="font-size: 16px">To use', 'bit-form'),
+
+    'The entered values do not match.' => __('The entered values do not match.', 'bit-form'),
+
+    'Please enter a valid email address.' => __('Please enter a valid email address.', 'bit-form'),
 
     'Change' => __('Change', 'bit-form'),
 
@@ -4514,13 +5042,13 @@ $bitforms_i18n_strings = array(
 
     'Modal Message' => __('Modal Message', 'bit-form'),
 
-    'Rating Icon' => __('Rating Icon', 'bit-form'),
-
     'Rating Message on Hover' => __('Rating Message on Hover', 'bit-form'),
 
     'Rating Message on Select' => __('Rating Message on Select', 'bit-form'),
 
     'PDF Template' => __('PDF Template', 'bit-form'),
+
+    'Custom Theme Feature' => __('Custom Theme Feature', 'bit-form'),
 
     'Name is the unique identifier for the field. It is used to reference the field in the form submission data.' => __('Name is the unique identifier for the field. It is used to reference the field in the form submission data.', 'bit-form'),
 
@@ -4587,6 +5115,14 @@ $bitforms_i18n_strings = array(
     'This allows to show the step label. You can toggle this option to show or hide the step label.' => __('This allows to show the step label. You can toggle this option to show or hide the step label.', 'bit-form'),
 
     'This allows to show the step subtitle. You can toggle this option to show or hide the step subtitle.' => __('This allows to show the step subtitle. You can toggle this option to show or hide the step subtitle.', 'bit-form'),
+
+    'Container Class allows you to add custom CSS classes to the field container. You can use this to apply custom styles to the field wrapper.' => __('Container Class allows you to add custom CSS classes to the field container. You can use this to apply custom styles to the field wrapper.', 'bit-form'),
+
+    'This option allows you to enable a confirm email field that requires users to re-enter their email address for verification.' => __('This option allows you to enable a confirm email field that requires users to re-enter their email address for verification.', 'bit-form'),
+
+    'This option allows you to enable a confirm password field that requires users to re-enter their password for verification.' => __('This option allows you to enable a confirm password field that requires users to re-enter their password for verification.', 'bit-form'),
+
+    'This allows to show the password icon. You can toggle this option to show or hide the password icon.' => __('This allows to show the password icon. You can toggle this option to show or hide the password icon.', 'bit-form'),
 
     'Allow only one entry for each IP address.' => __('Allow only one entry for each IP address.', 'bit-form'),
 
@@ -4722,6 +5258,8 @@ $bitforms_i18n_strings = array(
 
     'Allow logged in users to edit form entries' => __('Allow logged in users to edit form entries', 'bit-form'),
 
-    'Allow to Configure Global Validation Message' => __('Allow to Configure Global Validation Message', 'bit-form')
+    'Allow to Configure Global Validation Message' => __('Allow to Configure Global Validation Message', 'bit-form'),
+
+    'How to add Custom CSS/JS' => __('How to add Custom CSS/JS', 'bit-form')
 );
 /* THIS IS THE END OF THE GENERATED FILE */

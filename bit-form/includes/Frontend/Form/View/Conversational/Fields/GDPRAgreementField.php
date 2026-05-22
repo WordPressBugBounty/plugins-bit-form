@@ -22,6 +22,9 @@ class GDPRAgreementField
     $disabled = '';
     $readonly = '';
     $name = $fieldHelpers->name();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
+    $labelId = $fieldHelpers->getLabelId();
     $value = '';
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
@@ -49,11 +52,15 @@ class GDPRAgreementField
       $lbl = $field->info->lbl;
     }
 
-    return '      <div
+    return '      
+      <div
         ' . $fieldHelpers->getCustomAttributes('cc') . '
         class="' . $fieldHelpers->getConversationalCls('cc') . ' ' . $fieldHelpers->getCustomClasses('cc') . '"
+        role="group"
+        aria-labelledby="' . $labelId . '"
+        ' . $ariaDescribedBy . '
       >
-        <svg class="' . $fieldHelpers->getConversationalCls('cks') . '">
+        <svg class="' . $fieldHelpers->getConversationalCls('cks') . '" aria-hidden="true">
           <symbol id="' . $rowID . '-ck-svg" viewBox="0 0 12 10">
             <polyline
               class="' . $fieldHelpers->getConversationalCls('ck-svgline') . '"
@@ -73,10 +80,12 @@ class GDPRAgreementField
             ' . $disabled . '
             ' . $readonly . '
             ' . $req . '
+            ' . $ariaRequired . '
             ' . $name . '
             ' . $checked . '
             ' . $value . '
           />
+          <!-- aria-describedby is on the parent group wrapper to associate helper/error text with the entire field -->
           <label
             ' . $fieldHelpers->getCustomAttributes('cl') . '
             data-cl

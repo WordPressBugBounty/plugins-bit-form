@@ -25,7 +25,26 @@ final class Deactivation
     add_action('bitforms_deactivation', [$this, 'deactive']);
   }
 
-  public function deactive()
+  // handle deactivation tasks with multisite support
+  public function deactive($network_wide)
+  {
+    if ($network_wide && \function_exists('is_multisite') && is_multisite()) {
+      global $wpdb;
+      $blog_ids = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
+      foreach ($blog_ids as $blog_id) {
+        switch_to_blog($blog_id);
+        $this->deactivateOnCurrentBlog();
+        restore_current_blog();
+      }
+    } else {
+      $this->deactivateOnCurrentBlog();
+    }
+  }
+
+  /**
+   * Deactivates plugin for a single site
+   */
+  public function deactivateOnCurrentBlog()
   {
     $routes = get_option('bitforms_routes');
     if ($routes && isset($routes['root'])) {

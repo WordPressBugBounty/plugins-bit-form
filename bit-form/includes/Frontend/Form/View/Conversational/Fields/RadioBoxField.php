@@ -18,6 +18,9 @@ class RadioBoxField
     $fieldHelpers = new ConversationalFieldHelpers($formID, $field, $rowID, $form_atomic_Cls_map);
     $req = $fieldHelpers->required();
     $name = $fieldHelpers->name();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
+    $labelId = $fieldHelpers->getLabelId();
     $value = '';
     $radioBoxOptions = '';
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
@@ -54,6 +57,7 @@ class RadioBoxField
               ' . $fieldHelpers->getCustomAttributes('ci') . '
               id="' . $rowID . '-' . $contentCount . '-chk-' . $key . '"
               type="radio"
+              role="radio"
               class="' . $fieldHelpers->getConversationalCls('ci') . ' ' . $fieldHelpers->getCustomClasses('ci') . '"
               value="' . $fieldHelpers->esc_attr($value) . '"
               ' . $check . '
@@ -94,7 +98,8 @@ class RadioBoxField
     $inpReq = isset($field->valid->otherOptReq) ? ($field->valid->otherOptReq ? 'required' : '') : '';
     if (property_exists($field, 'addOtherOpt') && $field->addOtherOpt) {
       $keyChar = chr(65 + count($field->opt));
-      $radioBoxOptions .= '      <div
+      $radioBoxOptions .= '
+      <div
         ' . $fieldHelpers->getCustomAttributes('cw') . '
         class="' . $fieldHelpers->getConversationalCls('cw') . ' ' . $fieldHelpers->getCustomClasses('cw') . '"
       >
@@ -105,7 +110,7 @@ class RadioBoxField
           type="radio"
           class="' . $fieldHelpers->getConversationalCls('ci') . ' ' . $fieldHelpers->getCustomClasses('ci') . '"
           value=""
-          ' . $check . '
+          role="radio"
           ' . $name . '
         />
         <label
@@ -135,20 +140,27 @@ class RadioBoxField
             class="' . $fieldHelpers->getConversationalCls('other-inp') . '"
             ' . $inpReq . '
             placeholder="' . $fieldHelpers->esc_attr($inputPh) . '"
-          >
+          />
         </div>
       </div>
 ';
     }
 
     return sprintf(
-      '      <div
+      '
+      <div
         %1$s
         class="%2$s"
+        role="radiogroup"
+        aria-labelledby="%3$s"
+        %4$s
       >
-%3$s      </div>',
+        %5$s      
+      </div>',
       $fieldHelpers->getCustomAttributes('cc'),
       $fieldHelpers->getConversationalCls('cc') . ' ' . $fieldHelpers->getCustomClasses('cc'),
+      $labelId,
+      $ariaDescribedBy,
       $radioBoxOptions
     );
   }

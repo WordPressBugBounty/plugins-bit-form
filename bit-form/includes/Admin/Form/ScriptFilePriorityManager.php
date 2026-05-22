@@ -57,8 +57,19 @@ class ScriptFilePriorityManager
         ['priority' => 101, 'filename' => 'submit-form.min.js'],
         ['priority' => 101, 'filename' => 'setStyleProperty.min.js']
       ],
+
+      'text' => [
+        ['priority' => 301, 'filename' => 'initTextLengthHelper.min.js', 'paths' => ['valid->minlength', 'valid->maxlength', 'valid->maxword', 'valid->minword']],
+      ],
+      'textarea' => [
+        ['priority' => 301, 'filename' => 'initTextLengthHelper.min.js', 'paths' => ['valid->minlength', 'valid->maxlength', 'valid->maxword', 'valid->minword']],
+      ],
       'range' => [
         ['priority' => 301, 'filename' => 'setSliderFieldValue.min.js', 'path' => 'showValue'],
+      ],
+      'password' => [
+        ['priority' => 301, 'filename' => 'initPasswordStrengthHelper.min.js', 'path' => 'valid->validations'],
+        ['priority' => 301, 'filename' => 'bfTogglePasswordVisibility.min.js', 'path' => 'config->showPasswordIcon'],
       ],
       'country' => [
         ['priority' => 101, 'filename' => 'observeElm.min.js'],
@@ -78,13 +89,6 @@ class ScriptFilePriorityManager
         ['priority' => 201, 'filename' => 'customFieldsReset.min.js'],
         ['priority' => 101, 'filename' => 'observeElm.min.js'],
       ],
-      'advanced-file-up' => [
-        ['priority' => 101, 'filename' => 'observeElm.min.js'],
-        ['priority' => 202, 'filename' => 'bit-filepond.min.js'],
-        ['priority' => 301, 'filename' => 'bit-advanced-file-up-field.min.js'],
-        ['priority' => 101, 'filename' => 'advancedFileHandle.min.js'],
-        ['priority' => 201, 'filename' => 'customFieldsReset.min.js'],
-      ],
       'file-up' => [
         ['priority' => 301, 'filename' => 'bit-file-up-field.min.js'],
         ['priority' => 201, 'filename' => 'customFieldsReset.min.js'],
@@ -93,7 +97,7 @@ class ScriptFilePriorityManager
         ['priority' => 101, 'filename' => 'observeElm.min.js'],
         ['priority' => 301, 'filename' => 'bit-phone-number-field.min.js'],
         ['priority' => 201, 'filename' => 'customFieldsReset.min.js'],
-        ['priority' => 101, 'filename' => 'observeElm.min.js'],
+        // ['priority' => 101, 'filename' => 'observeElm.min.js'],
       ],
       'section' => [
         ['priority' => 101, 'filename' => 'hideChildFldHandle.min.js'],
@@ -262,6 +266,10 @@ class ScriptFilePriorityManager
         'showSelectStatus' => ['path' => 'config->showSelectStatus', 'val' => false],
         'fileSelectStatus' => ['path' => 'config->fileSelectStatus', 'val' => 'No File Selected'],
         'fileExistMsg'     => ['val' => 'A file already exist'],
+        'showFileList'     => ['path' => 'config->showFileList',     'val' => false],
+        'showFilePreview'  => ['path' => 'config->showFilePreview',  'val' => false],
+        'showFileSize'     => ['path' => 'config->showFileSize',     'val' => false],
+        'fileExistMsg'     => ['path' => 'config->fileExistMsg',     'val' => 'A file already exist'],
       ],
       'repeater' => [
         'config'          => (object) [],
@@ -281,7 +289,7 @@ class ScriptFilePriorityManager
       ],
       'hcaptcha'=> [
         'fieldKey'                     => ['var'=>'fieldKey']
-      ]
+      ],
     ];
     /**
      * Allow add-on plugins to extend field config mappings.
@@ -319,11 +327,13 @@ class ScriptFilePriorityManager
   public static function validationAndOtherScriptFile()
   {
     $files = [
+      'confirmFldMatch'                  => ['priority' => 701, 'filename' => 'confirmFldMatch.min.js'],
       'checkFldValidation'               => ['priority' => 701, 'filename' => 'checkFldValidation.min.js'],
       // 'checkMinMaxOptions'               => ['priority' => 702, 'filename' => 'checkMinMaxOptions.min.js'],
       // 'bfDatetimeFldValidation'          => ['priority' => 702, 'filename' => 'bfDatetimeFldValidation.min.js'],
       'bfParseDateTime'                  => ['priority' => 301, 'filename' => 'bfParseDateTime.min.js'],
       'checkMinMaxValue'                 => ['priority' => 702, 'filename' => 'checkMinMaxValue.min.js'],
+      'textLengthValidation'             => ['priority' => 702, 'filename' => 'textLengthValidation.min.js'],
       'customOptionValidation'           => ['priority' => 702, 'filename' => 'customOptionValidation.min.js'],
       'dcsnbxFldValidation'              => ['priority' => 702, 'filename' => 'dcsnbxFldValidation.min.js'],
       'emailFldValidation'               => ['priority' => 702, 'filename' => 'emailFldValidation.min.js'],
@@ -376,7 +386,14 @@ class ScriptFilePriorityManager
             'dependencies' => [
               'bit-input-mask'
             ]
+          ],
+          'textLengthValidation' => [
+            'paths' => ['valid->minlength', 'valid->maxlength', 'valid->minword', 'valid->maxword']
+          ],
+          'confirmFldMatch' => [
+            'paths' => ['parentFieldKey'],
           ]
+
         ],
         'textarea' => [
           'bit-input-mask' => [
@@ -394,6 +411,9 @@ class ScriptFilePriorityManager
             'dependencies' => [
               'bit-input-mask'
             ]
+          ],
+          'textLengthValidation' => [
+            'paths' => ['valid->minlength', 'valid->maxlength', 'valid->minword', 'valid->maxword']
           ]
         ],
         'email' => [
@@ -403,6 +423,14 @@ class ScriptFilePriorityManager
               'generateBackslashPattern'
             ]
           ],
+          'confirmFldMatch' => [
+            'paths' => ['parentFieldKey'],
+          ]
+        ],
+        'number' => [
+          'nmbrFldValidation' => [
+            'paths' => ['mn', 'mx']
+          ]
         ],
         'range' => [
           'checkMinMaxValue' => [

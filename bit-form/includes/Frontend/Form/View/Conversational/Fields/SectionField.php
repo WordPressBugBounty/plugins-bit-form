@@ -28,7 +28,7 @@ class SectionField
     $wrapperClass = $fieldHelpers->getConversationalMultiCls('inp-fld-wrp')
       . ' ' . $fieldHelpers->getConversationalCls('inner-grid-fld-wrp')
       . ' ' . $fieldHelpers->getCustomClasses('inp-fld-wrp');
-    $sectionGridClass = "_frm-b{$formID} section-grid";
+    $sectionGridClass = "_frm-b{$formID} b{$formID}-bf-section-grid bf-section-grid";
 
     return sprintf(
       '<div

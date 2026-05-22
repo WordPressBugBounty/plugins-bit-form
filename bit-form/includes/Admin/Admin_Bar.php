@@ -22,7 +22,8 @@ use WP_Admin_Bar;
 class Admin_Bar
 {
   private static $fonts_url = [
-    'https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;700&display=swap&famildy=Roboto:wght@300;400;500&display=swap',
+    // 'https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;700&display=swap&family=Roboto:wght@300;400;500&display=swap',
+    'https://fonts.googleapis.com/css2?family=DM+Sans:wght@100;200;300;400;500;600;700&display=swap',
     'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap',
   ];
 
@@ -81,6 +82,9 @@ class Admin_Bar
 
   public function AdminTopMenu(WP_Admin_Bar $wp_admin_bar)
   {
+    if (!(current_user_can('manage_options') || current_user_can('manage_bitform'))) {
+      return;
+    }
     $indicator = '';
     // if (self::countUnreadEntries()) {
     //   $indicator = ' <div class="wp-core-ui wp-ui-notification bf-indicator-badge">' . self::countUnreadEntries() . '</div>';
@@ -162,7 +166,7 @@ class Admin_Bar
    */
   public function AdminAssets($current_screen)
   {
-    if (!strpos($current_screen, 'bitform')) {
+    if (false === strpos($current_screen, 'bitform')) {
       return;
     }
     $parsed_url = wp_parse_url(get_admin_url());
@@ -186,7 +190,7 @@ class Admin_Bar
     if (!defined('BITAPPS_DEV') || (defined('BITAPPS_DEV') && !BITAPPS_DEV)) {
       $build_hash = file_get_contents(BITFORMS_PLUGIN_DIR_PATH . '/build-hash.txt');
       wp_enqueue_script('index-BITFORM-MODULE', BITFORMS_ASSET_URI . "/main-{$build_hash}.js", [], null);
-      wp_enqueue_style('bf-css', BITFORMS_ASSET_URI . "/main-{$build_hash}.css");
+      wp_enqueue_style('bf-css', BITFORMS_ASSET_URI . "/main-{$build_hash}.css", [], $build_hash);
     }
 
     // if (defined('BITAPPS_DEV') && BITAPPS_DEV) {
@@ -308,16 +312,6 @@ class Admin_Bar
       $allFormSettings['connectedIntegrationApps'] = $connectedIntegrationApps;
     }
 
-    $users = get_users(['fields' => ['ID', 'user_nicename', 'user_email', 'display_name']]);
-    $userMail = [];
-    $userNames = [];
-    foreach ($users as $key => $value) {
-      $userMail[$key]['label'] = !empty($value->display_name) ? $value->display_name : '';
-      $userMail[$key]['value'] = !empty($value->user_email) ? $value->user_email : '';
-      $userMail[$key]['id'] = $value->ID;
-      $userNames[$value->ID] = ['name' => $value->display_name, 'url' => get_edit_user_link($value->ID)];
-    }
-
     $appSettings = get_option('bitform_app_settings', (object)[]);
     $bits = [
       'configs'             => ['bf_separator' => BITFORMS_BF_SEPARATOR],
@@ -334,8 +328,6 @@ class Admin_Bar
       'allPages'            => is_wp_error($this->getAllPages()) ? [] : $this->getAllPages(),
       'allFormSettings'     => count($allFormSettings) > 0 ? $allFormSettings : (object)[],
       'appSettings'         => $appSettings,
-      'userMail'            => !empty($userMail) ? $userMail : [],
-      'user'                => (object) $userNames,
       'dateFormat'          => get_option('date_format'),
       'timeFormat'          => get_option('time_format'),
       'timeZone'            => DateTimeHelper::wp_timezone_string(),
@@ -343,7 +335,6 @@ class Admin_Bar
       'oneDriveRedirectURL' => get_rest_url() . 'bitform/v1/oneDrive',
       'zohoRedirectURL'     => get_rest_url() . 'bitform/v1/zoho',
       'oAuthRedirectURL'    => get_rest_url() . 'bitform/v1/oauth-redirect',
-      'userRoles'           => get_editable_roles(),
       'downloadedPdfFonts'  => is_array(get_option('bitforms_pdf_fonts')) ? get_option('bitforms_pdf_fonts') : [],
       'permission'          => empty(get_option('bitforms_allow_tracking')) ? false : true,
       'templatePath'        => BITFORMS_ROOT_URI . '/static/templates',

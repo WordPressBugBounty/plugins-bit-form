@@ -267,6 +267,7 @@ class DropdownField
               class="%15$s %16$s"
               role="combobox"
               aria-controls=""
+              aria-haspopup="listbox"
               aria-live="assertive"
               aria-expanded="false"
               tabIndex="0"

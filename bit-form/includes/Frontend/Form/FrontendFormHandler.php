@@ -54,7 +54,7 @@ final class FrontendFormHandler
 
   private function getJSFileSrc($postId)
   {
-    $formUpdateVersion = get_option('bit-form_form_update_version');
+    $formUpdateVersion = get_option('bitform_form_update_version');
     $formScriptSrc = BITFORMS_UPLOAD_BASE_URL . "/form-scripts/$postId/bitform-js-$postId.js?bfv=$formUpdateVersion";
 
     return $formScriptSrc;
@@ -82,7 +82,7 @@ final class FrontendFormHandler
     $previewMode = 'classic';
     $postId = '';
 
-    $formUpdateVersion = get_option('bit-form_form_update_version');
+    $formUpdateVersion = get_option('bitform_form_update_version');
     if ($formID) {
       $formIDs[] = $formID;
       $FrontendFormManager = FrontendFormManager::getInstance($formID, 1);
@@ -186,13 +186,13 @@ final class FrontendFormHandler
       }
     }
     if ($regenerateScriptFlag) {
-      $formUpdateVersion = get_option('bit-form_form_update_version');
+      $formUpdateVersion = get_option('bitform_form_update_version');
       if (!$formUpdateVersion) {
         $formUpdateVersion = 1;
       } else {
         $formUpdateVersion = (int) $formUpdateVersion + 1;
       }
-      update_option('bit-form_form_update_version', $formUpdateVersion);
+      update_option('bitform_form_update_version', $formUpdateVersion);
     }
     return $regenerateScriptFlag;
   }
@@ -239,7 +239,7 @@ final class FrontendFormHandler
   private function addInlineScript($code, $handle = '', $position = 'after')
   {
     $scriptHandle = !empty($handle) ? $handle : 'bf-inline-script';
-    $formUpdateVersion = get_option('bit-form_form_update_version');
+    $formUpdateVersion = get_option('bitform_form_update_version');
     if (!wp_script_is($scriptHandle)) {
       wp_register_script($scriptHandle, '', [], $formUpdateVersion, true);
       wp_enqueue_script($scriptHandle);
@@ -250,7 +250,7 @@ final class FrontendFormHandler
   private function addInlineStyle($code, $handle = '')
   {
     $styleHandle = !empty($handle) ? $handle : 'bf-inline-style';
-    $formUpdateVersion = get_option('bit-form_form_update_version');
+    $formUpdateVersion = get_option('bitform_form_update_version');
     if (!wp_style_is($styleHandle)) {
       wp_register_style($styleHandle, '', [], $formUpdateVersion);
       wp_enqueue_style($styleHandle);
@@ -765,7 +765,7 @@ final class FrontendFormHandler
       } else {
         $newFormId = $formID;
       }
-      $formUpdateVersion = get_option('bit-form_form_update_version');
+      $formUpdateVersion = get_option('bitform_form_update_version');
       if (!wp_style_is('bitform-style-' . $newFormId) && is_readable(BITFORMS_CONTENT_DIR . '/form-styles/bitform-' . $newFormId . '.css')) {
         wp_enqueue_style(
           'bitform-style-' . $newFormId,

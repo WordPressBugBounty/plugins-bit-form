@@ -45,6 +45,7 @@ class FormViewHelper
           class="%1$s _frm-b-stp-icn"
           src="%2$s"
           alt=""
+          aria-hidden="true"
        />
       ',
       $this->_form->getAtomicCls($classElement),
@@ -111,9 +112,14 @@ class FormViewHelper
 
     $formID = $this->_form->getFormID();
     $layout = $this->_layout;
+    $totalSteps = is_array($layout) ? count($layout) : 1;
     $stepHeaderHtml = sprintf(
       '<div class="%1$s _frm-b-stp-hdr-cntnr">
-       <div class="%2$s _frm-b-stp-hdr-wrpr">',
+        <div 
+          class="%2$s _frm-b-stp-hdr-wrpr"
+          role="tablist"
+          aria-label="Form steps navigation"
+        >',
       $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-cntnr"),
       $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-wrpr")
     );
@@ -163,26 +169,42 @@ class FormViewHelper
 
       $activeClass = 0 === $key ? 'active' : '';
       $disableClass = (0 !== $key && $stepValidation) ? 'disabled' : '';
+      $ariaSelected = 0 === $key ? 'true' : 'false';
+      $ariaDisabled = (0 !== $key && $stepValidation) ? 'aria-disabled="true"' : '';
+      $tabIndex = 0 === $key ? '0' : '-1';
       $stepHeaderHtml .= sprintf(
         '
-      <div class="%1$s _frm-b-stp-hdr %2$s %3$s" data-step="%4$s">
-        <div class="%5$s _frm-b-stp-hdr-cntnt">
-          %6$s
-          <span class="%7$s _frm-b-stp-hdr-titl-wrpr">
-            %8$s
-            %9$s
+      <div 
+        class="%1$s _frm-b-stp-hdr %2$s %3$s" 
+        data-step="%4$s"
+        role="tab"
+        aria-selected="%5$s"
+        aria-controls="step-%6$s-%4$s-panel"
+        id="step-%6$s-%4$s-tab"
+        tabindex="%7$s"
+        %8$s
+      >
+        <div class="%9$s _frm-b-stp-hdr-cntnt">
+          %10$s
+          <span class="%11$s _frm-b-stp-hdr-titl-wrpr">
+            %12$s
+            %13$s
           </span>
         </div>
       </div>',
-        $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr"),
-        $activeClass,
-        $disableClass,
-        $step,
-        $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-cntnt"),
-        $iconWrapper,
-        $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-titl-wrpr"),
-        $stepLabelMarkup,
-        $stepSubtitleMarkup
+        $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr"), // 1
+        $activeClass, // 2
+        $disableClass, // 3
+        $step, // 4
+        $ariaSelected, // 5
+        $formID, // 6
+        $tabIndex, // 7
+        $ariaDisabled, // 8
+        $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-cntnt"), // 9
+        $iconWrapper, // 10
+        $this->_form->getAtomicCls("_frm-b{$formID}-stp-hdr-titl-wrpr"), // 11
+        $stepLabelMarkup, // 12
+        $stepSubtitleMarkup // 13
       );
     }
     $stepHeaderHtml .= '
@@ -200,12 +222,21 @@ class FormViewHelper
     }
     $precentage = (isset($progressBarSettings->showPercentage) && $progressBarSettings->showPercentage) ? '0%' : '';
     $formID = $this->getFormId();
+    $totalSteps = is_array($this->_layout) ? count($this->_layout) : 1;
     return sprintf(
-      '<div class="%1$s">
+      '
+    <div class="%1$s">
       <div class="%2$s">
-        <div class="%3$s">
-          <div class="%4$s" style="width: 0%%;">
-            %5$s
+        <div 
+          class="%3$s"
+          role="progressbar"
+          aria-valuenow="0"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-label="Form completion progress: Step 1 of %4$s"
+        >
+          <div class="%5$s" style="width: 0%%;">
+            %6$s
           </div>
         </div>
       </div>
@@ -213,6 +244,7 @@ class FormViewHelper
       $this->_form->getAtomicCls("_frm-b{$formID}-stp-progress-wrpr"),
       $this->_form->getAtomicCls("_frm-b{$formID}-stp-progress"),
       $this->_form->getAtomicCls("_frm-b{$formID}-stp-progress-bar"),
+      $totalSteps,
       $this->_form->getAtomicCls("_frm-b{$formID}-progress-fill"),
       $precentage
     );

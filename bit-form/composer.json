@@ -15,7 +15,8 @@
     "friendsofphp/php-cs-fixer": "^3.11",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
     "vimeo/psalm": "^4.27",
-    "typisttech/imposter": "^0.6.1"
+    "typisttech/imposter": "^0.6.1",
+    "yoast/phpunit-polyfills": "^4"
   },
   "scripts": {
     "test": "./vendor/bin/phpunit --testdox --colors=always tests/ --exclude-group db",

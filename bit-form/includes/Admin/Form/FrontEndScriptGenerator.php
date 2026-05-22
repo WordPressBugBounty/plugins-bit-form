@@ -50,7 +50,7 @@ class FrontEndScriptGenerator
 
   private static function isValidationNeeded($fldData)
   {
-    $validationsToCheck = ['valid->req', 'valid->regexr', 'mn', 'mx',  'opt', 'err->invalid->show'];
+    $validationsToCheck = ['valid->req', 'valid->regexr', 'mn', 'mx', 'opt', 'err->invalid->show', 'err->notVerified->show'];
     foreach ($validationsToCheck as $property) {
       $needValidation = Helpers::property_exists_nested($fldData, $property);
       if ($needValidation) {
@@ -270,7 +270,18 @@ class FrontEndScriptGenerator
           }
         }
         foreach ($fldScriptArr as $scriptFile) {
-          if (isset($scriptFile['path']) && !Helpers::property_exists_nested($fld['field'], $scriptFile['path'], true)) {
+          if (isset($scriptFile['paths']) && is_array($scriptFile['paths'])) {
+            $pathMatched = false;
+            foreach ($scriptFile['paths'] as $path) {
+              if (Helpers::property_exists_nested($fld['field'], $path)) {
+                $pathMatched = true;
+                break;
+              }
+            }
+            if (!$pathMatched) {
+              continue;
+            }
+          } elseif (isset($scriptFile['path']) && !Helpers::property_exists_nested($fld['field'], $scriptFile['path'])) {
             continue;
           }
           $this->addScriptInLoadedScriptsList($scriptFile);
@@ -369,13 +380,14 @@ class FrontEndScriptGenerator
     'repeater'          => '.__$fk__-rpt-fld-wrp',
     'signature'         => '.__$fk__-inp-fld-wrp',
     'rating'            => '.__$fk__-inp-fld-wrp',
+    'email-otp'         => '.__$fk__-inp-fld-wrp',
     'hcaptcha'          => '.__$fk__-h-captcha-wrp',
     'advanced-datetime' => '.__$fk__-advanced-datetime',
   ];
 
   private function generateFieldConfigsJs()
   {
-    $customFlds = ['select', 'country', 'currency', 'phone-number', 'file-up', 'advanced-file-up', 'paypal', 'razorpay', 'stripe', 'mollie', 'recaptcha', 'repeater', 'signature', 'rating', 'turnstile', 'hcaptcha', 'advanced-datetime'];
+    $customFlds = ['select', 'country', 'currency', 'phone-number', 'file-up', 'advanced-file-up', 'paypal', 'razorpay', 'stripe', 'mollie', 'recaptcha', 'repeater', 'signature', 'rating', 'turnstile', 'hcaptcha', 'advanced-datetime', 'email-otp'];
     $allFieldTypes = array_keys($this->_fields);
     $customFldsInForms = array_intersect($allFieldTypes, $customFlds);
     $formContents = $this->_formContents;

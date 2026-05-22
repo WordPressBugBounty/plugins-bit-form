@@ -71,7 +71,7 @@ class RatingField
           $checkedCls = null;
         }
         $ratingOption .= sprintf(
-          '        <label
+          '<label
             class="%1$s %2$s"
             for="%3$s-%4$s-rating-%5$s"
             %6$s
@@ -119,6 +119,10 @@ class RatingField
       }
     }
 
+    $labelId = $fieldHelpers->getLabelId();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
+
     return sprintf(
       '<div
         %1$s
@@ -127,13 +131,17 @@ class RatingField
         <div
           %4$s
           class="%5$s %6$s"
+          role="radiogroup"
+          aria-labelledby="%7$s"
+          %8$s
+          %9$s
           tabindex="0"
         >
-%7$s
+%10$s
         </div>
         <span
-          class="%8$s %9$s"
-          %10$s
+          class="%11$s %12$s"
+          %13$s
         >
         </span>
       </div>',
@@ -143,6 +151,9 @@ class RatingField
       $fieldHelpers->getCustomAttributes('rating-wrp'),
       $fieldHelpers->getAtomicCls('rating-wrp'),
       $fieldHelpers->getCustomClasses('rating-wrp'),
+      $labelId,
+      $ariaDescribedBy,
+      $ariaRequired,
       $ratingOption,
       $fieldHelpers->getAtomicCls('rating-msg'),
       $fieldHelpers->getCustomClasses('rating-msg'),

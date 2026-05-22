@@ -30,7 +30,7 @@ class SectionField
       %1$s
       class="%2$s %3$s"
     >
-        <div class="_frm-b%4$s section-grid">
+        <div class="_frm-b%4$s b%4$s-bf-section-grid bf-section-grid">
           %5$s
         </div>
     </div>',

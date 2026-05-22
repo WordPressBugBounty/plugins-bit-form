@@ -20,6 +20,8 @@ class CountryField
     $disabled = $fieldHelpers->disabled();
     $readonly = $fieldHelpers->readonly();
     $name = $fieldHelpers->name();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
     $selectedFlagImage = '';
     $tabIndx = isset($field->disabled) ? -1 : 0;
     $selectedCountryClearable = '';
@@ -156,25 +158,28 @@ class CountryField
           <input
             %7$s
             %8$s
+            %9$s
+            %10$s
             type="text"
             title="Country Hidden Input"
-            class="%9$s d-none"
-            %10$s
-            %11$s
+            class="%11$s d-none"
             %12$s
+            %13$s
+            %14$s
           />
           <div
-            class="%13$s"
+            class="%15$s"
             aria-live="assertive"
             aria-label="Select a Country"
             role="combobox"
+            aria-haspopup="listbox"
             aria-expanded="false"
-            tabIndex="%14$s"
+            tabIndex="%16$s"
           >
-            %15$s
-            <div class="%16$s">
-              %17$s
-              <div class="%18$s">
+            %17$s
+            <div class="%18$s">
+              %19$s
+              <div class="%20$s">
                 <svg
                   width="15"
                   height="15"
@@ -193,22 +198,22 @@ class CountryField
             </div>
           </div>
           <div
-            %19$s
-            class="%20$s %21$s"
+            %21$s
+            class="%22$s %23$s"
           >
-            <div class="%22$s">
-              <div class="%23$s">
+            <div class="%24$s">
+              <div class="%25$s">
                 <input
-                  %24$s
+                  %26$s
                   type="search"
-                  class="%25$s %26$s"
-                  %27$s
+                  class="%27$s %28$s"
+                  %29$s
                   autoComplete="country-name"
                   tabIndex="-1"
                 />
                 <svg
-                  %28$s
-                  class="%29$s %30$s"
+                  %30$s
+                  class="%31$s %32$s"
                   aria-hidden="true"
                   width="22"
                   height="22"
@@ -224,16 +229,16 @@ class CountryField
                   <circle cx="11" cy="11" r="8" />
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
-                %31$s
+                %33$s
               </div>
               <ul
-                %32$s
-                class="%33$s %34$s"
+                %34$s
+                class="%35$s %36$s"
                 tabIndex="-1"
                 role="listbox"
                 aria-label="country list"
               >
-                %35$s
+                %37$s
               </ul>
             </div>
           </div>
@@ -247,33 +252,35 @@ class CountryField
       $readonly,                                               // 6
       $name,                                                   // 7
       $req,                                                    // 8
-      $fieldHelpers->getAtomicCls('country-hidden-input'),     // 9
-      $disabled,                                               // 10
-      $readonly,                                               // 11
-      $val,                                                    // 12
-      $fieldHelpers->getAtomicCls('dpd-wrp'),                  // 13
-      $tabIndx,                                                // 14
-      $selectedFlagImage,                                      // 15
-      $fieldHelpers->getAtomicCls('dpd-btn-wrp'),              // 16
-      $selectedCountryClearable,                               // 17
-      $fieldHelpers->getAtomicCls('dpd-down-btn'),             // 18
-      $fieldHelpers->getCustomAttributes('option-wrp'),        // 19
-      $fieldHelpers->getAtomicCls('option-wrp'),               // 20
-      $fieldHelpers->getCustomClasses('option-wrp'),           // 21
-      $fieldHelpers->getAtomicCls('option-inner-wrp'),         // 22
-      $fieldHelpers->getAtomicCls('option-search-wrp'),        // 23
-      $fieldHelpers->getCustomAttributes('opt-search-input'),  // 24
-      $fieldHelpers->getAtomicCls('opt-search-input'),         // 25
-      $fieldHelpers->getCustomClasses('opt-search-input'),     // 26
-      $searchPlaceholder,                                      // 27
-      $fieldHelpers->getCustomAttributes('opt-search-icn'),    // 28
-      $fieldHelpers->getAtomicCls('opt-search-icn'),           // 29
-      $fieldHelpers->getCustomClasses('opt-search-icn'),       // 30
-      $searchClearable,                                        // 31
-      $fieldHelpers->getCustomAttributes('option-list'),       // 32
-      $fieldHelpers->getAtomicCls('option-list'),              // 33
-      $fieldHelpers->getCustomClasses('option-list'),          // 34
-      $options                                                 // 35
+      $ariaRequired,                                           // 9
+      $ariaDescribedBy,                                        // 10
+      $fieldHelpers->getAtomicCls('country-hidden-input'),     // 11
+      $disabled,                                               // 12
+      $readonly,                                               // 13
+      $val,                                                    // 14
+      $fieldHelpers->getAtomicCls('dpd-wrp'),                  // 15
+      $tabIndx,                                                // 16
+      $selectedFlagImage,                                      // 17
+      $fieldHelpers->getAtomicCls('dpd-btn-wrp'),              // 18
+      $selectedCountryClearable,                               // 19
+      $fieldHelpers->getAtomicCls('dpd-down-btn'),             // 20
+      $fieldHelpers->getCustomAttributes('option-wrp'),        // 21
+      $fieldHelpers->getAtomicCls('option-wrp'),               // 22
+      $fieldHelpers->getCustomClasses('option-wrp'),           // 23
+      $fieldHelpers->getAtomicCls('option-inner-wrp'),         // 24
+      $fieldHelpers->getAtomicCls('option-search-wrp'),        // 25
+      $fieldHelpers->getCustomAttributes('opt-search-input'),  // 26
+      $fieldHelpers->getAtomicCls('opt-search-input'),         // 27
+      $fieldHelpers->getCustomClasses('opt-search-input'),     // 28
+      $searchPlaceholder,                                      // 29
+      $fieldHelpers->getCustomAttributes('opt-search-icn'),    // 30
+      $fieldHelpers->getAtomicCls('opt-search-icn'),           // 31
+      $fieldHelpers->getCustomClasses('opt-search-icn'),       // 32
+      $searchClearable,                                        // 33
+      $fieldHelpers->getCustomAttributes('option-list'),       // 34
+      $fieldHelpers->getAtomicCls('option-list'),              // 35
+      $fieldHelpers->getCustomClasses('option-list'),          // 36
+      $options                                                 // 37
     );
   }
 }

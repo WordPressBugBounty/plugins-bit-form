@@ -302,7 +302,6 @@ final class FieldValueHandler
 
   public static function changeImagePathInHTMLString($html_body, $path)
   {
-    $allowedExtensions = ['jpg', 'jpeg', 'png', 'svg'];
     if (empty($html_body) || empty($path)) {
       return $html_body;
     }
@@ -316,7 +315,7 @@ final class FieldValueHandler
 
     return preg_replace_callback(
       '/<img\s+[^>]*src=[\'"]([^\'"]*)[\'"][^>]*>/i',
-      function ($matches) use ($path, $allowedExtensions, $allowedMimeTypes) {
+      function ($matches) use ($path, $allowedMimeTypes) {
         $src = $matches[1];
 
         if (filter_var($src, FILTER_VALIDATE_URL)) {
@@ -523,7 +522,7 @@ final class FieldValueHandler
         }
       }
 
-      if (isset($formData[$key])) {
+      if (isset($formData[$key]) && !array_key_exists('parentFieldKey', $field)) {
         if ('repeater' === $field['type']) {
           $repeater_data = is_string($formData[$key]) ? json_decode($formData[$key], true) : $formData[$key];
           // ordering repeater field according to nested repeater layout
@@ -590,8 +589,13 @@ final class FieldValueHandler
           foreach ($value as $row) {
             $table .= '<tr>';
             foreach ($row as $subKey => $subValue) {
+              $subFieldType = self::getFldType($subKey, $formFields);
               if (is_array($subValue)) {
-                $subValue = self::unorderedAnchorListMarkup($subValue);
+                if (self::isCompositeFieldType($subFieldType)) {
+                  $subValue = self::joinCompositeFieldValue($subValue, $subFieldType);
+                } else {
+                  $subValue = self::unorderedAnchorListMarkup($subValue);
+                }
 
                 // $subValue = implode(', ', array_map(function ($v) {
                 //   if (self::isFileTypeValue($v)) {
@@ -607,7 +611,7 @@ final class FieldValueHandler
                 // }, $subValue));
               } else {
                 if (self::isFileTypeValue($subValue)) {
-                  if ('signature' === self::getFldType($subKey, $formFields)) {
+                  if ('signature' === $subFieldType) {
                     if ('signature-failed.png' === $subValue) {
                       $subValue = '';
                     } else {
@@ -628,6 +632,8 @@ final class FieldValueHandler
           if (is_array($value)) {
             $table .= self::unorderedAnchorListMarkup($value);
           }
+        } elseif (self::isCompositeFieldType($fieldType)) {
+          $table .= self::joinCompositeFieldValue($value, $fieldType);
         } elseif ('signature' === $fieldType) {
           if ('signature-failed.png' === $subValue) {
             $table .= '';
@@ -696,8 +702,14 @@ final class FieldValueHandler
         if ('signature' === $fieldType) {
           $stringToReplaceField = self::replaceImgTagForRepeatedSignature($stringToReplaceField, $flatFieldData[$repeaterFieldKey], $repeaterFieldKey);
         }
+        $repeaterFieldData = self::safeFlatString(
+          $flatFieldData[$repeaterFieldKey] ?? '',
+          $fieldType,
+          $repeaterFieldKey,
+          $flatFieldData,
+          $formFields
+        );
 
-        $repeaterFieldData = self::safeFlatString($flatFieldData[$repeaterFieldKey] ?? '', $fieldType);
         $stringToReplaceField = str_replace('${' . $fk . '}', $repeaterFieldData, $stringToReplaceField);
       }
     }
@@ -817,13 +829,26 @@ final class FieldValueHandler
    *
    * @param mixed $data
    * @param string $fldType
+   * @param string|null $fieldKey
+   * @param array|null $allFieldData
+   * @param array|null $formFields
    * @return string
    */
-  public static function safeFlatString($data, $fldType): string
+  public static function safeFlatString($data, $fldType, $fieldKey = null, $allFieldData = null, $formFields = null, $resolveFromParent = true): string
   {
     $newData = self::decodeIfJson($data);
+    if ($resolveFromParent) {
+      $resolvedChildValues = self::extractRepeaterChildFieldValues($fieldKey, $allFieldData, $formFields);
+      if (is_array($resolvedChildValues)) {
+        $newData = $resolvedChildValues;
+      }
+    }
+
     if (is_array($newData)) {
-      return implode(', ', array_map(function ($item) use ($fldType) {
+      if (self::isCompositeFieldType($fldType)) {
+        return self::joinCompositeFieldValue($newData, $fldType);
+      }
+      return implode(', ', array_map(function ($item) use ($fldType, $fieldKey, $allFieldData, $formFields) {
         return is_array($item)
         ? '[' . implode(', ', array_map(function ($itm) use ($fldType) {
           if (in_array($fldType, ['advanced-file-up', 'file-up']) || self::isFileTypeValue($itm)) {
@@ -837,7 +862,7 @@ final class FieldValueHandler
             return $itm;
           }
         }, $item)) . ']'
-        : self::safeFlatString($item, $fldType);
+        : self::safeFlatString($item, $fldType, $fieldKey, $allFieldData, $formFields, false);
       }, $newData));
     }
 
@@ -892,6 +917,74 @@ final class FieldValueHandler
     if (array_key_exists($fldKey, $formFields)) {
       return $formFields[$fldKey]['type'];
     }
+  }
+
+  private static function isCompositeFieldType($fieldType)
+  {
+    return in_array($fieldType, ['name', 'address'], true);
+  }
+
+  private static function joinCompositeFieldValue($value, $fieldType)
+  {
+    if (!is_array($value)) {
+      return (string) $value;
+    }
+
+    $parts = [];
+    array_walk_recursive($value, function ($item) use (&$parts) {
+      if (is_null($item)) {
+        return;
+      }
+
+      $item = (string) $item;
+      if ('' === trim($item) && '0' !== $item) {
+        return;
+      }
+
+      $parts[] = $item;
+    });
+
+    return implode('address' === $fieldType ? ', ' : ' ', $parts);
+  }
+
+  private static function extractRepeaterChildFieldValues($fieldKey, $allFieldData, $formFields)
+  {
+    if (empty($fieldKey) || !is_array($allFieldData) || !is_array($formFields) || !isset($formFields[$fieldKey])) {
+      return null;
+    }
+
+    $fieldData = $formFields[$fieldKey];
+    if (empty($fieldData['parentFieldKey']) || empty($fieldData['name'])) {
+      return null;
+    }
+
+    $parentFieldKey = $fieldData['parentFieldKey'];
+    $parentFieldName = $formFields[$parentFieldKey]['name'] ?? null;
+
+    if (!isset($allFieldData[$parentFieldKey]) || !is_array($allFieldData[$parentFieldKey])) {
+      return null;
+    }
+
+    $childFieldName = $fieldData['name'];
+    $childFieldName = str_replace(['[', ']', $parentFieldName], '', $childFieldName);
+
+    $childValues = [];
+    foreach ($allFieldData[$parentFieldKey] as $row) {
+      if (!is_array($row)) {
+        continue;
+      }
+
+      if (array_key_exists($childFieldName, $row)) {
+        $childValues[] = $row[$childFieldName];
+        continue;
+      }
+
+      if (array_key_exists($fieldKey, $row)) {
+        $childValues[] = $row[$fieldKey];
+      }
+    }
+
+    return $childValues;
   }
 
   /**
@@ -958,6 +1051,8 @@ final class FieldValueHandler
         if (is_array($value)) {
           if (in_array($fldTyp, ['advanced-file-up', 'file-up'])) {
             $newValue = self::unorderedAnchorListMarkup($value);
+          } elseif (self::isCompositeFieldType($fldTyp)) {
+            $newValue = self::joinCompositeFieldValue($value, $fldTyp);
           } else {
             $newValue = implode(', ', $value);
           }

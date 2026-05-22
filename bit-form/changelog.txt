@@ -1,3 +1,84 @@
+= 2.18.9 =
+*Release Date: 10 May, 2025*
+*Improvements:
+    1. Email Notifications: Added an option to send admin and user email notifications upon "Admin Review" status in WP Auth (User Registration).
+    2. HTML Rendering: Improved rendering of user-defined custom HTML in the HTML field and form field content.
+
+*Fix:
+    1. Fixed an issue where smart tags values were not visible in email and PDF templates.
+
+= 2.18.8 =
+*Release Date: 26 April, 2025*
+*Fix:
+    1. Resolved issue with Repeater field value not mapping in the email template.
+    2. Resolved single line comment issue in Custom JavaScript editor.
+
+= 2.18.7 =
+*Release Date: 26 April, 2025*
+*Fix:
+    1. Resolved user entry visibility issue in the entries section.
+
+= 2.18.6 =
+*Release Date: 25 April, 2025*
+*Fix:
+    1. Resolved hCaptcha configuration type mismatch issue.
+
+
+= 2.18.5 =
+*Release Date: 23 April, 2025*
+*New:
+    1. hCaptcha Field: Added a new field to boost security and block spam submissions.
+    2. Elementor Widget: Introduced the Bit Form widget for seamless form integration in Elementor pages.
+
+*Improvements:
+    1. Frontend Data View & Edit: Improved access control for viewing and editing form entries.
+
+*Fix:
+    1. Resolved issues with currency input and value formatting in the Currency field.
+
+
+
+= 2.18.4 =
+*Release Date: 12 April, 2025*
+*Improvement:
+    1. Security: Removed default support for SVG file uploads to enhance security.
+
+= 2.18.2 =
+*Release Date: 24 March, 2025*
+*New:
+    1. Hidden Field: Added a new hidden field type.
+    2. Smart Tag: Introduced ${bf_all_data} smart tag to retrieve all field data in one tag.
+
+*Improvements:
+    1. UI/UX: Moved integration application authorization to a global setting.
+    2. Enhanced accuracy of "Number" function in conditional logic.
+    3. Improved the "Always" action effect in conditional logic.
+
+= 2.18.1 =
+*Release Date: 02 March, 2025*
+ *New:
+    1. Feature: Added PDF downloadable URL in form submit success message.
+
+ *Improvement:
+    1. Enhanced security for Auth 2.0 redirect URls.
+
+ *Fix:
+    1. Enhanced Stripe payment entry twice issue.
+
+= 2.18.0 =
+*Release Date: 25 February, 2025*
+ *New:
+    1. Feature: Added PDF password protection and downloadable link options in PDF settings.
+
+*Improvements:
+    1. Enhanced user experience in the entries table.
+    2. Added customization options for dynamic/static PDF file names.
+
+*Fix:
+    1. Fixed the loading spinner issue on the Draft button.
+    2. Resolved multiple signature issues with PDF attachments.
+
+    
 = 2.17.8 =
 *Release Date: 12 February, 2025*
 *New:

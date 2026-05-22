@@ -244,7 +244,6 @@ final class FrontendFormManager extends FormManager
         $existAuthFilter = has_filter('bitform_wp_user_auth');
 
         if (true === $existAuthFilter) {
-          $filesData = GlobalHelper::sanitize_files_input($_FILES);
           $result = apply_filters('bitform_wp_user_auth', $existAuth[0], $unslashed_post, $parameter);
 
           $result = apply_filters('bitform_filter_wp_user_auth_response', $result, $this->_form_id, $unslashed_post, $parameter);
@@ -277,7 +276,7 @@ final class FrontendFormManager extends FormManager
 
       // transformed dropdown value from string to array
       $newPost = $this->transformDrpdwnValue($unslashed_post);
-
+      $filesData = GlobalHelper::sanitize_files_input($_FILES);
       do_action('bitform_submit_success', $this->_form_id, $entryID, $newPost, $filesData);
 
       $captchaV3Settings = $this->getCaptchaV3Settings();
@@ -347,7 +346,6 @@ final class FrontendFormManager extends FormManager
       $redirectPage = '';
       $regSuccMsg = '';
       $postData = wp_unslash($_POST);
-      $filesData = GlobalHelper::sanitize_files_input($_FILES);
 
       $existAuth = (new IntegrationHandler($this->_form_id))->getAllIntegration('wp_user_auth', 'wp_auth', 1);
       if (!is_wp_error($existAuth) && count($existAuth) > 0) {
@@ -381,6 +379,7 @@ final class FrontendFormManager extends FormManager
 
       // transformed dropdown value from string to array
       $newPost = $this->transformDrpdwnValue($postData);
+      $filesData = GlobalHelper::sanitize_files_input($_FILES);
 
       //TO DO:: submit success action temporarily added for solution of a issue
       do_action('bitform_submit_success', $this->_form_id, $entryID, $newPost, $filesData);

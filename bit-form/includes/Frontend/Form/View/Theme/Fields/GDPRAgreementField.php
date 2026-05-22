@@ -23,6 +23,10 @@ class GDPRAgreementField
     $readonly = '';
     $name = $fieldHelpers->name();
     $value = '';
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
+    // Get dynamic label ID to link the checkbox group to its label for screen readers
+    $labelId = $fieldHelpers->getLabelId();
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
     if ($fieldHelpers->property_exists_nested($field, 'msg->checked')) {
@@ -51,7 +55,7 @@ class GDPRAgreementField
 
     // SVG symbol for checkbox tick
     $svgSymbol = sprintf(
-      '<svg class="%1$s">
+      '<svg class="%1$s" aria-hidden="true">
         <symbol id="%2$s-ck-svg" viewBox="0 0 12 10">
           <polyline
             class="%3$s"
@@ -76,6 +80,7 @@ class GDPRAgreementField
         %7$s
         %8$s
         %9$s
+        %10$s
       />',
       $rowID,
       $contentCount,
@@ -83,6 +88,7 @@ class GDPRAgreementField
       $disabled,
       $readonly,
       $req,
+      $ariaRequired,
       $name,
       $checked,
       $value
@@ -93,23 +99,24 @@ class GDPRAgreementField
       '<span
         %1$s
         data-bx
-        class="%2$s %2$s"
+        class="%2$s %3$s"
       >
         <svg
           width="12"
           height="10"
           viewBox="0 0 12 10"
-          class="%3$s"
+          class="%4$s"
         >
           <use
             data-ck-icn
-            href="#%4$s-ck-svg"
-            class="%5$s"
+            href="#%5$s-ck-svg"
+            class="%6$s"
           />
         </svg>
       </span>',
       $fieldHelpers->getCustomAttributes('bx'),
       $fieldHelpers->getAtomicCls('bx'),
+      $fieldHelpers->getCustomClasses('bx'),
       $fieldHelpers->getAtomicCls('svgwrp'),
       $rowID,
       $fieldHelpers->getAtomicCls('ck-icn')
@@ -169,13 +176,18 @@ class GDPRAgreementField
       '<div
         %1$s
         class="%2$s %3$s"
-      >
-        %4$s
+        role="group"
+        aria-labelledby="%4$s"
         %5$s
+      >
+        %6$s
+        %7$s
       </div>',
       $fieldHelpers->getCustomAttributes('cc'),
       $fieldHelpers->getAtomicCls('cc'),
       $fieldHelpers->getCustomClasses('cc'),
+      $labelId,
+      $ariaDescribedBy,
       $svgSymbol,
       $checkboxWrapperHtml
     );

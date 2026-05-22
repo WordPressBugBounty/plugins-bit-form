@@ -64,6 +64,10 @@ final class FrontendAjax
     if (is_wp_error($submitSatus)) {
       do_action('bitform_submit_error', $form_id, $submitSatus);
       wp_send_json_error($submitSatus->get_error_message(), 400);
+    } elseif (true !== $submitSatus && !\is_array($submitSatus)) {
+      // Validation failed (e.g. OTP) — $submitSatus is the error message string
+      do_action('bitform_submit_error', $form_id, $submitSatus);
+      wp_send_json_error(\is_string($submitSatus) ? $submitSatus : __('Validation failed.', 'bit-form'), 400);
     } else {
       wp_send_json_success($submitSatus);
     }
@@ -86,6 +90,10 @@ final class FrontendAjax
       if (is_wp_error($updateStatus)) {
         do_action('bitform_update_error', $form_id, $updateStatus);
         wp_send_json_error($updateStatus->get_error_message(), 400);
+      } elseif (true !== $updateStatus && !\is_array($updateStatus)) {
+        // Validation failed (e.g. OTP) — $updateStatus is the error message string
+        do_action('bitform_update_error', $form_id, $updateStatus);
+        wp_send_json_error(\is_string($updateStatus) ? $updateStatus : __('Validation failed.', 'bit-form'), 400);
       } else {
         wp_send_json_success($updateStatus);
       }

@@ -62,25 +62,58 @@ class MailerLiteHandler
       }
 
       if ('v2' === $requestParams->version) {
-        $apiEndpoints = self::$_baseUrlV2 . 'groups/';
-        $apiKey = $requestParams->auth_token;
+        $apiEndpoints = self::$_baseUrlV2 . 'groups';
+        $apiKey = trim((string) $requestParams->auth_token);
         $header = [
-          'Authorization' => 'Bearer ' . $apiKey
+          'Authorization' => "Bearer $apiKey",
         ];
-        $response = wp_remote_get($apiEndpoints, [
-          'headers' => $header,
-          'timeout' => 10,
-        ]);
-        $data = wp_remote_retrieve_body($response);
-        $responseObj = json_decode($data);
         $formattedResponse = [];
-        if (isset($responseObj->data)) {
+
+        $httpArgs = [
+          'headers'     => $header,
+          'timeout'     => 30,
+          'redirection' => 0,
+          'httpversion' => '1.1',
+          'user-agent'  => 'Bitforms/' . BITFORMS_VERSION . '; ' . get_bloginfo('url')
+        ];
+
+        $response = wp_remote_get($apiEndpoints, $httpArgs);
+
+        if (is_wp_error($response)) {
+          wp_send_json_error($response->get_error_message(), 400);
+        }
+
+        $responseCode = wp_remote_retrieve_response_code($response);
+        $responseBody = wp_remote_retrieve_body($response);
+        $responseObj = json_decode($responseBody);
+
+        if (200 === $responseCode && isset($responseObj->data)) {
           foreach ($responseObj->data as $value) {
             $formattedResponse[] = [
               'group_id' => $value->id,
               'name'     => $value->name,
             ];
           }
+        } elseif (isset($responseObj->message) && 'Unauthenticated.' === $responseObj->message) {
+          wp_send_json_error(
+            __(
+              'Invalid API Token',
+              'bit-form'
+            ),
+            401
+          );
+        } elseif (isset($responseObj->message)) {
+          wp_send_json_error($responseObj->message, $responseCode ?: 400);
+        } elseif (!empty($responseBody)) {
+          wp_send_json_error($responseBody, $responseCode ?: 400);
+        } else {
+          wp_send_json_error(
+            __(
+              'Unable to fetch MailerLite groups',
+              'bit-form'
+            ),
+            $responseCode ?: 400
+          );
         }
       } else {
         $apiEndpoints = self::$_baseUrlV1 . 'groups/';
@@ -95,7 +128,7 @@ class MailerLiteHandler
         foreach ($response as $value) {
           $formattedResponse[] =
               [
-                'group_id' => $value->id,
+                'group_id' => (string)$value->id,
                 'name'     => $value->name,
               ];
         }

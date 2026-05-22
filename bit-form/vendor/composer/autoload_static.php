@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit7ef9e4c8707b0fde87e4484f88496b1d
+class ComposerStaticInitb1636013be4e69e483046dd9f9d08344
 {
     public static $prefixLengthsPsr4 = array (
         'e' =>
@@ -289,6 +289,7 @@ class ComposerStaticInit7ef9e4c8707b0fde87e4484f88496b1d
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\DecisionBoxField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/DecisionBoxField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\DividerField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/DividerField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\DropdownField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/DropdownField.php',
+        'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\FieldWithChild' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/FieldWithChild.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\FileUploadField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/FileUploadField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\GDPRAgreementField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/GDPRAgreementField.php',
         'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\HCaptchaField' => __DIR__ . '/../..' . '/includes/Frontend/Form/View/Theme/Fields/HCaptchaField.php',
@@ -360,9 +361,9 @@ class ComposerStaticInit7ef9e4c8707b0fde87e4484f88496b1d
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit7ef9e4c8707b0fde87e4484f88496b1d::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit7ef9e4c8707b0fde87e4484f88496b1d::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit7ef9e4c8707b0fde87e4484f88496b1d::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitb1636013be4e69e483046dd9f9d08344::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitb1636013be4e69e483046dd9f9d08344::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitb1636013be4e69e483046dd9f9d08344::$classMap;
 
         }, null, ClassLoader::class);
     }

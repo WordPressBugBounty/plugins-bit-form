@@ -240,6 +240,7 @@ return array(
     'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\DecisionBoxField' => $baseDir . '/includes/Frontend/Form/View/Theme/Fields/DecisionBoxField.php',
     'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\DividerField' => $baseDir . '/includes/Frontend/Form/View/Theme/Fields/DividerField.php',
     'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\DropdownField' => $baseDir . '/includes/Frontend/Form/View/Theme/Fields/DropdownField.php',
+    'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\FieldWithChild' => $baseDir . '/includes/Frontend/Form/View/Theme/Fields/FieldWithChild.php',
     'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\FileUploadField' => $baseDir . '/includes/Frontend/Form/View/Theme/Fields/FileUploadField.php',
     'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\GDPRAgreementField' => $baseDir . '/includes/Frontend/Form/View/Theme/Fields/GDPRAgreementField.php',
     'BitCode\\BitForm\\Frontend\\Form\\View\\Theme\\Fields\\HCaptchaField' => $baseDir . '/includes/Frontend/Form/View/Theme/Fields/HCaptchaField.php',

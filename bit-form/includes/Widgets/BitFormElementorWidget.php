@@ -97,7 +97,7 @@ class BitFormElementorWidget extends Widget_Base
 
     wp_dequeue_style('bitform-style-css');
 
-    $formUpdateVersion = get_option('bit-form_form_update_version');
+    $formUpdateVersion = get_option('bitform_form_update_version');
     wp_register_style('bitform-elementor-style-' . (int) $form_id, $css_path, [], $formUpdateVersion);
     wp_enqueue_style('bitform-elementor-style-' . (int) $form_id);
 

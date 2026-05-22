@@ -35,7 +35,7 @@ final class FormFallback
         $formHandler->admin = new AdminFormHandler();
       }
       $formHandler->admin->startMigrationProcess();
-      update_site_option('bitforms_db_version', '2.0');
+      update_option('bitforms_db_version', '2.0');
       DB::migrate();
       $migrateFormsHandler = new MigrateForms();
       $all_forms = $migrateFormsHandler->migrateToV2();

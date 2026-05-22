@@ -120,6 +120,7 @@ class ImageSelectField
             <img
               src="%4$s"
               alt=""
+              aria-hidden="true"
               class="%5$s %6$s"
               %7$s
             />
@@ -197,6 +198,10 @@ class ImageSelectField
       }
     }
 
+    $labelId = $fieldHelpers->getLabelId();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
+    $roleType = 'radio' === $field->inpType ? 'radiogroup' : 'group';
     return sprintf(
       '<div
         class="%1$s %2$s"
@@ -205,8 +210,12 @@ class ImageSelectField
         <div
           class="%4$s %5$s"
           %6$s
+          role="%7$s"
+          aria-labelledby="%8$s"
+          %9$s
+          %10$s
         >
-          %7$s
+          %11$s
         </div>
       </div>',
       $fieldHelpers->getAtomicCls('inp-fld-wrp'),
@@ -215,6 +224,10 @@ class ImageSelectField
       $fieldHelpers->getAtomicCls('ic'),
       $fieldHelpers->getCustomClasses('ic'),
       $fieldHelpers->getCustomAttributes('ic'),
+      $roleType,
+      $labelId,
+      $ariaDescribedBy,
+      $ariaRequired,
       $imageOption
     );
   }

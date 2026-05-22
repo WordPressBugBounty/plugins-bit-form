@@ -4,7 +4,7 @@
  * Plugin Name: Bit Form
  * Plugin URI:  https://www.bitapps.pro/bit-form
  * Description: Contact Form Builder Plugin: Multi Step Contact Form, Payment Form, Custom Contact Form Plugin by Bit Form
- * Version:     2.22.3
+ * Version:     3.0.0
  * Author:      Contact Form Builder - Bit Form
  * Author URI:  https://www.bitapps.pro
  * Text Domain: bit-form
@@ -21,11 +21,12 @@ if (!defined('ABSPATH')) {
 }
 
 // Define most essential constants.
-define('BITFORMS_VERSION', '2.22.3');
+define('BITFORMS_VERSION', '3.0.0');
 define('BITFORMS_PLUGIN_MAIN_FILE', __FILE__);
+define('BITFORMS_REQUIRED_BITFORMPRO_VERSION', '3.0.0');
 
 global $bitforms_db_version;
-$bitforms_db_version = '2.4';
+$bitforms_db_version = '3.0';
 define('BITFORMS_DB_VERSION', $bitforms_db_version);
 define('BITFORMS_REQUIRED_WP_VERSION', '5.1');
 define('BITFORMS_REQUIRED_PHP_VERSION', '7.4');
@@ -82,3 +83,73 @@ function bitforms_uninstall_plugin()
   do_action('bitforms_uninstall');
 }
 register_uninstall_hook(__FILE__, 'bitforms_uninstall_plugin');
+
+add_action('plugins_loaded', 'bitforms_check_pro_version');
+
+function bitforms_check_pro_version()
+{
+    if (!defined('BITFORMPRO_VERSION')) {
+        return;
+    }
+    if (!version_compare(BITFORMPRO_VERSION, BITFORMS_REQUIRED_BITFORMPRO_VERSION, '>=')) {
+        add_action('admin_notices', 'bitformsProUpgradeNotice');
+    }
+}
+
+function bitformsProUpgradeNotice()
+{
+    // user meta calls safe here — admin_notices fires well after user initialisation
+    $dismissed_for = get_user_meta(get_current_user_id(), 'bitforms_dismiss_pro_upgrade_notice', true);
+    if ($dismissed_for === BITFORMS_REQUIRED_BITFORMPRO_VERSION) {
+        return;
+    }
+
+    $update_url = esc_url(admin_url('plugins.php?plugin_status=upgrade'));
+    $required   = esc_html(BITFORMS_REQUIRED_BITFORMPRO_VERSION);
+
+    // Keep HTML out of translatable strings to prevent translator HTML injection
+    $message = '<strong>' . esc_html__('Bit Form Pro', 'bit-form') . '</strong> '
+        . sprintf(
+            /* translators: %s: minimum required version number */
+            esc_html__('requires an update to version %s or higher for full compatibility.', 'bit-form'),
+            '<strong>' . $required . '</strong>'
+        )
+        . ' <a href="' . $update_url . '">' . esc_html__('Update now', 'bit-form') . '</a>';
+
+    wp_admin_notice(
+        $message,
+        [
+            'type'               => 'error',
+            'dismissible'        => true,
+            'additional_classes' => ['bitforms-pro-upgrade-notice'],
+            'attributes'         => [
+                'data-nonce'    => wp_create_nonce('bitforms_dismiss_pro_notice'),
+                'data-ajax-url' => esc_url(admin_url('admin-ajax.php')),
+            ],
+            'paragraph_wrap'     => true,
+        ]
+    );
+
+    // Script at footer — avoids mid-page inline script
+    add_action('admin_footer', 'bitformsProUpgradeNoticeScript');
+}
+
+function bitformsProUpgradeNoticeScript()
+{
+    ?>
+    <script>
+    (function () {
+        var notice = document.querySelector('.bitforms-pro-upgrade-notice');
+        if (!notice) return;
+        notice.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('notice-dismiss')) return;
+            var fd = new FormData();
+            fd.append('action', 'bitforms_dismiss_pro_notice');
+            fd.append('nonce', notice.dataset.nonce);
+            fetch(notice.dataset.ajaxUrl, { method: 'POST', credentials: 'same-origin', body: fd });
+        });
+    }());
+    </script>
+    <?php
+}
+

@@ -77,6 +77,7 @@ class RadioBoxField
                   height="10"
                   viewBox="0 0 12 10"
                   class="%21$s %22$s"
+                  aria-hidden="true"
                 >
                   <use
                     data-ck-icn
@@ -133,7 +134,8 @@ class RadioBoxField
     if (property_exists($field, 'addOtherOpt') && $field->addOtherOpt) {
       $check = $check ?? '';
       $radioBoxOptions .= sprintf(
-        '      <div
+        '      
+      <div
         %1$s
         class="%2$s %3$s"
       >
@@ -221,16 +223,26 @@ class RadioBoxField
       );
     }
 
+    $labelId = $fieldHelpers->getLabelId();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
     return sprintf(
       '<div
         %1$s
         class="%2$s %3$s"
+        role="radiogroup"
+        aria-labelledby="%4$s"
+        %5$s
+        %6$s
       >
-      %4$s
+        %7$s
       </div>',
       $fieldHelpers->getCustomAttributes('cc'),
       $fieldHelpers->getAtomicCls('cc'),
       $fieldHelpers->getCustomClasses('cc'),
+      $labelId,
+      $ariaDescribedBy,
+      $ariaRequired,
       $radioBoxOptions
     );
   }

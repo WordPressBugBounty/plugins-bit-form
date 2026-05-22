@@ -20,6 +20,8 @@ class FileUploadField
     $suffixIcn = $fh->icon('suffixIcn', 'suf-i');
     $name = $fh->name();
     $req = $fh->required();
+    $ariaDescribedBy = $fh->ariaDescribedBy();
+    $ariaRequired = $fh->ariaRequired();
     $readonlyCls = isset($field->readonly) ? 'readonly' : '';
     $disabledCls = isset($field->disabled) ? 'disabled' : '';
     $btnTxt = isset($field->btnTxt) ? $field->btnTxt : '';
@@ -106,6 +108,8 @@ class FileUploadField
               id="' . $rowID . '-' . $contentCount . '"
               ' . $name . '
               ' . $req . '
+              ' . $ariaRequired . '
+              ' . $ariaDescribedBy . '
               ' . $fh->disabled() . '
               ' . $fh->readonly() . '
               aria-disabled="true"

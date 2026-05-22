@@ -9,6 +9,7 @@ use BitCode\BitForm\Frontend\Form\View\Theme\Fields\CurrencyField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\DecisionBoxField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\DividerField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\DropdownField;
+use BitCode\BitForm\Frontend\Form\View\Theme\Fields\FieldWithChild;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\FileUploadField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\GDPRAgreementField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\HCaptchaField;
@@ -90,8 +91,6 @@ class ThemeBase
       case 'text':
       case 'username':
       case 'number':
-      case 'password':
-      case 'email':
       case 'url':
       case 'date':
       case 'datetime-local':
@@ -100,6 +99,10 @@ class ThemeBase
       case 'week':
       case 'color':
         return TextField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+      case 'password':
+      case 'email':
+      case 'name':
+        return FieldWithChild::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'textarea':
         return TextAreaField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'range':
@@ -195,6 +198,11 @@ class ThemeBase
           return \BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\SignatureField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
         }
         return $proMissingHtml;
+      case 'email-otp':
+        if (class_exists('\BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\EmailOtpField')) {
+          return \BitCode\BitFormPro\Frontend\Form\View\Theme\Fields\EmailOtpField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+        }
+        return $proMissingHtml;
       case 'rating':
         return RatingField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'image-select':
@@ -207,20 +215,5 @@ class ThemeBase
       default:
         break;
     }
-  }
-
-  protected function setTag($tag, $value, $attr = null)
-  {
-    echo '<' . esc_html($tag) . ' ' . esc_html($attr) . '>' . esc_html($value) . '</' . esc_html($tag) . '>';
-  }
-
-  protected function setAttribute($attr, $value = null)
-  {
-    echo ' ' . esc_attr($attr) . "='" . esc_attr($value) . "' ";
-  }
-
-  protected function setSingleValuedAttribute($attr)
-  {
-    echo ' ' . esc_attr($attr) . ' ';
   }
 }

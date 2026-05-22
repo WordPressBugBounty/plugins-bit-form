@@ -20,6 +20,8 @@ class FileUploadField
     $suffixIcn = $fh->icon('suffixIcn', 'suf-i');
     $name = $fh->name();
     $req = $fh->required();
+    $ariaDescribedBy = $fh->ariaDescribedBy();
+    $ariaRequired = $fh->ariaRequired();
     $readonlyCls = isset($field->readonly) ? 'readonly' : '';
     $disabledCls = isset($field->disabled) ? 'disabled' : '';
     $btnTxt = isset($field->btnTxt) ? $field->btnTxt : '';
@@ -32,7 +34,7 @@ class FileUploadField
     $contentCount = count($bfFrontendFormIds);
 
     if ($fh->property_exists_nested($field, 'config->multiple', true)) {
-      $multiple = apply_filters('bitform_file_multiple_attr', 'multiple', $field);
+      $multiple = 'multiple';
     }
 
     if ($fh->property_exists_nested($field, 'config->showSelectStatus', true)) {

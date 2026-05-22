@@ -23,6 +23,9 @@ final class Utilities
     if (!self::isPro()) {
       return false;
     }
+    if (class_exists('BitCode\\BitFormPro\\Core\\Util\\LicenseHelper')) {
+      return \BitCode\BitFormPro\Core\Util\LicenseHelper::hasValidLicense();
+    }
     $integrateData = get_option('bitformpro_integrate_key_data');
 
     return !empty($integrateData)

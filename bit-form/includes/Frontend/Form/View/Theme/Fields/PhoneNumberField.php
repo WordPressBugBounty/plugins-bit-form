@@ -20,6 +20,10 @@ class PhoneNumberField
     $readonly = $fh->readonly();
     $name = $fh->name();
     $ph = $fh->placeholder();
+    $ariaDescribedBy = $fh->ariaDescribedBy();
+    $ariaRequired = $fh->ariaRequired();
+    // Get dynamic label ID to properly link the combobox to its label for screen readers
+    $labelId = $fh->getLabelId();
     $selectedFlagImage = '';
     $dropDownBtn = '';
     $tabIndx = isset($field->disabled) ? -1 : 0;
@@ -33,7 +37,7 @@ class PhoneNumberField
     $hideCountryList = $fh->property_exists_nested($field, 'config->hideCountryList', true);
     $readonlyCls = isset($field->readonly) ? 'readonly' : '';
     $disabledCls = isset($field->disabled) ? 'disabled' : '';
-    $img = htmlentities("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'></svg>");
+    $img = esc_url(includes_url('images/blank.gif'));
 
     $val = $fh->value();
 
@@ -144,15 +148,17 @@ class PhoneNumberField
         '<div
           class="%1$s"
           role="combobox"
+          aria-haspopup="listbox"
           aria-live="assertive"
-          aria-labelledby="country-label-2"
+          aria-labelledby="%2$s"
           aria-expanded="false"
-          tabIndex=%2$s
+          tabIndex=%3$s
         >
-          %3$s
           %4$s
+          %5$s
         </div>',
         $fh->getAtomicCls('dpd-wrp'),
+        $labelId,
         $tabIndx,
         $selectedFlagImage,
         $dropDownBtn
@@ -239,50 +245,54 @@ class PhoneNumberField
           <input
             %7$s
             %8$s
+            %9$s
+            %10$s
             type="text"
             title="Phone-number Hidden Input"
-            class="%9$s d-none"
-            %10$s
-            %11$s
+            class="%11$s d-none"
             %12$s
-          />
-          <div class="%13$s">
+            %13$s
             %14$s
+          />
+          <div class="%15$s">
+            %16$s
             <input
-              %15$s
+              %17$s
               aria-label="Phone Number"
               type="tel"
-              class="%16$s %17$s"
+              class="%18$s %19$s"
               autoComplete="tel"
-              %18$s
-              tabIndex=%19$s
+              %20$s
+              tabIndex=%21$s
             />
-            %20$s
+            %22$s
           </div>
-          %21$s
+          %23$s
         </div>
       </div>',
-      $fh->getAtomicCls('phone-fld-container'),
-      $fh->getCustomAttributes('phone-fld-wrp'),
-      $fh->getAtomicCls('phone-fld-wrp'),
-      $fh->getCustomClasses('phone-fld-wrp'),
-      $readonly,
-      $disabled,
-      $name,
-      $req,
-      $fh->getAtomicCls('phone-hidden-input'),
-      $fh->disabled(),
-      $fh->readonly(),
-      $val,
-      $fh->getAtomicCls('phone-inner-wrp'),
-      $dpdWrap,
-      $fh->getCustomAttributes('phone-number-input'),
-      $fh->getAtomicCls('phone-number-input'),
-      $fh->getCustomClasses('phone-number-input'),
-      $ph,
-      $tabIndx,
-      $selectedCountryClearable,
-      $optionWrap
+      $fh->getAtomicCls('phone-fld-container'),  // 1
+      $fh->getCustomAttributes('phone-fld-wrp'),  // 2
+      $fh->getAtomicCls('phone-fld-wrp'),  // 3
+      $fh->getCustomClasses('phone-fld-wrp'),  // 4
+      $readonly,  // 5
+      $disabled,  // 6
+      $name,  // 7
+      $req,  // 8
+      $ariaRequired,  // 9
+      $ariaDescribedBy,  // 10
+      $fh->getAtomicCls('phone-hidden-input'),  // 11
+      $fh->disabled(),  // 12
+      $fh->readonly(),  // 13
+      $val,  // 14
+      $fh->getAtomicCls('phone-inner-wrp'),  // 15
+      $dpdWrap,  // 16
+      $fh->getCustomAttributes('phone-number-input'),  // 17
+      $fh->getAtomicCls('phone-number-input'),  // 18
+      $fh->getCustomClasses('phone-number-input'),  // 19
+      $ph,  // 20
+      $tabIndx,  // 21
+      $selectedCountryClearable,  // 22
+      $optionWrap  // 23
     );
   }
 }

@@ -19,6 +19,8 @@ class DropdownField
     $val = 'array' === gettype($val) ? ("value='" . implode(',', $val) . "'") : $val;
     $name = $fh->name();
     $req = $fh->required();
+    $ariaDescribedBy = $fh->ariaDescribedBy();
+    $ariaRequired = $fh->ariaRequired();
     $readonlyCls = isset($field->valid->readonly) ? 'readonly' : '';
     $disabledCls = isset($field->valid->disabled) ? 'disabled' : '';
     $selectedOptImage = '';
@@ -301,6 +303,8 @@ class DropdownField
         <input
           ' . $name . '
           ' . $req . '
+          ' . $ariaRequired . '
+          ' . $ariaDescribedBy . '
           type="text"
           title="Dropdown Hidden Input"
           class="' . $fh->getConversationalMultiCls('dpd-hidden-input') . ' d-none"
@@ -313,6 +317,7 @@ class DropdownField
           class="' . $fh->getClassWithFieldKey('dpd-wrp') . ' ' . $fh->getConversationalCls('dpd-slct-wrp') . ' ' . $fh->getCustomClasses('dpd-wrp') . '"
           role="combobox"
           aria-controls=""
+          aria-haspopup="listbox"
           aria-live="assertive"
           aria-expanded="false"
           tabIndex="0"

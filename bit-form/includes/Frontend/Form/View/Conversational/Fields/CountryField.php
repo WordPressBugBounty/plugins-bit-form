@@ -20,6 +20,8 @@ class CountryField
     $disabled = $fieldHelpers->disabled();
     $readonly = $fieldHelpers->readonly();
     $name = $fieldHelpers->name();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
     $selectedFlagImage = '';
     $tabIndx = isset($field->disabled) ? -1 : 0;
     $selectedCountryClearable = '';
@@ -41,7 +43,7 @@ class CountryField
       $img = $img_url . $selectedItm->img;
       $ph = $selectedItm->lbl;
     } else {
-      $img = htmlentities("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>");
+      $img = esc_url(includes_url('images/blank.gif'));
       $ph = isset($field->ph) ? $field->ph : '';
     }
 
@@ -159,6 +161,8 @@ class CountryField
         <input
           ' . $name . '
           ' . $req . '
+          ' . $ariaRequired . '
+          ' . $ariaDescribedBy . '
           type="text"
           title="Country Hidden Input"
           class="' . $fieldHelpers->getConversationalMultiCls('country-hidden-input') . ' d-none"
@@ -171,6 +175,7 @@ class CountryField
           aria-live="assertive"
           aria-label="Select a Country"
           role="combobox"
+          aria-haspopup="listbox"
           aria-expanded="false"
           tabIndex=' . $tabIndx . '
         >

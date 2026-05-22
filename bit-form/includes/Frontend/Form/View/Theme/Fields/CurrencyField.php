@@ -21,6 +21,10 @@ class CurrencyField
     $readonly = $fh->readonly();
     $name = $fh->name();
     $ph = $fh->placeholder();
+    $ariaDescribedBy = $fh->ariaDescribedBy();
+    $ariaRequired = $fh->ariaRequired();
+    // Get dynamic label ID to properly link the combobox to its label for screen readers
+    $labelId = $fh->getLabelId();
     $selectedFlagImage = '';
     $tabIndx = isset($field->disabled) ? -1 : 0;
     $selectedCurrencyClearable = '';
@@ -32,7 +36,7 @@ class CurrencyField
     $value = is_string($value) ? $value : '';
     $numValue = preg_replace('/[^0-9.-]/', '', $value);
 
-    $img = htmlentities("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>");
+    $img = esc_url(includes_url('images/blank.gif'));
 
     if ($fh->property_exists_nested($field, 'config->selectedFlagImage', true)) {
       $selectedFlagImage = sprintf(
@@ -139,16 +143,20 @@ class CurrencyField
         %1$s
         %2$s
         %3$s
+        %4$s
+        %5$s
         type="text"
         title="Currency Hidden Input"
-        class="%4$s d-none"
-        %5$s
-        %6$s
-        value="%7$s"
+        class="%6$s d-none"
+        %7$s
+        %8$s
+        value="%9$s"
       />',
       $fh->getCustomAttributes('currency-hidden-input'),
       $name,
       $req,
+      $ariaRequired,
+      $ariaDescribedBy,
       $fh->getAtomicCls('currency-hidden-input'),
       $disabled,
       $readonly,
@@ -163,8 +171,9 @@ class CurrencyField
           class="%3$s %4$s"
           role="combobox"
           aria-controls="currency-dropdown"
+          aria-haspopup="listbox"
           aria-live="assertive"
-          aria-labelledby="currency-label-2"
+          aria-labelledby="{$labelId}"
           aria-expanded="false"
           tabIndex="%5$s"
         >

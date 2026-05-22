@@ -200,21 +200,21 @@ class FormViewer
     }
     $formHTML =
       '
-      <div id="' . $formIdentifier . '" class="bit-form ' . $this->_form->getAtomicCls("_frm-bg-b{$formID}") . '">
+      <div id="' . $formIdentifier . '" class="b' . $formID . '-bit-form ' . $this->_form->getAtomicCls("_frm-bg-b{$formID}") . ' bit-form bf-form-wrapper">
       ' . $restrictionMsg . '
-          <form novalidate id="form-' . $formIdentifier . '" class="_frm-bc' . $formID . '" ' . $file_upload_tag . ' method=\'post\'>
+          <form novalidate id="form-' . $formIdentifier . '" class="_frm-bc' . $formID . ' bf-form" ' . $file_upload_tag . ' method=\'post\'>
               <input type="text" class="d-none" name="csrf" value="' . $this->_tokens['csrf'] . '">
               <input type="text" class="d-none" name="t_identity" value="' . $this->_tokens['t_identity'] . '">
               ' . $this->honeypotField() . '
               <input type="text" class="d-none" name="bitforms_id" value="bitforms_' . $this->_form->getFormID() . '">
               <div class="bc' . $formID . '-steps-container">
-                ' . $welcomePageHtml . '    
+                ' . $welcomePageHtml . '
                 ' . $fieldHtml . '
+                ' . $conversationNavigationHtml . '
               </div>
           </form>
           <div id=\'bc-form-msg-wrp-' . $formIdentifier . '\' class="bc-form-msg-wrp"></div>
           ' . $abandonmentMsg . '
-          ' . $conversationNavigationHtml . '
       </div>
 ';
 
@@ -255,9 +255,17 @@ class FormViewer
       foreach ($layouts as $key => $lay) {
         $hideOtherSteps = $key > 0 ? 'deactive' : '';
         $step = $key + 1;
+        $ariaHidden = $key > 0 ? 'aria-hidden="true"' : '';
         $fieldHtml .=
           '
-          <div class="' . $this->_form->getAtomicCls("_frm-b{$formID}-stp-cntnt") . ' _frm-b-stp-cntnt ' . $hideOtherSteps . '" data-step="' . $step . '">
+          <div 
+            class="' . $this->_form->getAtomicCls("_frm-b{$formID}-stp-cntnt") . ' _frm-b-stp-cntnt ' . $hideOtherSteps . '" 
+            data-step="' . $step . '"
+            role="tabpanel"
+            id="step-' . $formID . '-' . $step . '-panel"
+            aria-labelledby="step-' . $formID . '-' . $step . '-tab"
+            ' . $ariaHidden . '
+          >
             <div class="_frm-b' . $formID . ' _frm-b">
               ' . $this->getLayoutHtml($lay->layout) . '
             </div>
@@ -294,9 +302,9 @@ class FormViewer
     }
     $formHTML =
       '
-      <div id="' . $formIdentifier . '" class="bit-form ' . $this->_form->getAtomicCls("_frm-bg-b{$formID}") . '">
+      <div id="' . $formIdentifier . '" class="b' . $formID . '-bit-form ' . $this->_form->getAtomicCls("_frm-bg-b{$formID}") . ' bit-form bf-form-wrapper">
       ' . $restrictionMsg . '
-          <form novalidate id="form-' . $formIdentifier . '" class="' . $this->_form->getAtomicCls("_frm-b{$formID}") . '" ' . $file_upload_tag . ' method=\'post\'>
+          <form novalidate id="form-' . $formIdentifier . '" class="' . $this->_form->getAtomicCls("_frm-b{$formID}") . ' bf-form" ' . $file_upload_tag . ' method=\'post\'>
               <input type="text" class="d-none" name="csrf" value="' . $this->_tokens['csrf'] . '">
               <input type="text" class="d-none" name="t_identity" value="' . $this->_tokens['t_identity'] . '">
               ' . $this->honeypotField() . '
@@ -305,6 +313,16 @@ class FormViewer
           </form>
           ' . $abandonmentMsg . '
           <div id=\'bf-form-msg-wrp-' . $formIdentifier . '\'></div>
+          <!-- 
+            Live Region for Screen Reader Announcements (Accessibility)
+          -->
+          <div 
+            class="bf-live-region" 
+            role="status" 
+            aria-live="polite" 
+            aria-atomic="true"
+            style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;"
+          ></div>
           ' . $confMsg . '
       </div>
 ';

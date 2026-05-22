@@ -45,9 +45,10 @@ class ButtonField
     $disabled = $fieldHelpers->disabled();
     // $name = $field->btnTyp === 'submit' ? 'name="bit-form-submit-btn"' : '';
     $name = $fieldHelpers->name();
-    $btnSpinner = '<span class="bf-spinner d-none"></span>';
+    $btnSpinner = '<span class="bf-spinner d-none" aria-hidden="true"></span>';
     $btnClass = self::getBtnClass($field->btnTyp);
     $btnTyp = self::getBtnTyp($field->btnTyp);
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
 
     return sprintf(
       '<div
@@ -60,11 +61,12 @@ class ButtonField
           type="%8$s"
           %9$s
           %10$s
-        >
           %11$s
+        >
           %12$s
           %13$s
           %14$s
+          %15$s
         </button>
       </div>',
       $fieldHelpers->getCustomAttributes('inp-fld-wrp'),                // 1
@@ -77,10 +79,11 @@ class ButtonField
       $btnTyp,                                                           // 8
       $name,                                                             // 9
       $disabled,                                                         // 10
-      $btnPreIcn,                                                        // 11
-      $fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->txt)),  // 12
-      $btnSufIcn,                                                        // 13
-      $btnSpinner                                                        // 14
+      $ariaDescribedBy,                                                  // 11
+      $btnPreIcn,                                                        // 12
+      $fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->txt)),  // 13
+      $btnSufIcn,                                                        // 14
+      $btnSpinner                                                        // 15
     );
   }
 

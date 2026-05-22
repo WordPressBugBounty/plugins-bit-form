@@ -109,7 +109,7 @@ final class Plugin
     }
 
     global $bitforms_db_version;
-    $installed_db_version = get_site_option('bitforms_db_version');
+    $installed_db_version = get_option('bitforms_db_version');
     if ($installed_db_version !== $bitforms_db_version) {
       DB::migrate();
     }
@@ -124,13 +124,13 @@ final class Plugin
    */
   public function init_plugin()
   {
+    $this->update_tables();
     $currentBitFormVersion = BITFORMS_VERSION;
     $installedBitFormVersion = get_option('bitforms_version');
     if ($currentBitFormVersion !== $installedBitFormVersion) {
       (new FormFallback())->resetJsGeneratedPageIds();
     }
     Hooks::init_hooks();
-    $this->update_tables();
     $this->initWidgets();
     do_action('bitform_loaded');
   }

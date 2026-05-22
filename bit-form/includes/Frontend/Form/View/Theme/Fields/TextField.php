@@ -9,13 +9,13 @@ class TextField
   public static function init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error = null, $value = null)
   {
     $inputWrapper = new ClassicInputWrapper($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
-    $input = self::field($field, $rowID, $form_atomic_Cls_map, $value);
+    $input = self::field($field, $rowID, $form_atomic_Cls_map, $value, $formID);
     return $inputWrapper->wrapper($input);
   }
 
-  private static function field($field, $rowID, $form_atomic_Cls_map, $value)
+  private static function field($field, $rowID, $form_atomic_Cls_map, $value, $formID = null)
   {
-    $fieldHelpers = new ClassicFieldHelpers($field, $rowID, $form_atomic_Cls_map);
+    $fieldHelpers = new ClassicFieldHelpers($field, $rowID, $form_atomic_Cls_map, $formID);
 
     $prefixIcn = $fieldHelpers->icon('prefixIcn', 'pre-i');
     $suffixIcn = $fieldHelpers->icon('suffixIcn', 'suf-i');
@@ -27,8 +27,14 @@ class TextField
     $ac = $fieldHelpers->autocomplete();
     $mx = apply_filters('bitform_field_max_attr', '', $field);
     $mn = apply_filters('bitform_field_min_attr', '', $field);
+    $minlength = $fieldHelpers->minlength();
+    $maxlength = $fieldHelpers->maxlength();
+    $maxword = $fieldHelpers->maxword();
+    $minword = $fieldHelpers->minword();
     $ph = $fieldHelpers->placeholder();
     $value = $fieldHelpers->value();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
     $list = '';
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
@@ -42,28 +48,34 @@ class TextField
 
     return sprintf(
       '<div %1$s class="%2$s %3$s">
-      <input
-        %4$s
-        id="%5$s"
-        %6$s
-        class="%7$s %8$s"
-        type="%9$s"
-        %10$s
-        %11$s
-        %12$s
-        %13$s
-        %14$s
-        %15$s
-        %16$s
-        %17$s
-        %18$s
-        %19$s
-        %20$s
-      />
-      %21$s
-      %22$s
-    </div>
-    %23$s',
+        <input
+          %4$s
+          id="%5$s"
+          %6$s
+          class="%7$s %8$s"
+          type="%9$s"
+          %10$s
+          %11$s
+          %12$s
+          %13$s
+          %14$s
+          %15$s
+          %16$s
+          %17$s
+          %18$s
+          %19$s
+          %20$s
+          %21$s
+          %22$s
+          %23$s
+          %24$s
+          %25$s
+          %26$s
+        />
+        %27$s
+        %28$s
+      </div>
+      %29$s',
       $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
       $fieldHelpers->getAtomicCls('inp-fld-wrp'),
       $fieldHelpers->getCustomClasses('inp-fld-wrp'),
@@ -74,11 +86,17 @@ class TextField
       $fieldHelpers->getCustomClasses('fld'),
       esc_attr($field->typ),
       $req,
+      $ariaRequired,
+      $ariaDescribedBy,
       $disabled,
       $readonly,
       $ph,
       $mn,
       $mx,
+      $minlength,
+      $maxlength,
+      $maxword,
+      $minword,
       $ac,
       $inputMode,
       $name,

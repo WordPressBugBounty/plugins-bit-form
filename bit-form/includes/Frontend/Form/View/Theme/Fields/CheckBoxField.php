@@ -54,7 +54,8 @@ class CheckBoxField
           $disabled = 'disabled';
         }
 
-        $checkBoxOptions .= '<div
+        $checkBoxOptions .= '
+        <div
           ' . $fieldHelpers->getCustomAttributes('cw') . '
           class="' . $fieldHelpers->getAtomicCls('cw') . ' ' . $fieldHelpers->getCustomClasses('cw') . '"
         >
@@ -79,7 +80,7 @@ class CheckBoxField
               data-bx
               class="' . $fieldHelpers->getAtomicCls('bx') . ' ' . $fieldHelpers->getCustomClasses('bx') . '"
             >
-              <svg width="12" height="10" viewBox="0 0 12 10" class="' . $fieldHelpers->getAtomicCls('svgwrp') . ' ' . $fieldHelpers->getCustomClasses('svgwrp') . '">
+              <svg width="12" height="10" viewBox="0 0 12 10" class="' . $fieldHelpers->getAtomicCls('svgwrp') . ' ' . $fieldHelpers->getCustomClasses('svgwrp') . '" aria-hidden="true">
                 <use data-ck-icn href="' . $href . '" class="' . $fieldHelpers->getAtomicCls('ck-icn') . ' ' . $fieldHelpers->getCustomClasses('ck-icn') . '" />
               </svg>
             </span>
@@ -100,71 +101,83 @@ class CheckBoxField
     $otherOptLbl = !empty($field->otherOptLbl) ? $field->otherOptLbl : __('Other...', 'bit-form');
     $inputPh = isset($field->otherInpPh) ? "placeholder='{$fieldHelpers->esc_attr($field->otherInpPh)}'" : "placeholder='{$otherOptLbl}'";
     if (property_exists($field, 'addOtherOpt') && $field->addOtherOpt) {
-      $checkBoxOptions .= '<div
-        ' . $fieldHelpers->getCustomAttributes('cw') . '
-        class="' . $fieldHelpers->getAtomicCls('cw') . ' ' . $fieldHelpers->getCustomClasses('cw') . '"
-      >
-        <input
-          id="' . $rowID . '-' . $contentCount . '-chk-' . $optCount . '"
-          data-oopt="' . $rowID . '"
-          type="checkbox"
-          class="' . $fieldHelpers->getAtomicCls('ci') . ' ' . $fieldHelpers->getCustomClasses('ci') . '"
-          ' . $disabled . '
-          value=""
-          ' . $name . '
-        />
-        <label
-          ' . $fieldHelpers->getCustomAttributes('cl') . '
-          data-cl
-          for="' . $rowID . '-' . $contentCount . '-chk-' . $optCount . '"
-          class="' . $fieldHelpers->getAtomicCls('cl') . ' ' . $fieldHelpers->getCustomClasses('cl') . '"
+      $checkBoxOptions .=
+        '<div
+          ' . $fieldHelpers->getCustomAttributes('cw') . '
+          class="' . $fieldHelpers->getAtomicCls('cw') . ' ' . $fieldHelpers->getCustomClasses('cw') . '"
         >
-          <span
-            ' . $fieldHelpers->getCustomAttributes('ck') . '
-            data-bx
-            class="' . $fieldHelpers->getAtomicCls('bx') . ' ' . $fieldHelpers->getAtomicCls('ck') . ' ' . $fieldHelpers->getCustomClasses('ck') . '"
-          >
-            <svg width="12" height="10" viewBox="0 0 12 10" class="' . $fieldHelpers->getAtomicCls('svgwrp') . ' ' . $fieldHelpers->getCustomClasses('svgwrp') . '">
-              <use data-ck-icn href="#' . $rowID . '-ck-svg" class="' . $fieldHelpers->getAtomicCls('ck-icn') . ' ' . $fieldHelpers->getCustomClasses('ck-icn') . '" />
-            </svg>
-          </span>
-          <span
-            ' . $fieldHelpers->getCustomAttributes('ct') . '
-            class="' . $fieldHelpers->getAtomicCls('ct') . ' ' . $fieldHelpers->getCustomClasses('ct') . '"
-          >
-            ' . $otherOptLbl . '
-          </span>
-        </label>
-        <div data-oinp-wrp class="' . $fieldHelpers->getAtomicCls('other-inp-wrp') . '">
           <input
-            data-bf-other-inp="' . $rowID . '-chk-' . $optCount . '"
-            type="text"
-            class="' . $fieldHelpers->getAtomicCls('other-inp') . ' ' . $fieldHelpers->getCustomClasses('other-inp') . '"
-            ' . $inpReq . '
-            ' . $inputPh . '
+            id="' . $rowID . '-' . $contentCount . '-chk-' . $optCount . '"
+            data-oopt="' . $rowID . '"
+            type="checkbox"
+            class="' . $fieldHelpers->getAtomicCls('ci') . ' ' . $fieldHelpers->getCustomClasses('ci') . '"
+            ' . $disabled . '
+            value=""
+            ' . $name . '
           />
-        </div>
-      </div>';
+          <label
+            ' . $fieldHelpers->getCustomAttributes('cl') . '
+            data-cl
+            for="' . $rowID . '-' . $contentCount . '-chk-' . $optCount . '"
+            class="' . $fieldHelpers->getAtomicCls('cl') . ' ' . $fieldHelpers->getCustomClasses('cl') . '"
+          >
+            <span
+              ' . $fieldHelpers->getCustomAttributes('ck') . '
+              data-bx
+              class="' . $fieldHelpers->getAtomicCls('bx') . ' ' . $fieldHelpers->getAtomicCls('ck') . ' ' . $fieldHelpers->getCustomClasses('ck') . '"
+            >
+              <svg width="12" height="10" viewBox="0 0 12 10" class="' . $fieldHelpers->getAtomicCls('svgwrp') . ' ' . $fieldHelpers->getCustomClasses('svgwrp') . '" aria-hidden="true">
+                <use data-ck-icn href="#' . $rowID . '-ck-svg" class="' . $fieldHelpers->getAtomicCls('ck-icn') . ' ' . $fieldHelpers->getCustomClasses('ck-icn') . '" />
+              </svg>
+            </span>
+            <span
+              ' . $fieldHelpers->getCustomAttributes('ct') . '
+              class="' . $fieldHelpers->getAtomicCls('ct') . ' ' . $fieldHelpers->getCustomClasses('ct') . '"
+            >
+              ' . $otherOptLbl . '
+            </span>
+          </label>
+          <div data-oinp-wrp class="' . $fieldHelpers->getAtomicCls('other-inp-wrp') . '">
+            <input
+              data-bf-other-inp="' . $rowID . '-chk-' . $optCount . '"
+              type="text"
+              class="' . $fieldHelpers->getAtomicCls('other-inp') . ' ' . $fieldHelpers->getCustomClasses('other-inp') . '"
+              ' . $inpReq . '
+              ' . $inputPh . '
+            />
+          </div>
+        </div>';
     }
+
+    $labelId = $fieldHelpers->getLabelId();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
 
     return sprintf(
       '<div
         %1$s
         class="%2$s %3$s"
+        role="group"
+        aria-labelledby="%4$s"
+        %5$s
+        %6$s
       >
-        <svg class="%4$s">
-          <symbol id="%5$s-ck-svg" viewBox="0 0 12 10">
+        <svg class="%7$s" aria-hidden="true">
+          <symbol id="%8$s-ck-svg" viewBox="0 0 12 10">
             <polyline
-              class="%6$s"
+              class="%9$s"
               points="1.5 6 4.5 9 10.5 1"
             ></polyline>
           </symbol>
         </svg>
-        %7$s
+        %10$s
       </div>',
       $fieldHelpers->getCustomAttributes('cc'),
       $fieldHelpers->getAtomicCls('cc'),
       $fieldHelpers->getCustomClasses('cc'),
+      $labelId,
+      $ariaDescribedBy,
+      $ariaRequired,
       $fieldHelpers->getAtomicCls('cks'),
       $rowID,
       $fieldHelpers->getAtomicCls('ck-svgline'),

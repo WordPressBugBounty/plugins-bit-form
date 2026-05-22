@@ -26,6 +26,12 @@ class TextAreaField
     $ac = $fieldHelpers->autocomplete();
     $ph = $fieldHelpers->placeholder();
     $value = $fieldHelpers->value();
+    $minlength = $fieldHelpers->minlength();
+    $maxlength = $fieldHelpers->maxlength();
+    $maxword = $fieldHelpers->maxword();
+    $minword = $fieldHelpers->minword();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
 
@@ -46,11 +52,17 @@ class TextAreaField
         id="' . $id . '"
         class="' . $fieldClass . '"
         ' . $req . '
+        ' . $ariaRequired . '
+        ' . $ariaDescribedBy . '
         ' . $disabled . '
         ' . $readonly . '
         ' . $ph . '
         ' . $ac . '
         ' . $name . '
+        ' . $minlength . '
+        ' . $maxlength . '
+        ' . $maxword . '
+        ' . $minword . '
       >' . $escapedValue . '</textarea>
       ' . $prefixIcn . '
       ' . $suffixIcn . '

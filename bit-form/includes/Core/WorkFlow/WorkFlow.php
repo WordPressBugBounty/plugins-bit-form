@@ -70,6 +70,7 @@ final class WorkFlow
         'workflow_run',
         'workflow_behaviour',
         'workflow_condition',
+        'workflow_info',
         'workflow_name',
         'workflow_order',
         'workflow_status',

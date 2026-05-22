@@ -30,6 +30,7 @@ class RepeaterField
           class="%2$s %3$s"
           type="%4$s"
           data-parent-field-name="%5$s"
+          aria-label="Add new row"
         >
           %6$s
           %7$s
@@ -60,6 +61,7 @@ class RepeaterField
             class="%5$s %6$s"
             type="%7$s"
             data-parent-field-name="%8$s"
+            aria-label="Add new row at end"
           >
             %9$s
             %10$s
@@ -91,16 +93,21 @@ class RepeaterField
       }
     }
 
+    // role="region" marks each repeater row as a landmark region
+    // aria-label provides context about which row number this is (dynamically updated by JS)
+    // This helps screen reader users navigate between repeater rows
     $repeatableWrap = sprintf(
       '<div 
         %1$s
         class="%2$s %3$s"
+        role="region"
+        aria-label="Repeater row"
       >
         <div 
           %4$s
           class="%5$s %6$s"
         >   
-          <div class="_frm-b%7$s repeater-grid">
+          <div class="_frm-b%7$s b%7$s-bf-repeater-grid bf-repeater-grid">
             %8$s
           </div>
         </div>
@@ -114,6 +121,7 @@ class RepeaterField
             class="%14$s %15$s"
             type="%16$s"
             data-parent-field-name="%17$s"
+            aria-label="Remove this row"
           >
             %18$s
             %19$s
@@ -145,32 +153,41 @@ class RepeaterField
 
     $repeatedRow = apply_filters('bitform_repeater_repeated_rows', $repeatableWrap, $field);
 
+    // role="group" indicates this is a collection of related form controls
+    // aria-labelledby links to the field label for screen reader context
+    // This helps users understand the repeater structure
     return sprintf(
       '<div 
-      %1$s
-      class="%2$s %3$s"
-    >
-      <div 
-        %4$s
-        class="%5$s %6$s"
+        %1$s
+        class="%2$s %3$s"
       >
-        %7$s
-        %8$s
-        <input
-          type="text"
-          class="d-none"
-          title="Rpeater Index Hidden Input"
-          name="%9$s"
-          value=""
-        />
-      </div>
-    </div>',
+        <div 
+          %4$s
+          class="%5$s %6$s"
+          role="group"
+          aria-labelledby="%7$s"
+          aria-describedby="%8$s"
+        >
+          %9$s
+          %10$s
+          <input
+            type="text"
+            class="d-none"
+            title="Rpeater Index Hidden Input"
+            name="%11$s"
+            value=""
+            aria-hidden="true"
+          />
+        </div>
+      </div>',
       $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
       $fieldHelpers->getAtomicCls('inp-fld-wrp'),
       $fieldHelpers->getCustomClasses('inp-fld-wrp'),
       $fieldHelpers->getCustomAttributes('rpt-fld-wrp'),
       $fieldHelpers->getAtomicCls('rpt-fld-wrp'),
       $fieldHelpers->getCustomClasses('rpt-fld-wrp'),
+      $fieldHelpers->getLabelId(),
+      $fieldHelpers->getErrorId(),
       $repeatedRow,
       $addToEndBtnMarkup,
       $fieldHelpers->esc_attr($field->fieldName . '-repeat-index')

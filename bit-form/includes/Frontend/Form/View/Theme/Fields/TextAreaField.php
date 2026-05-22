@@ -26,6 +26,12 @@ class TextAreaField
     $ac = $fieldHelpers->autocomplete();
     $ph = $fieldHelpers->placeholder();
     $value = $fieldHelpers->value();
+    $minlength = $fieldHelpers->minlength();
+    $maxlength = $fieldHelpers->maxlength();
+    $maxword = $fieldHelpers->maxword();
+    $minword = $fieldHelpers->minword();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
 
@@ -43,9 +49,15 @@ class TextAreaField
         %11$s
         %12$s
         %13$s
-      >%14$s</textarea>
-      %15$s
-      %16$s
+        %14$s
+        %15$s
+        %16$s
+        %17$s
+        %18$s
+        %19$s
+      >%20$s</textarea>
+      %21$s
+      %22$s
     </div>',
       $fieldHelpers->getCustomAttributes('inp-fld-wrp'),
       $fieldHelpers->getAtomicCls('inp-fld-wrp'),
@@ -55,11 +67,17 @@ class TextAreaField
       $fieldHelpers->getAtomicCls('fld'),
       $fieldHelpers->getCustomClasses('fld'),
       $req,
+      $ariaRequired,
+      $ariaDescribedBy,
       $disabled,
       $readonly,
       $ph,
       $ac,
       $name,
+      $minlength,
+      $maxlength,
+      $maxword,
+      $minword,
       $fieldHelpers->esc_textarea($value),
       $prefixIcn,
       $suffixIcn

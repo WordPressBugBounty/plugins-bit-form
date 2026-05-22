@@ -11,7 +11,7 @@ if (!defined('BITFORMS_ASSET_URI')) {
   exit;
 }
 
-$formUpdateVersion = get_option('bit-form_form_update_version');
+$formUpdateVersion = get_option('bitform_form_update_version');
 $formIdSafe = sanitize_key((string) $formID);
 
 $baseCSSPath = "/form-styles/bitform-{$formID}.css";

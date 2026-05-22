@@ -27,8 +27,14 @@ class TextField
     $ac = $fieldHelpers->autocomplete();
     $mx = apply_filters('bitform_field_max_attr', '', $field);
     $mn = apply_filters('bitform_field_min_attr', '', $field);
+    $minlength = $fieldHelpers->minlength();
+    $maxlength = $fieldHelpers->maxlength();
+    $maxword = $fieldHelpers->maxword();
+    $minword = $fieldHelpers->minword();
     $ph = $fieldHelpers->placeholder();
     $value = $fieldHelpers->value();
+    $ariaDescribedBy = $fieldHelpers->ariaDescribedBy();
+    $ariaRequired = $fieldHelpers->ariaRequired();
     $list = '';
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
@@ -55,11 +61,17 @@ class TextField
         class="' . $fieldClass . '"
         type="' . $field->typ . '"
         ' . $req . '
+        ' . $ariaRequired . '
+        ' . $ariaDescribedBy . '
         ' . $disabled . '
         ' . $readonly . '
         ' . $ph . '
         ' . $mn . '
         ' . $mx . '
+        ' . $minlength . '
+        ' . $maxlength . '
+        ' . $maxword . '
+        ' . $minword . '
         ' . $ac . '
         ' . $inputMode . '
         ' . $name . '

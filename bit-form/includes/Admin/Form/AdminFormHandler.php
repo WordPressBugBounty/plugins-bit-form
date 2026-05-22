@@ -807,13 +807,13 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     if (isset($atomic_class_map)) {
       $updateData['atomic_class_map'] = $atomic_class_map;
     }
-    $formUpdateVersion = get_option('bit-form_form_update_version');
+    $formUpdateVersion = get_option('bitform_form_update_version');
     if (!$formUpdateVersion) {
       $formUpdateVersion = 1;
     } else {
       $formUpdateVersion = (int) $formUpdateVersion + 1;
     }
-    update_option('bit-form_form_update_version', $formUpdateVersion);
+    update_option('bitform_form_update_version', $formUpdateVersion);
     do_action('bitform_admin_form_changed');
 
     $update_status = static::$formModel->update(
@@ -2752,6 +2752,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     if (!$webhook_already_exist) {
       $webhook_response = HttpHelper::post($create_webhook_url, $data, $headers);
       if (is_wp_error($webhook_response) || (isset($webhook_response->error) && $webhook_response->error)) {
+        Log::debug_log(['Stripe webhook creation failed' => $webhook_response]);
         return null;
       }
     }

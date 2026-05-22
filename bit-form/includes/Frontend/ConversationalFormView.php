@@ -121,7 +121,7 @@ class ConversationalFormView
 
     $isPreview = isset($_GET['bf_preview']);
 
-    // ConversationalHelpers::setPreviewMode($isPreview);
+    ConversationalHelpers::setPreviewMode($isPreview);
 
     $attr = ['type'=> $formType, 'form_id' => $formID, 'form_preview' => true];
 

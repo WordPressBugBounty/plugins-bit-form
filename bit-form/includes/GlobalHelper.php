@@ -148,6 +148,21 @@ class GlobalHelper
             return is_array($v) ? array_map('absint', $v) : absint($v);
           }, $file_data['size']),
         ];
+        if (isset($file_data['full_path'])) {
+          $sanitized[$field_key]['full_path'] = array_map(function ($v) {
+            return is_array($v) ? array_map('sanitize_text_field', $v) : sanitize_text_field((string) $v);
+          }, $file_data['full_path']);
+        }
+        if (isset($file_data['new_name'])) {
+          $sanitized[$field_key]['new_name'] = array_map(function ($v) {
+            return is_array($v) ? array_map('sanitize_file_name', $v) : sanitize_file_name((string) $v);
+          }, $file_data['new_name']);
+        }
+        if (isset($file_data['file_path'])) {
+          $sanitized[$field_key]['file_path'] = array_map(function ($v) {
+            return is_array($v) ? array_map('sanitize_text_field', $v) : sanitize_text_field((string) $v);
+          }, $file_data['file_path']);
+        }
       } else {
         $sanitized[$field_key] = [
           'name'     => sanitize_file_name($file_data['name']),
@@ -156,6 +171,18 @@ class GlobalHelper
           'error'    => absint($file_data['error']),
           'size'     => absint($file_data['size']),
         ];
+        if (isset($file_data['full_path'])) {
+          $v = $file_data['full_path'];
+          $sanitized[$field_key]['full_path'] = is_array($v) ? array_map('sanitize_text_field', $v) : sanitize_text_field($v);
+        }
+        if (isset($file_data['new_name'])) {
+          $v = $file_data['new_name'];
+          $sanitized[$field_key]['new_name'] = is_array($v) ? array_map('sanitize_file_name', $v) : sanitize_file_name($v);
+        }
+        if (isset($file_data['file_path'])) {
+          $v = $file_data['file_path'];
+          $sanitized[$field_key]['file_path'] = is_array($v) ? array_map('sanitize_text_field', $v) : sanitize_text_field($v);
+        }
       }
     }
     return $sanitized;

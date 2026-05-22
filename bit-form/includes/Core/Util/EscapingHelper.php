@@ -132,6 +132,7 @@ final class EscapingHelper
       'xlink:href'      => true,
       'transform'       => true,
       'viewbox'         => true,
+      'data-ck-icn'     => true,
     ]);
 
     return [
