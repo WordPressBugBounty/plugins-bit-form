@@ -1,13 +1,13 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.0.1
-Stable tag: 3.0.1
+Version: 3.0.2
+Stable tag: 3.0.2
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin, akaioum 
 Tags:  contact form, form, form builder, wp forms, form plugin
 Requires at least: 5.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -29,6 +29,9 @@ Bit Form is built for both beginners and advanced WordPress users. If you need a
 If you need a complex form with **conditional logic, calculations, payment fields, file upload, PDF attachments, email notifications, integrations, and entry management,** Bit Form gives you the tools to build it with minimum effort.
 
 [youtube https://youtu.be/BUX6-BIPfSA]
+
+
+### Useful Links
 
 [Try Demo](https://towp.io/) | [Documentation](https://bit-form.com/wp-docs/) | [Bit Form Repository](https://github.com/Bit-Apps-Pro/bit-form-frontend) | [Youtube Channel](https://www.youtube.com/@bit-apps) | [Support Chat](https://tawk.to/chat/60eac4b6d6e7610a49aab375/1faah0r3e) | [Facebook Community](https://www.facebook.com/groups/bitapps)
 
@@ -476,6 +479,11 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.0.2 =
+*Release Date: 22 May, 2026*
+*Improvements:
+    1. Support File upload field in email and PDF templates.
+
 = 3.0.1=
 *Release Date: 22 May, 2026*
 *Fix:

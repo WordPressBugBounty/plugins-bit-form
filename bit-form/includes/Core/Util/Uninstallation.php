@@ -116,7 +116,7 @@ final class Uninstallation
       'bitforms_salt',
     ];
 
-    $placeholders = implode( ',', array_fill( 0, count( $pluginOptions ), '%s' ) );
+    $placeholders = implode(',', array_fill(0, count($pluginOptions), '%s'));
     $wpdb->query(
       $wpdb->prepare(
         'DELETE FROM `' . $wpdb->prefix . 'options` WHERE option_name IN (' . $placeholders . ')',

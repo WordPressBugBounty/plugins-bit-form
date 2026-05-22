@@ -34,13 +34,32 @@ class FieldWithChild
         $parentChildHTML .= $inputWrapper->childFieldWrapper($input);
       }
     } elseif ('name' === $field->typ) {
+      $parentFieldValue = '';
+      if (isset($field->val)) {
+        $value = $field->val;
+        if (is_array($value)) {
+          $parentFieldValue = (object) $value;
+        } elseif (is_string($value) && !empty($value)) {
+          $parentFieldValue = json_decode($value);
+        }
+      }
       //  for name field there will be no primary field just child fields
       foreach ($childFields as $childFldKey) {
+        if (!isset($childFldKey->fldKey) || !isset($fields->{$childFldKey->fldKey})) {
+          continue;
+        }
         $fldKey = $childFldKey->fldKey;
-        $childField = $fields->$fldKey;
+        $childField = $fields->{$fldKey};
         $isDeactive = property_exists($childField, 'isDeactive') && $childField->isDeactive;
         if ($isDeactive) {
           continue;
+        }
+        $childFieldName = '';
+        if (preg_match('/\[([^\]]+)\]/', $childField->fieldName, $matches)) {
+          $childFieldName = $matches[1];
+        }
+        if ($childFieldName && is_object($parentFieldValue) && property_exists($parentFieldValue, $childFieldName)) {
+          $childField->val = $parentFieldValue->{$childFieldName};
         }
         $input = TextField::init($childField, $fldKey, $field_name . '_confirm', $form_atomic_Cls_map, $formID, $error, $value);
         $parentChildHTML .= $inputWrapper->childFieldWrapper($input);

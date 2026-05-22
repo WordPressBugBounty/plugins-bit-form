@@ -4,7 +4,7 @@
  * Plugin Name: Bit Form
  * Plugin URI:  https://www.bitapps.pro/bit-form
  * Description: Contact Form Builder Plugin: Multi Step Contact Form, Payment Form, Custom Contact Form Plugin by Bit Form
- * Version:     3.0.1
+ * Version:     3.0.2
  * Author:      Contact Form Builder - Bit Form
  * Author URI:  https://www.bitapps.pro
  * Text Domain: bit-form
@@ -21,7 +21,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define most essential constants.
-define('BITFORMS_VERSION', '3.0.1');
+define('BITFORMS_VERSION', '3.0.2');
 define('BITFORMS_PLUGIN_MAIN_FILE', __FILE__);
 define('BITFORMS_REQUIRED_BITFORMPRO_VERSION', '3.0.0');
 
@@ -88,55 +88,55 @@ add_action('plugins_loaded', 'bitforms_check_pro_version');
 
 function bitforms_check_pro_version()
 {
-    if (!defined('BITFORMPRO_VERSION')) {
-        return;
-    }
-    if (!version_compare(BITFORMPRO_VERSION, BITFORMS_REQUIRED_BITFORMPRO_VERSION, '>=')) {
-        add_action('admin_notices', 'bitformsProUpgradeNotice');
-    }
+  if (!defined('BITFORMPRO_VERSION')) {
+    return;
+  }
+  if (!version_compare(BITFORMPRO_VERSION, BITFORMS_REQUIRED_BITFORMPRO_VERSION, '>=')) {
+    add_action('admin_notices', 'bitformsProUpgradeNotice');
+  }
 }
 
 function bitformsProUpgradeNotice()
 {
-    // user meta calls safe here — admin_notices fires well after user initialisation
-    $dismissed_for = get_user_meta(get_current_user_id(), 'bitforms_dismiss_pro_upgrade_notice', true);
-    if ($dismissed_for === BITFORMS_REQUIRED_BITFORMPRO_VERSION) {
-        return;
-    }
+  // user meta calls safe here — admin_notices fires well after user initialisation
+  $dismissed_for = get_user_meta(get_current_user_id(), 'bitforms_dismiss_pro_upgrade_notice', true);
+  if (BITFORMS_REQUIRED_BITFORMPRO_VERSION === $dismissed_for) {
+    return;
+  }
 
-    $update_url = esc_url(admin_url('plugins.php?plugin_status=upgrade'));
-    $required   = esc_html(BITFORMS_REQUIRED_BITFORMPRO_VERSION);
+  $update_url = esc_url(admin_url('plugins.php?plugin_status=upgrade'));
+  $required = esc_html(BITFORMS_REQUIRED_BITFORMPRO_VERSION);
 
-    // Keep HTML out of translatable strings to prevent translator HTML injection
-    $message = '<strong>' . esc_html__('Bit Form Pro', 'bit-form') . '</strong> '
-        . sprintf(
-            /* translators: %s: minimum required version number */
-            esc_html__('requires an update to version %s or higher for full compatibility.', 'bit-form'),
-            '<strong>' . $required . '</strong>'
-        )
-        . ' <a href="' . $update_url . '">' . esc_html__('Update now', 'bit-form') . '</a>';
+  // Keep HTML out of translatable strings to prevent translator HTML injection
+  $message = '<strong>' . esc_html__('Bit Form Pro', 'bit-form') . '</strong> '
+      . sprintf(
+        /* translators: %s: minimum required version number */
+        esc_html__('requires an update to version %s or higher for full compatibility.', 'bit-form'),
+        '<strong>' . $required . '</strong>'
+      )
+      . ' <a href="' . $update_url . '">' . esc_html__('Update now', 'bit-form') . '</a>';
 
-    wp_admin_notice(
-        $message,
-        [
-            'type'               => 'error',
-            'dismissible'        => true,
-            'additional_classes' => ['bitforms-pro-upgrade-notice'],
-            'attributes'         => [
-                'data-nonce'    => wp_create_nonce('bitforms_dismiss_pro_notice'),
-                'data-ajax-url' => esc_url(admin_url('admin-ajax.php')),
-            ],
-            'paragraph_wrap'     => true,
-        ]
-    );
+  wp_admin_notice(
+    $message,
+    [
+      'type'               => 'error',
+      'dismissible'        => true,
+      'additional_classes' => ['bitforms-pro-upgrade-notice'],
+      'attributes'         => [
+        'data-nonce'    => wp_create_nonce('bitforms_dismiss_pro_notice'),
+        'data-ajax-url' => esc_url(admin_url('admin-ajax.php')),
+      ],
+      'paragraph_wrap'     => true,
+    ]
+  );
 
-    // Script at footer — avoids mid-page inline script
-    add_action('admin_footer', 'bitformsProUpgradeNoticeScript');
+  // Script at footer — avoids mid-page inline script
+  add_action('admin_footer', 'bitformsProUpgradeNoticeScript');
 }
 
 function bitformsProUpgradeNoticeScript()
 {
-    ?>
+  ?>
     <script>
     (function () {
         var notice = document.querySelector('.bitforms-pro-upgrade-notice');
@@ -152,4 +152,3 @@ function bitformsProUpgradeNoticeScript()
     </script>
     <?php
 }
-

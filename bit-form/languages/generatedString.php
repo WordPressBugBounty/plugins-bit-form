@@ -4338,8 +4338,6 @@ $bitforms_i18n_strings = array(
 
     'Try searching with different keywords' => __('Try searching with different keywords', 'bit-form'),
 
-    'Name Field' => __('Name Field', 'bit-form'),
-
     'Email OTP' => __('Email OTP', 'bit-form'),
 
     'A verification code will be sent to the specified email address.' => __('A verification code will be sent to the specified email address.', 'bit-form'),

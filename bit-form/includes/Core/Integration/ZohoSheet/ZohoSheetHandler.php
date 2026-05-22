@@ -296,15 +296,32 @@ class ZohoSheetHandler
         $queryParams->headerRow = 1;
       }
 
-      $worksheetHeadersMetaApiEndpoint = "https://sheet.zoho.{$queryParams->dataCenter}/api/v2/{$queryParams->workbook}?method=worksheet.records.fetch&worksheet_name={$queryParams->worksheet}&count=1&header_row={$queryParams->headerRow}";
+      $baseUrl = "https://sheet.zoho.{$queryParams->dataCenter}/api/v2/{$queryParams->workbook}";
+
+      $params = http_build_query([
+        'method'              => 'range.content.get',
+        'worksheet_name'      => $queryParams->worksheet,
+        'start_row'           => $queryParams->headerRow,
+        'end_row'             => $queryParams->headerRow,
+        'start_column'        => 1,
+        'end_column'          => 100
+      ]);
+
+      $worksheetHeadersMetaApiEndpoint = "{$baseUrl}?{$params}";
 
       $authorizationHeader['Authorization'] = "Zoho-oauthtoken {$queryParams->tokenDetails->access_token}";
       $worksheetHeadersMetaResponse = HttpHelper::get($worksheetHeadersMetaApiEndpoint, null, $authorizationHeader);
 
-      // wp_send_json_success($worksheetHeadersMetaResponse, 200);
-
       if (!is_wp_error($worksheetHeadersMetaResponse)) {
-        $allHeaders = array_diff(array_keys((array) $worksheetHeadersMetaResponse->records[0]), ['row_index']);
+        $rowDetails = $worksheetHeadersMetaResponse->range_details[0]->row_details ?? [];
+        $allHeaders = is_array($rowDetails)
+          ? array_map(
+            function ($rowDetail) {
+              return isset($rowDetail->content) ? (string) $rowDetail->content : null;
+            },
+            $rowDetails
+          )
+          : [];
 
         usort($allHeaders, 'strnatcasecmp');
         $response['worksheet_headers'] = $allHeaders;

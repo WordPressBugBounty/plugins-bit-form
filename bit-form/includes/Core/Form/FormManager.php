@@ -392,6 +392,9 @@ class FormManager
       if (isset($field->mul)) {
         $field_details[$key]['mul'] = $field->mul;
       }
+      if (in_array($field_type, ['name'])) {
+        $field_details[$key]['label'] = $field->adminLbl ?? $field->lbl;
+      }
       if ('file-up' === $field_type && isset($field->exts)) {
         $field_details[$key]['valid']['type'] = $field->exts;
       }
