@@ -146,6 +146,11 @@ class TelegramHandler
               'id'   => $list->my_chat_member->chat->id,
               'name' => $list->my_chat_member->chat->title,
             ];
+          } elseif (isset($list->channel_post->chat->title, $list->channel_post->chat->id)) {
+            $allList[$list->channel_post->chat->title] = (object) [
+              'id'   => $list->channel_post->chat->id,
+              'name' => $list->channel_post->chat->title,
+            ];
           }
         }
         uksort($allList, 'strnatcasecmp');

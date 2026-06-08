@@ -1,12 +1,12 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.0.2
-Stable tag: 3.0.2
+Version: 3.0.3
+Stable tag: 3.0.3
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin, akaioum 
 Tags:  contact form, form, form builder, wp forms, form plugin
-Requires at least: 5.0
+Requires at least: 6.4
 Tested up to: 7.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -479,6 +479,17 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.0.3 =
+* Release Date: 6 June, 2026
+
+* Improvements:
+    1. Improved CPT data validation during create and update operations.
+
+* Fixes:
+    1. Fixed required field validation issues for Name child fields (First Name and Last Name).
+    2. Fixed an issue with Telegram integration list fetching.
+    3. Fixed a PDF configuration issue where global PDF settings could be overwritten.
+
 = 3.0.2 =
 *Release Date: 22 May, 2026*
 *Improvements:

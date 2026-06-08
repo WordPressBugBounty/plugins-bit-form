@@ -38,6 +38,23 @@ final class FormFieldValidator
     $hidden_fields = isset($this->_submitted_fields['hidden_fields']) ? $this->_submitted_fields['hidden_fields'] : '';
     unset($this->_submitted_fields['hidden_fields'], $this->_submitted_fields['workflow']);
     foreach ($this->_form_fields as $field_name => $field_data) {
+      // Composite child fields (name/address) submit nested under the parent key
+      // (e.g. $_POST['<parent>']['first_name']). Resolve the child's own value so the
+      // required/type checks below see it, and skip deactivated children entirely.
+      if (isset($field_data['parentFieldKey'])) {
+        if (!empty($field_data['isDeactive'])) {
+          continue;
+        }
+        $parentData = $this->_form_fields[$field_data['parentFieldKey']] ?? null;
+        $parentValue = $this->_submitted_fields[$field_data['parentFieldKey']] ?? null;
+        if (is_array($parentValue)) {
+          $childName = FieldValueHandler::deriveChildName($field_data['name'] ?? '', isset($parentData['name']) ? $parentData['name'] : '');
+          $childValue = FieldValueHandler::extractChildValueFromParentValue($parentValue, $childName, $field_name);
+          if (null !== $childValue) {
+            $this->_submitted_fields[$field_name] = $childValue;
+          }
+        }
+      }
       $submittedFieldData = isset($this->_submitted_fields[$field_name]) ? $this->_submitted_fields[$field_name] : null;
 
       if (('file-up' === $field_data['type'] || 'advanced-file-up' === $field_data['type']) && isset($this->_submitted_files[$field_name]['name'])) {
@@ -188,6 +205,23 @@ final class FormFieldValidator
 
   public function validateRepeatedField($field_name, $field_data, $hidden_fields, $rowIndex, $formID)
   {
+    // Repeated composite child fields are stored per row under the parent key
+    // (e.g. $_POST['<parent>'][$rowIndex]['first_name']). Resolve the child's row value
+    // so the per-row checks operate on it; skip deactivated children.
+    if (isset($field_data['parentFieldKey'])) {
+      if (!empty($field_data['isDeactive'])) {
+        return true;
+      }
+      $parentData = $this->_form_fields[$field_data['parentFieldKey']] ?? null;
+      $parentRowValue = $this->_submitted_fields[$field_data['parentFieldKey']][$rowIndex] ?? null;
+      if (is_array($parentRowValue)) {
+        $childName = FieldValueHandler::deriveChildName($field_data['name'] ?? '', isset($parentData['name']) ? $parentData['name'] : '');
+        $childValue = FieldValueHandler::extractChildValueFromParentValue($parentRowValue, $childName, $field_name);
+        if (null !== $childValue) {
+          $this->_submitted_fields[$field_name][$rowIndex] = $childValue;
+        }
+      }
+    }
     if (isset($this->_submitted_fields[$field_name][$rowIndex])) {
       $values = $this->_submitted_fields[$field_name][$rowIndex];
       $this->_form_fields[$field_name]['value'] = FieldValueHandler::isEmpty($values) ? null : $values;

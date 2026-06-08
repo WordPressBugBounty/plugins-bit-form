@@ -34,6 +34,9 @@ class PostType
     $cpts = get_option('bitform_custom_post_types');
     if (!empty($cpts)) {
       foreach ($cpts as $cpt) {
+        if (empty($cpt->name) || strlen($cpt->name) > 20) {
+          continue;
+        }
         $labels = [
           'name'          => esc_html($cpt->name),
           'singular_name' => esc_html($cpt->singular_label),

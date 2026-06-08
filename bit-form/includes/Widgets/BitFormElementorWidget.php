@@ -6,7 +6,7 @@ use BitCode\BitForm\GlobalHelper;
 use Elementor\Controls_Manager;
 use Elementor\Widget_Base;
 
-if (!\defined('ABSPATH')) {
+if (!defined('ABSPATH')) {
   exit;
 }
 

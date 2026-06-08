@@ -4,10 +4,11 @@
  * Plugin Name: Bit Form
  * Plugin URI:  https://www.bitapps.pro/bit-form
  * Description: Contact Form Builder Plugin: Multi Step Contact Form, Payment Form, Custom Contact Form Plugin by Bit Form
- * Version:     3.0.2
+ * Version:     3.0.3
  * Author:      Contact Form Builder - Bit Form
  * Author URI:  https://www.bitapps.pro
  * Text Domain: bit-form
+ * Requires at least: 6.4
  * Requires PHP: 7.4
  * Domain Path: /languages
  * License: GPLv2 or later
@@ -21,9 +22,9 @@ if (!defined('ABSPATH')) {
 }
 
 // Define most essential constants.
-define('BITFORMS_VERSION', '3.0.2');
+define('BITFORMS_VERSION', '3.0.3');
 define('BITFORMS_PLUGIN_MAIN_FILE', __FILE__);
-define('BITFORMS_REQUIRED_BITFORMPRO_VERSION', '3.0.0');
+define('BITFORMS_REQUIRED_BITFORMPRO_VERSION', '3.0.1');
 
 global $bitforms_db_version;
 $bitforms_db_version = '3.0';

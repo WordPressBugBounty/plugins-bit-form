@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Bit Form 3.0.2\n"
+"Project-Id-Version: Bit Form 3.0.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/bit-form\n"
 "Last-Translator: developer@bitcode.pro\n"
 "Language-Team: support@bitcode.pro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-22T12:56:37+00:00\n"
+"POT-Creation-Date: 2026-06-08T06:10:35+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: bit-form\n"
@@ -43,17 +43,17 @@ msgstr ""
 msgid "https://www.bitapps.pro"
 msgstr ""
 
-#: bitforms.php:111
+#: bitforms.php:112
 msgid "Bit Form Pro"
 msgstr ""
 
 #. translators: %s: minimum required version number
-#: bitforms.php:114
+#: bitforms.php:115
 #, php-format
 msgid "requires an update to version %s or higher for full compatibility."
 msgstr ""
 
-#: bitforms.php:117
+#: bitforms.php:118
 msgid "Update now"
 msgstr ""
 
@@ -167,7 +167,7 @@ msgstr ""
 #: includes/Core/Integration/SendinBlue/SendinBlueHandler.php:217
 #: includes/Core/Integration/SendinBlue/SendinBlueHandler.php:272
 #: includes/Core/Integration/Telegram/TelegramHandler.php:98
-#: includes/Core/Integration/Telegram/TelegramHandler.php:163
+#: includes/Core/Integration/Telegram/TelegramHandler.php:168
 #: includes/Core/Integration/WebHooks/WebHooksHandler.php:93
 #: includes/Core/Integration/WooCommerce/WooCommerceHandler.php:65
 #: includes/Core/Integration/WooCommerce/WooCommerceHandler.php:467
@@ -301,13 +301,13 @@ msgid "App Settings"
 msgstr ""
 
 #: includes/Admin/Admin_Bar.php:70
-#: languages/generatedString.php:3405
+#: languages/generatedString.php:3409
 msgid "Integrations"
 msgstr ""
 
 #: includes/Admin/Admin_Bar.php:71
 #: includes/Admin/Admin_Bar.php:122
-#: languages/generatedString.php:4681
+#: languages/generatedString.php:4685
 msgid "SMTP"
 msgstr ""
 
@@ -318,7 +318,7 @@ msgstr ""
 
 #: includes/Admin/Admin_Bar.php:73
 #: includes/Admin/Admin_Bar.php:134
-#: languages/generatedString.php:4685
+#: languages/generatedString.php:4689
 msgid "CPT"
 msgstr ""
 
@@ -329,7 +329,7 @@ msgstr ""
 
 #: includes/Admin/Admin_Bar.php:75
 #: includes/Admin/Admin_Bar.php:146
-#: languages/generatedString.php:4679
+#: languages/generatedString.php:4683
 msgid "Payments"
 msgstr ""
 
@@ -340,7 +340,7 @@ msgid "Doc & Support"
 msgstr ""
 
 #: includes/Admin/Admin_Bar.php:78
-#: languages/generatedString.php:4429
+#: languages/generatedString.php:4433
 msgid "Get 74% OFF"
 msgstr ""
 
@@ -374,33 +374,33 @@ msgid "Form Saved successfully"
 msgstr ""
 
 #: includes/Admin/Form/AdminFormHandler.php:742
-#: includes/Core/Form/FormManager.php:1507
+#: includes/Core/Form/FormManager.php:1486
 #: languages/generatedString.php:1519
 msgid "User"
 msgstr ""
 
 #: includes/Admin/Form/AdminFormHandler.php:743
-#: includes/Core/Form/FormManager.php:1512
+#: includes/Core/Form/FormManager.php:1491
 msgid "IP address"
 msgstr ""
 
 #: includes/Admin/Form/AdminFormHandler.php:745
-#: includes/Core/Form/FormManager.php:1510
+#: includes/Core/Form/FormManager.php:1489
 msgid "Refer URL"
 msgstr ""
 
 #: includes/Admin/Form/AdminFormHandler.php:746
-#: includes/Core/Form/FormManager.php:1511
+#: includes/Core/Form/FormManager.php:1490
 msgid "Device"
 msgstr ""
 
 #: includes/Admin/Form/AdminFormHandler.php:747
-#: includes/Core/Form/FormManager.php:1513
+#: includes/Core/Form/FormManager.php:1492
 msgid "Created Time"
 msgstr ""
 
 #: includes/Admin/Form/AdminFormHandler.php:748
-#: includes/Core/Form/FormManager.php:1514
+#: includes/Core/Form/FormManager.php:1493
 msgid "Modified Time"
 msgstr ""
 
@@ -754,83 +754,83 @@ msgstr ""
 msgid "URL is invalid"
 msgstr ""
 
-#: includes/Core/Form/FormManager.php:804
+#: includes/Core/Form/FormManager.php:783
 msgid "Sorry, Error occurred in saving form entry"
 msgstr ""
 
-#: includes/Core/Form/FormManager.php:810
+#: includes/Core/Form/FormManager.php:789
 msgid "Sorry, error occurred in logging form entry"
 msgstr ""
 
-#: includes/Core/Form/FormManager.php:888
+#: includes/Core/Form/FormManager.php:867
 msgid "Sorry, Error occured in saving form entry data"
 msgstr ""
 
-#: includes/Core/Form/FormManager.php:952
+#: includes/Core/Form/FormManager.php:931
 msgid "Entry update skipped due to submission restriction."
 msgstr ""
 
-#: includes/Core/Form/FormManager.php:983
-#: includes/Core/Form/FormManager.php:1002
+#: includes/Core/Form/FormManager.php:962
+#: includes/Core/Form/FormManager.php:981
 #: includes/Frontend/Ajax/FrontendAjax.php:252
 msgid "provided form entries does not exists"
 msgstr ""
 
-#: includes/Core/Form/FormManager.php:1175
+#: includes/Core/Form/FormManager.php:1154
 #: includes/Core/WorkFlow/WorkFlow.php:220
 #: includes/Core/WorkFlow/WorkFlow.php:305
 msgid "Entry Updated Successfully"
 msgstr ""
 
-#: includes/Core/Form/FormManager.php:1508
+#: includes/Core/Form/FormManager.php:1487
 #: languages/generatedString.php:409
 msgid "Status"
 msgstr ""
 
-#: includes/Core/Form/Validator/FormFieldValidator.php:71
-#: includes/Core/Form/Validator/FormFieldValidator.php:91
-#: includes/Core/Form/Validator/FormFieldValidator.php:210
-#: includes/Core/Form/Validator/FormFieldValidator.php:227
+#: includes/Core/Form/Validator/FormFieldValidator.php:88
+#: includes/Core/Form/Validator/FormFieldValidator.php:108
+#: includes/Core/Form/Validator/FormFieldValidator.php:244
+#: includes/Core/Form/Validator/FormFieldValidator.php:261
 msgid " is required."
 msgstr ""
 
-#: includes/Core/Form/Validator/FormFieldValidator.php:101
-#: includes/Core/Form/Validator/FormFieldValidator.php:237
+#: includes/Core/Form/Validator/FormFieldValidator.php:118
+#: includes/Core/Form/Validator/FormFieldValidator.php:271
 msgid " should be an email. please provide a valid email address."
 msgstr ""
 
-#: includes/Core/Form/Validator/FormFieldValidator.php:115
-#: includes/Core/Form/Validator/FormFieldValidator.php:246
+#: includes/Core/Form/Validator/FormFieldValidator.php:132
+#: includes/Core/Form/Validator/FormFieldValidator.php:280
 msgid " should be Time Format"
 msgstr ""
 
-#: includes/Core/Form/Validator/FormFieldValidator.php:124
-#: includes/Core/Form/Validator/FormFieldValidator.php:255
+#: includes/Core/Form/Validator/FormFieldValidator.php:141
+#: includes/Core/Form/Validator/FormFieldValidator.php:289
 msgid " should be a phone number"
 msgstr ""
 
-#: includes/Core/Form/Validator/FormFieldValidator.php:133
-#: includes/Core/Form/Validator/FormFieldValidator.php:264
+#: includes/Core/Form/Validator/FormFieldValidator.php:150
+#: includes/Core/Form/Validator/FormFieldValidator.php:298
 msgid " should be a number"
 msgstr ""
 
-#: includes/Core/Form/Validator/FormFieldValidator.php:142
-#: includes/Core/Form/Validator/FormFieldValidator.php:273
+#: includes/Core/Form/Validator/FormFieldValidator.php:159
+#: includes/Core/Form/Validator/FormFieldValidator.php:307
 msgid " should be an URL"
 msgstr ""
 
-#: includes/Core/Form/Validator/FormFieldValidator.php:151
-#: includes/Core/Form/Validator/FormFieldValidator.php:282
+#: includes/Core/Form/Validator/FormFieldValidator.php:168
+#: includes/Core/Form/Validator/FormFieldValidator.php:316
 msgid " should be a date"
 msgstr ""
 
-#: includes/Core/Form/Validator/FormFieldValidator.php:163
-#: includes/Core/Form/Validator/FormFieldValidator.php:294
+#: includes/Core/Form/Validator/FormFieldValidator.php:180
+#: includes/Core/Form/Validator/FormFieldValidator.php:328
 msgid " contains invalid option."
 msgstr ""
 
-#: includes/Core/Form/Validator/FormFieldValidator.php:321
-#: languages/generatedString.php:4909
+#: includes/Core/Form/Validator/FormFieldValidator.php:355
+#: languages/generatedString.php:4913
 msgid "The entered values do not match."
 msgstr ""
 
@@ -840,7 +840,7 @@ msgid "Docs"
 msgstr ""
 
 #: includes/Core/Hooks/Hooks.php:130
-#: languages/generatedString.php:4417
+#: languages/generatedString.php:4421
 msgid "Upgrade to Pro"
 msgstr ""
 
@@ -1075,7 +1075,7 @@ msgstr ""
 msgid "module, fields are required for SendFox api"
 msgstr ""
 
-#: includes/Core/Integration/Telegram/TelegramHandler.php:187
+#: includes/Core/Integration/Telegram/TelegramHandler.php:192
 msgid "module, fields are required for Telegram api"
 msgstr ""
 
@@ -1407,7 +1407,7 @@ msgstr ""
 msgid "Cloudflare Turnstile Validation Error: %s"
 msgstr ""
 
-#: includes/Frontend/Form/FrontendFormManager.php:778
+#: includes/Frontend/Form/FrontendFormManager.php:782
 msgid "Sorry!! You have already submitted from this IP address"
 msgstr ""
 
@@ -7497,4400 +7497,4408 @@ msgid "CPT added successfully, refresh your window"
 msgstr ""
 
 #: languages/generatedString.php:3049
-msgid "Learn more about CPT Integration"
+msgid "Failed to add CPT"
 msgstr ""
 
 #: languages/generatedString.php:3051
-msgid "Post Type Slug *"
+msgid "Learn more about CPT Integration"
 msgstr ""
 
 #: languages/generatedString.php:3053
-msgid "Singular Label *"
+msgid "Post Type Slug *"
 msgstr ""
 
 #: languages/generatedString.php:3055
-msgid "Menu Name *"
+msgid "Singular Label *"
 msgstr ""
 
 #: languages/generatedString.php:3057
-msgid "Menu Icon"
+msgid "Menu Name *"
 msgstr ""
 
 #: languages/generatedString.php:3059
-msgid "Public"
+msgid "Menu Icon"
 msgstr ""
 
 #: languages/generatedString.php:3061
-msgid "This type should be shown in the admin UI and is publicly queryable"
+msgid "Public"
 msgstr ""
 
 #: languages/generatedString.php:3063
-msgid "Publicly Queryable"
+msgid "This type should be shown in the admin UI and is publicly queryable"
 msgstr ""
 
 #: languages/generatedString.php:3065
-msgid "Queries can be performed on the front end"
+msgid "Publicly Queryable"
 msgstr ""
 
 #: languages/generatedString.php:3067
-msgid "Show in REST API"
+msgid "Queries can be performed on the front end"
 msgstr ""
 
 #: languages/generatedString.php:3069
-msgid "To show this post type in the WP REST API"
+msgid "Show in REST API"
 msgstr ""
 
 #: languages/generatedString.php:3071
-msgid "Show in Menu"
+msgid "To show this post type in the WP REST API"
 msgstr ""
 
 #: languages/generatedString.php:3073
-msgid "Show the post type in the admin menu"
+msgid "Show in Menu"
 msgstr ""
 
 #: languages/generatedString.php:3075
-msgid "Show UI"
+msgid "Show the post type in the admin menu"
 msgstr ""
 
 #: languages/generatedString.php:3077
-msgid "Generate UI for managing this post type"
+msgid "Show UI"
 msgstr ""
 
 #: languages/generatedString.php:3079
-msgid "Add Post Type"
+msgid "Generate UI for managing this post type"
 msgstr ""
 
 #: languages/generatedString.php:3081
-msgid "Delete successfully, refresh your window"
+msgid "Add Post Type"
 msgstr ""
 
 #: languages/generatedString.php:3083
-msgid "Delete Post Type"
+msgid "Delete successfully, refresh your window"
 msgstr ""
 
 #: languages/generatedString.php:3085
-msgid "Confirmation"
+msgid "Delete Post Type"
 msgstr ""
 
 #: languages/generatedString.php:3087
-msgid "Are you sure to delete post type?"
+msgid "Confirmation"
 msgstr ""
 
 #: languages/generatedString.php:3089
-msgid "cpt type update successfully, refresh your window"
+msgid "Are you sure to delete post type?"
 msgstr ""
 
 #: languages/generatedString.php:3091
-msgid "Select Type *"
+msgid "cpt type update successfully, refresh your window"
 msgstr ""
 
 #: languages/generatedString.php:3093
-msgid "Menu Icon *"
+msgid "Failed to update CPT"
 msgstr ""
 
 #: languages/generatedString.php:3095
-msgid "public"
+msgid "Select Type *"
 msgstr ""
 
 #: languages/generatedString.php:3097
-msgid "Posts of this type should be shown in the admin UI and is publicly queryable"
+msgid "Menu Icon *"
 msgstr ""
 
 #: languages/generatedString.php:3099
-msgid "Queries can be performed on the front end as part of parse_request()"
+msgid "public"
 msgstr ""
 
 #: languages/generatedString.php:3101
-msgid "To show this post type data in the WP REST API"
+msgid "Posts of this type should be shown in the admin UI and is publicly queryable"
 msgstr ""
 
 #: languages/generatedString.php:3103
-msgid "This show the post type in the admin menu and where to show that menu"
+msgid "Queries can be performed on the front end as part of parse_request()"
 msgstr ""
 
 #: languages/generatedString.php:3105
-msgid "Generate a default UI for managing this post type"
+msgid "To show this post type data in the WP REST API"
 msgstr ""
 
 #: languages/generatedString.php:3107
-msgid "Update Post Type"
+msgid "This show the post type in the admin menu and where to show that menu"
 msgstr ""
 
 #: languages/generatedString.php:3109
-msgid "Update Template"
+msgid "Generate a default UI for managing this post type"
 msgstr ""
 
 #: languages/generatedString.php:3111
-msgid "Template Name:"
+msgid "Update Post Type"
 msgstr ""
 
 #: languages/generatedString.php:3113
-msgid "Browse Template"
+msgid "Update Template"
 msgstr ""
 
 #: languages/generatedString.php:3115
-msgid "Email Templates Coming soon"
+msgid "Template Name:"
 msgstr ""
 
 #: languages/generatedString.php:3117
-msgid "Save Template"
+msgid "Browse Template"
 msgstr ""
 
 #: languages/generatedString.php:3119
-msgid "Payment"
+msgid "Email Templates Coming soon"
 msgstr ""
 
 #: languages/generatedString.php:3121
-msgid "Timeline"
+msgid "Save Template"
 msgstr ""
 
 #: languages/generatedString.php:3123
-msgid "PDF Downloads"
+msgid "Payment"
 msgstr ""
 
 #: languages/generatedString.php:3125
-msgid "Google Ads Information"
+msgid "Timeline"
 msgstr ""
 
 #: languages/generatedString.php:3127
-msgid "No PDF templates available"
+msgid "PDF Downloads"
 msgstr ""
 
 #: languages/generatedString.php:3129
-msgid "Related Info"
+msgid "Google Ads Information"
 msgstr ""
 
 #: languages/generatedString.php:3131
-msgid "Note Deleted Successfully"
+msgid "No PDF templates available"
 msgstr ""
 
 #: languages/generatedString.php:3133
-msgid "updated on:"
+msgid "Related Info"
 msgstr ""
 
 #: languages/generatedString.php:3135
-msgid "created at:"
+msgid "Note Deleted Successfully"
 msgstr ""
 
 #: languages/generatedString.php:3137
-msgid "create new note"
+msgid "updated on:"
 msgstr ""
 
 #: languages/generatedString.php:3139
-msgid "Are you sure to delete this note"
+msgid "created at:"
 msgstr ""
 
 #: languages/generatedString.php:3141
-msgid "No Payment Info Found!"
+msgid "create new note"
 msgstr ""
 
 #: languages/generatedString.php:3143
-msgid "No field data change"
+msgid "Are you sure to delete this note"
 msgstr ""
 
 #: languages/generatedString.php:3145
-msgid "Form Submitted"
+msgid "No Payment Info Found!"
 msgstr ""
 
 #: languages/generatedString.php:3147
-msgid "Show Integration Logs"
+msgid "No field data change"
 msgstr ""
 
 #: languages/generatedString.php:3149
-msgid "Hide Integration Logs"
+msgid "Form Submitted"
 msgstr ""
 
 #: languages/generatedString.php:3151
-msgid "Note"
+msgid "Show Integration Logs"
 msgstr ""
 
 #: languages/generatedString.php:3153
-msgid "Added"
+msgid "Hide Integration Logs"
 msgstr ""
 
 #: languages/generatedString.php:3155
-msgid "Updated"
+msgid "Note"
 msgstr ""
 
 #: languages/generatedString.php:3157
-msgid "Deleted"
+msgid "Added"
 msgstr ""
 
 #: languages/generatedString.php:3159
-msgid "Read More"
+msgid "Updated"
 msgstr ""
 
 #: languages/generatedString.php:3161
-msgid "Show Less"
+msgid "Deleted"
 msgstr ""
 
 #: languages/generatedString.php:3163
-msgid "Note no change"
+msgid "Read More"
 msgstr ""
 
 #: languages/generatedString.php:3165
-msgid "Note Updated Successfully"
+msgid "Show Less"
 msgstr ""
 
 #: languages/generatedString.php:3167
-msgid "Note Added Successfully"
+msgid "Note no change"
 msgstr ""
 
 #: languages/generatedString.php:3169
-msgid "Edit Note"
+msgid "Note Updated Successfully"
 msgstr ""
 
 #: languages/generatedString.php:3171
-msgid "Create New Note"
+msgid "Note Added Successfully"
 msgstr ""
 
 #: languages/generatedString.php:3173
-msgid "Cancel"
+msgid "Edit Note"
 msgstr ""
 
 #: languages/generatedString.php:3175
-msgid "Mollie"
+msgid "Create New Note"
 msgstr ""
 
 #: languages/generatedString.php:3177
-msgid "Transaction ID"
+msgid "Cancel"
 msgstr ""
 
 #: languages/generatedString.php:3179
-msgid "Total Paid"
+msgid "Mollie"
 msgstr ""
 
 #: languages/generatedString.php:3181
-msgid "no data found"
+msgid "Transaction ID"
 msgstr ""
 
 #: languages/generatedString.php:3183
-msgid "PayPal"
+msgid "Total Paid"
 msgstr ""
 
 #: languages/generatedString.php:3185
-msgid "Subscription"
+msgid "no data found"
 msgstr ""
 
 #: languages/generatedString.php:3187
-msgid "Order"
+msgid "PayPal"
 msgstr ""
 
 #: languages/generatedString.php:3189
-msgid "Plan ID"
+msgid "Subscription"
 msgstr ""
 
 #: languages/generatedString.php:3191
-msgid "Next Billing Time"
+msgid "Order"
 msgstr ""
 
 #: languages/generatedString.php:3193
-msgid "Razorpay"
+msgid "Plan ID"
 msgstr ""
 
 #: languages/generatedString.php:3195
-msgid "Email"
+msgid "Next Billing Time"
 msgstr ""
 
 #: languages/generatedString.php:3197
-msgid "Stripe"
+msgid "Razorpay"
 msgstr ""
 
 #: languages/generatedString.php:3199
-msgid "Please select at least one column"
+msgid "Email"
 msgstr ""
 
 #: languages/generatedString.php:3201
-msgid "no response found"
+msgid "Stripe"
 msgstr ""
 
 #: languages/generatedString.php:3203
-msgid "How many rows to export"
+msgid "Please select at least one column"
 msgstr ""
 
 #: languages/generatedString.php:3205
-msgid "Enter row number"
+msgid "no response found"
 msgstr ""
 
 #: languages/generatedString.php:3207
-msgid "Select filter"
+msgid "How many rows to export"
 msgstr ""
 
 #: languages/generatedString.php:3209
-msgid "Select columns"
+msgid "Enter row number"
 msgstr ""
 
 #: languages/generatedString.php:3211
-msgid "Sort Order"
+msgid "Select filter"
 msgstr ""
 
 #: languages/generatedString.php:3213
-msgid "Sort by"
+msgid "Select columns"
 msgstr ""
 
 #: languages/generatedString.php:3215
-msgid "Export File Format"
+msgid "Sort Order"
 msgstr ""
 
 #: languages/generatedString.php:3217
-msgid "Export"
+msgid "Sort by"
 msgstr ""
 
 #: languages/generatedString.php:3219
-msgid "Export Form Data"
+msgid "Export File Format"
 msgstr ""
 
 #: languages/generatedString.php:3221
-msgid "Preview Data"
+msgid "Export"
 msgstr ""
 
 #: languages/generatedString.php:3223
-msgid "Move"
+msgid "Export Form Data"
 msgstr ""
 
 #: languages/generatedString.php:3225
-msgid "Settings"
+msgid "Preview Data"
 msgstr ""
 
 #: languages/generatedString.php:3227
-msgid "Clone"
+msgid "Move"
 msgstr ""
 
 #: languages/generatedString.php:3229
-msgid "Add Field"
+msgid "Settings"
 msgstr ""
 
 #: languages/generatedString.php:3231
-msgid "Remove"
+msgid "Clone"
 msgstr ""
 
 #: languages/generatedString.php:3233
-msgid "Send OTP"
+msgid "Add Field"
 msgstr ""
 
 #: languages/generatedString.php:3235
-msgid "Wait ${bf_resend_countdown}s to Resend"
+msgid "Remove"
 msgstr ""
 
 #: languages/generatedString.php:3237
-msgid "Verify OTP"
+msgid "Send OTP"
 msgstr ""
 
 #: languages/generatedString.php:3239
-msgid "Mollie API key is missing"
+msgid "Wait ${bf_resend_countdown}s to Resend"
 msgstr ""
 
 #: languages/generatedString.php:3241
-msgid "Mollie Redirect Url is not Selected"
+msgid "Verify OTP"
 msgstr ""
 
 #: languages/generatedString.php:3243
-msgid "PayPal Client ID is missing"
+msgid "Mollie API key is missing"
 msgstr ""
 
 #: languages/generatedString.php:3245
-msgid "Razorpay Client ID is missing"
+msgid "Mollie Redirect Url is not Selected"
 msgstr ""
 
 #: languages/generatedString.php:3247
-msgid "Drag and drop fields here"
+msgid "PayPal Client ID is missing"
 msgstr ""
 
 #: languages/generatedString.php:3249
-msgid "Stripe publishable key is missing"
+msgid "Razorpay Client ID is missing"
 msgstr ""
 
 #: languages/generatedString.php:3251
-msgid "History Empty"
+msgid "Drag and drop fields here"
 msgstr ""
 
 #: languages/generatedString.php:3253
-msgid "Please select property you want to import with form"
+msgid "Stripe publishable key is missing"
 msgstr ""
 
 #: languages/generatedString.php:3255
-msgid "Preview Form"
+msgid "History Empty"
 msgstr ""
 
 #: languages/generatedString.php:3257
-msgid "Preview"
+msgid "Please select property you want to import with form"
 msgstr ""
 
 #: languages/generatedString.php:3259
-msgid "Custom CSS/JS"
+msgid "Preview Form"
 msgstr ""
 
 #: languages/generatedString.php:3261
-msgid "How to add Custom CSS/JS:"
+msgid "Preview"
 msgstr ""
 
 #: languages/generatedString.php:3263
-msgid "You can write your custom CSS/JS her. This CSS/JS will be applied in this form only."
+msgid "Custom CSS/JS"
 msgstr ""
 
 #: languages/generatedString.php:3265
-msgid "In order to repopulate form fields, it is necessary to store the submitted data in the database. Please make sure to turn off the \"disable storing form submission data\" option in the form settings."
+msgid "How to add Custom CSS/JS:"
 msgstr ""
 
 #: languages/generatedString.php:3267
-msgid "Form Abandonment"
+msgid "You can write your custom CSS/JS her. This CSS/JS will be applied in this form only."
 msgstr ""
 
 #: languages/generatedString.php:3269
-msgid "How to setup Form Abandonment & save partial form progress:"
+msgid "In order to repopulate form fields, it is necessary to store the submitted data in the database. Please make sure to turn off the \"disable storing form submission data\" option in the form settings."
 msgstr ""
 
 #: languages/generatedString.php:3271
-msgid "Show warning message below the form description"
+msgid "Form Abandonment"
 msgstr ""
 
 #: languages/generatedString.php:3273
-msgid "Places an admin-defined message below the form description, making your users aware that their field values are being saved before submission."
+msgid "How to setup Form Abandonment & save partial form progress:"
 msgstr ""
 
 #: languages/generatedString.php:3275
-msgid "Save draft only for logged in users"
+msgid "Show warning message below the form description"
 msgstr ""
 
 #: languages/generatedString.php:3277
+msgid "Places an admin-defined message below the form description, making your users aware that their field values are being saved before submission."
+msgstr ""
+
+#: languages/generatedString.php:3279
+msgid "Save draft only for logged in users"
+msgstr ""
+
+#: languages/generatedString.php:3281
 msgid "Repopulate form fields with previous partial entry"
 msgstr ""
 
-#: languages/generatedString.php:3280
+#: languages/generatedString.php:3284
 msgid ""
 "If the user is logged in, the form will be repopulated with the previous partial entry from the database.\n"
 "                    Otherwise, from the local storage of the browser."
 msgstr ""
 
-#: languages/generatedString.php:3283
+#: languages/generatedString.php:3287
 msgid "Save draft when user leaves the form page"
 msgstr ""
 
-#: languages/generatedString.php:3285
+#: languages/generatedString.php:3289
 msgid "If turned off, the form will save draft when clicks on the save button or using conditional logic."
 msgstr ""
 
-#: languages/generatedString.php:3287
+#: languages/generatedString.php:3291
 msgid "Allow empty form as Save draft"
 msgstr ""
 
-#: languages/generatedString.php:3289
+#: languages/generatedString.php:3293
 msgid "If turned on, the empty form save as draft when leave page."
 msgstr ""
 
-#: languages/generatedString.php:3291
+#: languages/generatedString.php:3295
 msgid "When to save:"
 msgstr ""
 
-#: languages/generatedString.php:3293
+#: languages/generatedString.php:3297
 msgid "Always save abandoned form entries"
 msgstr ""
 
-#: languages/generatedString.php:3295
+#: languages/generatedString.php:3299
 msgid "Save only if email address or phone number is provided"
 msgstr ""
 
-#: languages/generatedString.php:3297
+#: languages/generatedString.php:3301
 msgid "Landing Page"
 msgstr ""
 
-#: languages/generatedString.php:3299
+#: languages/generatedString.php:3303
 msgid "How to setup Landinge Page"
 msgstr ""
 
-#: languages/generatedString.php:3301
+#: languages/generatedString.php:3305
 msgid "Custom URL"
 msgstr ""
 
-#: languages/generatedString.php:3303
+#: languages/generatedString.php:3307
 msgid "Please try to avoid any duplicate custom url, as it will conflict between the page and Bit Form."
 msgstr ""
 
-#: languages/generatedString.php:3305
+#: languages/generatedString.php:3309
 msgid "Page Title"
 msgstr ""
 
-#: languages/generatedString.php:3307
+#: languages/generatedString.php:3311
 msgid "Share via Direct URL"
 msgstr ""
 
-#: languages/generatedString.php:3309
+#: languages/generatedString.php:3313
 msgid "Share via Direct URL (Conversational Form)"
 msgstr ""
 
-#: languages/generatedString.php:3311
+#: languages/generatedString.php:3315
 msgid "Embed via HTML Code"
 msgstr ""
 
-#: languages/generatedString.php:3313
+#: languages/generatedString.php:3317
 msgid "Embed via HTML Code (Conversational Form)"
 msgstr ""
 
-#: languages/generatedString.php:3315
+#: languages/generatedString.php:3319
 msgid "Customer ID key cann't be empty"
 msgstr ""
 
-#: languages/generatedString.php:3317
+#: languages/generatedString.php:3321
 msgid "save Successfully"
 msgstr ""
 
-#: languages/generatedString.php:3319
+#: languages/generatedString.php:3323
 msgid "save failed Cause:"
 msgstr ""
 
-#: languages/generatedString.php:3321
+#: languages/generatedString.php:3325
 msgid "save failed. please try again"
 msgstr ""
 
-#: languages/generatedString.php:3323
+#: languages/generatedString.php:3327
 msgid "Google Ads"
 msgstr ""
 
-#: languages/generatedString.php:3325
+#: languages/generatedString.php:3329
 msgid "Learn more about Google Ads configuration"
 msgstr ""
 
-#: languages/generatedString.php:3327
+#: languages/generatedString.php:3331
 msgid "Client ID"
 msgstr ""
 
-#: languages/generatedString.php:3329
+#: languages/generatedString.php:3333
 msgid "Client Secret"
 msgstr ""
 
-#: languages/generatedString.php:3331
+#: languages/generatedString.php:3335
 msgid "To get Client ID and SECRET , Please Visit Google API Console"
 msgstr ""
 
-#: languages/generatedString.php:3333
+#: languages/generatedString.php:3337
 msgid "Customer Id (non manager account)"
 msgstr ""
 
-#: languages/generatedString.php:3335
+#: languages/generatedString.php:3339
 msgid "To get Customer ID , Please Visit"
 msgstr ""
 
-#: languages/generatedString.php:3337
+#: languages/generatedString.php:3341
 msgid "Google Ads Manager Account"
 msgstr ""
 
-#: languages/generatedString.php:3339
+#: languages/generatedString.php:3343
 msgid "Saving General Settings..."
 msgstr ""
 
-#: languages/generatedString.php:3341
+#: languages/generatedString.php:3345
 msgid "Global Settings"
 msgstr ""
 
-#: languages/generatedString.php:3343
+#: languages/generatedString.php:3347
 msgid "Validation Error/Invalid Message."
 msgstr ""
 
-#: languages/generatedString.php:3345
+#: languages/generatedString.php:3349
 msgid "Generate Token after page load to prevent conflict with cache plugins."
 msgstr ""
 
-#: languages/generatedString.php:3347
+#: languages/generatedString.php:3351
 msgid "Other Settings"
 msgstr ""
 
-#: languages/generatedString.php:3349
+#: languages/generatedString.php:3353
 msgid "Delete all data table when delete plugin."
 msgstr ""
 
-#: languages/generatedString.php:3351
+#: languages/generatedString.php:3355
 msgid "Usage Reporting Opt In."
 msgstr ""
 
-#: languages/generatedString.php:3353
+#: languages/generatedString.php:3357
 msgid "Edit Global Message (Type:"
 msgstr ""
 
-#: languages/generatedString.php:3355
+#: languages/generatedString.php:3359
 msgid "Messages saved successfully."
 msgstr ""
 
-#: languages/generatedString.php:3357
+#: languages/generatedString.php:3361
 msgid "Note: This global message will be applied to all forms and fields unless a custom error message is set for an individual field. Also you can use the"
 msgstr ""
 
-#: languages/generatedString.php:3359
+#: languages/generatedString.php:3363
 msgid "Shortcode patterns (Ex:"
 msgstr ""
 
-#: languages/generatedString.php:3361
+#: languages/generatedString.php:3365
 msgid "to dynamically replace field-specific labels/values."
 msgstr ""
 
-#: languages/generatedString.php:3363
+#: languages/generatedString.php:3367
 msgid "Required Field"
 msgstr ""
 
-#: languages/generatedString.php:3365
+#: languages/generatedString.php:3369
 msgid "Invalid Email"
 msgstr ""
 
-#: languages/generatedString.php:3367
+#: languages/generatedString.php:3371
 msgid "Invalid URL"
 msgstr ""
 
-#: languages/generatedString.php:3369
+#: languages/generatedString.php:3373
 msgid "Invalid Number"
 msgstr ""
 
-#: languages/generatedString.php:3371
+#: languages/generatedString.php:3375
 msgid "Invalid Phone Number"
 msgstr ""
 
-#: languages/generatedString.php:3373
+#: languages/generatedString.php:3377
 msgid "Minimum Value"
 msgstr ""
 
-#: languages/generatedString.php:3375
+#: languages/generatedString.php:3379
 msgid "Maximum Value"
 msgstr ""
 
-#: languages/generatedString.php:3377
+#: languages/generatedString.php:3381
 msgid "Input mask"
 msgstr ""
 
-#: languages/generatedString.php:3379
+#: languages/generatedString.php:3383
 msgid "Regex Pattern"
 msgstr ""
 
-#: languages/generatedString.php:3381
+#: languages/generatedString.php:3385
 msgid "Minimum Option Count"
 msgstr ""
 
-#: languages/generatedString.php:3383
+#: languages/generatedString.php:3387
 msgid "Maximum Option Count"
 msgstr ""
 
-#: languages/generatedString.php:3385
+#: languages/generatedString.php:3389
 msgid "Minimum File Count"
 msgstr ""
 
-#: languages/generatedString.php:3387
+#: languages/generatedString.php:3391
 msgid "Maximum File Count"
 msgstr ""
 
-#: languages/generatedString.php:3389
+#: languages/generatedString.php:3393
 msgid "Maximum File Size"
 msgstr ""
 
-#: languages/generatedString.php:3391
+#: languages/generatedString.php:3395
 msgid "Other Option Required"
 msgstr ""
 
-#: languages/generatedString.php:3393
+#: languages/generatedString.php:3397
 msgid "Unique Entry Value"
 msgstr ""
 
-#: languages/generatedString.php:3395
+#: languages/generatedString.php:3399
 msgid "Unique User"
 msgstr ""
 
-#: languages/generatedString.php:3397
+#: languages/generatedString.php:3401
 msgid "App delete successfully."
 msgstr ""
 
-#: languages/generatedString.php:3399
+#: languages/generatedString.php:3403
 msgid "App deletion failed Cause"
 msgstr ""
 
-#: languages/generatedString.php:3401
+#: languages/generatedString.php:3405
 msgid "App deletion failed. please try again"
 msgstr ""
 
-#: languages/generatedString.php:3403
+#: languages/generatedString.php:3407
 msgid "Are you sure to delete this App configuration?"
 msgstr ""
 
-#: languages/generatedString.php:3407
+#: languages/generatedString.php:3411
 msgid "How to setup Integrations:"
 msgstr ""
 
-#: languages/generatedString.php:3409
+#: languages/generatedString.php:3413
 msgid "Connected/Authorized Platforms"
 msgstr ""
 
-#: languages/generatedString.php:3411
+#: languages/generatedString.php:3415
 msgid "Search Available Integrations..."
 msgstr ""
 
-#: languages/generatedString.php:3413
+#: languages/generatedString.php:3417
 msgid "Available Integrations"
 msgstr ""
 
-#: languages/generatedString.php:3415
+#: languages/generatedString.php:3419
 msgid "Submit button cannot be removed"
 msgstr ""
 
-#: languages/generatedString.php:3417
+#: languages/generatedString.php:3421
 msgid "Integration deletion failed Cause"
 msgstr ""
 
-#: languages/generatedString.php:3419
+#: languages/generatedString.php:3423
 msgid "Integration deletion failed. please try again"
 msgstr ""
 
-#: languages/generatedString.php:3421
+#: languages/generatedString.php:3425
 msgid "Are you sure to delete this integration?"
 msgstr ""
 
-#: languages/generatedString.php:3423
+#: languages/generatedString.php:3427
 msgid "Are you sure to clone this integration?"
 msgstr ""
 
-#: languages/generatedString.php:3425
+#: languages/generatedString.php:3429
 msgid "Integration clone failed Cause"
 msgstr ""
 
-#: languages/generatedString.php:3427
+#: languages/generatedString.php:3431
 msgid "Integration clone failed."
 msgstr ""
 
-#: languages/generatedString.php:3429
+#: languages/generatedString.php:3433
 msgid "Integrate your form with your favorite apps and services."
 msgstr ""
 
-#: languages/generatedString.php:3431
+#: languages/generatedString.php:3435
 msgid "Date Time (Advanced)"
 msgstr ""
 
-#: languages/generatedString.php:3433
+#: languages/generatedString.php:3437
 msgid "Advanced Date Time"
 msgstr ""
 
-#: languages/generatedString.php:3435
+#: languages/generatedString.php:3439
 msgid "Please Select a Date"
 msgstr ""
 
-#: languages/generatedString.php:3437
+#: languages/generatedString.php:3441
 msgid "Spacer"
 msgstr ""
 
-#: languages/generatedString.php:3439
+#: languages/generatedString.php:3443
 msgid "First Name"
 msgstr ""
 
-#: languages/generatedString.php:3441
+#: languages/generatedString.php:3445
 msgid "Last Name"
 msgstr ""
 
-#: languages/generatedString.php:3443
+#: languages/generatedString.php:3447
 msgid "Text"
 msgstr ""
 
-#: languages/generatedString.php:3445
+#: languages/generatedString.php:3449
 msgid "Placeholder..."
 msgstr ""
 
-#: languages/generatedString.php:3447
+#: languages/generatedString.php:3451
 msgid "Multiline Text"
 msgstr ""
 
-#: languages/generatedString.php:3449
+#: languages/generatedString.php:3453
 msgid "Multi-Line Text"
 msgstr ""
 
-#: languages/generatedString.php:3451
+#: languages/generatedString.php:3455
 msgid "example@mail.com"
 msgstr ""
 
-#: languages/generatedString.php:3453
+#: languages/generatedString.php:3457
 msgid "Number"
 msgstr ""
 
-#: languages/generatedString.php:3455
+#: languages/generatedString.php:3459
 msgid "e.g. 123"
 msgstr ""
 
-#: languages/generatedString.php:3457
+#: languages/generatedString.php:3461
 msgid "Select"
 msgstr ""
 
-#: languages/generatedString.php:3459
+#: languages/generatedString.php:3463
 msgid "Radio Button"
 msgstr ""
 
-#: languages/generatedString.php:3461
+#: languages/generatedString.php:3465
 msgid "Radio"
 msgstr ""
 
-#: languages/generatedString.php:3463
+#: languages/generatedString.php:3467
 msgid "Option 1"
 msgstr ""
 
-#: languages/generatedString.php:3465
+#: languages/generatedString.php:3469
 msgid "Option 2"
 msgstr ""
 
-#: languages/generatedString.php:3467
+#: languages/generatedString.php:3471
 msgid "Option 3"
 msgstr ""
 
-#: languages/generatedString.php:3469
+#: languages/generatedString.php:3473
 msgid "Checkbox"
 msgstr ""
 
-#: languages/generatedString.php:3471
+#: languages/generatedString.php:3475
 msgid "Check Boxs"
 msgstr ""
 
-#: languages/generatedString.php:3473
+#: languages/generatedString.php:3477
 msgid "Dropdown"
 msgstr ""
 
-#: languages/generatedString.php:3475
+#: languages/generatedString.php:3479
 msgid "File Upload"
 msgstr ""
 
-#: languages/generatedString.php:3477
+#: languages/generatedString.php:3481
 msgid "Advance File Upload"
 msgstr ""
 
-#: languages/generatedString.php:3479
+#: languages/generatedString.php:3483
 msgid "Advanced File Upload"
 msgstr ""
 
-#: languages/generatedString.php:3481
+#: languages/generatedString.php:3485
 msgid "Country"
 msgstr ""
 
-#: languages/generatedString.php:3483
+#: languages/generatedString.php:3487
 msgid "Enter Amount.."
 msgstr ""
 
-#: languages/generatedString.php:3485
+#: languages/generatedString.php:3489
 msgid "Phone Number"
 msgstr ""
 
-#: languages/generatedString.php:3487
+#: languages/generatedString.php:3491
 msgid "Enter Phone Number"
 msgstr ""
 
-#: languages/generatedString.php:3489
+#: languages/generatedString.php:3493
 msgid "Username"
 msgstr ""
 
-#: languages/generatedString.php:3491
+#: languages/generatedString.php:3495
 msgid "e.g. John Doe"
 msgstr ""
 
-#: languages/generatedString.php:3493
+#: languages/generatedString.php:3497
 msgid "Password"
 msgstr ""
 
-#: languages/generatedString.php:3495
+#: languages/generatedString.php:3499
 msgid "Password Field"
 msgstr ""
 
-#: languages/generatedString.php:3497
+#: languages/generatedString.php:3501
 msgid "Slider"
 msgstr ""
 
-#: languages/generatedString.php:3499
+#: languages/generatedString.php:3503
 msgid "Date"
 msgstr ""
 
-#: languages/generatedString.php:3501
+#: languages/generatedString.php:3505
 msgid "Pick A Date"
 msgstr ""
 
-#: languages/generatedString.php:3503
+#: languages/generatedString.php:3507
 msgid "Time"
 msgstr ""
 
-#: languages/generatedString.php:3505
+#: languages/generatedString.php:3509
 msgid "Date-Time"
 msgstr ""
 
-#: languages/generatedString.php:3507
+#: languages/generatedString.php:3511
 msgid "Select Date-Time"
 msgstr ""
 
-#: languages/generatedString.php:3509
+#: languages/generatedString.php:3513
 msgid "Week"
 msgstr ""
 
-#: languages/generatedString.php:3511
+#: languages/generatedString.php:3515
 msgid "Select Week"
 msgstr ""
 
-#: languages/generatedString.php:3513
+#: languages/generatedString.php:3517
 msgid "Month"
 msgstr ""
 
-#: languages/generatedString.php:3515
+#: languages/generatedString.php:3519
 msgid "Month Input"
 msgstr ""
 
-#: languages/generatedString.php:3517
+#: languages/generatedString.php:3521
 msgid "URL"
 msgstr ""
 
-#: languages/generatedString.php:3519
+#: languages/generatedString.php:3523
 msgid "https://www.example.com"
 msgstr ""
 
-#: languages/generatedString.php:3521
+#: languages/generatedString.php:3525
 msgid "GDPR Agreement"
 msgstr ""
 
-#: languages/generatedString.php:3523
+#: languages/generatedString.php:3527
 msgid "I consent to having this website store my submitted information so they can respond to my inquiry. Learn more in"
 msgstr ""
 
-#: languages/generatedString.php:3525
+#: languages/generatedString.php:3529
 msgid "Our Privacy Policy."
 msgstr ""
 
-#: languages/generatedString.php:3527
+#: languages/generatedString.php:3531
 msgid "Decision Box"
 msgstr ""
 
-#: languages/generatedString.php:3529
+#: languages/generatedString.php:3533
 msgid "reCAPTCHA v2"
 msgstr ""
 
-#: languages/generatedString.php:3531
+#: languages/generatedString.php:3535
 msgid "Turnstile"
 msgstr ""
 
-#: languages/generatedString.php:3533
+#: languages/generatedString.php:3537
 msgid "Repeater"
 msgstr ""
 
-#: languages/generatedString.php:3535
+#: languages/generatedString.php:3539
 msgid "Signature"
 msgstr ""
 
-#: languages/generatedString.php:3537
+#: languages/generatedString.php:3541
 msgid "Rating"
 msgstr ""
 
-#: languages/generatedString.php:3539
+#: languages/generatedString.php:3543
 msgid "Terrible"
 msgstr ""
 
-#: languages/generatedString.php:3541
+#: languages/generatedString.php:3545
 msgid "Bad"
 msgstr ""
 
-#: languages/generatedString.php:3543
+#: languages/generatedString.php:3547
 msgid "Satisfied"
 msgstr ""
 
-#: languages/generatedString.php:3545
+#: languages/generatedString.php:3549
 msgid "Good"
 msgstr ""
 
-#: languages/generatedString.php:3547
+#: languages/generatedString.php:3551
 msgid "Excellent"
 msgstr ""
 
-#: languages/generatedString.php:3549
+#: languages/generatedString.php:3553
 msgid "Image Select"
 msgstr ""
 
-#: languages/generatedString.php:3551
+#: languages/generatedString.php:3555
 msgid "Option 4"
 msgstr ""
 
-#: languages/generatedString.php:3553
+#: languages/generatedString.php:3557
 msgid "Hidden Field"
 msgstr ""
 
-#: languages/generatedString.php:3555
+#: languages/generatedString.php:3559
 msgid "Set Default Value"
 msgstr ""
 
-#: languages/generatedString.php:3557
+#: languages/generatedString.php:3561
 msgid "Pay with Stripe"
 msgstr ""
 
-#: languages/generatedString.php:3559
+#: languages/generatedString.php:3563
 msgid "Pay now"
 msgstr ""
 
-#: languages/generatedString.php:3561
+#: languages/generatedString.php:3565
 msgid "Pay with Mollie"
 msgstr ""
 
-#: languages/generatedString.php:3563
+#: languages/generatedString.php:3567
 msgid "Shortcode"
 msgstr ""
 
-#: languages/generatedString.php:3565
+#: languages/generatedString.php:3569
 msgid "Button"
 msgstr ""
 
-#: languages/generatedString.php:3567
+#: languages/generatedString.php:3571
 msgid "Draft Button"
 msgstr ""
 
-#: languages/generatedString.php:3569
+#: languages/generatedString.php:3573
 msgid "Save Draft"
 msgstr ""
 
-#: languages/generatedString.php:3571
+#: languages/generatedString.php:3575
 msgid "Next Step"
 msgstr ""
 
-#: languages/generatedString.php:3573
+#: languages/generatedString.php:3577
 msgid "Previous Step"
 msgstr ""
 
-#: languages/generatedString.php:3575
+#: languages/generatedString.php:3579
 msgid "Previous"
 msgstr ""
 
-#: languages/generatedString.php:3577
+#: languages/generatedString.php:3581
 msgid "Section"
 msgstr ""
 
-#: languages/generatedString.php:3579
+#: languages/generatedString.php:3583
 msgid "Image"
 msgstr ""
 
-#: languages/generatedString.php:3581
+#: languages/generatedString.php:3585
 msgid "Divider"
 msgstr ""
 
-#: languages/generatedString.php:3583
+#: languages/generatedString.php:3587
 msgid "Migration Issue Detected"
 msgstr ""
 
-#: languages/generatedString.php:3585
+#: languages/generatedString.php:3589
 msgid "There may have been a problem during auto-migrating your Bit Forms from V1 to V2."
 msgstr ""
 
-#: languages/generatedString.php:3587
+#: languages/generatedString.php:3591
 msgid "Please contact support for assistance at"
 msgstr ""
 
-#: languages/generatedString.php:3589
+#: languages/generatedString.php:3593
 msgid "Migrating to V2"
 msgstr ""
 
-#: languages/generatedString.php:3591
+#: languages/generatedString.php:3595
 msgid "Please wait while we migrate your data to V2"
 msgstr ""
 
-#: languages/generatedString.php:3593
+#: languages/generatedString.php:3597
 msgid "This may take a few minutes..."
 msgstr ""
 
-#: languages/generatedString.php:3595
+#: languages/generatedString.php:3599
 msgid "Meanwhile do not close this window."
 msgstr ""
 
-#: languages/generatedString.php:3597
+#: languages/generatedString.php:3601
 msgid "Mollie Settings"
 msgstr ""
 
-#: languages/generatedString.php:3599
+#: languages/generatedString.php:3603
 msgid "API key:"
 msgstr ""
 
-#: languages/generatedString.php:3601
+#: languages/generatedString.php:3605
 msgid "To get API key, Please Visit"
 msgstr ""
 
-#: languages/generatedString.php:3603
+#: languages/generatedString.php:3607
 msgid "Mollie Developer Dashboard"
 msgstr ""
 
-#: languages/generatedString.php:3605
+#: languages/generatedString.php:3609
 msgid "Step-"
 msgstr ""
 
-#: languages/generatedString.php:3607
+#: languages/generatedString.php:3611
 msgid "Clone Step"
 msgstr ""
 
-#: languages/generatedString.php:3609
+#: languages/generatedString.php:3613
 msgid "Delete Step"
 msgstr ""
 
-#: languages/generatedString.php:3611
+#: languages/generatedString.php:3615
 msgid "Add New Step"
 msgstr ""
 
-#: languages/generatedString.php:3613
+#: languages/generatedString.php:3617
 msgid "Add Steps"
 msgstr ""
 
-#: languages/generatedString.php:3615
+#: languages/generatedString.php:3619
 msgid "Multi step settings"
 msgstr ""
 
-#: languages/generatedString.php:3617
+#: languages/generatedString.php:3621
 msgid "Layouts are in sync"
 msgstr ""
 
-#: languages/generatedString.php:3619
+#: languages/generatedString.php:3623
 msgid "Layouts will sync on breakpoint switch or form update."
 msgstr ""
 
-#: languages/generatedString.php:3621
+#: languages/generatedString.php:3625
 msgid "Layout sync settings"
 msgstr ""
 
-#: languages/generatedString.php:3623
+#: languages/generatedString.php:3627
 msgid "All fields are required"
 msgstr ""
 
-#: languages/generatedString.php:3625
+#: languages/generatedString.php:3629
 msgid "Saving Payment Setting..."
 msgstr ""
 
-#: languages/generatedString.php:3627
+#: languages/generatedString.php:3631
 msgid "Choose a unique name to identify this integration within your app."
 msgstr ""
 
-#: languages/generatedString.php:3629
+#: languages/generatedString.php:3633
 msgid "Login to you Mollie account (or create on if you haven't already)."
 msgstr ""
 
-#: languages/generatedString.php:3631
+#: languages/generatedString.php:3635
 msgid "Go to your Mollie Dashboard"
 msgstr ""
 
-#: languages/generatedString.php:3633
+#: languages/generatedString.php:3637
 msgid "and find the API section."
 msgstr ""
 
-#: languages/generatedString.php:3635
+#: languages/generatedString.php:3639
 msgid "Generate a new API key or use an existing one (you can use test API key for testing purposes). This key is required for authenticating API requests."
 msgstr ""
 
-#: languages/generatedString.php:3637
+#: languages/generatedString.php:3641
 msgid "Copy the API key and paste it in the Bit Form"
 msgstr ""
 
-#: languages/generatedString.php:3639
+#: languages/generatedString.php:3643
 msgid "field above."
 msgstr ""
 
-#: languages/generatedString.php:3641
+#: languages/generatedString.php:3645
 msgid "Then click on the"
 msgstr ""
 
-#: languages/generatedString.php:3643
+#: languages/generatedString.php:3647
 msgid "button to save the settings."
 msgstr ""
 
-#: languages/generatedString.php:3645
+#: languages/generatedString.php:3649
 msgid "Please go to your form now and add a Mollie payment field."
 msgstr ""
 
-#: languages/generatedString.php:3647
+#: languages/generatedString.php:3651
 msgid "Bit form Mollie Payment Gateway documentation"
 msgstr ""
 
-#: languages/generatedString.php:3649
+#: languages/generatedString.php:3653
 msgid "Login to you PayPal account (or create on if you haven't already)."
 msgstr ""
 
-#: languages/generatedString.php:3651
+#: languages/generatedString.php:3655
 msgid "Go to your PayPal Dashboard"
 msgstr ""
 
-#: languages/generatedString.php:3653
+#: languages/generatedString.php:3657
 msgid "Select Transaction Mode (Live or Sandbox)."
 msgstr ""
 
-#: languages/generatedString.php:3655
+#: languages/generatedString.php:3659
 msgid "Copy the"
 msgstr ""
 
-#: languages/generatedString.php:3657
+#: languages/generatedString.php:3661
 msgid "from PayPal Dashboard and paste it in the Bit Form"
 msgstr ""
 
-#: languages/generatedString.php:3659
+#: languages/generatedString.php:3663
 msgid "field above (you can use Sandbox or Live mode)."
 msgstr ""
 
-#: languages/generatedString.php:3661
+#: languages/generatedString.php:3665
 msgid "Please go to your form now and add a PayPal payment field."
 msgstr ""
 
-#: languages/generatedString.php:3663
+#: languages/generatedString.php:3667
 msgid "Bit form PayPal Payment Gateway documentation"
 msgstr ""
 
-#: languages/generatedString.php:3665
+#: languages/generatedString.php:3669
 msgid "PayPal Integrations Video"
 msgstr ""
 
-#: languages/generatedString.php:3667
+#: languages/generatedString.php:3671
 msgid "Login to you Stripe account (or create on if you haven't already)."
 msgstr ""
 
-#: languages/generatedString.php:3669
+#: languages/generatedString.php:3673
 msgid "Go to your Stripe Dashboard"
 msgstr ""
 
-#: languages/generatedString.php:3671
+#: languages/generatedString.php:3675
 msgid "and find the API Key section."
 msgstr ""
 
-#: languages/generatedString.php:3673
+#: languages/generatedString.php:3677
 msgid "from Stripe API Dashboard and paste it in the Bit Form"
 msgstr ""
 
-#: languages/generatedString.php:3675
+#: languages/generatedString.php:3679
 msgid "field above (you can use test API key for testing purposes)."
 msgstr ""
 
-#: languages/generatedString.php:3677
+#: languages/generatedString.php:3681
 msgid "Please go to your form now and add a Stripe payment field."
 msgstr ""
 
-#: languages/generatedString.php:3679
+#: languages/generatedString.php:3683
 msgid "Bit form Stripe Payment Gateway documentation"
 msgstr ""
 
-#: languages/generatedString.php:3681
+#: languages/generatedString.php:3685
 msgid "Stripe Integrations Video"
 msgstr ""
 
-#: languages/generatedString.php:3683
+#: languages/generatedString.php:3687
 msgid "Login to you Razorpay account (or create on if you haven't already)."
 msgstr ""
 
-#: languages/generatedString.php:3685
+#: languages/generatedString.php:3689
 msgid "Go to your Razorpay Dashboard"
 msgstr ""
 
-#: languages/generatedString.php:3687
+#: languages/generatedString.php:3691
 msgid "from Razorpay API Dashboard and paste it in the Bit Form"
 msgstr ""
 
-#: languages/generatedString.php:3689
+#: languages/generatedString.php:3693
 msgid "Please go to your form now and add a Razorpay payment field."
 msgstr ""
 
-#: languages/generatedString.php:3691
+#: languages/generatedString.php:3695
 msgid "Bit form Razorpay Payment Gateway documentation"
 msgstr ""
 
-#: languages/generatedString.php:3693
+#: languages/generatedString.php:3697
 msgid "Razorpay Integrations Video"
 msgstr ""
 
-#: languages/generatedString.php:3695
+#: languages/generatedString.php:3699
 msgid "Available Payment Gateways"
 msgstr ""
 
-#: languages/generatedString.php:3697
+#: languages/generatedString.php:3701
 msgid "Please click on the available payment gateway option for configuration."
 msgstr ""
 
-#: languages/generatedString.php:3699
+#: languages/generatedString.php:3703
 msgid "Available on"
 msgstr ""
 
-#: languages/generatedString.php:3701
+#: languages/generatedString.php:3705
 msgid "Connected Accounts"
 msgstr ""
 
-#: languages/generatedString.php:3703
+#: languages/generatedString.php:3707
 msgid "Currently, no payment gateway has been connected."
 msgstr ""
 
-#: languages/generatedString.php:3705
+#: languages/generatedString.php:3709
 msgid "PayPal Settings"
 msgstr ""
 
-#: languages/generatedString.php:3707
+#: languages/generatedString.php:3711
 msgid "Transaction Mode:"
 msgstr ""
 
-#: languages/generatedString.php:3709
+#: languages/generatedString.php:3713
 msgid "Client ID:"
 msgstr ""
 
-#: languages/generatedString.php:3711
+#: languages/generatedString.php:3715
 msgid "Client Secret:"
 msgstr ""
 
-#: languages/generatedString.php:3713
+#: languages/generatedString.php:3717
 msgid "To get Client ID & Secret, Please Visit"
 msgstr ""
 
-#: languages/generatedString.php:3715
+#: languages/generatedString.php:3719
 msgid "PayPal Developer Dashboard"
 msgstr ""
 
-#: languages/generatedString.php:3717
+#: languages/generatedString.php:3721
 msgid "PDF Global Setting"
 msgstr ""
 
-#: languages/generatedString.php:3719
+#: languages/generatedString.php:3723
 msgid "Available Font for PDF"
 msgstr ""
 
-#: languages/generatedString.php:3721
+#: languages/generatedString.php:3725
 msgid "PDF Templates"
 msgstr ""
 
-#: languages/generatedString.php:3723
+#: languages/generatedString.php:3727
 msgid "How to setup PDF Templates:"
 msgstr ""
 
-#: languages/generatedString.php:3725
+#: languages/generatedString.php:3729
 msgid "PDF File Name"
 msgstr ""
 
-#: languages/generatedString.php:3727
+#: languages/generatedString.php:3731
 msgid "PDF Password"
 msgstr ""
 
-#: languages/generatedString.php:3729
+#: languages/generatedString.php:3733
 msgid "Static Password"
 msgstr ""
 
-#: languages/generatedString.php:3731
+#: languages/generatedString.php:3735
 msgid "PDF Password Shortcode"
 msgstr ""
 
-#: languages/generatedString.php:3733
+#: languages/generatedString.php:3737
 msgid "Allow Download (Link)"
 msgstr ""
 
-#: languages/generatedString.php:3735
+#: languages/generatedString.php:3739
 msgid "All User"
 msgstr ""
 
-#: languages/generatedString.php:3737
+#: languages/generatedString.php:3741
 msgid "Only Logged In User"
 msgstr ""
 
-#: languages/generatedString.php:3739
+#: languages/generatedString.php:3743
 msgid "Download Link Shortcode"
 msgstr ""
 
-#: languages/generatedString.php:3741
+#: languages/generatedString.php:3745
 msgid "Override Default Settings"
 msgstr ""
 
-#: languages/generatedString.php:3743
+#: languages/generatedString.php:3747
 msgid "Paper Size"
 msgstr ""
 
-#: languages/generatedString.php:3745
+#: languages/generatedString.php:3749
 msgid "Orientation"
 msgstr ""
 
-#: languages/generatedString.php:3747
+#: languages/generatedString.php:3751
 msgid "Portrait"
 msgstr ""
 
-#: languages/generatedString.php:3749
+#: languages/generatedString.php:3753
 msgid "Landscape"
 msgstr ""
 
-#: languages/generatedString.php:3751
+#: languages/generatedString.php:3755
 msgid "Font Family"
 msgstr ""
 
-#: languages/generatedString.php:3753
+#: languages/generatedString.php:3757
 msgid "Font Size (Pixels)"
 msgstr ""
 
-#: languages/generatedString.php:3755
+#: languages/generatedString.php:3759
 msgid "Watermark"
 msgstr ""
 
-#: languages/generatedString.php:3757
+#: languages/generatedString.php:3761
 msgid "Watermark Text"
 msgstr ""
 
-#: languages/generatedString.php:3759
+#: languages/generatedString.php:3763
 msgid "Watermark Image"
 msgstr ""
 
-#: languages/generatedString.php:3761
+#: languages/generatedString.php:3765
 msgid "Position X (Units in millimeters)"
 msgstr ""
 
-#: languages/generatedString.php:3763
+#: languages/generatedString.php:3767
 msgid "Position Y (Units in millimeters)"
 msgstr ""
 
-#: languages/generatedString.php:3765
+#: languages/generatedString.php:3769
 msgid "Show watermark behind the page content"
 msgstr ""
 
-#: languages/generatedString.php:3767
+#: languages/generatedString.php:3771
 msgid "Opacity (0-100)"
 msgstr ""
 
-#: languages/generatedString.php:3769
+#: languages/generatedString.php:3773
 msgid "Language Direction"
 msgstr ""
 
-#: languages/generatedString.php:3771
+#: languages/generatedString.php:3775
 msgid "LTR"
 msgstr ""
 
-#: languages/generatedString.php:3773
+#: languages/generatedString.php:3777
 msgid "RTL"
 msgstr ""
 
-#: languages/generatedString.php:3775
+#: languages/generatedString.php:3779
 msgid "Go to PDF Settings"
 msgstr ""
 
-#: languages/generatedString.php:3777
+#: languages/generatedString.php:3781
 msgid "Please configure PDF settings first."
 msgstr ""
 
-#: languages/generatedString.php:3779
+#: languages/generatedString.php:3783
 msgid "Upload"
 msgstr ""
 
-#: languages/generatedString.php:3781
+#: languages/generatedString.php:3785
 msgid "Image width"
 msgstr ""
 
-#: languages/generatedString.php:3783
+#: languages/generatedString.php:3787
 msgid "Image height"
 msgstr ""
 
-#: languages/generatedString.php:3785
+#: languages/generatedString.php:3789
 msgid "Position X"
 msgstr ""
 
-#: languages/generatedString.php:3787
+#: languages/generatedString.php:3791
 msgid "Position Y"
 msgstr ""
 
-#: languages/generatedString.php:3789
+#: languages/generatedString.php:3793
 msgid "Learn more about PDF Attachment"
 msgstr ""
 
-#: languages/generatedString.php:3791
+#: languages/generatedString.php:3795
 msgid "This global settings will be set as the default for any new PDF attachment generated from your forms."
 msgstr ""
 
-#: languages/generatedString.php:3793
+#: languages/generatedString.php:3797
 msgid "Remember,"
 msgstr ""
 
-#: languages/generatedString.php:3795
+#: languages/generatedString.php:3799
 msgid "If you haven't used PDFs yet, you'll need to click the \"Save\" button to apply these global PDF settings. You can also customize settings for a specific PDF template by accessing the PDF templates in your form settings."
 msgstr ""
 
-#: languages/generatedString.php:3797
+#: languages/generatedString.php:3801
 msgid "Please update your PHP version is 7.4 or higher."
 msgstr ""
 
-#: languages/generatedString.php:3799
+#: languages/generatedString.php:3803
 msgid "PHP extension is missing in your server. Please install it."
 msgstr ""
 
-#: languages/generatedString.php:3801
+#: languages/generatedString.php:3805
 msgid "To use Arabic, Chinese, Japanese and Korean languages, you need to install additional fonts! Please navigate to the"
 msgstr ""
 
-#: languages/generatedString.php:3803
+#: languages/generatedString.php:3807
 msgid "tab to proceed."
 msgstr ""
 
-#: languages/generatedString.php:3805
+#: languages/generatedString.php:3809
 msgid "Copy Shortcode"
 msgstr ""
 
-#: languages/generatedString.php:3807
+#: languages/generatedString.php:3811
 msgid "Embed"
 msgstr ""
 
-#: languages/generatedString.php:3809
+#: languages/generatedString.php:3813
 msgid "Razorpay Settings"
 msgstr ""
 
-#: languages/generatedString.php:3811
+#: languages/generatedString.php:3815
 msgid "API Secret:"
 msgstr ""
 
-#: languages/generatedString.php:3813
+#: languages/generatedString.php:3817
 msgid "To get API Key & Secret, Please Visit"
 msgstr ""
 
-#: languages/generatedString.php:3815
+#: languages/generatedString.php:3819
 msgid "Razorpay Dashboard"
 msgstr ""
 
-#: languages/generatedString.php:3817
+#: languages/generatedString.php:3821
 msgid "Are you sure to delete this URL ?"
 msgstr ""
 
-#: languages/generatedString.php:3819
+#: languages/generatedString.php:3823
 msgid "Select A Page:"
 msgstr ""
 
-#: languages/generatedString.php:3821
+#: languages/generatedString.php:3825
 msgid "Custom Link"
 msgstr ""
 
-#: languages/generatedString.php:3823
+#: languages/generatedString.php:3827
 msgid "set Form Field"
 msgstr ""
 
-#: languages/generatedString.php:3825
+#: languages/generatedString.php:3829
 msgid "Select Form Field"
 msgstr ""
 
-#: languages/generatedString.php:3827
+#: languages/generatedString.php:3831
 msgid "Add More Alternative URL"
 msgstr ""
 
-#: languages/generatedString.php:3829
+#: languages/generatedString.php:3833
 msgid "Filter Entries between Dates"
 msgstr ""
 
-#: languages/generatedString.php:3831
+#: languages/generatedString.php:3835
 msgid "Filter"
 msgstr ""
 
-#: languages/generatedString.php:3833
+#: languages/generatedString.php:3837
 msgid "Search"
 msgstr ""
 
-#: languages/generatedString.php:3835
+#: languages/generatedString.php:3839
 msgid "report name cann't be empty"
 msgstr ""
 
-#: languages/generatedString.php:3837
+#: languages/generatedString.php:3841
 msgid "Refresh"
 msgstr ""
 
-#: languages/generatedString.php:3839
+#: languages/generatedString.php:3843
 msgid "Premium Feature"
 msgstr ""
 
-#: languages/generatedString.php:3841
+#: languages/generatedString.php:3845
 msgid "Buy Premium"
 msgstr ""
 
-#: languages/generatedString.php:3843
+#: languages/generatedString.php:3847
 msgid "Are you sure to delete this report"
 msgstr ""
 
-#: languages/generatedString.php:3845
+#: languages/generatedString.php:3849
 msgid "Deleting ..."
 msgstr ""
 
-#: languages/generatedString.php:3847
+#: languages/generatedString.php:3851
 msgid "Filter List"
 msgstr ""
 
-#: languages/generatedString.php:3849
+#: languages/generatedString.php:3853
 msgid "Search filters..."
 msgstr ""
 
-#: languages/generatedString.php:3851
+#: languages/generatedString.php:3855
 msgid "New Filter"
 msgstr ""
 
-#: languages/generatedString.php:3853
+#: languages/generatedString.php:3857
 msgid "No matching filter found"
 msgstr ""
 
-#: languages/generatedString.php:3855
+#: languages/generatedString.php:3859
 msgid "Equal"
 msgstr ""
 
-#: languages/generatedString.php:3857
+#: languages/generatedString.php:3861
 msgid "Not equal"
 msgstr ""
 
-#: languages/generatedString.php:3859
+#: languages/generatedString.php:3863
 msgid "Not empty"
 msgstr ""
 
-#: languages/generatedString.php:3861
+#: languages/generatedString.php:3865
 msgid "Start With"
 msgstr ""
 
-#: languages/generatedString.php:3863
+#: languages/generatedString.php:3867
 msgid "End With"
 msgstr ""
 
-#: languages/generatedString.php:3865
+#: languages/generatedString.php:3869
 msgid "Not Start With"
 msgstr ""
 
-#: languages/generatedString.php:3867
+#: languages/generatedString.php:3871
 msgid "Not End With"
 msgstr ""
 
-#: languages/generatedString.php:3869
+#: languages/generatedString.php:3873
 msgid "Not contains"
 msgstr ""
 
-#: languages/generatedString.php:3871
+#: languages/generatedString.php:3875
 msgid "Contains"
 msgstr ""
 
-#: languages/generatedString.php:3873
+#: languages/generatedString.php:3877
 msgid "Contain All"
 msgstr ""
 
-#: languages/generatedString.php:3875
+#: languages/generatedString.php:3879
 msgid "Greater Than"
 msgstr ""
 
-#: languages/generatedString.php:3877
+#: languages/generatedString.php:3881
 msgid "Less Than"
 msgstr ""
 
-#: languages/generatedString.php:3879
+#: languages/generatedString.php:3883
 msgid "Greater Than or Equal"
 msgstr ""
 
-#: languages/generatedString.php:3881
+#: languages/generatedString.php:3885
 msgid "Less Than or Equal"
 msgstr ""
 
-#: languages/generatedString.php:3883
+#: languages/generatedString.php:3887
 msgid "Today"
 msgstr ""
 
-#: languages/generatedString.php:3885
+#: languages/generatedString.php:3889
 msgid "Till Today"
 msgstr ""
 
-#: languages/generatedString.php:3887
+#: languages/generatedString.php:3891
 msgid "Tomorrow"
 msgstr ""
 
-#: languages/generatedString.php:3889
+#: languages/generatedString.php:3893
 msgid "Yesterday"
 msgstr ""
 
-#: languages/generatedString.php:3891
+#: languages/generatedString.php:3895
 msgid "Till Yesterday"
 msgstr ""
 
-#: languages/generatedString.php:3893
+#: languages/generatedString.php:3897
 msgid "Last 7 Days"
 msgstr ""
 
-#: languages/generatedString.php:3895
+#: languages/generatedString.php:3899
 msgid "Last 30 Days"
 msgstr ""
 
-#: languages/generatedString.php:3897
+#: languages/generatedString.php:3901
 msgid "Last 60 Days"
 msgstr ""
 
-#: languages/generatedString.php:3899
+#: languages/generatedString.php:3903
 msgid "Last 90 Days"
 msgstr ""
 
-#: languages/generatedString.php:3901
+#: languages/generatedString.php:3905
 msgid "Last 120 Days"
 msgstr ""
 
-#: languages/generatedString.php:3903
+#: languages/generatedString.php:3907
 msgid "Next 7 Days"
 msgstr ""
 
-#: languages/generatedString.php:3905
+#: languages/generatedString.php:3909
 msgid "Next 30 Days"
 msgstr ""
 
-#: languages/generatedString.php:3907
+#: languages/generatedString.php:3911
 msgid "Next 60 Days"
 msgstr ""
 
-#: languages/generatedString.php:3909
+#: languages/generatedString.php:3913
 msgid "Next 90 Days"
 msgstr ""
 
-#: languages/generatedString.php:3911
+#: languages/generatedString.php:3915
 msgid "Next 120 Days"
 msgstr ""
 
-#: languages/generatedString.php:3913
+#: languages/generatedString.php:3917
 msgid "Current Week"
 msgstr ""
 
-#: languages/generatedString.php:3915
+#: languages/generatedString.php:3919
 msgid "Next Week"
 msgstr ""
 
-#: languages/generatedString.php:3917
+#: languages/generatedString.php:3921
 msgid "Last Week"
 msgstr ""
 
-#: languages/generatedString.php:3919
+#: languages/generatedString.php:3923
 msgid "Current Month"
 msgstr ""
 
-#: languages/generatedString.php:3921
+#: languages/generatedString.php:3925
 msgid "Next Month"
 msgstr ""
 
-#: languages/generatedString.php:3923
+#: languages/generatedString.php:3927
 msgid "Last Month"
 msgstr ""
 
-#: languages/generatedString.php:3925
+#: languages/generatedString.php:3929
 msgid "Current Year"
 msgstr ""
 
-#: languages/generatedString.php:3927
+#: languages/generatedString.php:3931
 msgid "Next Year"
 msgstr ""
 
-#: languages/generatedString.php:3929
+#: languages/generatedString.php:3933
 msgid "Last Year"
 msgstr ""
 
-#: languages/generatedString.php:3931
+#: languages/generatedString.php:3935
 msgid "Read entries"
 msgstr ""
 
-#: languages/generatedString.php:3933
+#: languages/generatedString.php:3937
 msgid "Unread entries"
 msgstr ""
 
-#: languages/generatedString.php:3935
+#: languages/generatedString.php:3939
 msgid "Confirmed entries"
 msgstr ""
 
-#: languages/generatedString.php:3937
+#: languages/generatedString.php:3941
 msgid "Unconfirmed entries"
 msgstr ""
 
-#: languages/generatedString.php:3939
+#: languages/generatedString.php:3943
 msgid "Draft entries"
 msgstr ""
 
-#: languages/generatedString.php:3941
+#: languages/generatedString.php:3945
 msgid "Logic"
 msgstr ""
 
-#: languages/generatedString.php:3943
+#: languages/generatedString.php:3947
 msgid "OR"
 msgstr ""
 
-#: languages/generatedString.php:3945
+#: languages/generatedString.php:3949
 msgid "AND"
 msgstr ""
 
-#: languages/generatedString.php:3947
+#: languages/generatedString.php:3951
 msgid "ReCaptcha validation failed."
 msgstr ""
 
-#: languages/generatedString.php:3949
+#: languages/generatedString.php:3953
 msgid "The form has reached its maximum number of submissions."
 msgstr ""
 
-#: languages/generatedString.php:3951
+#: languages/generatedString.php:3955
 msgid "You have reached the maximum number of submissions allowed."
 msgstr ""
 
-#: languages/generatedString.php:3953
+#: languages/generatedString.php:3957
 msgid "You must be logged in."
 msgstr ""
 
-#: languages/generatedString.php:3955
+#: languages/generatedString.php:3959
 msgid "Empty form cannot be submitted."
 msgstr ""
 
-#: languages/generatedString.php:3957
+#: languages/generatedString.php:3961
 msgid "Validate form input on focus lost"
 msgstr ""
 
-#: languages/generatedString.php:3959
+#: languages/generatedString.php:3963
 msgid "Allow single entry for each IP address"
 msgstr ""
 
-#: languages/generatedString.php:3961
+#: languages/generatedString.php:3965
 msgid "Require user to be logged in for submit form"
 msgstr ""
 
-#: languages/generatedString.php:3963
+#: languages/generatedString.php:3967
 msgid "Prevent empty form submission"
 msgstr ""
 
-#: languages/generatedString.php:3965
+#: languages/generatedString.php:3969
 msgid "Disable entry storing in WordPress database"
 msgstr ""
 
-#: languages/generatedString.php:3967
+#: languages/generatedString.php:3971
 msgid "Enable ReCaptcha V3"
 msgstr ""
 
-#: languages/generatedString.php:3969
+#: languages/generatedString.php:3973
 msgid "Enable / Disable"
 msgstr ""
 
-#: languages/generatedString.php:3971
+#: languages/generatedString.php:3975
 msgid "Hide ReCaptcha Badge"
 msgstr ""
 
-#: languages/generatedString.php:3973
+#: languages/generatedString.php:3977
 msgid "Honeypot trap for bot"
 msgstr ""
 
-#: languages/generatedString.php:3975
+#: languages/generatedString.php:3979
 msgid "Manage Submission Limits (by count, time, or user)"
 msgstr ""
 
-#: languages/generatedString.php:3977
+#: languages/generatedString.php:3981
 msgid "Limit By Submission Count"
 msgstr ""
 
-#: languages/generatedString.php:3979
+#: languages/generatedString.php:3983
 msgid "Submission Limit"
 msgstr ""
 
-#: languages/generatedString.php:3981
+#: languages/generatedString.php:3985
 msgid "Limit period type"
 msgstr ""
 
-#: languages/generatedString.php:3983
+#: languages/generatedString.php:3987
 msgid "Limit By Per User"
 msgstr ""
 
-#: languages/generatedString.php:3985
+#: languages/generatedString.php:3989
 msgid "User verify type"
 msgstr ""
 
-#: languages/generatedString.php:3987
+#: languages/generatedString.php:3991
 msgid "Limit Form Submission Period"
 msgstr ""
 
-#: languages/generatedString.php:3989
+#: languages/generatedString.php:3993
 msgid "Every Day"
 msgstr ""
 
-#: languages/generatedString.php:3991
+#: languages/generatedString.php:3995
 msgid "Friday"
 msgstr ""
 
-#: languages/generatedString.php:3993
+#: languages/generatedString.php:3997
 msgid "Saturday"
 msgstr ""
 
-#: languages/generatedString.php:3995
+#: languages/generatedString.php:3999
 msgid "Sunday"
 msgstr ""
 
-#: languages/generatedString.php:3997
+#: languages/generatedString.php:4001
 msgid "Monday"
 msgstr ""
 
-#: languages/generatedString.php:3999
+#: languages/generatedString.php:4003
 msgid "Tuesday"
 msgstr ""
 
-#: languages/generatedString.php:4001
+#: languages/generatedString.php:4005
 msgid "Wednesday"
 msgstr ""
 
-#: languages/generatedString.php:4003
+#: languages/generatedString.php:4007
 msgid "Thursday"
 msgstr ""
 
-#: languages/generatedString.php:4005
+#: languages/generatedString.php:4009
 msgid "From"
 msgstr ""
 
-#: languages/generatedString.php:4007
+#: languages/generatedString.php:4011
 msgid "To"
 msgstr ""
 
-#: languages/generatedString.php:4009
+#: languages/generatedString.php:4013
 msgid "Time:"
 msgstr ""
 
-#: languages/generatedString.php:4011
+#: languages/generatedString.php:4015
 msgid "Blocked IP list"
 msgstr ""
 
-#: languages/generatedString.php:4013
+#: languages/generatedString.php:4017
 msgid "Add Blocked IP"
 msgstr ""
 
-#: languages/generatedString.php:4015
+#: languages/generatedString.php:4019
 msgid "Allowed IP"
 msgstr ""
 
-#: languages/generatedString.php:4017
+#: languages/generatedString.php:4021
 msgid "By enabling this option only listed IP can submit this form."
 msgstr ""
 
-#: languages/generatedString.php:4019
+#: languages/generatedString.php:4023
 msgid "Add Allowed IP"
 msgstr ""
 
-#: languages/generatedString.php:4021
+#: languages/generatedString.php:4025
 msgid "Capture Google Ads (Click ID)"
 msgstr ""
 
-#: languages/generatedString.php:4023
+#: languages/generatedString.php:4027
 msgid "Email sent successfully."
 msgstr ""
 
-#: languages/generatedString.php:4025
+#: languages/generatedString.php:4029
 msgid "Sending..."
 msgstr ""
 
-#: languages/generatedString.php:4027
+#: languages/generatedString.php:4031
 msgid "Email Test"
 msgstr ""
 
-#: languages/generatedString.php:4029
+#: languages/generatedString.php:4033
 msgid "To:"
 msgstr ""
 
-#: languages/generatedString.php:4031
+#: languages/generatedString.php:4035
 msgid "Message:"
 msgstr ""
 
-#: languages/generatedString.php:4033
+#: languages/generatedString.php:4037
 msgid "Send Test Mail"
 msgstr ""
 
-#: languages/generatedString.php:4035
+#: languages/generatedString.php:4039
 msgid "Configuration"
 msgstr ""
 
-#: languages/generatedString.php:4037
+#: languages/generatedString.php:4041
 msgid "Mail Test"
 msgstr ""
 
-#: languages/generatedString.php:4039
+#: languages/generatedString.php:4043
 msgid "SMTP config saved successfully."
 msgstr ""
 
-#: languages/generatedString.php:4041
+#: languages/generatedString.php:4045
 msgid "Learn more about SMTP configuration"
 msgstr ""
 
-#: languages/generatedString.php:4043
+#: languages/generatedString.php:4047
 msgid "Enable SMTP"
 msgstr ""
 
-#: languages/generatedString.php:4045
+#: languages/generatedString.php:4049
 msgid "From Email Address"
 msgstr ""
 
-#: languages/generatedString.php:4047
+#: languages/generatedString.php:4051
 msgid "Some servers block emails if \"From Email\" differs from the authenticated (login) email— use the same email to ensure delivery."
 msgstr ""
 
-#: languages/generatedString.php:4049
+#: languages/generatedString.php:4053
 msgid "From Name"
 msgstr ""
 
-#: languages/generatedString.php:4051
+#: languages/generatedString.php:4055
 msgid "Reply-To Email Address"
 msgstr ""
 
-#: languages/generatedString.php:4053
+#: languages/generatedString.php:4057
 msgid "SMTP Host"
 msgstr ""
 
-#: languages/generatedString.php:4055
+#: languages/generatedString.php:4059
 msgid "Type of Encryption"
 msgstr ""
 
-#: languages/generatedString.php:4057
+#: languages/generatedString.php:4061
 msgid "SMTP Port"
 msgstr ""
 
-#: languages/generatedString.php:4059
+#: languages/generatedString.php:4063
 msgid "SMTP Authentication"
 msgstr ""
 
-#: languages/generatedString.php:4061
+#: languages/generatedString.php:4065
 msgid "SMTP Username"
 msgstr ""
 
-#: languages/generatedString.php:4063
+#: languages/generatedString.php:4067
 msgid "SMTP Password"
 msgstr ""
 
-#: languages/generatedString.php:4065
+#: languages/generatedString.php:4069
 msgid "Save Changes"
 msgstr ""
 
-#: languages/generatedString.php:4067
+#: languages/generatedString.php:4071
 msgid "Stripe Settings"
 msgstr ""
 
-#: languages/generatedString.php:4069
+#: languages/generatedString.php:4073
 msgid "Publishable key:"
 msgstr ""
 
-#: languages/generatedString.php:4071
+#: languages/generatedString.php:4075
 msgid "Secret Key:"
 msgstr ""
 
-#: languages/generatedString.php:4073
+#: languages/generatedString.php:4077
 msgid "To get Publishable key & Secret key, Please Visit"
 msgstr ""
 
-#: languages/generatedString.php:4075
+#: languages/generatedString.php:4079
 msgid "Stripe Developer Dashboard"
 msgstr ""
 
-#: languages/generatedString.php:4077
+#: languages/generatedString.php:4081
 msgid "Transparant"
 msgstr ""
 
-#: languages/generatedString.php:4079
+#: languages/generatedString.php:4083
 msgid "Add Property"
 msgstr ""
 
-#: languages/generatedString.php:4081
+#: languages/generatedString.php:4085
 msgid "Override theme and common styles"
 msgstr ""
 
-#: languages/generatedString.php:4083
+#: languages/generatedString.php:4087
 msgid "Multi Step Quick Tweaks"
 msgstr ""
 
-#: languages/generatedString.php:4085
+#: languages/generatedString.php:4089
 msgid "Step Container"
 msgstr ""
 
-#: languages/generatedString.php:4087
+#: languages/generatedString.php:4091
 msgid "Step Header Wrapper"
 msgstr ""
 
-#: languages/generatedString.php:4089
+#: languages/generatedString.php:4093
 msgid "Step Header"
 msgstr ""
 
-#: languages/generatedString.php:4091
+#: languages/generatedString.php:4095
 msgid "Step Header Label"
 msgstr ""
 
-#: languages/generatedString.php:4093
+#: languages/generatedString.php:4097
 msgid "Step Header Subtitle"
 msgstr ""
 
-#: languages/generatedString.php:4095
+#: languages/generatedString.php:4099
 msgid "Step Wrapper"
 msgstr ""
 
-#: languages/generatedString.php:4097
+#: languages/generatedString.php:4101
 msgid "Step Progress Wrapper"
 msgstr ""
 
-#: languages/generatedString.php:4099
+#: languages/generatedString.php:4103
 msgid "Step Progress Bar"
 msgstr ""
 
-#: languages/generatedString.php:4101
+#: languages/generatedString.php:4105
 msgid "Step Content"
 msgstr ""
 
-#: languages/generatedString.php:4103
+#: languages/generatedString.php:4107
 msgid "Step Button Wrapper"
 msgstr ""
 
-#: languages/generatedString.php:4105
+#: languages/generatedString.php:4109
 msgid "Step Button"
 msgstr ""
 
-#: languages/generatedString.php:4107
+#: languages/generatedString.php:4111
 msgid "Step Label Prefix Icon"
 msgstr ""
 
-#: languages/generatedString.php:4109
+#: languages/generatedString.php:4113
 msgid "Step Label Suffix Icon"
 msgstr ""
 
-#: languages/generatedString.php:4111
+#: languages/generatedString.php:4115
 msgid "Step Subtitle Prefix Icon"
 msgstr ""
 
-#: languages/generatedString.php:4113
+#: languages/generatedString.php:4117
 msgid "Step Subtitle Suffix Icon"
 msgstr ""
 
-#: languages/generatedString.php:4115
+#: languages/generatedString.php:4119
 msgid "Previous Button Prefix Icon"
 msgstr ""
 
-#: languages/generatedString.php:4117
+#: languages/generatedString.php:4121
 msgid "Previous Button Suffix Icon"
 msgstr ""
 
-#: languages/generatedString.php:4119
+#: languages/generatedString.php:4123
 msgid "Next Button Prefix Icon"
 msgstr ""
 
-#: languages/generatedString.php:4121
+#: languages/generatedString.php:4125
 msgid "Next Button Suffix Icon"
 msgstr ""
 
-#: languages/generatedString.php:4123
+#: languages/generatedString.php:4127
 msgid "Theme Customization"
 msgstr ""
 
-#: languages/generatedString.php:4125
+#: languages/generatedString.php:4129
 msgid "Multi Step Customize"
 msgstr ""
 
-#: languages/generatedString.php:4127
+#: languages/generatedString.php:4131
 msgid "Multi step quick tweaks is not available. this feature will coming soon."
 msgstr ""
 
-#: languages/generatedString.php:4129
+#: languages/generatedString.php:4133
 msgid "Transparent"
 msgstr ""
 
-#: languages/generatedString.php:4131
+#: languages/generatedString.php:4135
 msgid "Go to Theme Gallery Settings"
 msgstr ""
 
-#: languages/generatedString.php:4133
+#: languages/generatedString.php:4137
 msgid "Add important rule to all styles to override the conflicting styles in frontend."
 msgstr ""
 
-#: languages/generatedString.php:4135
+#: languages/generatedString.php:4139
 msgid "Add prefix to atomic class names to avoid conflicts."
 msgstr ""
 
-#: languages/generatedString.php:4137
+#: languages/generatedString.php:4141
 msgid "Transition"
 msgstr ""
 
-#: languages/generatedString.php:4139
+#: languages/generatedString.php:4143
 msgid "Please setup your payment settings before using this template."
 msgstr ""
 
-#: languages/generatedString.php:4141
+#: languages/generatedString.php:4145
 msgid "Please setup your"
 msgstr ""
 
-#: languages/generatedString.php:4143
+#: languages/generatedString.php:4147
 msgid "Please update your Pro Plugin to the latest version ("
 msgstr ""
 
-#: languages/generatedString.php:4145
+#: languages/generatedString.php:4149
 msgid "this feature"
 msgstr ""
 
-#: languages/generatedString.php:4147
+#: languages/generatedString.php:4151
 msgid "PRO"
 msgstr ""
 
-#: languages/generatedString.php:4149
+#: languages/generatedString.php:4153
 msgid "New"
 msgstr ""
 
-#: languages/generatedString.php:4151
+#: languages/generatedString.php:4155
 msgid "Use Template"
 msgstr ""
 
-#: languages/generatedString.php:4153
+#: languages/generatedString.php:4157
 msgid "Go to Payment Settings"
 msgstr ""
 
-#: languages/generatedString.php:4155
+#: languages/generatedString.php:4159
 msgid "Search Template"
 msgstr ""
 
-#: languages/generatedString.php:4157
+#: languages/generatedString.php:4161
 msgid "Import Form"
 msgstr ""
 
-#: languages/generatedString.php:4159
+#: languages/generatedString.php:4163
 msgid "Search Result"
 msgstr ""
 
-#: languages/generatedString.php:4161
+#: languages/generatedString.php:4165
 msgid "No Template Found"
 msgstr ""
 
-#: languages/generatedString.php:4163
+#: languages/generatedString.php:4167
 msgid "Prefix Icon"
 msgstr ""
 
-#: languages/generatedString.php:4165
+#: languages/generatedString.php:4169
 msgid "Suffix Icon"
 msgstr ""
 
-#: languages/generatedString.php:4167
+#: languages/generatedString.php:4171
 msgid "Always (default)"
 msgstr ""
 
-#: languages/generatedString.php:4169
+#: languages/generatedString.php:4173
 msgid "Interaction Only"
 msgstr ""
 
-#: languages/generatedString.php:4171
+#: languages/generatedString.php:4175
 msgid "Container Class"
 msgstr ""
 
-#: languages/generatedString.php:4173
+#: languages/generatedString.php:4177
 msgid "Show Option Flag Image"
 msgstr ""
 
-#: languages/generatedString.php:4175
+#: languages/generatedString.php:4179
 msgid "Button Texts"
 msgstr ""
 
-#: languages/generatedString.php:4177
+#: languages/generatedString.php:4181
 msgid "Customize the label text shown on the Send, Resend, and Verify buttons."
 msgstr ""
 
-#: languages/generatedString.php:4179
+#: languages/generatedString.php:4183
 msgid "Resend OTP"
 msgstr ""
 
-#: languages/generatedString.php:4181
+#: languages/generatedString.php:4185
 msgid "Resend OTP Countdown Text"
 msgstr ""
 
-#: languages/generatedString.php:4183
+#: languages/generatedString.php:4187
 msgid "Text shown while the user waits to resend. Use ${bf_resend_countdown} as a placeholder for the live countdown number."
 msgstr ""
 
-#: languages/generatedString.php:4185
+#: languages/generatedString.php:4189
 msgid "Use ${bf_resend_countdown} as placeholder for the resend countdown number."
 msgstr ""
 
-#: languages/generatedString.php:4187
+#: languages/generatedString.php:4191
 msgid "Maximum OTP Verification Attempts"
 msgstr ""
 
-#: languages/generatedString.php:4189
+#: languages/generatedString.php:4193
 msgid "Limits the number of OTP verification attempts on the frontend. Once the maximum limit is reached, the field will be locked until the page is reloaded."
 msgstr ""
 
-#: languages/generatedString.php:4191
+#: languages/generatedString.php:4195
 msgid "OTP Expiration Time (Minutes)"
 msgstr ""
 
-#: languages/generatedString.php:4193
+#: languages/generatedString.php:4197
 msgid "How long the OTP remains valid in minutes. The expiration is verified on the server during form submission."
 msgstr ""
 
-#: languages/generatedString.php:4195
+#: languages/generatedString.php:4199
 msgid "Defines how long the OTP remains valid. The expiration is verified on the server during form submission."
 msgstr ""
 
-#: languages/generatedString.php:4197
+#: languages/generatedString.php:4201
 msgid "When enabled, the OTP will be automatically sent if the user attempts to submit the form or move to the next step without clicking \"Send OTP\" first."
 msgstr ""
 
-#: languages/generatedString.php:4199
+#: languages/generatedString.php:4203
 msgid "Automatically Send OTP on Validation"
 msgstr ""
 
-#: languages/generatedString.php:4201
+#: languages/generatedString.php:4205
 msgid "When enabled, OTP verification is triggered automatically once the user has entered all digits (via typing, pasting, or autofill)."
 msgstr ""
 
-#: languages/generatedString.php:4203
+#: languages/generatedString.php:4207
 msgid "Automatically Verify OTP on Input"
 msgstr ""
 
-#: languages/generatedString.php:4205
+#: languages/generatedString.php:4209
 msgid "OTP Code Length"
 msgstr ""
 
-#: languages/generatedString.php:4207
+#: languages/generatedString.php:4211
 msgid "Set how many digits the OTP code will contain. Accepted range: 4 – 8."
 msgstr ""
 
-#: languages/generatedString.php:4209
+#: languages/generatedString.php:4213
 msgid "Allowed range: 4 to 8 digits."
 msgstr ""
 
-#: languages/generatedString.php:4211
+#: languages/generatedString.php:4215
 msgid "OTP Resend Delay (Seconds)"
 msgstr ""
 
-#: languages/generatedString.php:4213
+#: languages/generatedString.php:4217
 msgid "Sets the waiting time (in seconds) before the \"Resend OTP\" button becomes active again."
 msgstr ""
 
-#: languages/generatedString.php:4215
+#: languages/generatedString.php:4219
 msgid "Email Template"
 msgstr ""
 
-#: languages/generatedString.php:4217
+#: languages/generatedString.php:4221
 msgid "Available placeholders: ${bf_otp_code}, ${bf_expiry_minutes}"
 msgstr ""
 
-#: languages/generatedString.php:4219
+#: languages/generatedString.php:4223
 msgid "Note: To send OTP emails, SMTP must be configured on your site. You can set it up in Bit Form"
 msgstr ""
 
-#: languages/generatedString.php:4221
+#: languages/generatedString.php:4225
 msgid "section."
 msgstr ""
 
-#: languages/generatedString.php:4223
+#: languages/generatedString.php:4227
 msgid "Edit OTP Email Template"
 msgstr ""
 
-#: languages/generatedString.php:4225
+#: languages/generatedString.php:4229
 msgid "Placeholders: ${bf_otp_code} — the OTP code, ${bf_expiry_minutes} — expiry time in minutes"
 msgstr ""
 
-#: languages/generatedString.php:4227
+#: languages/generatedString.php:4231
 msgid "Email OTP Receiver Email is missing"
 msgstr ""
 
-#: languages/generatedString.php:4229
+#: languages/generatedString.php:4233
 msgid "Receiver Email"
 msgstr ""
 
-#: languages/generatedString.php:4231
+#: languages/generatedString.php:4235
 msgid "The email address where the OTP will be sent. Choose \"Dynamic\" to use an Email field from your form, or \"Static\" to enter a fixed address."
 msgstr ""
 
-#: languages/generatedString.php:4233
+#: languages/generatedString.php:4237
 msgid "Dynamic (Email Field)"
 msgstr ""
 
-#: languages/generatedString.php:4235
+#: languages/generatedString.php:4239
 msgid "Static (Fixed Email)"
 msgstr ""
 
-#: languages/generatedString.php:4237
+#: languages/generatedString.php:4241
 msgid "Email Address"
 msgstr ""
 
-#: languages/generatedString.php:4239
+#: languages/generatedString.php:4243
 msgid "Enter a email here.."
 msgstr ""
 
-#: languages/generatedString.php:4241
+#: languages/generatedString.php:4245
 msgid "-- Select Email Field --"
 msgstr ""
 
-#: languages/generatedString.php:4243
+#: languages/generatedString.php:4247
 msgid "Mollie Description is Required"
 msgstr ""
 
-#: languages/generatedString.php:4245
+#: languages/generatedString.php:4249
 msgid "Select Account"
 msgstr ""
 
-#: languages/generatedString.php:4247
+#: languages/generatedString.php:4251
 msgid "Razorpay Dynamic Amount Field is not Selected"
 msgstr ""
 
-#: languages/generatedString.php:4249
+#: languages/generatedString.php:4253
 msgid "Rating Icon"
 msgstr ""
 
-#: languages/generatedString.php:4251
+#: languages/generatedString.php:4255
 msgid "Rounded"
 msgstr ""
 
-#: languages/generatedString.php:4253
+#: languages/generatedString.php:4257
 msgid "Min/Max Text Length:"
 msgstr ""
 
-#: languages/generatedString.php:4255
+#: languages/generatedString.php:4259
 msgid "Min Length:"
 msgstr ""
 
-#: languages/generatedString.php:4257
+#: languages/generatedString.php:4261
 msgid "By enabling this feature, user will see the error message when input length is less than"
 msgstr ""
 
-#: languages/generatedString.php:4259
+#: languages/generatedString.php:4263
 msgid "Max Length:"
 msgstr ""
 
-#: languages/generatedString.php:4261
+#: languages/generatedString.php:4265
 msgid "By enabling this feature, user will see the error message when input length is greater than"
 msgstr ""
 
-#: languages/generatedString.php:4263
+#: languages/generatedString.php:4267
 msgid "Min Word:"
 msgstr ""
 
-#: languages/generatedString.php:4265
+#: languages/generatedString.php:4269
 msgid "By enabling this feature, user will see the error message when word count is less than"
 msgstr ""
 
-#: languages/generatedString.php:4267
+#: languages/generatedString.php:4271
 msgid "Max Word:"
 msgstr ""
 
-#: languages/generatedString.php:4269
+#: languages/generatedString.php:4273
 msgid "By enabling this feature, user will see the error message when word count is greater than"
 msgstr ""
 
-#: languages/generatedString.php:4271
+#: languages/generatedString.php:4275
 msgid "No fields available"
 msgstr ""
 
-#: languages/generatedString.php:4273
+#: languages/generatedString.php:4277
 msgid "You haven’t added any fields to this form or step yet."
 msgstr ""
 
-#: languages/generatedString.php:4275
+#: languages/generatedString.php:4279
 msgid "Please add fields from the Form Fields panel."
 msgstr ""
 
-#: languages/generatedString.php:4277
+#: languages/generatedString.php:4281
 msgid "No field key provided"
 msgstr ""
 
-#: languages/generatedString.php:4279
+#: languages/generatedString.php:4283
 msgid "Advanced"
 msgstr ""
 
-#: languages/generatedString.php:4281
+#: languages/generatedString.php:4285
 msgid "Conditional Logic"
 msgstr ""
 
-#: languages/generatedString.php:4283
+#: languages/generatedString.php:4287
 msgid "Individual Customize"
 msgstr ""
 
-#: languages/generatedString.php:4285
+#: languages/generatedString.php:4289
 msgid "Global Customize"
 msgstr ""
 
-#: languages/generatedString.php:4287
+#: languages/generatedString.php:4291
 msgid "Select Your Theme"
 msgstr ""
 
-#: languages/generatedString.php:4289
+#: languages/generatedString.php:4293
 msgid "Reset"
 msgstr ""
 
-#: languages/generatedString.php:4291
+#: languages/generatedString.php:4295
 msgid "Import"
 msgstr ""
 
-#: languages/generatedString.php:4293
+#: languages/generatedString.php:4297
 msgid "Rename"
 msgstr ""
 
-#: languages/generatedString.php:4295
+#: languages/generatedString.php:4299
 msgid "Reset Theme Style"
 msgstr ""
 
-#: languages/generatedString.php:4297
+#: languages/generatedString.php:4301
 msgid "Update Theme Style"
 msgstr ""
 
-#: languages/generatedString.php:4299
+#: languages/generatedString.php:4303
 msgid "Save as New Theme"
 msgstr ""
 
-#: languages/generatedString.php:4301
+#: languages/generatedString.php:4305
 msgid "Click to Highlight Element in Builder"
 msgstr ""
 
-#: languages/generatedString.php:4303
+#: languages/generatedString.php:4307
 msgid "Enable Conditional Logic"
 msgstr ""
 
-#: languages/generatedString.php:4305
+#: languages/generatedString.php:4309
 msgid "Configure when this field should be shown or hidden"
 msgstr ""
 
-#: languages/generatedString.php:4307
+#: languages/generatedString.php:4311
 msgid "Hide"
 msgstr ""
 
-#: languages/generatedString.php:4309
+#: languages/generatedString.php:4313
 msgid "Show"
 msgstr ""
 
-#: languages/generatedString.php:4311
+#: languages/generatedString.php:4315
 msgid "this field if"
 msgstr ""
 
-#: languages/generatedString.php:4313
+#: languages/generatedString.php:4317
 msgid "And"
 msgstr ""
 
-#: languages/generatedString.php:4315
+#: languages/generatedString.php:4319
 msgid "Or"
 msgstr ""
 
-#: languages/generatedString.php:4317
+#: languages/generatedString.php:4321
 msgid "Need Advanced Conditional Logic?"
 msgstr ""
 
-#: languages/generatedString.php:4319
+#: languages/generatedString.php:4323
 msgid "Switch now"
 msgstr ""
 
-#: languages/generatedString.php:4321
+#: languages/generatedString.php:4325
 msgid "Theme Quick Tweaks"
 msgstr ""
 
-#: languages/generatedString.php:4323
+#: languages/generatedString.php:4327
 msgid "Global Elements"
 msgstr ""
 
-#: languages/generatedString.php:4325
+#: languages/generatedString.php:4329
 msgid "Multi-Step Elements"
 msgstr ""
 
-#: languages/generatedString.php:4327
+#: languages/generatedString.php:4331
 msgid "Individual Elements"
 msgstr ""
 
-#: languages/generatedString.php:4329
+#: languages/generatedString.php:4333
 msgid "found"
 msgstr ""
 
-#: languages/generatedString.php:4331
+#: languages/generatedString.php:4335
 msgid "Search fields.."
 msgstr ""
 
-#: languages/generatedString.php:4333
+#: languages/generatedString.php:4337
 msgid "Search results for:"
 msgstr ""
 
-#: languages/generatedString.php:4335
+#: languages/generatedString.php:4339
 msgid "No fields found"
 msgstr ""
 
-#: languages/generatedString.php:4337
+#: languages/generatedString.php:4341
 msgid "We couldn't find any fields matching"
 msgstr ""
 
-#: languages/generatedString.php:4339
+#: languages/generatedString.php:4343
 msgid "Try searching with different keywords"
 msgstr ""
 
-#: languages/generatedString.php:4341
+#: languages/generatedString.php:4345
 msgid "Email OTP"
 msgstr ""
 
-#: languages/generatedString.php:4343
+#: languages/generatedString.php:4347
 msgid "A verification code will be sent to the specified email address."
 msgstr ""
 
-#: languages/generatedString.php:4345
+#: languages/generatedString.php:4349
 msgid "Please verify your email OTP before submitting."
 msgstr ""
 
-#: languages/generatedString.php:4347
+#: languages/generatedString.php:4351
 msgid "Resend available in ${bf_resend_countdown}s."
 msgstr ""
 
-#: languages/generatedString.php:4349
+#: languages/generatedString.php:4353
 msgid "Create New Theme"
 msgstr ""
 
-#: languages/generatedString.php:4351
+#: languages/generatedString.php:4355
 msgid "Click to upload"
 msgstr ""
 
-#: languages/generatedString.php:4353
+#: languages/generatedString.php:4357
 msgid "or drag and drop"
 msgstr ""
 
-#: languages/generatedString.php:4355
+#: languages/generatedString.php:4359
 msgid "Import from Form"
 msgstr ""
 
-#: languages/generatedString.php:4357
+#: languages/generatedString.php:4361
 msgid "Import from File"
 msgstr ""
 
-#: languages/generatedString.php:4359
+#: languages/generatedString.php:4363
 msgid "Import Theme (Style)"
 msgstr ""
 
-#: languages/generatedString.php:4361
+#: languages/generatedString.php:4365
 msgid "Customize"
 msgstr ""
 
-#: languages/generatedString.php:4363
+#: languages/generatedString.php:4367
 msgid "Applied Styles"
 msgstr ""
 
-#: languages/generatedString.php:4365
+#: languages/generatedString.php:4369
 msgid "Your customizations apply only to this form's styling. To preserve changes, create or update a custom theme from the Options menu."
 msgstr ""
 
-#: languages/generatedString.php:4367
+#: languages/generatedString.php:4371
 msgid "App Themes"
 msgstr ""
 
-#: languages/generatedString.php:4369
+#: languages/generatedString.php:4373
 msgid "Custom Themes"
 msgstr ""
 
-#: languages/generatedString.php:4371
+#: languages/generatedString.php:4375
 msgid "Please write form name"
 msgstr ""
 
-#: languages/generatedString.php:4373
+#: languages/generatedString.php:4377
 msgid "Search forms here..."
 msgstr ""
 
-#: languages/generatedString.php:4375
+#: languages/generatedString.php:4379
 msgid "No forms found"
 msgstr ""
 
-#: languages/generatedString.php:4377
+#: languages/generatedString.php:4381
 msgid "Search fields..."
 msgstr ""
 
-#: languages/generatedString.php:4379
+#: languages/generatedString.php:4383
 msgid "Clear search"
 msgstr ""
 
-#: languages/generatedString.php:4381
+#: languages/generatedString.php:4385
 msgid "No fields available in this category"
 msgstr ""
 
-#: languages/generatedString.php:4383
+#: languages/generatedString.php:4387
 msgid "Recent"
 msgstr ""
 
-#: languages/generatedString.php:4385
+#: languages/generatedString.php:4389
 msgid "No fields found by your search keywords:"
 msgstr ""
 
-#: languages/generatedString.php:4387
+#: languages/generatedString.php:4391
 msgid "fields found for"
 msgstr ""
 
-#: languages/generatedString.php:4389
+#: languages/generatedString.php:4393
 msgid "Any field order change on this breakpoint will be reflected in other breakpoints after switching views or updating the form."
 msgstr ""
 
-#: languages/generatedString.php:4391
+#: languages/generatedString.php:4395
 msgid "Dismiss warning"
 msgstr ""
 
-#: languages/generatedString.php:4393
+#: languages/generatedString.php:4397
 msgid "Update Form"
 msgstr ""
 
-#: languages/generatedString.php:4395
+#: languages/generatedString.php:4399
 msgid "Save Form"
 msgstr ""
 
-#: languages/generatedString.php:4397
+#: languages/generatedString.php:4401
 msgid "Please fix the errors"
 msgstr ""
 
-#: languages/generatedString.php:4399
+#: languages/generatedString.php:4403
 msgid "Sorry"
 msgstr ""
 
-#: languages/generatedString.php:4401
+#: languages/generatedString.php:4405
 msgid "Please add a submit button"
 msgstr ""
 
-#: languages/generatedString.php:4403
+#: languages/generatedString.php:4407
 msgid "Could not sync layouts before save. Form will be saved with current layout state"
 msgstr ""
 
-#: languages/generatedString.php:4405
+#: languages/generatedString.php:4409
 msgid "ctrl + s"
 msgstr ""
 
-#: languages/generatedString.php:4407
+#: languages/generatedString.php:4411
 msgid "Choose/Drop your file (.json)"
 msgstr ""
 
-#: languages/generatedString.php:4409
+#: languages/generatedString.php:4413
 msgid "Issue"
 msgstr ""
 
-#: languages/generatedString.php:4411
+#: languages/generatedString.php:4415
 msgid "Idea"
 msgstr ""
 
-#: languages/generatedString.php:4413
+#: languages/generatedString.php:4417
 msgid "Other"
 msgstr ""
 
-#: languages/generatedString.php:4415
+#: languages/generatedString.php:4419
 msgid "Send"
 msgstr ""
 
-#: languages/generatedString.php:4419
+#: languages/generatedString.php:4423
 msgid "This feature"
 msgstr ""
 
-#: languages/generatedString.php:4421
+#: languages/generatedString.php:4425
 msgid "is available in Pro"
 msgstr ""
 
-#: languages/generatedString.php:4423
+#: languages/generatedString.php:4427
 msgid "Thank you for using our product! We're sorry,"
 msgstr ""
 
-#: languages/generatedString.php:4425
+#: languages/generatedString.php:4429
 msgid "is not available in your plan."
 msgstr ""
 
-#: languages/generatedString.php:4427
+#: languages/generatedString.php:4431
 msgid "Please upgrade to the PRO plan to unlock all these awesome features."
 msgstr ""
 
-#: languages/generatedString.php:4431
+#: languages/generatedString.php:4435
 msgid "Try Demo"
 msgstr ""
 
-#: languages/generatedString.php:4433
+#: languages/generatedString.php:4437
 msgid "Check out our"
 msgstr ""
 
-#: languages/generatedString.php:4435
+#: languages/generatedString.php:4439
 msgid "Demo"
 msgstr ""
 
-#: languages/generatedString.php:4437
+#: languages/generatedString.php:4441
 msgid "to see what can you do with Pro version."
 msgstr ""
 
-#: languages/generatedString.php:4439
+#: languages/generatedString.php:4443
 msgid "Available On Pro"
 msgstr ""
 
-#: languages/generatedString.php:4441
+#: languages/generatedString.php:4445
 msgid "Do You want Deplicate these"
 msgstr ""
 
-#: languages/generatedString.php:4443
+#: languages/generatedString.php:4447
 msgid "item"
 msgstr ""
 
-#: languages/generatedString.php:4445
+#: languages/generatedString.php:4449
 msgid "Disable"
 msgstr ""
 
-#: languages/generatedString.php:4447
+#: languages/generatedString.php:4451
 msgid "Do you want to change these"
 msgstr ""
 
-#: languages/generatedString.php:4449
+#: languages/generatedString.php:4453
 msgid "status"
 msgstr ""
 
-#: languages/generatedString.php:4451
+#: languages/generatedString.php:4455
 msgid "Are you sure to delete these"
 msgstr ""
 
-#: languages/generatedString.php:4453
+#: languages/generatedString.php:4457
 msgid "items"
 msgstr ""
 
-#: languages/generatedString.php:4455
+#: languages/generatedString.php:4459
 msgid "Row Selected"
 msgstr ""
 
-#: languages/generatedString.php:4457
+#: languages/generatedString.php:4461
 msgid "Total Entries:"
 msgstr ""
 
-#: languages/generatedString.php:4459
+#: languages/generatedString.php:4463
 msgid "Page"
 msgstr ""
 
-#: languages/generatedString.php:4461
+#: languages/generatedString.php:4465
 msgid "of"
 msgstr ""
 
-#: languages/generatedString.php:4463
+#: languages/generatedString.php:4467
 msgid "No response from the server"
 msgstr ""
 
-#: languages/generatedString.php:4465
+#: languages/generatedString.php:4469
 msgid "Are you sure to delete this web hook?"
 msgstr ""
 
-#: languages/generatedString.php:4467
+#: languages/generatedString.php:4471
 msgid "Add More Hook"
 msgstr ""
 
-#: languages/generatedString.php:4469
+#: languages/generatedString.php:4473
 msgid "Select One"
 msgstr ""
 
-#: languages/generatedString.php:4471
+#: languages/generatedString.php:4475
 msgid "Click"
 msgstr ""
 
-#: languages/generatedString.php:4473
+#: languages/generatedString.php:4477
 msgid "Readonly"
 msgstr ""
 
-#: languages/generatedString.php:4475
+#: languages/generatedString.php:4479
 msgid "Writeable"
 msgstr ""
 
-#: languages/generatedString.php:4477
+#: languages/generatedString.php:4481
 msgid "Not Required"
 msgstr ""
 
-#: languages/generatedString.php:4479
+#: languages/generatedString.php:4483
 msgid "Active List"
 msgstr ""
 
-#: languages/generatedString.php:4481
+#: languages/generatedString.php:4485
 msgid "Sub Title"
 msgstr ""
 
-#: languages/generatedString.php:4483
+#: languages/generatedString.php:4487
 msgid "Config Option"
 msgstr ""
 
-#: languages/generatedString.php:4485
+#: languages/generatedString.php:4489
 msgid "Email Template:"
 msgstr ""
 
-#: languages/generatedString.php:4487
+#: languages/generatedString.php:4491
 msgid "Select Email Template"
 msgstr ""
 
-#: languages/generatedString.php:4489
+#: languages/generatedString.php:4493
 msgid "Add mail from address"
 msgstr ""
 
-#: languages/generatedString.php:4491
+#: languages/generatedString.php:4495
 msgid "From Mail"
 msgstr ""
 
-#: languages/generatedString.php:4493
+#: languages/generatedString.php:4497
 msgid "CC"
 msgstr ""
 
-#: languages/generatedString.php:4495
+#: languages/generatedString.php:4499
 msgid "BCC"
 msgstr ""
 
-#: languages/generatedString.php:4497
+#: languages/generatedString.php:4501
 msgid "Reply To"
 msgstr ""
 
-#: languages/generatedString.php:4499
+#: languages/generatedString.php:4503
 msgid "PDF Attachment Template:"
 msgstr ""
 
-#: languages/generatedString.php:4501
+#: languages/generatedString.php:4505
 msgid "Select PDF Template"
 msgstr ""
 
-#: languages/generatedString.php:4503
+#: languages/generatedString.php:4507
 msgid "Field Actions"
 msgstr ""
 
-#: languages/generatedString.php:4505
+#: languages/generatedString.php:4509
 msgid "Integration"
 msgstr ""
 
-#: languages/generatedString.php:4507
+#: languages/generatedString.php:4511
 msgid "Select Integation"
 msgstr ""
 
-#: languages/generatedString.php:4509
+#: languages/generatedString.php:4513
 msgid "Logged In"
 msgstr ""
 
-#: languages/generatedString.php:4511
+#: languages/generatedString.php:4515
 msgid "Logged Out"
 msgstr ""
 
-#: languages/generatedString.php:4513
+#: languages/generatedString.php:4517
 msgid "Date Format"
 msgstr ""
 
-#: languages/generatedString.php:4515
+#: languages/generatedString.php:4519
 msgid "Meta Key"
 msgstr ""
 
-#: languages/generatedString.php:4517
+#: languages/generatedString.php:4521
 msgid "Query Param"
 msgstr ""
 
-#: languages/generatedString.php:4519
+#: languages/generatedString.php:4523
 msgid "Redirect URL"
 msgstr ""
 
-#: languages/generatedString.php:4521
+#: languages/generatedString.php:4525
 msgid "Select Page To Redirect"
 msgstr ""
 
-#: languages/generatedString.php:4523
+#: languages/generatedString.php:4527
 msgid "Success Message"
 msgstr ""
 
-#: languages/generatedString.php:4525
+#: languages/generatedString.php:4529
 msgid "Select Message"
 msgstr ""
 
-#: languages/generatedString.php:4527
+#: languages/generatedString.php:4531
 msgid "Web Hook"
 msgstr ""
 
-#: languages/generatedString.php:4529
+#: languages/generatedString.php:4533
 msgid "Select Hooks to Call"
 msgstr ""
 
-#: languages/generatedString.php:4531
+#: languages/generatedString.php:4535
 msgid "On Load"
 msgstr ""
 
-#: languages/generatedString.php:4533
+#: languages/generatedString.php:4537
 msgid "On Field Input"
 msgstr ""
 
-#: languages/generatedString.php:4535
+#: languages/generatedString.php:4539
 msgid "On Form Validate"
 msgstr ""
 
-#: languages/generatedString.php:4537
+#: languages/generatedString.php:4541
 msgid "On Form Submit"
 msgstr ""
 
-#: languages/generatedString.php:4539
+#: languages/generatedString.php:4543
 msgid "Record Create/Edit"
 msgstr ""
 
-#: languages/generatedString.php:4541
+#: languages/generatedString.php:4545
 msgid "Record Create"
 msgstr ""
 
-#: languages/generatedString.php:4543
+#: languages/generatedString.php:4547
 msgid "Record Edit"
 msgstr ""
 
-#: languages/generatedString.php:4545
+#: languages/generatedString.php:4549
 msgid "Record Delete"
 msgstr ""
 
-#: languages/generatedString.php:4547
+#: languages/generatedString.php:4551
 msgid "Always"
 msgstr ""
 
-#: languages/generatedString.php:4549
+#: languages/generatedString.php:4553
 msgid "With Condition"
 msgstr ""
 
-#: languages/generatedString.php:4551
+#: languages/generatedString.php:4555
 msgid "Conditional Logics"
 msgstr ""
 
-#: languages/generatedString.php:4553
+#: languages/generatedString.php:4557
 msgid "Add Conditional Logic"
 msgstr ""
 
-#: languages/generatedString.php:4555
+#: languages/generatedString.php:4559
 msgid "Conditional logics execute according to the sequence of their logic groups. A group placed higher will have greater priority. To adjust the priority, simply drag and drop the logic groups as needed."
 msgstr ""
 
-#: languages/generatedString.php:4557
+#: languages/generatedString.php:4561
 msgid "Additional Actions"
 msgstr ""
 
-#: languages/generatedString.php:4559
+#: languages/generatedString.php:4563
 msgid "Email Notification"
 msgstr ""
 
-#: languages/generatedString.php:4561
+#: languages/generatedString.php:4565
 msgid "Action Run When:"
 msgstr ""
 
-#: languages/generatedString.php:4563
+#: languages/generatedString.php:4567
 msgid "Action Effect:"
 msgstr ""
 
-#: languages/generatedString.php:4565
+#: languages/generatedString.php:4569
 msgid "Only on Form Load"
 msgstr ""
 
-#: languages/generatedString.php:4567
+#: languages/generatedString.php:4571
 msgid "Only on Field Input"
 msgstr ""
 
-#: languages/generatedString.php:4569
+#: languages/generatedString.php:4573
 msgid "Only on Form Validate"
 msgstr ""
 
-#: languages/generatedString.php:4571
+#: languages/generatedString.php:4575
 msgid "Only on Form Submit"
 msgstr ""
 
-#: languages/generatedString.php:4573
+#: languages/generatedString.php:4577
 msgid "Action Behaviour:"
 msgstr ""
 
-#: languages/generatedString.php:4575
+#: languages/generatedString.php:4579
 msgid "Condition"
 msgstr ""
 
-#: languages/generatedString.php:4577
+#: languages/generatedString.php:4581
 msgid "Forgot Password Fields"
 msgstr ""
 
-#: languages/generatedString.php:4579
+#: languages/generatedString.php:4583
 msgid "Redirect Page:"
 msgstr ""
 
-#: languages/generatedString.php:4581
+#: languages/generatedString.php:4585
 msgid "Password reset email template"
 msgstr ""
 
-#: languages/generatedString.php:4583
+#: languages/generatedString.php:4587
 msgid "Success Message:"
 msgstr ""
 
-#: languages/generatedString.php:4585
+#: languages/generatedString.php:4589
 msgid "Login Fields"
 msgstr ""
 
-#: languages/generatedString.php:4587
+#: languages/generatedString.php:4591
 msgid "Success redirect Page:"
 msgstr ""
 
-#: languages/generatedString.php:4589
+#: languages/generatedString.php:4593
 msgid "Redirect page (already activated):"
 msgstr ""
 
-#: languages/generatedString.php:4591
+#: languages/generatedString.php:4595
 msgid "Invalid redirect page:"
 msgstr ""
 
-#: languages/generatedString.php:4593
+#: languages/generatedString.php:4597
 msgid "Rejection Success redirect page:"
 msgstr ""
 
-#: languages/generatedString.php:4595
+#: languages/generatedString.php:4599
 msgid "Activation success"
 msgstr ""
 
-#: languages/generatedString.php:4597
+#: languages/generatedString.php:4601
 msgid "Already activated account"
 msgstr ""
 
-#: languages/generatedString.php:4599
+#: languages/generatedString.php:4603
 msgid "Invalid activation key"
 msgstr ""
 
-#: languages/generatedString.php:4601
+#: languages/generatedString.php:4605
 msgid "Reject Success Message"
 msgstr ""
 
-#: languages/generatedString.php:4603
+#: languages/generatedString.php:4607
 msgid "If the Username and Password fields are blank then the user will take the value of the email field as the field and the password will be auto-generated."
 msgstr ""
 
-#: languages/generatedString.php:4605
+#: languages/generatedString.php:4609
 msgid "Field Mappping"
 msgstr ""
 
-#: languages/generatedString.php:4607
+#: languages/generatedString.php:4611
 msgid "User Fields"
 msgstr ""
 
-#: languages/generatedString.php:4609
+#: languages/generatedString.php:4613
 msgid "User Email Notification"
 msgstr ""
 
-#: languages/generatedString.php:4611
+#: languages/generatedString.php:4615
 msgid "Admin Email Notification"
 msgstr ""
 
-#: languages/generatedString.php:4613
+#: languages/generatedString.php:4617
 msgid "WP User Role"
 msgstr ""
 
-#: languages/generatedString.php:4615
+#: languages/generatedString.php:4619
 msgid "Success Messages"
 msgstr ""
 
-#: languages/generatedString.php:4617
+#: languages/generatedString.php:4621
 msgid "User Approval  Method:"
 msgstr ""
 
-#: languages/generatedString.php:4619
+#: languages/generatedString.php:4623
 msgid "Select approval method"
 msgstr ""
 
-#: languages/generatedString.php:4621
+#: languages/generatedString.php:4625
 msgid "Auto Login After Registration"
 msgstr ""
 
-#: languages/generatedString.php:4623
+#: languages/generatedString.php:4627
 msgid "Customize Email templates"
 msgstr ""
 
-#: languages/generatedString.php:4625
+#: languages/generatedString.php:4629
 msgid "Edit verification Messages/Redirect URL"
 msgstr ""
 
-#: languages/generatedString.php:4627
+#: languages/generatedString.php:4631
 msgid "User Meta Field Mappping"
 msgstr ""
 
-#: languages/generatedString.php:4629
+#: languages/generatedString.php:4633
 msgid "Meta Value"
 msgstr ""
 
-#: languages/generatedString.php:4631
+#: languages/generatedString.php:4635
 msgid "Reset Password Fields"
 msgstr ""
 
-#: languages/generatedString.php:4633
+#: languages/generatedString.php:4637
 msgid "Bit Form - Contact Form Builder Plugin for WordPress"
 msgstr ""
 
-#: languages/generatedString.php:4635
+#: languages/generatedString.php:4639
 msgid "Contact Form"
 msgstr ""
 
-#: languages/generatedString.php:4637
+#: languages/generatedString.php:4641
 msgid "Select a Form"
 msgstr ""
 
-#: languages/generatedString.php:4639
+#: languages/generatedString.php:4643
 msgid "Bitform block settings"
 msgstr ""
 
-#: languages/generatedString.php:4641
+#: languages/generatedString.php:4645
 msgid "Form settings"
 msgstr ""
 
-#: languages/generatedString.php:4643
+#: languages/generatedString.php:4647
 msgid "Failed to change Form Status"
 msgstr ""
 
-#: languages/generatedString.php:4645
+#: languages/generatedString.php:4649
 msgid "Form Name"
 msgstr ""
 
-#: languages/generatedString.php:4647
+#: languages/generatedString.php:4651
 msgid "Entries"
 msgstr ""
 
-#: languages/generatedString.php:4649
+#: languages/generatedString.php:4653
 msgid "Views"
 msgstr ""
 
-#: languages/generatedString.php:4651
+#: languages/generatedString.php:4655
 msgid "Completion Rate"
 msgstr ""
 
-#: languages/generatedString.php:4653
+#: languages/generatedString.php:4657
 msgid "Created"
 msgstr ""
 
-#: languages/generatedString.php:4655
+#: languages/generatedString.php:4659
 msgid "Edit Form"
 msgstr ""
 
-#: languages/generatedString.php:4657
+#: languages/generatedString.php:4661
 msgid "Data Table"
 msgstr ""
 
-#: languages/generatedString.php:4659
+#: languages/generatedString.php:4663
 msgid "Form Deleted Successfully"
 msgstr ""
 
-#: languages/generatedString.php:4661
+#: languages/generatedString.php:4665
 msgid "Duplicate..."
 msgstr ""
 
-#: languages/generatedString.php:4663
+#: languages/generatedString.php:4667
 msgid "Exporting..."
 msgstr ""
 
-#: languages/generatedString.php:4665
+#: languages/generatedString.php:4669
 msgid "Are you sure to delete this form?"
 msgstr ""
 
-#: languages/generatedString.php:4667
+#: languages/generatedString.php:4671
 msgid "Are you sure to duplicate this form ?"
 msgstr ""
 
-#: languages/generatedString.php:4669
+#: languages/generatedString.php:4673
 msgid "Are you sure to export this form ?"
 msgstr ""
 
-#: languages/generatedString.php:4671
+#: languages/generatedString.php:4675
 msgid "Create a New Form"
 msgstr ""
 
-#: languages/generatedString.php:4673
+#: languages/generatedString.php:4677
 msgid "Create Form"
 msgstr ""
 
-#: languages/generatedString.php:4675
+#: languages/generatedString.php:4679
 msgid "General"
 msgstr ""
 
-#: languages/generatedString.php:4677
+#: languages/generatedString.php:4681
 msgid "CAPTCHA"
 msgstr ""
 
-#: languages/generatedString.php:4683
+#: languages/generatedString.php:4687
 msgid "PDF"
 msgstr ""
 
-#: languages/generatedString.php:4687
+#: languages/generatedString.php:4691
 msgid "API"
 msgstr ""
 
-#: languages/generatedString.php:4689
+#: languages/generatedString.php:4693
 msgid "View Name"
 msgstr ""
 
-#: languages/generatedString.php:4691
+#: languages/generatedString.php:4695
 msgid "Edit Table"
 msgstr ""
 
-#: languages/generatedString.php:4693
+#: languages/generatedString.php:4697
 msgid "Table Deleted Successfully"
 msgstr ""
 
-#: languages/generatedString.php:4695
+#: languages/generatedString.php:4699
 msgid "Are you sure to delete this table?"
 msgstr ""
 
-#: languages/generatedString.php:4697
+#: languages/generatedString.php:4701
 msgid "Create View"
 msgstr ""
 
-#: languages/generatedString.php:4699
+#: languages/generatedString.php:4703
 msgid "Prevent Public View of Entries"
 msgstr ""
 
-#: languages/generatedString.php:4701
+#: languages/generatedString.php:4705
 msgid "(Allow only selected rules to View Entries)"
 msgstr ""
 
-#: languages/generatedString.php:4703
+#: languages/generatedString.php:4707
 msgid "Allow Roles to view own entries"
 msgstr ""
 
-#: languages/generatedString.php:4705
+#: languages/generatedString.php:4709
 msgid "Allow Roles to view Other's entries"
 msgstr ""
 
-#: languages/generatedString.php:4707
+#: languages/generatedString.php:4711
 msgid "Allow Users to Edit Form Entries"
 msgstr ""
 
-#: languages/generatedString.php:4709
+#: languages/generatedString.php:4713
 msgid "Allow Roles to edit own entries"
 msgstr ""
 
-#: languages/generatedString.php:4711
+#: languages/generatedString.php:4715
 msgid "Allow Roles to edit Other's entries"
 msgstr ""
 
-#: languages/generatedString.php:4713
+#: languages/generatedString.php:4717
 msgid "By Roles"
 msgstr ""
 
-#: languages/generatedString.php:4715
+#: languages/generatedString.php:4719
 msgid "Selected User"
 msgstr ""
 
-#: languages/generatedString.php:4717
+#: languages/generatedString.php:4721
 msgid "Users"
 msgstr ""
 
-#: languages/generatedString.php:4719
+#: languages/generatedString.php:4723
 msgid "Access Setting"
 msgstr ""
 
-#: languages/generatedString.php:4721
+#: languages/generatedString.php:4725
 msgid "Entry View"
 msgstr ""
 
-#: languages/generatedString.php:4723
+#: languages/generatedString.php:4727
 msgid "Entry Edit"
 msgstr ""
 
-#: languages/generatedString.php:4725
+#: languages/generatedString.php:4729
 msgid "Single Entry View"
 msgstr ""
 
-#: languages/generatedString.php:4727
+#: languages/generatedString.php:4731
 msgid "Single Entry Details View"
 msgstr ""
 
-#: languages/generatedString.php:4729
+#: languages/generatedString.php:4733
 msgid "All Submitted Response"
 msgstr ""
 
-#: languages/generatedString.php:4731
+#: languages/generatedString.php:4735
 msgid "Own Submitted Response"
 msgstr ""
 
-#: languages/generatedString.php:4733
+#: languages/generatedString.php:4737
 msgid "View List"
 msgstr ""
 
-#: languages/generatedString.php:4735
+#: languages/generatedString.php:4739
 msgid "Details Page"
 msgstr ""
 
-#: languages/generatedString.php:4737
+#: languages/generatedString.php:4741
 msgid "Details Page Styling"
 msgstr ""
 
-#: languages/generatedString.php:4739
+#: languages/generatedString.php:4743
 msgid "Setting"
 msgstr ""
 
-#: languages/generatedString.php:4741
+#: languages/generatedString.php:4745
 msgid "Style"
 msgstr ""
 
-#: languages/generatedString.php:4743
+#: languages/generatedString.php:4747
 msgid "Table Caption"
 msgstr ""
 
-#: languages/generatedString.php:4745
+#: languages/generatedString.php:4749
 msgid "Column Mapping"
 msgstr ""
 
-#: languages/generatedString.php:4747
+#: languages/generatedString.php:4751
 msgid "Column Header"
 msgstr ""
 
-#: languages/generatedString.php:4749
+#: languages/generatedString.php:4753
 msgid "Column Width"
 msgstr ""
 
-#: languages/generatedString.php:4751
+#: languages/generatedString.php:4755
 msgid "Form Field"
 msgstr ""
 
-#: languages/generatedString.php:4753
+#: languages/generatedString.php:4757
 msgid "Action Column"
 msgstr ""
 
-#: languages/generatedString.php:4755
+#: languages/generatedString.php:4759
 msgid "Column Title"
 msgstr ""
 
-#: languages/generatedString.php:4757
+#: languages/generatedString.php:4761
 msgid "Edit Button"
 msgstr ""
 
-#: languages/generatedString.php:4759
+#: languages/generatedString.php:4763
 msgid "Custom Page"
 msgstr ""
 
-#: languages/generatedString.php:4761
+#: languages/generatedString.php:4765
 msgid "View Button"
 msgstr ""
 
-#: languages/generatedString.php:4763
+#: languages/generatedString.php:4767
 msgid "Redirect Link"
 msgstr ""
 
-#: languages/generatedString.php:4765
+#: languages/generatedString.php:4769
 msgid "Caption"
 msgstr ""
 
-#: languages/generatedString.php:4767
+#: languages/generatedString.php:4771
 msgid "Table Even Row"
 msgstr ""
 
-#: languages/generatedString.php:4769
+#: languages/generatedString.php:4773
 msgid "Table Odd Row"
 msgstr ""
 
-#: languages/generatedString.php:4771
+#: languages/generatedString.php:4775
 msgid "Page Select Box"
 msgstr ""
 
-#: languages/generatedString.php:4773
+#: languages/generatedString.php:4777
 msgid "Pagination Button"
 msgstr ""
 
-#: languages/generatedString.php:4775
+#: languages/generatedString.php:4779
 msgid "Search Box"
 msgstr ""
 
-#: languages/generatedString.php:4777
+#: languages/generatedString.php:4781
 msgid "Table"
 msgstr ""
 
-#: languages/generatedString.php:4779
+#: languages/generatedString.php:4783
 msgid "Table Rows"
 msgstr ""
 
-#: languages/generatedString.php:4781
+#: languages/generatedString.php:4785
 msgid "Background color"
 msgstr ""
 
-#: languages/generatedString.php:4783
+#: languages/generatedString.php:4787
 msgid "Font Weight"
 msgstr ""
 
-#: languages/generatedString.php:4785
+#: languages/generatedString.php:4789
 msgid "Font Style"
 msgstr ""
 
-#: languages/generatedString.php:4787
+#: languages/generatedString.php:4791
 msgid "Table Wrapper"
 msgstr ""
 
-#: languages/generatedString.php:4789
+#: languages/generatedString.php:4793
 msgid "Welcome to Bit Form Views (Beta)"
 msgstr ""
 
-#: languages/generatedString.php:4791
+#: languages/generatedString.php:4795
 msgid "Create First View"
 msgstr ""
 
-#: languages/generatedString.php:4793
+#: languages/generatedString.php:4797
 msgid "Professional & Easy To Use WordPress Form Builder"
 msgstr ""
 
-#: languages/generatedString.php:4795
+#: languages/generatedString.php:4799
 msgid "Drag and Drop WordPress Form Builder will allow you to build any kind of forms for WordPress website that you can imagine. The Professional design of Bit Form keeps all the tools right where you want them! You can make integration among various CRM and application with no zero experience."
 msgstr ""
 
-#: languages/generatedString.php:4797
+#: languages/generatedString.php:4801
 msgid "Explore our extensive documentation. From beginners to developers - everyone will get an answer"
 msgstr ""
 
-#: languages/generatedString.php:4799
+#: languages/generatedString.php:4803
 msgid "here"
 msgstr ""
 
-#: languages/generatedString.php:4801
+#: languages/generatedString.php:4805
 msgid "Support"
 msgstr ""
 
-#: languages/generatedString.php:4803
+#: languages/generatedString.php:4807
 msgid "In Bit Apps, we provide all kind product support for any types of customer, it doesn't matter FREE or PRO user. We actively provide support through Email and Live Chat. Our support team is always ready to help you. We are here to answer your questions and help you with any issues you may have."
 msgstr ""
 
-#: languages/generatedString.php:4805
+#: languages/generatedString.php:4809
 msgid "Facebook support group"
 msgstr ""
 
-#: languages/generatedString.php:4807
+#: languages/generatedString.php:4811
 msgid "YouTube channel"
 msgstr ""
 
-#: languages/generatedString.php:4809
+#: languages/generatedString.php:4813
 msgid "Chat here"
 msgstr ""
 
-#: languages/generatedString.php:4811
+#: languages/generatedString.php:4815
 msgid "Rate us on WordPress"
 msgstr ""
 
-#: languages/generatedString.php:4813
+#: languages/generatedString.php:4817
 msgid "Lost In Space"
 msgstr ""
 
-#: languages/generatedString.php:4815
+#: languages/generatedString.php:4819
 msgid "Redirecting Home in"
 msgstr ""
 
-#: languages/generatedString.php:4817
+#: languages/generatedString.php:4821
 msgid "Go Home"
 msgstr ""
 
-#: languages/generatedString.php:4819
+#: languages/generatedString.php:4823
 msgid "Warning"
 msgstr ""
 
-#: languages/generatedString.php:4821
+#: languages/generatedString.php:4825
 msgid "Are you sure you want to leave the form? Unsaved data will be lost."
 msgstr ""
 
-#: languages/generatedString.php:4823
+#: languages/generatedString.php:4827
 msgid "Are you sure you want to switch forms? Unsaved data will be lost."
 msgstr ""
 
-#: languages/generatedString.php:4825
+#: languages/generatedString.php:4829
 msgid "Switch Form"
 msgstr ""
 
-#: languages/generatedString.php:4827
+#: languages/generatedString.php:4831
 msgid "Are you sure to duplicate this entry?"
 msgstr ""
 
-#: languages/generatedString.php:4829
+#: languages/generatedString.php:4833
 msgid "View Repeater Data"
 msgstr ""
 
-#: languages/generatedString.php:4831
+#: languages/generatedString.php:4835
 msgid "Entry Details #"
 msgstr ""
 
-#: languages/generatedString.php:4833
+#: languages/generatedString.php:4837
 msgid "Data Views & Edit"
 msgstr ""
 
-#: languages/generatedString.php:4835
+#: languages/generatedString.php:4839
 msgid "View Analytics Report"
 msgstr ""
 
-#: languages/generatedString.php:4837
+#: languages/generatedString.php:4841
 msgid "No Entry Found."
 msgstr ""
 
-#: languages/generatedString.php:4839
+#: languages/generatedString.php:4843
 msgid "Form Settings"
 msgstr ""
 
-#: languages/generatedString.php:4841
+#: languages/generatedString.php:4845
 msgid "Conversational Form"
 msgstr ""
 
-#: languages/generatedString.php:4843
+#: languages/generatedString.php:4847
 msgid "Landing Form"
 msgstr ""
 
-#: languages/generatedString.php:4845
+#: languages/generatedString.php:4849
 msgid "WP Auth"
 msgstr ""
 
-#: languages/generatedString.php:4847
+#: languages/generatedString.php:4851
 msgid "Entries are loading..."
 msgstr ""
 
-#: languages/generatedString.php:4849
+#: languages/generatedString.php:4853
 msgid "Advance Field Wise Report"
 msgstr ""
 
-#: languages/generatedString.php:4851
+#: languages/generatedString.php:4855
 msgid "Please select fields to view reports individually"
 msgstr ""
 
-#: languages/generatedString.php:4853
+#: languages/generatedString.php:4857
 msgid "Thank you for using Bit Form. If you like the plugin, please give us a"
 msgstr ""
 
-#: languages/generatedString.php:4855
+#: languages/generatedString.php:4859
 msgid "review"
 msgstr ""
 
-#: languages/generatedString.php:4857
+#: languages/generatedString.php:4861
 msgid "on WordPress.org to help us spread more."
 msgstr ""
 
-#: languages/generatedString.php:4859
+#: languages/generatedString.php:4863
 msgid "Filter Options"
 msgstr ""
 
-#: languages/generatedString.php:4861
+#: languages/generatedString.php:4865
 msgid "All filters below will get entries based on analytics report"
 msgstr ""
 
-#: languages/generatedString.php:4863
+#: languages/generatedString.php:4867
 msgid "Filter by Date"
 msgstr ""
 
-#: languages/generatedString.php:4865
+#: languages/generatedString.php:4869
 msgid "Entry Status"
 msgstr ""
 
-#: languages/generatedString.php:4867
+#: languages/generatedString.php:4871
 msgid "Select Fields for Report:"
 msgstr ""
 
-#: languages/generatedString.php:4869
+#: languages/generatedString.php:4873
 msgid "Other Info"
 msgstr ""
 
-#: languages/generatedString.php:4871
+#: languages/generatedString.php:4875
 msgid "Total Entry:"
 msgstr ""
 
-#: languages/generatedString.php:4873
+#: languages/generatedString.php:4877
 msgid "Loading..."
 msgstr ""
 
-#: languages/generatedString.php:4875
+#: languages/generatedString.php:4879
 msgid "Printing..."
 msgstr ""
 
-#: languages/generatedString.php:4877
+#: languages/generatedString.php:4881
 msgid "Print Report"
 msgstr ""
 
-#: languages/generatedString.php:4879
+#: languages/generatedString.php:4883
 msgid "Welcome to Bit Form"
 msgstr ""
 
-#: languages/generatedString.php:4881
+#: languages/generatedString.php:4885
 msgid "Thank you for installing Bit Form."
 msgstr ""
 
-#: languages/generatedString.php:4883
+#: languages/generatedString.php:4887
 msgid "Modern Form builder and database management  system"
 msgstr ""
 
-#: languages/generatedString.php:4885
+#: languages/generatedString.php:4889
 msgid "for Wordpress"
 msgstr ""
 
-#: languages/generatedString.php:4887
+#: languages/generatedString.php:4891
 msgid "Create First Form"
 msgstr ""
 
-#: languages/generatedString.php:4889
+#: languages/generatedString.php:4893
 msgid "Add More +"
 msgstr ""
 
-#: languages/generatedString.php:4891
+#: languages/generatedString.php:4895
 msgid "Country Field available in Pro version of Bit Form."
 msgstr ""
 
-#: languages/generatedString.php:4893
+#: languages/generatedString.php:4897
 msgid "You can use either ReCaptcha-V2 or ReCaptcha-V3 in a form. to use ReCaptcha-V2 disable the ReCaptcha-V3 from the Form Settings."
 msgstr ""
 
-#: languages/generatedString.php:4895
+#: languages/generatedString.php:4899
 msgid "<p style=\"font-size: 16px\">To use reCaptchav2, you must set Site Key and Secret Key from <a href=\""
 msgstr ""
 
-#: languages/generatedString.php:4897
+#: languages/generatedString.php:4901
 msgid "<p style=\"font-size: 16px\">To use Turnstile, you must set Site Key and Secret Key from <a href=\""
 msgstr ""
 
-#: languages/generatedString.php:4899
+#: languages/generatedString.php:4903
 msgid "<p style=\"font-size: 16px\">To use hCaptcha, you must set Site Key and Secret Key from <a href=\""
 msgstr ""
 
-#: languages/generatedString.php:4901
+#: languages/generatedString.php:4905
 msgid "You cannot add more than one"
 msgstr ""
 
-#: languages/generatedString.php:4903
+#: languages/generatedString.php:4907
 msgid "Save Draft Button available in Pro version of Bit Form."
 msgstr ""
 
-#: languages/generatedString.php:4905
+#: languages/generatedString.php:4909
 msgid "You cannot add"
 msgstr ""
 
-#: languages/generatedString.php:4907
+#: languages/generatedString.php:4911
 msgid "<p style=\"font-size: 16px\">To use"
 msgstr ""
 
-#: languages/generatedString.php:4911
+#: languages/generatedString.php:4915
 msgid "Please enter a valid email address."
 msgstr ""
 
-#: languages/generatedString.php:4913
+#: languages/generatedString.php:4917
 msgid "Change"
 msgstr ""
 
-#: languages/generatedString.php:4915
+#: languages/generatedString.php:4919
 msgid "Not Equal"
 msgstr ""
 
-#: languages/generatedString.php:4917
+#: languages/generatedString.php:4921
 msgid "Is Null"
 msgstr ""
 
-#: languages/generatedString.php:4919
+#: languages/generatedString.php:4923
 msgid "Is Not Null"
 msgstr ""
 
-#: languages/generatedString.php:4921
+#: languages/generatedString.php:4925
 msgid "Contain"
 msgstr ""
 
-#: languages/generatedString.php:4923
+#: languages/generatedString.php:4927
 msgid "Not Contain"
 msgstr ""
 
-#: languages/generatedString.php:4925
+#: languages/generatedString.php:4929
 msgid "Between"
 msgstr ""
 
-#: languages/generatedString.php:4927
+#: languages/generatedString.php:4931
 msgid "On Click"
 msgstr ""
 
-#: languages/generatedString.php:4929
+#: languages/generatedString.php:4933
 msgid "Advanced File Upload Field"
 msgstr ""
 
-#: languages/generatedString.php:4931
+#: languages/generatedString.php:4935
 msgid "PayPal Payment Field"
 msgstr ""
 
-#: languages/generatedString.php:4933
+#: languages/generatedString.php:4937
 msgid "Razorpay Payment Field"
 msgstr ""
 
-#: languages/generatedString.php:4935
+#: languages/generatedString.php:4939
 msgid "Stripe Payment Field"
 msgstr ""
 
-#: languages/generatedString.php:4937
+#: languages/generatedString.php:4941
 msgid "Mollie Payment Field"
 msgstr ""
 
-#: languages/generatedString.php:4939
+#: languages/generatedString.php:4943
 msgid "Default Value"
 msgstr ""
 
-#: languages/generatedString.php:4941
+#: languages/generatedString.php:4945
 msgid "Suggestions"
 msgstr ""
 
-#: languages/generatedString.php:4943
+#: languages/generatedString.php:4947
 msgid "Input Mode"
 msgstr ""
 
-#: languages/generatedString.php:4945
+#: languages/generatedString.php:4949
 msgid "Read Only"
 msgstr ""
 
-#: languages/generatedString.php:4947
+#: languages/generatedString.php:4951
 msgid "User Unique"
 msgstr ""
 
-#: languages/generatedString.php:4949
+#: languages/generatedString.php:4953
 msgid "Input Validation"
 msgstr ""
 
-#: languages/generatedString.php:4951
+#: languages/generatedString.php:4955
 msgid "Maximum Option Validation"
 msgstr ""
 
-#: languages/generatedString.php:4953
+#: languages/generatedString.php:4957
 msgid "Minimum Option Validation"
 msgstr ""
 
-#: languages/generatedString.php:4955
+#: languages/generatedString.php:4959
 msgid "Option Column"
 msgstr ""
 
-#: languages/generatedString.php:4957
+#: languages/generatedString.php:4961
 msgid "Other Option"
 msgstr ""
 
-#: languages/generatedString.php:4959
+#: languages/generatedString.php:4963
 msgid "Search Placeholder Modify"
 msgstr ""
 
-#: languages/generatedString.php:4961
+#: languages/generatedString.php:4965
 msgid "Selected Option Image"
 msgstr ""
 
-#: languages/generatedString.php:4963
+#: languages/generatedString.php:4967
 msgid "Showing Selected Option Image"
 msgstr ""
 
-#: languages/generatedString.php:4965
+#: languages/generatedString.php:4969
 msgid "Option Icon/Image"
 msgstr ""
 
-#: languages/generatedString.php:4967
+#: languages/generatedString.php:4971
 msgid "Showing Icon/Image in option"
 msgstr ""
 
-#: languages/generatedString.php:4969
+#: languages/generatedString.php:4973
 msgid "Minimum and Maximum Option"
 msgstr ""
 
-#: languages/generatedString.php:4971
+#: languages/generatedString.php:4975
 msgid "Minimum and Maximum Option validation"
 msgstr ""
 
-#: languages/generatedString.php:4973
+#: languages/generatedString.php:4977
 msgid "List Height"
 msgstr ""
 
-#: languages/generatedString.php:4975
+#: languages/generatedString.php:4979
 msgid "Option List Height"
 msgstr ""
 
-#: languages/generatedString.php:4977
+#: languages/generatedString.php:4981
 msgid "Detect Country by IP"
 msgstr ""
 
-#: languages/generatedString.php:4979
+#: languages/generatedString.php:4983
 msgid "Detect Country by Geo Location"
 msgstr ""
 
-#: languages/generatedString.php:4981
+#: languages/generatedString.php:4985
 msgid "Multiple Option List"
 msgstr ""
 
-#: languages/generatedString.php:4983
+#: languages/generatedString.php:4987
 msgid "Minimum and Maximum Value"
 msgstr ""
 
-#: languages/generatedString.php:4985
+#: languages/generatedString.php:4989
 msgid "Minimum and Maximum Value Validation"
 msgstr ""
 
-#: languages/generatedString.php:4987
+#: languages/generatedString.php:4991
 msgid "Country Not Found Text Modify"
 msgstr ""
 
-#: languages/generatedString.php:4989
+#: languages/generatedString.php:4993
 msgid "Currency Not Found Text Modify"
 msgstr ""
 
-#: languages/generatedString.php:4991
+#: languages/generatedString.php:4995
 msgid "Modification of File Select Status"
 msgstr ""
 
-#: languages/generatedString.php:4993
+#: languages/generatedString.php:4997
 msgid "Show Max Size"
 msgstr ""
 
-#: languages/generatedString.php:4995
+#: languages/generatedString.php:4999
 msgid "Individual Style"
 msgstr ""
 
-#: languages/generatedString.php:4997
+#: languages/generatedString.php:5001
 msgid "Individual Field Styling"
 msgstr ""
 
-#: languages/generatedString.php:4999
+#: languages/generatedString.php:5003
 msgid "Custom Class & Attribute"
 msgstr ""
 
-#: languages/generatedString.php:5001
+#: languages/generatedString.php:5005
 msgid "Custom Classes and Attributes"
 msgstr ""
 
-#: languages/generatedString.php:5003
+#: languages/generatedString.php:5007
 msgid "Custom JS and CSS Editor"
 msgstr ""
 
-#: languages/generatedString.php:5005
+#: languages/generatedString.php:5009
 msgid "Custom JS and CSS Code Editor"
 msgstr ""
 
-#: languages/generatedString.php:5007
+#: languages/generatedString.php:5011
 msgid "Breakpoint Modification"
 msgstr ""
 
-#: languages/generatedString.php:5009
+#: languages/generatedString.php:5013
 msgid "Breakpoint width size modification"
 msgstr ""
 
-#: languages/generatedString.php:5011
+#: languages/generatedString.php:5015
 msgid "Form Width Modification"
 msgstr ""
 
-#: languages/generatedString.php:5013
+#: languages/generatedString.php:5017
 msgid "Field Clone"
 msgstr ""
 
-#: languages/generatedString.php:5015
+#: languages/generatedString.php:5019
 msgid "Field Cloning"
 msgstr ""
 
-#: languages/generatedString.php:5017
+#: languages/generatedString.php:5021
 msgid "Disable Entry Storing"
 msgstr ""
 
-#: languages/generatedString.php:5019
+#: languages/generatedString.php:5023
 msgid "Capture Google Ads Click"
 msgstr ""
 
-#: languages/generatedString.php:5021
+#: languages/generatedString.php:5025
 msgid "Login User"
 msgstr ""
 
-#: languages/generatedString.php:5023
+#: languages/generatedString.php:5027
 msgid "Empty Submission"
 msgstr ""
 
-#: languages/generatedString.php:5025
+#: languages/generatedString.php:5029
 msgid "Allowed IP List"
 msgstr ""
 
-#: languages/generatedString.php:5027
+#: languages/generatedString.php:5031
 msgid "Blocked IP"
 msgstr ""
 
-#: languages/generatedString.php:5029
+#: languages/generatedString.php:5033
 msgid "Blocked IP List"
 msgstr ""
 
-#: languages/generatedString.php:5031
+#: languages/generatedString.php:5035
 msgid "Entry Limit"
 msgstr ""
 
-#: languages/generatedString.php:5033
+#: languages/generatedString.php:5037
 msgid "Single Entry for each IP"
 msgstr ""
 
-#: languages/generatedString.php:5035
+#: languages/generatedString.php:5039
 msgid "Form Entry Edit"
 msgstr ""
 
-#: languages/generatedString.php:5037
+#: languages/generatedString.php:5041
 msgid "Honeypot trap"
 msgstr ""
 
-#: languages/generatedString.php:5039
+#: languages/generatedString.php:5043
 msgid "Snackbar Message"
 msgstr ""
 
-#: languages/generatedString.php:5041
+#: languages/generatedString.php:5045
 msgid "Modal Message"
 msgstr ""
 
-#: languages/generatedString.php:5043
+#: languages/generatedString.php:5047
 msgid "Rating Message on Hover"
 msgstr ""
 
-#: languages/generatedString.php:5045
+#: languages/generatedString.php:5049
 msgid "Rating Message on Select"
 msgstr ""
 
-#: languages/generatedString.php:5047
+#: languages/generatedString.php:5051
 msgid "PDF Template"
 msgstr ""
 
-#: languages/generatedString.php:5049
+#: languages/generatedString.php:5053
 msgid "Custom Theme Feature"
 msgstr ""
 
-#: languages/generatedString.php:5051
+#: languages/generatedString.php:5055
 msgid "Name is the unique identifier for the field. It is used to reference the field in the form submission data."
 msgstr ""
 
-#: languages/generatedString.php:5053
+#: languages/generatedString.php:5057
 msgid "Label is the title of the field that appears above or beside the field. You can show or hide the field label by toggling this option."
 msgstr ""
 
-#: languages/generatedString.php:5055
+#: languages/generatedString.php:5059
 msgid "Autocomplete allows you to specify what type of automated assistance the browser should provide for filling out the field, <a target='_blank' href='https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete'>Learn more</a>"
 msgstr ""
 
-#: languages/generatedString.php:5057
+#: languages/generatedString.php:5061
 msgid "Admin Label is the title of the field that will be used as an alternative reference throughout the dashboard. You can toggle this option to use or disable the admin label."
 msgstr ""
 
-#: languages/generatedString.php:5059
+#: languages/generatedString.php:5063
 msgid "Subtitle is an optional description that appears under the Field Label. You can show or hide the field subtitle by toggling this option."
 msgstr ""
 
-#: languages/generatedString.php:5061
+#: languages/generatedString.php:5065
 msgid "Helper Text is an optional text that appears beneath the field to provide additional information to the user. You can show or hide the helper text by toggling this option."
 msgstr ""
 
-#: languages/generatedString.php:5063
+#: languages/generatedString.php:5067
 msgid "Default Value is the initial value that will appear in the field. You can show or hide the default value by toggling this option."
 msgstr ""
 
-#: languages/generatedString.php:5065
+#: languages/generatedString.php:5069
 msgid "Suggestions allows you to add a custom suggestion list that will display suggestions as the user types in the input field."
 msgstr ""
 
-#: languages/generatedString.php:5067
+#: languages/generatedString.php:5071
 msgid "Placeholder is the text that appears inside the field before your user enters their own content. You can show or hide the field placeholder by toggling this option."
 msgstr ""
 
-#: languages/generatedString.php:5069
+#: languages/generatedString.php:5073
 msgid "This allows browser to display an appropriate virtual keyboard if needed. <a target='_blank' href='https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode'>Learn more</a>"
 msgstr ""
 
-#: languages/generatedString.php:5071
+#: languages/generatedString.php:5075
 msgid "Input Mask allows you to specify a pattern for the input field, helping users enter data in the correct format.<a target='_blank' href='https://bit-form.com/wp-docs/form-fields/bit-form-input-mask/'>Learn more</a>"
 msgstr ""
 
-#: languages/generatedString.php:5073
+#: languages/generatedString.php:5077
 msgid "Set a regular expression pattern that the input value should match for the field."
 msgstr ""
 
-#: languages/generatedString.php:5075
+#: languages/generatedString.php:5079
 msgid "This allows to make the field mandatory for users to fill out before submitting the form. You can toggle this option to use or disable the required."
 msgstr ""
 
-#: languages/generatedString.php:5077
+#: languages/generatedString.php:5081
 msgid "The hide field feature allows you to hide the field from the user on the form. You can toggle this option to show or hide the field."
 msgstr ""
 
-#: languages/generatedString.php:5079
+#: languages/generatedString.php:5083
 msgid "The reverse button feature allows to reverse the clear and undo button. You can toggle this option to reverse clear and undo button."
 msgstr ""
 
-#: languages/generatedString.php:5081
+#: languages/generatedString.php:5085
 msgid "Readonly feature allows you to set a field as read-only, meaning that users will not be able to edit the content of that field. You can toggle this option to enable or disable the setting."
 msgstr ""
 
-#: languages/generatedString.php:5083
+#: languages/generatedString.php:5087
 msgid "Disabling a field prevents users from interacting with it or entering data. You can toggle this option to enable or disable the field as needed."
 msgstr ""
 
-#: languages/generatedString.php:5085
+#: languages/generatedString.php:5089
 msgid "Enabling this option will check from the submitted entries whether its value is duplicate."
 msgstr ""
 
-#: languages/generatedString.php:5087
+#: languages/generatedString.php:5091
 msgid "Enabling this option will check from your WordPress user database whether its value is duplicate."
 msgstr ""
 
-#: languages/generatedString.php:5089
+#: languages/generatedString.php:5093
 msgid "Stripe provide a variety of themes for the payment form. You can choose the theme that best suits theme your payment form. <a target=\"_blank\" href=\"https://stripe.com/docs/elements/appearance-api\">Learn more</a>"
 msgstr ""
 
-#: languages/generatedString.php:5091
+#: languages/generatedString.php:5095
 msgid "Stripe provide minimum or maximum amount for different payment method type and currency. <a target='_blank' href='https://stripe.com/docs/currencies#minimum-and-maximum-charge-amounts'>learn more</a>"
 msgstr ""
 
-#: languages/generatedString.php:5093
+#: languages/generatedString.php:5097
 msgid "Allows you to preset the language to be used in the hosted payment pages shown to the consumer. This option is Optional. <a target='_blank' href='https://docs.mollie.com/reference/v2/payments-api/create-payment#:~:text=locale,OPTIONAL,-Allows%20you%20to'>learn more</a>"
 msgstr ""
 
-#: languages/generatedString.php:5095
+#: languages/generatedString.php:5099
 #, php-format
 msgid "Mollie provide a description for the payment. This option is required. <a target='_blank' href='https://docs.mollie.com/reference/create-payment#:~:text=Body%20Params-,description,required,-The%20description%20of'>learn more</a>. and also you add field value in this description. e.g: This Payment from Name: ${field_key}"
 msgstr ""
 
-#: languages/generatedString.php:5097
+#: languages/generatedString.php:5101
 msgid "You can add or remove Undo button form Signature Field. You can toggle this option to add or remove the Undo button."
 msgstr ""
 
-#: languages/generatedString.php:5099
+#: languages/generatedString.php:5103
 msgid "You can add or remove Clear button form Signature Field. You can toggle this option to add or remove the Clear button."
 msgstr ""
 
-#: languages/generatedString.php:5101
+#: languages/generatedString.php:5105
 msgid "This allows to show the rating message on hover. You can toggle this option to show or hide the rating message on hover."
 msgstr ""
 
-#: languages/generatedString.php:5103
+#: languages/generatedString.php:5107
 msgid "This allows to show the rating message on rating selected. You can toggle this option to show or hide the rating message on rating selected."
 msgstr ""
 
-#: languages/generatedString.php:5105
+#: languages/generatedString.php:5109
 msgid "By enabling this feature, you will enable to select multiple image."
 msgstr ""
 
-#: languages/generatedString.php:5107
+#: languages/generatedString.php:5111
 msgid "By enabling this feature, you will be hide image label."
 msgstr ""
 
-#: languages/generatedString.php:5109
+#: languages/generatedString.php:5113
 msgid "This allows to show the header icon. You can toggle this option to show or hide the header icon."
 msgstr ""
 
-#: languages/generatedString.php:5111
+#: languages/generatedString.php:5115
 msgid "This allows to show the stem button settings. You can toggle this option to show or hide the stem button settings."
 msgstr ""
 
-#: languages/generatedString.php:5113
+#: languages/generatedString.php:5117
 msgid "This allows to show the step label. You can toggle this option to show or hide the step label."
 msgstr ""
 
-#: languages/generatedString.php:5115
+#: languages/generatedString.php:5119
 msgid "This allows to show the step subtitle. You can toggle this option to show or hide the step subtitle."
 msgstr ""
 
-#: languages/generatedString.php:5117
+#: languages/generatedString.php:5121
 msgid "Container Class allows you to add custom CSS classes to the field container. You can use this to apply custom styles to the field wrapper."
 msgstr ""
 
-#: languages/generatedString.php:5119
+#: languages/generatedString.php:5123
 msgid "This option allows you to enable a confirm email field that requires users to re-enter their email address for verification."
 msgstr ""
 
-#: languages/generatedString.php:5121
+#: languages/generatedString.php:5125
 msgid "This option allows you to enable a confirm password field that requires users to re-enter their password for verification."
 msgstr ""
 
-#: languages/generatedString.php:5123
+#: languages/generatedString.php:5127
 msgid "This allows to show the password icon. You can toggle this option to show or hide the password icon."
 msgstr ""
 
-#: languages/generatedString.php:5125
+#: languages/generatedString.php:5129
 msgid "Allow only one entry for each IP address."
 msgstr ""
 
-#: languages/generatedString.php:5127
+#: languages/generatedString.php:5131
 msgid "Allow only logged in users to submit the form."
 msgstr ""
 
-#: languages/generatedString.php:5129
+#: languages/generatedString.php:5133
 msgid "This will prevent empty form submission."
 msgstr ""
 
-#: languages/generatedString.php:5131
+#: languages/generatedString.php:5135
 msgid "This will validate the field when the user leaves the field."
 msgstr ""
 
-#: languages/generatedString.php:5133
+#: languages/generatedString.php:5137
 msgid "This will disable storing the user entry in the database."
 msgstr ""
 
-#: languages/generatedString.php:5135
+#: languages/generatedString.php:5139
 msgid "This will enable reCAPTCHA v3."
 msgstr ""
 
-#: languages/generatedString.php:5137
+#: languages/generatedString.php:5141
 msgid "This will limit the number of entries."
 msgstr ""
 
-#: languages/generatedString.php:5139
+#: languages/generatedString.php:5143
 msgid "this will limit the form submission for specific period."
 msgstr ""
 
-#: languages/generatedString.php:5141
+#: languages/generatedString.php:5145
 msgid "This will block the specific IP address from submitting the form."
 msgstr ""
 
-#: languages/generatedString.php:5143
+#: languages/generatedString.php:5147
 msgid "This will allow the specific IP address to submit the form."
 msgstr ""
 
-#: languages/generatedString.php:5145
+#: languages/generatedString.php:5149
 msgid "This will enable Google Ads conversion tracking."
 msgstr ""
 
-#: languages/generatedString.php:5147
+#: languages/generatedString.php:5151
 msgid "How to Configure Confirmation Message/Redirect page"
 msgstr ""
 
-#: languages/generatedString.php:5149
+#: languages/generatedString.php:5153
 msgid "How to Configure Conditional Logic"
 msgstr ""
 
-#: languages/generatedString.php:5151
+#: languages/generatedString.php:5155
 msgid "How to enable Conversational Form"
 msgstr ""
 
-#: languages/generatedString.php:5153
+#: languages/generatedString.php:5157
 msgid "How to Setup Integrations"
 msgstr ""
 
-#: languages/generatedString.php:5155
+#: languages/generatedString.php:5159
 msgid "How to Configure Email Templates"
 msgstr ""
 
-#: languages/generatedString.php:5157
+#: languages/generatedString.php:5161
 msgid "How to Setup ACF integration"
 msgstr ""
 
-#: languages/generatedString.php:5159
+#: languages/generatedString.php:5163
 msgid "How to Setup ActiveCampaign integration"
 msgstr ""
 
-#: languages/generatedString.php:5161
+#: languages/generatedString.php:5165
 msgid "How to Setup Acumbamail integration"
 msgstr ""
 
-#: languages/generatedString.php:5163
+#: languages/generatedString.php:5167
 msgid "How to Setup Autonami integration"
 msgstr ""
 
-#: languages/generatedString.php:5165
+#: languages/generatedString.php:5169
 msgid "How to Setup Dropbox integration"
 msgstr ""
 
-#: languages/generatedString.php:5167
+#: languages/generatedString.php:5171
 msgid "How to Setup Elastic Email Integration"
 msgstr ""
 
-#: languages/generatedString.php:5169
+#: languages/generatedString.php:5173
 msgid "How to Setup Encharge integration"
 msgstr ""
 
-#: languages/generatedString.php:5171
+#: languages/generatedString.php:5175
 msgid "How to Setup Fluent-CRM integration"
 msgstr ""
 
-#: languages/generatedString.php:5173
+#: languages/generatedString.php:5177
 msgid "How to Setup Google Sheets integration"
 msgstr ""
 
-#: languages/generatedString.php:5175
+#: languages/generatedString.php:5179
 msgid "How to Setup Integrately integration"
 msgstr ""
 
-#: languages/generatedString.php:5177
+#: languages/generatedString.php:5181
 msgid "How to Setup Integromat integration"
 msgstr ""
 
-#: languages/generatedString.php:5179
+#: languages/generatedString.php:5183
 msgid "How to Setup MailChamp integration"
 msgstr ""
 
-#: languages/generatedString.php:5181
+#: languages/generatedString.php:5185
 msgid "How to Setup MailPoet integration"
 msgstr ""
 
-#: languages/generatedString.php:5183
+#: languages/generatedString.php:5187
 msgid "How to Setup MailerLite integration"
 msgstr ""
 
-#: languages/generatedString.php:5185
+#: languages/generatedString.php:5189
 msgid "How to Setup MetaBox integration"
 msgstr ""
 
-#: languages/generatedString.php:5187
+#: languages/generatedString.php:5191
 msgid "How to Setup Pabbly integration"
 msgstr ""
 
-#: languages/generatedString.php:5189
+#: languages/generatedString.php:5193
 msgid "How to Setup Pods integration"
 msgstr ""
 
-#: languages/generatedString.php:5191
+#: languages/generatedString.php:5195
 msgid "How to Setup Brevo(SendinBlue) integration"
 msgstr ""
 
-#: languages/generatedString.php:5193
+#: languages/generatedString.php:5197
 msgid "How to Setup Telegram integration"
 msgstr ""
 
-#: languages/generatedString.php:5195
+#: languages/generatedString.php:5199
 msgid "How to Setup WooCommerce integration"
 msgstr ""
 
-#: languages/generatedString.php:5197
+#: languages/generatedString.php:5201
 msgid "How to Setup Zapier integration"
 msgstr ""
 
-#: languages/generatedString.php:5199
+#: languages/generatedString.php:5203
 msgid "How to Setup Zoho Analytics integration"
 msgstr ""
 
-#: languages/generatedString.php:5201
+#: languages/generatedString.php:5205
 msgid "How to Setup Zoho Bigin integration"
 msgstr ""
 
-#: languages/generatedString.php:5203
+#: languages/generatedString.php:5207
 msgid "How to Setup Zoho Campaigns integration"
 msgstr ""
 
-#: languages/generatedString.php:5205
+#: languages/generatedString.php:5209
 msgid "How to Setup Zoho Creator integration"
 msgstr ""
 
-#: languages/generatedString.php:5207
+#: languages/generatedString.php:5211
 msgid "How to Setup Zoho-CRM integration"
 msgstr ""
 
-#: languages/generatedString.php:5209
+#: languages/generatedString.php:5213
 msgid "How to Setup Zoho Desk integration"
 msgstr ""
 
-#: languages/generatedString.php:5211
+#: languages/generatedString.php:5215
 msgid "How to Setup Zoho Flow integration"
 msgstr ""
 
-#: languages/generatedString.php:5213
+#: languages/generatedString.php:5217
 msgid "How to Setup Zoho Mail integration"
 msgstr ""
 
-#: languages/generatedString.php:5215
+#: languages/generatedString.php:5219
 msgid "How to Setup Zoho Marketing Hub integration"
 msgstr ""
 
-#: languages/generatedString.php:5217
+#: languages/generatedString.php:5221
 msgid "How to Setup Zoho Projects integration"
 msgstr ""
 
-#: languages/generatedString.php:5219
+#: languages/generatedString.php:5223
 msgid "How to Setup Zoho Recruit integration"
 msgstr ""
 
-#: languages/generatedString.php:5221
+#: languages/generatedString.php:5225
 msgid "How to Setup Zoho Sheet integration"
 msgstr ""
 
-#: languages/generatedString.php:5223
+#: languages/generatedString.php:5227
 msgid "How to Setup Zoho Sign integration"
 msgstr ""
 
-#: languages/generatedString.php:5225
+#: languages/generatedString.php:5229
 msgid "How to Setup Zoho Work Drive integration"
 msgstr ""
 
-#: languages/generatedString.php:5227
+#: languages/generatedString.php:5231
 msgid "How to Configure Double Opt-In"
 msgstr ""
 
-#: languages/generatedString.php:5229
+#: languages/generatedString.php:5233
 msgid "How to Configure Form Abandonment"
 msgstr ""
 
-#: languages/generatedString.php:5231
+#: languages/generatedString.php:5235
 msgid "How to Configure PDF Template"
 msgstr ""
 
-#: languages/generatedString.php:5233
+#: languages/generatedString.php:5237
 msgid "How to Setup FlowMattic integration"
 msgstr ""
 
-#: languages/generatedString.php:5235
+#: languages/generatedString.php:5239
 msgid "How to Setup AutomatorWP integration"
 msgstr ""
 
-#: languages/generatedString.php:5237
+#: languages/generatedString.php:5241
 msgid "How to Setup Uncanny Automator integration"
 msgstr ""
 
-#: languages/generatedString.php:5239
+#: languages/generatedString.php:5243
 msgid "How to Setup Automate Hub by Sperse.IO integration"
 msgstr ""
 
-#: languages/generatedString.php:5241
+#: languages/generatedString.php:5245
 msgid "How to Setup Thrive Automator integration"
 msgstr ""
 
-#: languages/generatedString.php:5243
+#: languages/generatedString.php:5247
 msgid "How to Setup WP Webhooks integration"
 msgstr ""
 
-#: languages/generatedString.php:5245
+#: languages/generatedString.php:5249
 msgid "How to Setup Advanced Form Integration"
 msgstr ""
 
-#: languages/generatedString.php:5247
+#: languages/generatedString.php:5251
 msgid "How to Setup IFTTT integration"
 msgstr ""
 
-#: languages/generatedString.php:5249
+#: languages/generatedString.php:5253
 msgid "How to Setup n8n.io integration"
 msgstr ""
 
-#: languages/generatedString.php:5251
+#: languages/generatedString.php:5255
 msgid "How to Setup Sure Triggers integration"
 msgstr ""
 
-#: languages/generatedString.php:5253
+#: languages/generatedString.php:5257
 msgid "How to Configure WP User Registration"
 msgstr ""
 
-#: languages/generatedString.php:5255
+#: languages/generatedString.php:5259
 msgid "Allow Only logged in users to view all entries"
 msgstr ""
 
-#: languages/generatedString.php:5257
+#: languages/generatedString.php:5261
 msgid "Allow logged in users to edit form entries"
 msgstr ""
 
-#: languages/generatedString.php:5259
+#: languages/generatedString.php:5263
 msgid "Allow to Configure Global Validation Message"
 msgstr ""
 
-#: languages/generatedString.php:5261
+#: languages/generatedString.php:5265
 msgid "How to add Custom CSS/JS"
 msgstr ""

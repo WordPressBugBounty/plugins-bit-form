@@ -834,15 +834,9 @@ final class FieldValueHandler
    * @param array|null $formFields
    * @return string
    */
-  public static function safeFlatString($data, $fldType, $fieldKey = null, $allFieldData = null, $formFields = null, $resolveFromParent = true): string
+  public static function safeFlatString($data, $fldType, $fieldKey = null, $allFieldData = null, $formFields = null): string
   {
     $newData = self::decodeIfJson($data);
-    if ($resolveFromParent) {
-      $resolvedChildValues = self::extractRepeaterChildFieldValues($fieldKey, $allFieldData, $formFields);
-      if (is_array($resolvedChildValues)) {
-        $newData = $resolvedChildValues;
-      }
-    }
 
     if (is_array($newData)) {
       if (self::isCompositeFieldType($fldType)) {
@@ -862,7 +856,7 @@ final class FieldValueHandler
             return $itm;
           }
         }, $item)) . ']'
-        : self::safeFlatString($item, $fldType, $fieldKey, $allFieldData, $formFields, false);
+        : self::safeFlatString($item, $fldType, $fieldKey, $allFieldData, $formFields);
       }, $newData));
     }
 
@@ -945,46 +939,6 @@ final class FieldValueHandler
     });
 
     return implode('address' === $fieldType ? ', ' : ' ', $parts);
-  }
-
-  private static function extractRepeaterChildFieldValues($fieldKey, $allFieldData, $formFields)
-  {
-    if (empty($fieldKey) || !is_array($allFieldData) || !is_array($formFields) || !isset($formFields[$fieldKey])) {
-      return null;
-    }
-
-    $fieldData = $formFields[$fieldKey];
-    if (empty($fieldData['parentFieldKey']) || empty($fieldData['name'])) {
-      return null;
-    }
-
-    $parentFieldKey = $fieldData['parentFieldKey'];
-    $parentFieldName = $formFields[$parentFieldKey]['name'] ?? null;
-
-    if (!isset($allFieldData[$parentFieldKey]) || !is_array($allFieldData[$parentFieldKey])) {
-      return null;
-    }
-
-    $childFieldName = $fieldData['name'];
-    $childFieldName = str_replace(['[', ']', $parentFieldName], '', $childFieldName);
-
-    $childValues = [];
-    foreach ($allFieldData[$parentFieldKey] as $row) {
-      if (!is_array($row)) {
-        continue;
-      }
-
-      if (array_key_exists($childFieldName, $row)) {
-        $childValues[] = $row[$childFieldName];
-        continue;
-      }
-
-      if (array_key_exists($fieldKey, $row)) {
-        $childValues[] = $row[$fieldKey];
-      }
-    }
-
-    return $childValues;
   }
 
   /**
@@ -1083,5 +1037,46 @@ final class FieldValueHandler
   private static function getLabel($formFields, $key)
   {
     return $formFields[$key]['label'] ?? $key;
+  }
+
+  /**
+   * Derive a composite child field's key name from its bracketed HTML name.
+   * e.g. childFieldName "name[first_name]" with parent "name" => "first_name".
+   * Falls back to the bracket contents when the parent name is empty.
+   */
+  public static function deriveChildName($childFieldName, $parentFieldName)
+  {
+    $childFieldName = (string) $childFieldName;
+    if (preg_match('/\[(.*?)\]/', $childFieldName, $matches)) {
+      return $matches[1];
+    }
+
+    return str_replace(['[', ']', (string) $parentFieldName], '', $childFieldName);
+  }
+
+  /**
+   * Pull a child value out of a parent composite field's nested submitted value.
+   * Looks up by the derived child name first, then by the child field key.
+   * Returns null when no match is found.
+   */
+  public static function extractChildValueFromParentValue($parentValue, $childName, $childKey)
+  {
+    if (is_object($parentValue)) {
+      $parentValue = (array) $parentValue;
+    }
+
+    if (!is_array($parentValue)) {
+      return null;
+    }
+
+    if (array_key_exists($childName, $parentValue)) {
+      return $parentValue[$childName];
+    }
+
+    if (array_key_exists($childKey, $parentValue)) {
+      return $parentValue[$childKey];
+    }
+
+    return null;
   }
 }

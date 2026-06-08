@@ -3046,6 +3046,8 @@ $bitforms_i18n_strings = array(
 
     'CPT added successfully, refresh your window' => __('CPT added successfully, refresh your window', 'bit-form'),
 
+    'Failed to add CPT' => __('Failed to add CPT', 'bit-form'),
+
     'Learn more about CPT Integration' => __('Learn more about CPT Integration', 'bit-form'),
 
     'Post Type Slug *' => __('Post Type Slug *', 'bit-form'),
@@ -3087,6 +3089,8 @@ $bitforms_i18n_strings = array(
     'Are you sure to delete post type?' => __('Are you sure to delete post type?', 'bit-form'),
 
     'cpt type update successfully, refresh your window' => __('cpt type update successfully, refresh your window', 'bit-form'),
+
+    'Failed to update CPT' => __('Failed to update CPT', 'bit-form'),
 
     'Select Type *' => __('Select Type *', 'bit-form'),
 

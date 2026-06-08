@@ -716,17 +716,19 @@ final class FrontendFormManager extends FormManager
   public function checkSubmissionRestriction($checkedEmptySubmitted = true)
   {
     $formContents = $this->getFormContent();
-    $fromRestrictionSetitingsEnabled = empty($formContents->additional->enabled) ? [] : $formContents->additional->enabled;
-    $fromRestrictionSetitings = empty($formContents->additional->settings) ? null : $formContents->additional->settings;
-    if (is_null($formContents->additional->enabled) || is_null($formContents->additional->settings)) {
+    $additionalSettings = isset($formContents->additional) ? $formContents->additional : null;
+    $fromRestrictionSetitingsEnabled = empty($additionalSettings->enabled) ? [] : $additionalSettings->enabled;
+    $fromRestrictionSetitings = empty($additionalSettings->settings) ? null : $additionalSettings->settings;
+
+    if (is_null($additionalSettings) || is_null($fromRestrictionSetitings) || empty((array) $fromRestrictionSetitingsEnabled)) {
       return false;
     }
+
     $restrictionMessage = [];
     $ipTool = new IpTool();
     $ipAddress = $ipTool->getIP();
     $currentUserId = get_current_user_id();
-    // error_log(print_r(['ip address', $ipAddress, ip2long($ipAddress)], true));
-    // error_log(print_r(['restrictions', $fromRestrictionSetitings], true));
+
     foreach ($fromRestrictionSetitingsEnabled as $restrictionKey => $isEnabled) {
       if ($isEnabled) {
         /**
@@ -740,10 +742,12 @@ final class FrontendFormManager extends FormManager
           null,
           $restrictionKey,
           $this->form_id,
+          $fromRestrictionSetitingsEnabled,
           $fromRestrictionSetitings,
           $ipAddress,
           $currentUserId
         );
+
         if (!is_null($addonMsg) && '' !== $addonMsg) {
           $restrictionMessage[] = $addonMsg;
           continue;

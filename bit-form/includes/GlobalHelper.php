@@ -4,7 +4,7 @@ namespace BitCode\BitForm;
 
 use BitCode\BitForm\Core\Util\Log;
 
-if (!\defined('ABSPATH')) {
+if (!defined('ABSPATH')) {
   exit;
 }
 

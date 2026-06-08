@@ -18,12 +18,13 @@ $baseCSSPath = "/form-styles/bitform-{$formID}.css";
 $customCSSPath = "/form-styles/bitform-custom-{$formID}.css";
 $standaloneCSSPath = "/form-styles/bitform-standalone-{$formID}.css";
 
-wp_register_style('bitform-standalone-base-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $baseCSSPath, [], $formUpdateVersion);
-wp_enqueue_style('bitform-standalone-base-' . $formIdSafe);
+// Use the same handles as FrontendFormHandler::loadAssets() so WP dedups instead of printing the file twice.
+wp_register_style('bitform-style-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $baseCSSPath, [], $formUpdateVersion);
+wp_enqueue_style('bitform-style-' . $formIdSafe);
 
 if (file_exists(BITFORMS_CONTENT_DIR . $customCSSPath)) {
-  wp_register_style('bitform-standalone-custom-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $customCSSPath, [], $formUpdateVersion);
-  wp_enqueue_style('bitform-standalone-custom-' . $formIdSafe);
+  wp_register_style('bitform-style-custom-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $customCSSPath, [], $formUpdateVersion);
+  wp_enqueue_style('bitform-style-custom-' . $formIdSafe);
 }
 
 if (file_exists(BITFORMS_CONTENT_DIR . $standaloneCSSPath)) {

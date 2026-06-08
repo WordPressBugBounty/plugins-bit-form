@@ -599,12 +599,12 @@ class FormManager
 
           $childFieldData = $form_fields->{$childFieldKey};
           $childFieldName = isset($childFieldData->fieldName) ? $childFieldData->fieldName : '';
-          $childFieldName = str_replace(['[', ']', $parentFieldName], '', $childFieldName);
+          $childFieldName = FieldValueHandler::deriveChildName($childFieldName, $parentFieldName);
           if (empty($childFieldName)) {
             continue;
           }
 
-          $childValue = $this->extractChildValueFromParentValue($normalizedParentValue, $childFieldName, $childFieldKey);
+          $childValue = FieldValueHandler::extractChildValueFromParentValue($normalizedParentValue, $childFieldName, $childFieldKey);
           if (null !== $childValue) {
             $submitted_data[$childFieldKey] = $childValue;
           }
@@ -639,27 +639,6 @@ class FormManager
 
     $decoded = json_decode($value, true);
     return (JSON_ERROR_NONE === json_last_error()) ? $decoded : $value;
-  }
-
-  private function extractChildValueFromParentValue($parentValue, $childFieldName, $childFieldKey)
-  {
-    if (is_object($parentValue)) {
-      $parentValue = (array) $parentValue;
-    }
-
-    if (!is_array($parentValue)) {
-      return null;
-    }
-
-    if (array_key_exists($childFieldName, $parentValue)) {
-      return $parentValue[$childFieldName];
-    }
-
-    if (array_key_exists($childFieldKey, $parentValue)) {
-      return $parentValue[$childFieldKey];
-    }
-
-    return null;
   }
 
   private function addNewFilePathToFiles($form_id, $entry_id, $file_fields = [])
