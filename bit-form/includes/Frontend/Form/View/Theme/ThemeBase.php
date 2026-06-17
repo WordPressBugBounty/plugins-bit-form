@@ -2,6 +2,7 @@
 
 namespace BitCode\BitForm\Frontend\Form\View\Theme;
 
+use BitCode\BitForm\Frontend\Form\View\Theme\Fields\AddressField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\ButtonField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\CheckBoxField;
 use BitCode\BitForm\Frontend\Form\View\Theme\Fields\CountryField;
@@ -103,6 +104,8 @@ class ThemeBase
       case 'email':
       case 'name':
         return FieldWithChild::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+      case 'address':
+        return AddressField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'textarea':
         return TextAreaField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       case 'range':

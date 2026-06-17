@@ -160,6 +160,7 @@ class CountryField
             %8$s
             %9$s
             %10$s
+            data-field-key="%38$s"
             type="text"
             title="Country Hidden Input"
             class="%11$s d-none"
@@ -280,7 +281,8 @@ class CountryField
       $fieldHelpers->getCustomAttributes('option-list'),       // 34
       $fieldHelpers->getAtomicCls('option-list'),              // 35
       $fieldHelpers->getCustomClasses('option-list'),          // 36
-      $options                                                 // 37
+      $options,                                                // 37
+      $rowID                                                    // 38
     );
   }
 }

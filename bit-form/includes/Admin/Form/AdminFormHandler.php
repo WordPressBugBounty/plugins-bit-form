@@ -1192,6 +1192,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         'themeVars'       => $helper_states->themeVars,
         'themeColors'     => $helper_states->themeColors,
         'builderSettings' => $helper_states->builderSettings,
+        'customCode'      => FrontEndScriptGenerator::getCustomCodes($formID),
         'additional'      => empty($form_content->additional) ? [
           'enabled' => [
             'blocked_ip'    => false,

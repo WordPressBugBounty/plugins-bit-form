@@ -124,6 +124,9 @@ final class FormFieldValidator
             $this->validateConfirmField($field_name, $field_data);
             break;
           }
+          case 'address': {
+            break;
+          }
           case 'time': {
             if (!$this->validateTime($this->_submitted_fields[$field_name])) {
               $this->_messages[$field_name]
@@ -487,16 +490,23 @@ final class FormFieldValidator
       return [];
     }
 
-    $activeListIndex = isset($fieldDetails->config->activeList) ? (int) $fieldDetails->config->activeList : 0;
+    // A dropdown can hold multiple option lists. Conditional logic (WorkFlow Actions)
+    // switches the runtime active list based on other fields, but the stored
+    // config->activeList only reflects the builder default. The server cannot reliably
+    // know which list was active at submit time, so accept any value present in ANY list.
     $optionsList = is_array($fieldDetails->optionsList) ? $fieldDetails->optionsList : (array) $fieldDetails->optionsList;
-    if (!isset($optionsList[$activeListIndex])) {
-      return [];
+
+    $allowedOptions = [];
+    foreach ($optionsList as $list) {
+      $list = (array) $list;
+      if (empty($list)) {
+        continue;
+      }
+      $options = array_values($list)[0];
+      $allowedOptions = array_merge($allowedOptions, $this->flattenOptions($options));
     }
 
-    $activeList = (array) $optionsList[$activeListIndex];
-    $options = empty($activeList) ? [] : array_values($activeList)[0];
-
-    return $this->flattenOptions($options);
+    return $allowedOptions;
   }
 
   private function flattenOptions($options)

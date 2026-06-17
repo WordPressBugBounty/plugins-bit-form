@@ -18,6 +18,100 @@ $bitforms_i18n_strings = array(
 
     'Unsplash Images' => __('Unsplash Images', 'bit-form'),
 
+    'Go to the Google Cloud Console Credentials page' => __('Go to the Google Cloud Console Credentials page', 'bit-form'),
+
+    'Create a new project or select an existing one.' => __('Create a new project or select an existing one.', 'bit-form'),
+
+    'Enable the' => __('Enable the', 'bit-form'),
+
+    'Maps JavaScript API' => __('Maps JavaScript API', 'bit-form'),
+
+    'Geocoding API' => __('Geocoding API', 'bit-form'),
+
+    'and' => __('and', 'bit-form'),
+
+    'Places API' => __('Places API', 'bit-form'),
+
+    'for your project.' => __('for your project.', 'bit-form'),
+
+    'Click' => __('Click', 'bit-form'),
+
+    'Create Credentials → API key' => __('Create Credentials → API key', 'bit-form'),
+
+    'and copy the generated key.' => __('and copy the generated key.', 'bit-form'),
+
+    'Edit the key, copy your Domain URL above and add it as an' => __('Edit the key, copy your Domain URL above and add it as an', 'bit-form'),
+
+    'HTTP referrer' => __('HTTP referrer', 'bit-form'),
+
+    'restriction to prevent unauthorized use.' => __('restriction to prevent unauthorized use.', 'bit-form'),
+
+    'Paste the key into the' => __('Paste the key into the', 'bit-form'),
+
+    'Google Maps API Key' => __('Google Maps API Key', 'bit-form'),
+
+    'field and click' => __('field and click', 'bit-form'),
+
+    'Save Keys' => __('Save Keys', 'bit-form'),
+
+    'Go to the Mapbox Access Tokens page' => __('Go to the Mapbox Access Tokens page', 'bit-form'),
+
+    'Use the default public token or click' => __('Use the default public token or click', 'bit-form'),
+
+    'Create a token' => __('Create a token', 'bit-form'),
+
+    'to make a new one.' => __('to make a new one.', 'bit-form'),
+
+    'Copy your Domain URL above and add it as a' => __('Copy your Domain URL above and add it as a', 'bit-form'),
+
+    'URL restriction' => __('URL restriction', 'bit-form'),
+
+    'on the token to prevent unauthorized use.' => __('on the token to prevent unauthorized use.', 'bit-form'),
+
+    'Paste the token into the' => __('Paste the token into the', 'bit-form'),
+
+    'Mapbox Access Token' => __('Mapbox Access Token', 'bit-form'),
+
+    'OpenStreetMap (Nominatim) is free and needs no API key — just select it as the autocomplete provider in the Address field settings.' => __('OpenStreetMap (Nominatim) is free and needs no API key — just select it as the autocomplete provider in the Address field settings.', 'bit-form'),
+
+    'Note: the free Nominatim service allows a maximum of 1 request per second. It is best for low-traffic forms — for high-traffic forms use Google or Mapbox.' => __('Note: the free Nominatim service allows a maximum of 1 request per second. It is best for low-traffic forms — for high-traffic forms use Google or Mapbox.', 'bit-form'),
+
+    'Address API keys saved successfully' => __('Address API keys saved successfully', 'bit-form'),
+
+    'Error saving keys' => __('Error saving keys', 'bit-form'),
+
+    'Saving...' => __('Saving...', 'bit-form'),
+
+    'Address Field API Keys' => __('Address Field API Keys', 'bit-form'),
+
+    'Global API keys used by all Address fields. A per-field key set in field settings takes priority over these.' => __('Global API keys used by all Address fields. A per-field key set in field settings takes priority over these.', 'bit-form'),
+
+    'Domain URL:' => __('Domain URL:', 'bit-form'),
+
+    'Add this domain when restricting your API keys.' => __('Add this domain when restricting your API keys.', 'bit-form'),
+
+    'Required for Google Places autocomplete and Show Map features.' => __('Required for Google Places autocomplete and Show Map features.', 'bit-form'),
+
+    'Get a key in Google Cloud Console' => __('Get a key in Google Cloud Console', 'bit-form'),
+
+    'AIza...' => __('AIza...', 'bit-form'),
+
+    'Required for Mapbox geocoding autocomplete. Use a public token (pk.).' => __('Required for Mapbox geocoding autocomplete. Use a public token (pk.).', 'bit-form'),
+
+    'Get a token in your Mapbox account' => __('Get a token in your Mapbox account', 'bit-form'),
+
+    'pk.eyJ1...' => __('pk.eyJ1...', 'bit-form'),
+
+    'OpenStreetMap (Nominatim) is free (rate limited) and requires no API key.' => __('OpenStreetMap (Nominatim) is free (rate limited) and requires no API key.', 'bit-form'),
+
+    'Security tip:' => __('Security tip:', 'bit-form'),
+
+    'These keys run in the browser, so lock each one to your domain to keep it safe — set an HTTP referrer restriction for Google and a URL restriction for Mapbox. This makes sure only your site can use the keys and keeps your usage and billing under control.' => __('These keys run in the browser, so lock each one to your domain to keep it safe — set an HTTP referrer restriction for Google and a URL restriction for Mapbox. This makes sure only your site can use the keys and keeps your usage and billing under control.', 'bit-form'),
+
+    'How to set up?' => __('How to set up?', 'bit-form'),
+
+    'OpenStreetMap (Free)' => __('OpenStreetMap (Free)', 'bit-form'),
+
     'Go to the Google reCaptcha V2 Admin Dashboard' => __('Go to the Google reCaptcha V2 Admin Dashboard', 'bit-form'),
 
     'Click on the Register button and add Label.' => __('Click on the Register button and add Label.', 'bit-form'),
@@ -31,8 +125,6 @@ $bitforms_i18n_strings = array(
     'You will then see the site key and secret key. Copy both keys and back to Bit form Google reCaptcha Settings to paste them into the corresponding' => __('You will then see the site key and secret key. Copy both keys and back to Bit form Google reCaptcha Settings to paste them into the corresponding', 'bit-form'),
 
     'Site Key' => __('Site Key', 'bit-form'),
-
-    'and' => __('and', 'bit-form'),
 
     'Secret Key' => __('Secret Key', 'bit-form'),
 
@@ -105,8 +197,6 @@ $bitforms_i18n_strings = array(
     'reCAPTCHA is a free service that protects your website from spam and abuse.' => __('reCAPTCHA is a free service that protects your website from spam and abuse.', 'bit-form'),
 
     'Learn More' => __('Learn More', 'bit-form'),
-
-    'Domain URL:' => __('Domain URL:', 'bit-form'),
 
     'To get Site Key and SECRET , Please Visit' => __('To get Site Key and SECRET , Please Visit', 'bit-form'),
 
@@ -1850,8 +1940,6 @@ $bitforms_i18n_strings = array(
 
     'Saved successfully.' => __('Saved successfully.', 'bit-form'),
 
-    'Saving...' => __('Saving...', 'bit-form'),
-
     'Something went wrong, Try again.' => __('Something went wrong, Try again.', 'bit-form'),
 
     'WP Authentication' => __('WP Authentication', 'bit-form'),
@@ -1986,7 +2074,7 @@ $bitforms_i18n_strings = array(
 
     'Inline' => __('Inline', 'bit-form'),
 
-    'Name fields' => __('Name fields', 'bit-form'),
+    'Child Fields' => __('Child Fields', 'bit-form'),
 
     'Edit Custom Error Message' => __('Edit Custom Error Message', 'bit-form'),
 
@@ -2581,8 +2669,6 @@ $bitforms_i18n_strings = array(
     'Automatic' => __('Automatic', 'bit-form'),
 
     'Google Maps API' => __('Google Maps API', 'bit-form'),
-
-    'Google Maps API Key' => __('Google Maps API Key', 'bit-form'),
 
     'Allowed Countries :' => __('Allowed Countries :', 'bit-form'),
 
@@ -3231,6 +3317,38 @@ $bitforms_i18n_strings = array(
     'Clone' => __('Clone', 'bit-form'),
 
     'Add Field' => __('Add Field', 'bit-form'),
+
+    'Set Google reCAPTCHA v2 Keys' => __('Set Google reCAPTCHA v2 Keys', 'bit-form'),
+
+    'reCAPTCHA needs a Site Key and Secret Key before this field can be used.' => __('reCAPTCHA needs a Site Key and Secret Key before this field can be used.', 'bit-form'),
+
+    'Set Cloudflare Turnstile Keys' => __('Set Cloudflare Turnstile Keys', 'bit-form'),
+
+    'Turnstile needs a Site Key and Secret Key before this field can be used.' => __('Turnstile needs a Site Key and Secret Key before this field can be used.', 'bit-form'),
+
+    'Set hCaptcha Keys' => __('Set hCaptcha Keys', 'bit-form'),
+
+    'hCaptcha needs a Site Key and Secret Key before this field can be used.' => __('hCaptcha needs a Site Key and Secret Key before this field can be used.', 'bit-form'),
+
+    'Configure Stripe' => __('Configure Stripe', 'bit-form'),
+
+    'Stripe must be configured before this field can be used.' => __('Stripe must be configured before this field can be used.', 'bit-form'),
+
+    'Configure PayPal' => __('Configure PayPal', 'bit-form'),
+
+    'PayPal must be configured before this field can be used.' => __('PayPal must be configured before this field can be used.', 'bit-form'),
+
+    'Configure Razorpay' => __('Configure Razorpay', 'bit-form'),
+
+    'Razorpay must be configured before this field can be used.' => __('Razorpay must be configured before this field can be used.', 'bit-form'),
+
+    'Configure Mollie' => __('Configure Mollie', 'bit-form'),
+
+    'Mollie must be configured before this field can be used.' => __('Mollie must be configured before this field can be used.', 'bit-form'),
+
+    'Set Address Autocomplete API Key' => __('Set Address Autocomplete API Key', 'bit-form'),
+
+    'Your Address field uses Google/Mapbox autocomplete, which needs an API key before the form can be saved.' => __('Your Address field uses Google/Mapbox autocomplete, which needs an API key before the form can be saved.', 'bit-form'),
 
     'Remove' => __('Remove', 'bit-form'),
 
@@ -4164,6 +4282,46 @@ $bitforms_i18n_strings = array(
 
     'No Template Found' => __('No Template Found', 'bit-form'),
 
+    'Address Autocomplete' => __('Address Autocomplete', 'bit-form'),
+
+    'Provider for address lookup suggestions. Nominatim is free. Google and Mapbox require an API key.' => __('Provider for address lookup suggestions. Nominatim is free. Google and Mapbox require an API key.', 'bit-form'),
+
+    'Address autocomplete provider' => __('Address autocomplete provider', 'bit-form'),
+
+    'Nominatim is free but rate-limited. Do not use for high-traffic forms.' => __('Nominatim is free but rate-limited. Do not use for high-traffic forms.', 'bit-form'),
+
+    'This provider needs an API key to work. Add the key once and all Address fields will use it (a per-field key overrides it).' => __('This provider needs an API key to work. Add the key once and all Address fields will use it (a per-field key overrides it).', 'bit-form'),
+
+    'Set up API Key' => __('Set up API Key', 'bit-form'),
+
+    '✓ API key configured.' => __('✓ API key configured.', 'bit-form'),
+
+    'Edit key' => __('Edit key', 'bit-form'),
+
+    'Auto Locate' => __('Auto Locate', 'bit-form'),
+
+    'Use the browser geolocation API to auto-fill the address. Requires HTTPS.' => __('Use the browser geolocation API to auto-fill the address. Requires HTTPS.', 'bit-form'),
+
+    'Auto locate mode' => __('Auto locate mode', 'bit-form'),
+
+    'When enabled, latitude and longitude are saved as hidden fields alongside the address entry.' => __('When enabled, latitude and longitude are saved as hidden fields alongside the address entry.', 'bit-form'),
+
+    'Save Coordinates' => __('Save Coordinates', 'bit-form'),
+
+    'Address Scheme' => __('Address Scheme', 'bit-form'),
+
+    'Address scheme preset' => __('Address scheme preset', 'bit-form'),
+
+    'Show Map' => __('Show Map', 'bit-form'),
+
+    'Embed a Google Map below the address fields. Preview shows the selected location; Interactive lets users click or drag the pin to set the address.' => __('Embed a Google Map below the address fields. Preview shows the selected location; Interactive lets users click or drag the pin to set the address.', 'bit-form'),
+
+    'Map mode' => __('Map mode', 'bit-form'),
+
+    'ZIP / Postal Validation' => __('ZIP / Postal Validation', 'bit-form'),
+
+    'Custom ZIP regex pattern' => __('Custom ZIP regex pattern', 'bit-form'),
+
     'Prefix Icon' => __('Prefix Icon', 'bit-form'),
 
     'Suffix Icon' => __('Suffix Icon', 'bit-form'),
@@ -4173,6 +4331,20 @@ $bitforms_i18n_strings = array(
     'Interaction Only' => __('Interaction Only', 'bit-form'),
 
     'Container Class' => __('Container Class', 'bit-form'),
+
+    'Column Width' => __('Column Width', 'bit-form'),
+
+    'Full (12)' => __('Full (12)', 'bit-form'),
+
+    '3/4 (9)' => __('3/4 (9)', 'bit-form'),
+
+    '2/3 (8)' => __('2/3 (8)', 'bit-form'),
+
+    'Half (6)' => __('Half (6)', 'bit-form'),
+
+    '1/3 (4)' => __('1/3 (4)', 'bit-form'),
+
+    '1/4 (3)' => __('1/4 (3)', 'bit-form'),
 
     'Show Option Flag Image' => __('Show Option Flag Image', 'bit-form'),
 
@@ -4350,6 +4522,8 @@ $bitforms_i18n_strings = array(
 
     'Resend available in ${bf_resend_countdown}s.' => __('Resend available in ${bf_resend_countdown}s.', 'bit-form'),
 
+    'Address' => __('Address', 'bit-form'),
+
     'Create New Theme' => __('Create New Theme', 'bit-form'),
 
     'Click to upload' => __('Click to upload', 'bit-form'),
@@ -4471,8 +4645,6 @@ $bitforms_i18n_strings = array(
     'Add More Hook' => __('Add More Hook', 'bit-form'),
 
     'Select One' => __('Select One', 'bit-form'),
-
-    'Click' => __('Click', 'bit-form'),
 
     'Readonly' => __('Readonly', 'bit-form'),
 
@@ -4682,6 +4854,8 @@ $bitforms_i18n_strings = array(
 
     'Payments' => __('Payments', 'bit-form'),
 
+    'Address Keys' => __('Address Keys', 'bit-form'),
+
     'SMTP' => __('SMTP', 'bit-form'),
 
     'PDF' => __('PDF', 'bit-form'),
@@ -4749,8 +4923,6 @@ $bitforms_i18n_strings = array(
     'Column Mapping' => __('Column Mapping', 'bit-form'),
 
     'Column Header' => __('Column Header', 'bit-form'),
-
-    'Column Width' => __('Column Width', 'bit-form'),
 
     'Form Field' => __('Form Field', 'bit-form'),
 
@@ -4896,23 +5068,17 @@ $bitforms_i18n_strings = array(
 
     'You can use either ReCaptcha-V2 or ReCaptcha-V3 in a form. to use ReCaptcha-V2 disable the ReCaptcha-V3 from the Form Settings.' => __('You can use either ReCaptcha-V2 or ReCaptcha-V3 in a form. to use ReCaptcha-V2 disable the ReCaptcha-V3 from the Form Settings.', 'bit-form'),
 
-    '<p style="font-size: 16px">To use reCaptchav2, you must set Site Key and Secret Key from <a href="' => __('<p style="font-size: 16px">To use reCaptchav2, you must set Site Key and Secret Key from <a href="', 'bit-form'),
-
-    '<p style="font-size: 16px">To use Turnstile, you must set Site Key and Secret Key from <a href="' => __('<p style="font-size: 16px">To use Turnstile, you must set Site Key and Secret Key from <a href="', 'bit-form'),
-
-    '<p style="font-size: 16px">To use hCaptcha, you must set Site Key and Secret Key from <a href="' => __('<p style="font-size: 16px">To use hCaptcha, you must set Site Key and Secret Key from <a href="', 'bit-form'),
-
     'You cannot add more than one' => __('You cannot add more than one', 'bit-form'),
 
     'Save Draft Button available in Pro version of Bit Form.' => __('Save Draft Button available in Pro version of Bit Form.', 'bit-form'),
 
     'You cannot add' => __('You cannot add', 'bit-form'),
 
-    '<p style="font-size: 16px">To use' => __('<p style="font-size: 16px">To use', 'bit-form'),
-
     'The entered values do not match.' => __('The entered values do not match.', 'bit-form'),
 
     'Please enter a valid email address.' => __('Please enter a valid email address.', 'bit-form'),
+
+    'Please enter a valid zip/postal code.' => __('Please enter a valid zip/postal code.', 'bit-form'),
 
     'Change' => __('Change', 'bit-form'),
 

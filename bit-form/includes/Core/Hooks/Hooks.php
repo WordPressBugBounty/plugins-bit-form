@@ -28,6 +28,7 @@ class Hooks
     add_action('init', [PostType::class, 'registerBitformsPostType']);
     add_action('init', [PostType::class, 'registerCustomPostType']);
     add_action('update_option_bitform_custom_post_types', [PostType::class, 'scheduleRewriteFlush']);
+    add_filter('wp_robots', [PostType::class, 'noindexBitformsPages']);
     add_action('bitforms_exec_integrations', [Integrations::class, 'integrationExecutionHelper'], 1, 5);
     add_action('init', [Hooks::class, 'init_classes']);
     add_action('init', [Hooks::class, 'versionUpdateRunFallbacks']);

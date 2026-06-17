@@ -30,17 +30,19 @@ class InputWrapper
     $labelWrapper = !$noLabel ? $this->labelWrapper() : '';
     $helperText = $this->helperText();
     $error = !$noErrMsg ? $this->errorMessages() : '';
+    $fieldTypeClass = empty($this->_fieldData->typ) ? 'bf-default-field' : 'bf-' . $this->_fieldData->typ . '-field';
 
     return sprintf(
-      '<div %1$s class="%2$s %3$s">
-  %4$s
-  <div %5$s class="%6$s %7$s">
-    %8$s
-    %9$s
-    %10$s
-  </div>
-</div>',
+      '<div %1$s class="%2$s %3$s %4$s">
+        %5$s
+        <div %6$s class="%7$s %8$s">
+          %9$s
+          %10$s
+          %11$s
+        </div>
+      </div>',
       $this->_fieldHelpers->getCustomAttributes('fld-wrp'),
+      $fieldTypeClass,
       $this->_fieldHelpers->getAtomicCls('fld-wrp'),
       $this->_fieldHelpers->getCustomClasses('fld-wrp'),
       $labelWrapper,
@@ -284,11 +286,18 @@ class InputWrapper
       . '</div>';
   }
 
-  public function childFieldWrapper($fieldInput)
+  public function childFieldWrapper($fieldInput, $subFieldName = '', $colSpan = null, $childKey = '')
   {
-    return '<div '
+    $dataAttr = $subFieldName ? ' data-bf-subfield="' . esc_attr($subFieldName) . '"' : '';
+    $styleAttr = null !== $colSpan ? ' style="--bfv-addr-col:' . (int) $colSpan . '"' : '';
+    // Per-child class so conditional actions (show/hide) can collapse the whole column.
+    $childKeyCls = $childKey ? ' ' . esc_attr($childKey) . '-sub-fld-wrp' : '';
+    return '<div'
+      . $dataAttr
+      . $styleAttr
+      . ' '
       . $this->_fieldHelpers->getCustomAttributes('child-fld-wrp')
-      . ' class="' . $this->_fieldHelpers->getAtomicCls('child-fld-wrp') . ' ' . $this->_fieldHelpers->getCustomClasses('child-fld-wrp') . '">'
+      . ' class="' . $this->_fieldHelpers->getAtomicCls('child-fld-wrp') . ' ' . $this->_fieldHelpers->getCustomClasses('child-fld-wrp') . $childKeyCls . '">'
       . $fieldInput
       . '</div>';
   }

@@ -366,6 +366,7 @@ class FrontEndScriptGenerator
   }
 
   private $fldContainersByType = [
+    'address'           => '.__$fk__-parent-fld-wrp',
     'select'            => '.__$fk__-dpd-fld-wrp',
     'country'           => '.__$fk__-country-fld-wrp',
     'currency'          => '.__$fk__-currency-fld-wrp',
@@ -387,7 +388,7 @@ class FrontEndScriptGenerator
 
   private function generateFieldConfigsJs()
   {
-    $customFlds = ['select', 'country', 'currency', 'phone-number', 'file-up', 'advanced-file-up', 'paypal', 'razorpay', 'stripe', 'mollie', 'recaptcha', 'repeater', 'signature', 'rating', 'turnstile', 'hcaptcha', 'advanced-datetime', 'email-otp'];
+    $customFlds = ['address', 'select', 'country', 'currency', 'phone-number', 'file-up', 'advanced-file-up', 'paypal', 'razorpay', 'stripe', 'mollie', 'recaptcha', 'repeater', 'signature', 'rating', 'turnstile', 'hcaptcha', 'advanced-datetime', 'email-otp'];
     $allFieldTypes = array_keys($this->_fields);
     $customFldsInForms = array_intersect($allFieldTypes, $customFlds);
     $formContents = $this->_formContents;

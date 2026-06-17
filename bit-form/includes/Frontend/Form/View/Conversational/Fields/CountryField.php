@@ -163,6 +163,7 @@ class CountryField
           ' . $req . '
           ' . $ariaRequired . '
           ' . $ariaDescribedBy . '
+          data-field-key="' . $rowID . '"
           type="text"
           title="Country Hidden Input"
           class="' . $fieldHelpers->getConversationalMultiCls('country-hidden-input') . ' d-none"

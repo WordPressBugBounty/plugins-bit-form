@@ -554,6 +554,9 @@ class AdminAjax
       $integrationHandler = new IntegrationHandler(0, $user_details);
       $user_details = $ipTool->getUserDetail();
       $formIntegrations = $integrationHandler->getAllIntegration('mail', 'smtp');
+      if (is_wp_error($formIntegrations)) {
+        wp_send_json_error($formIntegrations->get_error_message(), 411);
+      }
       if (isset($formIntegrations[0]->integration_details) && is_string($formIntegrations[0]->integration_details)) {
         $formIntegrations[0]->integration_details = wp_unslash($formIntegrations[0]->integration_details);
       }

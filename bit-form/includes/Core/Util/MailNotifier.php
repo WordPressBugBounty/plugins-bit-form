@@ -170,6 +170,11 @@ final class MailNotifier
           }
 
           $mailBody = FieldValueHandler::replaceFieldWithValue($mailBody, $fieldValue, $formID);
+          // Signature images: embed inline (cid:) so they render for non-logged-in recipients.
+          // Must run before changeImagePathInHTMLString so the src is still the raw filename.
+          $cidMap = [];
+          $sigBasePath = FileHandler::getEntriesFileUploadDir($formID, $entryID) . DIRECTORY_SEPARATOR;
+          $mailBody = self::embedSignatureImages($mailBody, $formManager, $fieldValue, $sigBasePath, $cidMap);
           $webUrl = Helpers::getWebPathWithEncryptedEntryId($formID, $entryID);
           $mailBody = FieldValueHandler::changeImagePathInHTMLString($mailBody, $webUrl);
           $mailBody = FieldValueHandler::changeHrefPathInHTMLString($mailBody, $webUrl);  // replace anchor tag href with constructed weburl
@@ -256,6 +261,18 @@ final class MailNotifier
           }
           $mailBody = stripcslashes($mailBody);
           $mailSubject = stripcslashes($mailSubject);
+          $embedCb = static function ($phpmailer) use ($cidMap) {
+            foreach ($cidMap as $cid => $info) {
+              try {
+                $phpmailer->addEmbeddedImage($info['path'], $cid, $info['name']);
+              } catch (\Throwable $e) {
+                Log::debug_log("[Signature Embed] failed for {$info['path']} - " . $e->getMessage());
+              }
+            }
+          };
+          if (!empty($cidMap)) {
+            add_action('phpmailer_init', $embedCb);
+          }
           add_filter('wp_mail_content_type', [self::class, 'filterMailContentType']);
           $status = wp_mail($mailTo, $mailSubject, $mailBody, $mailHeaders, $attachments);
 
@@ -313,6 +330,9 @@ final class MailNotifier
             );
           }
           remove_filter('wp_mail_content_type', [self::class, 'filterMailContentType']);
+          if (!empty($cidMap)) {
+            remove_action('phpmailer_init', $embedCb);
+          }
         }
       }
     }
@@ -325,5 +345,65 @@ final class MailNotifier
   public static function filterMailContentType()
   {
     return 'text/html; charset=UTF-8';
+  }
+
+  /**
+   * Rewrite signature <img> tags to inline cid: references and collect the files
+   * to embed. Only signature-field images that are local & readable are embedded;
+   * external URLs and non-signature images are left untouched. When the form has
+   * no signature (or none is in the body) $cidMap stays empty and nothing changes.
+   */
+  private static function embedSignatureImages($html, $formManager, $fieldValue, $baseDir, &$cidMap)
+  {
+    if (empty($html)) {
+      return $html;
+    }
+
+    // Collect signature filenames for this entry.
+    $sigFiles = [];
+    foreach ($formManager->getFields() as $key => $detail) {
+      if (!isset($detail['type']) || 'signature' !== $detail['type']) {
+        continue;
+      }
+      $val = isset($fieldValue[$key]) ? $fieldValue[$key] : '';
+      foreach ((array) $val as $fn) {
+        $fn = is_string($fn) ? trim($fn) : '';
+        if ('' !== $fn && 'signature-failed.png' !== $fn) {
+          $sigFiles[basename($fn)] = true;
+        }
+      }
+    }
+    if (empty($sigFiles)) {
+      return $html;
+    }
+
+    return preg_replace_callback(
+      '/<img\s+[^>]*src=[\'"]([^\'"]+)[\'"][^>]*>/i',
+      function ($m) use ($baseDir, $sigFiles, &$cidMap) {
+        $src = $m[1];
+        if (filter_var($src, FILTER_VALIDATE_URL)) {
+          return $m[0]; // external URL, leave as-is
+        }
+        $name = basename($src);
+        if (!isset($sigFiles[$name])) {
+          return $m[0]; // not a signature image
+        }
+        $file = $baseDir . $name;
+        if (!is_readable($file)) {
+          return $m[0];
+        }
+        $cid = 'bfsig_' . md5($file);
+        $cidMap[$cid] = ['path' => $file, 'name' => $name];
+
+        // Replace only the src attribute value (leave alt untouched).
+        return preg_replace(
+          '/(src=[\'"])' . preg_quote($src, '/') . '([\'"])/i',
+          '${1}cid:' . $cid . '${2}',
+          $m[0],
+          1
+        );
+      },
+      $html
+    );
   }
 }

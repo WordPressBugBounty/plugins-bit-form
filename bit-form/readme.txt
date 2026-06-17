@@ -1,10 +1,10 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.0.3
-Stable tag: 3.0.3
+Version: 3.1.0
+Stable tag: 3.1.0
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
-Contributors: bitpressadmin, arif25897, mdrhmaruf, mdabbasuddin, akaioum 
+Contributors: bitpressadmin
 Tags:  contact form, form, form builder, wp forms, form plugin
 Requires at least: 6.4
 Tested up to: 7.0
@@ -479,9 +479,29 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.1.0 =
+* Release Date: 17 June, 2026
+* New:
+  1. Address Field: Added a new Address field with multiple sub-fields for comprehensive address collection.
+  2. Custom Filter Events: Added new filter JS event hooks for modifying Address and Payment field configurations and options, making it easier for developers to extend field functionality.
+
+* Improvements:
+  1. Conditional Logic: Enhanced conditional logic support for composite fields (Name, Address, and Confirm Email), allowing more granular control based on sub-field values.
+  2. Sensitive Data Handling: Improved frontend handling of sensitive data to help prevent potential data exposure.
+  3. Custom CSS: Custom CSS styles are now rendered instantly in the Form Builder.
+  4. Improve support for Smart Tags in default value settings for non-text fields.
+
+* Fixes:
+  1. Fixed a Phone Number field styling issue when the country list was hidden.
+  2. Excluded the "bitforms" post type from XML sitemaps.
+  3. Fixed a nonce validation issue in the Save Form Progress route.
+  4. Fixed an issue causing signature images to appear broken in email templates.
+  5. Fixed a Dropdown field validation issue when using multiple option lists.
+  6. Fixed preview and download URL issues for uploaded files across different permalink configurations.
+
+
 = 3.0.3 =
 * Release Date: 6 June, 2026
-
 * Improvements:
     1. Improved CPT data validation during create and update operations.
 

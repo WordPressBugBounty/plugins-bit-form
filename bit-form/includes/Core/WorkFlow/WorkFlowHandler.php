@@ -95,10 +95,10 @@ final class WorkFlowHandler
       $workFlow['action_type'] = $value->workflow_type;
       $workFlow['action_run'] = $value->workflow_run;
       $workFlow['action_behaviour'] = $value->workflow_behaviour;
-      $workFlow['conditions'] = json_decode($value->workflow_condition);
-      $workFlow['info'] = json_decode($value->workflow_info);
+      $workFlow['conditions'] = json_decode($value->workflow_condition ?? '');
+      $workFlow['info'] = json_decode($value->workflow_info ?? '');
       $workFlow['status'] = (int) $value->workflow_status;
-      foreach ($workFlow['conditions'] as $conIndex => $condition) {
+      foreach ((array) $workFlow['conditions'] as $conIndex => $condition) {
         if (property_exists($condition, 'logics')) {
           $workFlow['conditions'][$conIndex]->logics = $condition->logics;
         }

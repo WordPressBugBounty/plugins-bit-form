@@ -9,7 +9,10 @@ use BitCode\BitForm\Core\Fallback\FallBack;
 /*
  * Add fallbacks
  * only class working under BitCode\BitForm\Core\Fallback\.
+ * set current release version and the method to be called for fallback in the add method of FallBack class.
+ * The method will be called if the installed version is less than the current release version.
  */
+
 FallBack::add('1.0.4', 'FormEntryMetaChange@changeMeta');
 FallBack::add('1.4.1', 'Field@addButton');
 FallBack::add('1.4.7', 'Validation@errorMessage');
@@ -30,3 +33,4 @@ FallBack::add('2.16.4', 'StylesFallback@addStaticStyleForMultiStepForm');
 FallBack::add('2.17.5', 'AppStructureFallback@ensureIndexFileInUploadDirs');
 FallBack::add('2.20.0', 'AppOptionsFallback@appSettingsWithGlobalMessages');
 FallBack::add('2.20.3', 'StylesFallback@addStaticStyleForMultiStepContentFld');
+FallBack::add('3.0.3', 'AppStructureFallback@flushRewriteRulesForBitformsCpt');

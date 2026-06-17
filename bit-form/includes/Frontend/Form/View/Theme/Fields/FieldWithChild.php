@@ -31,7 +31,7 @@ class FieldWithChild
         $childField = $fields->$fldKey;
 
         $input = TextField::init($childField, $fldKey, $field_name . '_confirm', $form_atomic_Cls_map, $formID, $error, $value);
-        $parentChildHTML .= $inputWrapper->childFieldWrapper($input);
+        $parentChildHTML .= $inputWrapper->childFieldWrapper($input, '', null, $fldKey);
       }
     } elseif ('name' === $field->typ) {
       $parentFieldValue = '';
@@ -62,7 +62,7 @@ class FieldWithChild
           $childField->val = $parentFieldValue->{$childFieldName};
         }
         $input = TextField::init($childField, $fldKey, $field_name . '_confirm', $form_atomic_Cls_map, $formID, $error, $value);
-        $parentChildHTML .= $inputWrapper->childFieldWrapper($input);
+        $parentChildHTML .= $inputWrapper->childFieldWrapper($input, '', null, $fldKey);
       }
     }
 
@@ -71,6 +71,7 @@ class FieldWithChild
 
   private static function shouldRenderChild($field)
   {
-    return (in_array($field->typ, ['email', 'password']) && property_exists($field, 'confirm') && true === $field->confirm) || ('name' === $field->typ && property_exists($field, 'childFields') && !empty((array) $field->childFields));
+    return (in_array($field->typ, ['email', 'password']) && property_exists($field, 'confirm') && true === $field->confirm)
+      || ('name' === $field->typ && property_exists($field, 'childFields') && !empty((array) $field->childFields));
   }
 }

@@ -37,7 +37,7 @@ final class FieldValueHandler
       if (isset($fieldValues[$fieldName])) {
         $targetFieldValue = isset($fieldValues[$fieldName]['value']) ? $fieldValues[$fieldName]['value'] : $fieldValues[$fieldName];
         if ('array' === gettype($targetFieldValue) || 'object' === gettype($targetFieldValue)) {
-          foreach ((array) $targetFieldValue as $singleTargetVal) {
+          foreach (self::stripMetaSubfields((array) $targetFieldValue) as $singleTargetVal) {
             if (isset($fieldValue)) {
               if (is_numeric($fieldValue) && is_numeric($singleTargetVal)) {
                 $fieldValue = $fieldValue + $singleTargetVal;
@@ -317,6 +317,11 @@ final class FieldValueHandler
       '/<img\s+[^>]*src=[\'"]([^\'"]*)[\'"][^>]*>/i',
       function ($matches) use ($path, $allowedMimeTypes) {
         $src = $matches[1];
+
+        // Already-embedded inline images (cid:) must be left untouched.
+        if (0 === stripos($src, 'cid:')) {
+          return $matches[0];
+        }
 
         if (filter_var($src, FILTER_VALIDATE_URL)) {
           return $matches[0];
@@ -918,11 +923,34 @@ final class FieldValueHandler
     return in_array($fieldType, ['name', 'address'], true);
   }
 
+  /**
+   * Removes internal/meta subfields (keys prefixed with "_", e.g. the address
+   * field's _latitude / _longitude) so they never leak into human-readable
+   * output (entry views, emails, SmartTags, PDF, exports).
+   *
+   * @param mixed $value
+   * @return mixed
+   */
+  private static function stripMetaSubfields($value)
+  {
+    if (!is_array($value)) {
+      return $value;
+    }
+    foreach (array_keys($value) as $key) {
+      if (is_string($key) && '' !== $key && '_' === $key[0]) {
+        unset($value[$key]);
+      }
+    }
+    return $value;
+  }
+
   private static function joinCompositeFieldValue($value, $fieldType)
   {
     if (!is_array($value)) {
       return (string) $value;
     }
+
+    $value = self::stripMetaSubfields($value);
 
     $parts = [];
     array_walk_recursive($value, function ($item) use (&$parts) {

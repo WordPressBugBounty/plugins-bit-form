@@ -71,6 +71,11 @@ class ScriptFilePriorityManager
         ['priority' => 301, 'filename' => 'initPasswordStrengthHelper.min.js', 'path' => 'valid->validations'],
         ['priority' => 301, 'filename' => 'bfTogglePasswordVisibility.min.js', 'path' => 'config->showPasswordIcon'],
       ],
+      'address' => [
+        ['priority' => 101, 'filename' => 'observeElm.min.js'],
+        ['priority' => 301, 'filename' => 'bit-address-field.min.js'],
+        ['priority' => 201, 'filename' => 'customFieldsReset.min.js'],
+      ],
       'country' => [
         ['priority' => 101, 'filename' => 'observeElm.min.js'],
         ['priority' => 301, 'filename' => 'bit-country-field.min.js'],
@@ -205,6 +210,19 @@ class ScriptFilePriorityManager
         'searchClearable'       => ['path' => 'config->searchClearable', 'val' => true],
         'searchPlaceholder'     => ['path' => 'config->searchPlaceholder', 'val' => ''],
         'activeList'            => ['path' => 'config->activeList', 'val' => 0],
+      ],
+      'address' => [
+        'config'             => (object) [],
+        'fieldKey'           => ['var' => 'fieldKey'],
+        'contentId'          => ['var' => 'contentId'],
+        'assetsURL'          => ['val' => BITFORMS_ROOT_URI . '/static/address/'],
+        'fieldName'          => ['path' => 'fieldName'],
+        'classNames'         => ['path' => 'customClasses'],
+        'attributes'         => ['path' => 'customAttributes'],
+        'defaultCountry'     => ['path' => 'config->defaultCountry',     'val' => ''],
+        'zipValidation'      => ['path' => 'config->zipValidation',      'val' => 'auto'],
+        'zipCustomRegex'     => ['path' => 'config->zipCustomRegex',     'val' => ''],
+
       ],
       'country' => [
         'config'                    => (object) [],  // sentinel: blocks raw fldData.config passthrough;
@@ -341,6 +359,7 @@ class ScriptFilePriorityManager
       'advanceFileupFldValidation'       => ['priority' => 702, 'filename' => 'advanceFileUpFldValidation.min.js'],
       'phoneNumberFldValidation'         => ['priority' => 702, 'filename' => 'phoneNumberFldValidation.min.js'],
       'currencyFldValidation'            => ['priority' => 702, 'filename' => 'currencyFldValidation.min.js'],
+      'addressZipFldValidation'          => ['priority' => 702, 'filename' => 'addressZipFldValidation.min.js'],
       'generateBackslashPattern'         => ['priority' => 700, 'filename' => 'generateBackslashPattern.min.js'],
       // 'nmbrFldValidation'                => ['priority' => 702, 'filename' => 'nmbrFldValidation.min.js'],
       // 'regexPatternValidation'           => ['priority' => 701, 'filename' => 'regexPatternValidation.min.js'], // load before generateBackslashPattern file, then load  regexPatternValidation
@@ -479,6 +498,14 @@ class ScriptFilePriorityManager
         'phone-number' => [
           'phoneNumberFldValidation' => [
             'paths'        => ['err->invalid->show'],
+          ]
+        ],
+        'address' => [
+          'addressZipFldValidation' => [
+            'paths'        => ['config->zipValidation'],
+            'dependencies' => [
+              'validation',
+            ]
           ]
         ],
       ];

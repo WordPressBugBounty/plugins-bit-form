@@ -18,7 +18,9 @@ use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\FileDownloadProvider;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\Core\Util\SmartTags;
+use BitCode\BitForm\Core\Util\SmartTagRegistry;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
+use Error;
 
 final class FrontendFormHandler
 {
@@ -530,7 +532,7 @@ final class FrontendFormHandler
       'GCLID'                          => $FrontendFormManager->isGCLIDEnabled(),
       'assetUrl'                       => BITFORMS_ASSET_URI,
       'onfieldCondition'               => !empty($workFlowreturnedOnUserInput['onfield_input_conditions']) ? $workFlowreturnedOnUserInput['onfield_input_conditions'] : false,
-      'smartTags'                      => SmartTags::smartTags(SmartTags::getPostUserData()),
+      'smartTags'                      => $this->buildFrontendSmartTags($formID, $workFlowreturnedOnUserInput, $fields),
       'paymentCallbackUrl'             => get_rest_url() . 'bitform/v1/payments/razorpay',
       'gRecaptchaSiteKey'              => !empty($reCAPTCHA->siteKey) ? $reCAPTCHA->siteKey : null,
       'gRecaptchaVersion'              => !empty($reCAPTCHAVersion) ? $reCAPTCHAVersion : null,
@@ -624,6 +626,56 @@ final class FrontendFormHandler
 
     echo wp_kses(trim($html), EscapingHelper::getFormAllowedHtml($formContent));
     return ob_get_clean();
+  }
+
+  /**
+   * Build the smart-tag map exposed to the browser in window.bf_globals[formId].smartTags.
+   *
+   * Security: the legacy code shipped the ENTIRE ~43-tag map to every visitor, leaking
+   * PII (admin/user/author email) and freezing per-visitor request data (IP, time,
+   * browser, referer) into cacheable HTML. We now emit ONLY tags that are (a) actually
+   * referenced by this form's client-evaluated surfaces — conditional logic, payment
+   * notes, admin custom JS — AND (b) flagged frontend-safe in the registry (static/post
+   * context only). Sensitive (identity) and request/visitor tags are never emitted; they
+   * resolve server-side at submit time instead.
+   *
+   * @param int|string $formID
+   * @param mixed      $workflowConditions on-field input conditions (client-evaluated)
+   * @param mixed      $fields             form fields object (carries payment notes, etc.)
+   * @return array<string,string>
+   */
+  private function buildFrontendSmartTags($formID, $workflowConditions, $fields)
+  {
+    // Haystack = only surfaces the browser actually evaluates against smartTags.
+    $haystack = wp_json_encode($workflowConditions) . ' ' . wp_json_encode($fields);
+    $customJs = FrontEndScriptGenerator::getCustomCodes($formID)['JavaScript'];
+    if (is_string($customJs) && '' !== $customJs) {
+      $haystack .= ' ' . $customJs;
+    }
+
+    $ctx = SmartTags::getPostUserData();
+    $frontendSmartTags = [];
+    $referenced = [];
+    foreach (SmartTags::smartTagFieldKeys() as $key) {
+      if (!SmartTagRegistry::isFrontendExposable($key)) {
+        continue; // identity / request / param tags never travel to the browser
+      }
+      // Match '${' . key prefix so keys containing spaces/slashes/commas are handled.
+      if (false !== strpos($haystack, '${' . $key)) {
+        $referenced[]   = $key;
+        $frontendSmartTags[$key] = SmartTagRegistry::resolve($key, $ctx);
+      }
+    }
+
+    /**
+     * Escape hatch: a site that genuinely needs an extra tag client-side can opt it
+     * back in explicitly here, rather than core shipping everything by default.
+     *
+     * @param array<string,string> $frontendSmartTags resolved frontend-safe smart tags
+     * @param int|string           $formID
+     * @param string[]             $referenced keys detected in client surfaces
+     */
+    return apply_filters('bitform_frontend_smarttags', $frontendSmartTags, $formID, $referenced);
   }
 
   /**

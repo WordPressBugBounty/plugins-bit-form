@@ -7,17 +7,38 @@ class PostType
   public static function registerBitformsPostType()
   {
     $args = [
-      'label'           => __('Bitform Pages', 'bit-form'),
-      'public'          => true,
-      'show_ui'         => true,
-      'show_in_menu'    => false,
-      'capability_type' => 'page',
-      'hierarchical'    => false,
-      'query_var'       => false,
-      'supports'        => ['title'],
-      'show_in_rest'    => false,
+      'label'               => __('Bitform Pages', 'bit-form'),
+      // Internal helper post type (file-download page). Kept out of sitemaps/search/index,
+      // but still resolvable for the authenticated download flow (is_singular + permalink).
+      'public'              => false,
+      'publicly_queryable'  => true,
+      'exclude_from_search' => true,
+      'show_in_nav_menus'   => false,
+      'show_ui'             => true,
+      'show_in_menu'        => false,
+      'capability_type'     => 'page',
+      'hierarchical'        => false,
+      'has_archive'         => false,
+      'query_var'           => false,
+      'rewrite'             => true,
+      'supports'            => ['title'],
+      'show_in_rest'        => false,
     ];
     register_post_type('bitforms', $args);
+  }
+
+  /**
+   * Add noindex/nofollow to the internal 'bitforms' helper page. `public => false` already
+   * removes it from WP core sitemaps; this guards every reachable URL (incl. third-party SEO
+   * plugin sitemaps like Yoast/RankMath and already-indexed URLs) from search-engine indexing.
+   */
+  public static function noindexBitformsPages($robots)
+  {
+    if (is_singular('bitforms')) {
+      return wp_robots_no_robots($robots);
+    }
+
+    return $robots;
   }
 
   public static function scheduleRewriteFlush()

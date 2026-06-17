@@ -239,15 +239,20 @@ final class Activation
   private function createFrontendPages()
   {
     $args = [
-      'label'           => __('Bitforms Pages', 'bit-form'),
-      'public'          => true,
-      'show_ui'         => true,
-      'show_in_menu'    => false,
-      'capability_type' => 'page',
-      'hierarchical'    => false,
-      'query_var'       => false,
-      'supports'        => ['title'],
-      'show_in_rest'    => false
+      'label'               => __('Bitforms Pages', 'bit-form'),
+      'public'              => false,
+      'publicly_queryable'  => true,
+      'exclude_from_search' => true,
+      'show_in_nav_menus'   => false,
+      'show_ui'             => true,
+      'show_in_menu'        => false,
+      'capability_type'     => 'page',
+      'hierarchical'        => false,
+      'has_archive'         => false,
+      'query_var'           => false,
+      'rewrite'             => true,
+      'supports'            => ['title'],
+      'show_in_rest'        => false
     ];
     register_post_type('bitforms', $args);
     $routes = get_option('bitforms_routes');

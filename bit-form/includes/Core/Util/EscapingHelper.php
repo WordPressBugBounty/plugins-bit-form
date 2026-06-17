@@ -68,6 +68,7 @@ final class EscapingHelper
       'data-bf-show-picker',
       'data-bx',
       'data-ck-icn',
+      'data-field-key',
     ], true);
   }
 

@@ -26,4 +26,13 @@ class AppStructureFallback
       }
     }
   }
+
+  /**
+   * Flush rewrite rules once after the 'bitforms' post type args changed
+   * (public => false, publicly_queryable => true) so the download permalink keeps resolving.
+   */
+  public function flushRewriteRulesForBitformsCpt()
+  {
+    flush_rewrite_rules();
+  }
 }
