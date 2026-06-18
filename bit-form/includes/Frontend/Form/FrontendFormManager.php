@@ -207,7 +207,7 @@ final class FrontendFormManager extends FormManager
     $formFields = $this->getFormFields($this->_form_id);
 
     foreach ($post as $key => $value) {
-      if (!str_starts_with($key, 'repeater') && 'select' === $formFields->{$key}->typ) {
+      if (!str_starts_with($key, 'repeater') && isset($formFields->{$key}) && 'select' === $formFields->{$key}->typ) {
         if (is_array($value)) {
           foreach ($value as $k => $v) {
             $post[$key][$k] = !is_array($v) && is_string($v) ? explode(BITFORMS_BF_SEPARATOR, $v) : $v;

@@ -29,35 +29,71 @@ final class MailNotifier
 
       $pdfTemplate = $pdfTemplateHandler->getById($pdfTemplateID);
 
-      $pdfSetting = json_decode($pdfTemplate[0]->setting);
-      // error_log('PDF Setting before pdfFileName: ' . print_r([$pdfSetting, $fieldValue], true));
+      // Bail out if the template lookup failed (WP_Error) or returned no row.
+      // Without this guard json_decode($pdfTemplate[0]->setting) fatals and the whole email is lost.
+      if (is_wp_error($pdfTemplate) || empty($pdfTemplate[0]) || !isset($pdfTemplate[0]->setting)) {
+        $apiResponse->apiResponse($logId, '', ['type' => 'record', 'type_name' => 'pdf'], 'errors', 'PDF template not found, skipping PDF attachment.', $entryDetails);
+        Log::debug_log([
+          'status'          => 'error',
+          'code'            => 'pdf_template_not_found',
+          'message'         => 'PDF template not found, skipping PDF attachment',
+          'inputDetails'    => [
+            'notifyDetails' => $notifyDetails,
+            'formID'        => $formID,
+            'entryID'       => $entryID,
+            'pdfTemplateID' => $pdfTemplateID,
+          ],
+          'responseDetails' => is_wp_error($pdfTemplate) ? $pdfTemplate->get_error_message() : 'empty result',
+        ]);
+      } else {
+        $pdfSetting = json_decode($pdfTemplate[0]->setting);
 
-      $path = BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'pdf';
-      // $fileName = 'bit-form-pdf-' . $formID . '-' . $entryID;
+        $path = BITFORMS_CONTENT_DIR . DIRECTORY_SEPARATOR . 'pdf';
+        // $fileName = 'bit-form-pdf-' . $formID . '-' . $entryID;
 
-      if (!is_dir($path)) {
-        wp_mkdir_p($path);
-      }
-
-      if (class_exists('\BitCode\BitFormPro\Admin\AppSetting\Pdf')) {
-        $serverPath = Helpers::getFullPathWithEncryptedEntryId($formID, $entryID);
-        $webPath = Helpers::getWebPathWithEncryptedEntryId($formID, $entryID);
-
-        if (isset($pdfSetting->password)) {
-          if (isset($pdfSetting->password->static) && $pdfSetting->password->static && !empty($pdfSetting->password->pass)) {
-            $pass = FieldValueHandler::replaceFieldWithValue($pdfSetting->password->pass, $fieldValue);
-            $pdfSetting->password->pass = $pass;
-          } elseif (isset($pdfSetting->password->dynamic)) {
-            $pass = Helpers::PDFPassHash($entryID);
-            $pdfSetting->password->pass = $pass;
-          }
+        if (!is_dir($path)) {
+          wp_mkdir_p($path);
         }
-        if (isset($pdfSetting->pdfFileName)) {
-          $pdfSetting->pdfFileName = FieldValueHandler::replaceFieldWithValue($pdfSetting->pdfFileName, $fieldValue);
-          // allow developers to modify PDF filename
-          $pdfSetting->pdfFileName = apply_filters(
-            'bitform_filter_pdf_filename',
-            $pdfSetting->pdfFileName,
+
+        if (class_exists('\BitCode\BitFormPro\Admin\AppSetting\Pdf')) {
+          $serverPath = Helpers::getFullPathWithEncryptedEntryId($formID, $entryID);
+          $webPath = Helpers::getWebPathWithEncryptedEntryId($formID, $entryID);
+
+          if (isset($pdfSetting->password)) {
+            if (isset($pdfSetting->password->static) && $pdfSetting->password->static && !empty($pdfSetting->password->pass)) {
+              $pass = FieldValueHandler::replaceFieldWithValue($pdfSetting->password->pass, $fieldValue);
+              $pdfSetting->password->pass = $pass;
+            } elseif (isset($pdfSetting->password->dynamic)) {
+              $pass = Helpers::PDFPassHash($entryID);
+              $pdfSetting->password->pass = $pass;
+            }
+          }
+          if (isset($pdfSetting->pdfFileName)) {
+            $pdfSetting->pdfFileName = FieldValueHandler::replaceFieldWithValue($pdfSetting->pdfFileName, $fieldValue);
+            // allow developers to modify PDF filename
+            $pdfSetting->pdfFileName = apply_filters(
+              'bitform_filter_pdf_filename',
+              $pdfSetting->pdfFileName,
+              [
+                'form_id'      => $formID,
+                'entry_id'     => $entryID,
+                'field_values' => $fieldValue,
+                'pdf_setting'  => $pdfSetting,
+                'template'     => $pdfTemplate[0] ?? null,
+              ]
+            );
+          }
+
+          $fieldValue['entry_id'] = $entryID;
+
+          $pdfBody = FieldValueHandler::replaceFieldWithValue($pdfTemplate[0]->body, $fieldValue, $formID);
+          $pdfBody = FieldValueHandler::changeImagePathInHTMLString($pdfBody, $serverPath);
+          $pdfBody = FieldValueHandler::changeHrefPathInHTMLString($pdfBody, $webPath);  // replace anchor tag href with constructed weburl
+
+          // allow developers to modify PDF body
+          $pdfBody = apply_filters(
+            'bitform_filter_pdf_body',
+            $pdfBody,
             [
               'form_id'      => $formID,
               'entry_id'     => $entryID,
@@ -66,61 +102,42 @@ final class MailNotifier
               'template'     => $pdfTemplate[0] ?? null,
             ]
           );
-        }
 
-        $fieldValue['entry_id'] = $entryID;
+          $generatedPdf = \BitCode\BitFormPro\Admin\AppSetting\Pdf::getInstance()->generator($pdfSetting, $pdfBody, $path, $entryID, 'F');
 
-        $pdfBody = FieldValueHandler::replaceFieldWithValue($pdfTemplate[0]->body, $fieldValue, $formID);
-        $pdfBody = FieldValueHandler::changeImagePathInHTMLString($pdfBody, $serverPath);
-        $pdfBody = FieldValueHandler::changeHrefPathInHTMLString($pdfBody, $webPath);  // replace anchor tag href with constructed weburl
-
-        // allow developers to modify PDF body
-        $pdfBody = apply_filters(
-          'bitform_filter_pdf_body',
-          $pdfBody,
-          [
-            'form_id'      => $formID,
-            'entry_id'     => $entryID,
-            'field_values' => $fieldValue,
-            'pdf_setting'  => $pdfSetting,
-            'template'     => $pdfTemplate[0] ?? null,
-          ]
-        );
-
-        $generatedPdf = \BitCode\BitFormPro\Admin\AppSetting\Pdf::getInstance()->generator($pdfSetting, $pdfBody, $path, $entryID, 'F');
-
-        if (!is_wp_error($generatedPdf) && file_exists($generatedPdf)) {
-          $attachments[] = $generatedPdf;
-          $tempPdfLink = $generatedPdf;
-          $apiResponse->apiResponse($logId, '', ['type' =>  'record', 'type_name' => 'pdf'], 'success', 'PDF successfully generated.', $entryDetails);
-          Log::debug_log([
-            'status'          => 'success',
-            'code'            => 'pdf_generated',
-            'message'         => 'PDF successfully generated',
-            'inputDetails'    => [
-              'notifyDetails' => $notifyDetails,
-              'formID'        => $formID,
-              'entryID'       => $entryID,
-              'isDblOptin'    => $isDblOptin,
-              'logId'         => $logId
-            ],
-            'responseDetails' => $generatedPdf
-          ]);
-        } else {
-          $apiResponse->apiResponse($logId, '', ['type' =>  'record', 'type_name' => 'pdf'], 'errors', 'Error in generating PDF.', $entryDetails);
-          Log::debug_log([
-            'status'          => 'error',
-            'code'            => 'pdf_generation_error',
-            'message'         => 'Error in generating PDF',
-            'inputDetails'    => [
-              'notifyDetails' => $notifyDetails,
-              'formID'        => $formID,
-              'entryID'       => $entryID,
-              'isDblOptin'    => $isDblOptin,
-              'logId'         => $logId
-            ],
-            'responseDetails' => $generatedPdf->get_error_message()
-          ]);
+          if (!is_wp_error($generatedPdf) && file_exists($generatedPdf)) {
+            $attachments[] = $generatedPdf;
+            $tempPdfLink = $generatedPdf;
+            $apiResponse->apiResponse($logId, '', ['type' =>  'record', 'type_name' => 'pdf'], 'success', 'PDF successfully generated.', $entryDetails);
+            Log::debug_log([
+              'status'          => 'success',
+              'code'            => 'pdf_generated',
+              'message'         => 'PDF successfully generated',
+              'inputDetails'    => [
+                'notifyDetails' => $notifyDetails,
+                'formID'        => $formID,
+                'entryID'       => $entryID,
+                'isDblOptin'    => $isDblOptin,
+                'logId'         => $logId
+              ],
+              'responseDetails' => $generatedPdf
+            ]);
+          } else {
+            $apiResponse->apiResponse($logId, '', ['type' =>  'record', 'type_name' => 'pdf'], 'errors', 'Error in generating PDF.', $entryDetails);
+            Log::debug_log([
+              'status'          => 'error',
+              'code'            => 'pdf_generation_error',
+              'message'         => 'Error in generating PDF',
+              'inputDetails'    => [
+                'notifyDetails' => $notifyDetails,
+                'formID'        => $formID,
+                'entryID'       => $entryID,
+                'isDblOptin'    => $isDblOptin,
+                'logId'         => $logId
+              ],
+              'responseDetails' => $generatedPdf->get_error_message()
+            ]);
+          }
         }
       }
     }

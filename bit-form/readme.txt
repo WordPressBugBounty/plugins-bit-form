@@ -1,7 +1,7 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.1.0
-Stable tag: 3.1.0
+Version: 3.1.1
+Stable tag: 3.1.1
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin
@@ -479,6 +479,11 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.1.1 =
+* Release Date: 18 June, 2026
+* Fix:
+    1. Length Validation: Resolve length validation functionality with Checkbox Field
+
 = 3.1.0 =
 * Release Date: 17 June, 2026
 * New:
