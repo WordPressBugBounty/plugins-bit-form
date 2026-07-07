@@ -909,6 +909,30 @@ class FormManager
     return $updatedValue;
   }
 
+  private function normalizeOldFileValues($stored_files, $old_values)
+  {
+    $stored_files = is_array($stored_files) ? $stored_files : [];
+    $old_values = is_array($old_values) ? $old_values : explode(',', (string) $old_values);
+
+    $normalized_values = [];
+    foreach ($old_values as $value) {
+      if (!is_string($value) && !is_numeric($value)) {
+        continue;
+      }
+
+      $trimmed_value = trim((string) $value);
+      if ('' === $trimmed_value) {
+        continue;
+      }
+
+      if (in_array($trimmed_value, $stored_files, true)) {
+        $normalized_values[] = $trimmed_value;
+      }
+    }
+
+    return array_values(array_unique($normalized_values));
+  }
+
   public function updateFormEntry($updatedValue, $formID, $entryID)
   {
     // CSRF / entry-token verified upstream via FrontendFormManager::handleUpdateEntry() before this method is invoked.
@@ -1020,7 +1044,10 @@ class FormManager
                 if (isset($repeaterRow[$field_key]) && !empty($repeaterRow[$field_key])) {
                   $repeaterExistFiles[$index] = json_decode($repeaterRow[$field_key], true);
                 }
-                $repeaterFiles_old[$index] = empty($updatedValue[$field_key . '_old'][$index]) ? [] : explode(',', $updatedValue[$field_key . '_old'][$index]);
+                if (!is_array($repeaterExistFiles[$index])) {
+                  $repeaterExistFiles[$index] = [];
+                }
+                $repeaterFiles_old[$index] = $this->normalizeOldFileValues($repeaterExistFiles[$index], empty($updatedValue[$field_key . '_old'][$index]) ? [] : $updatedValue[$field_key . '_old'][$index]);
                 $repeaterDeleted_files[$index] = array_diff($repeaterExistFiles[$index], $repeaterFiles_old[$index]);
                 $fileHandler->deleteFiles($formID, $entryID, $repeaterDeleted_files[$index]);
               }
@@ -1035,8 +1062,11 @@ class FormManager
               ]
             );
             if (!is_wp_error($file_exists) && count($file_exists) > 0) {
-              $files_in_db = json_decode($file_exists[0]->meta_value);
-              $files_old = empty($updatedValue[$field_key . '_old']) ? [] : explode(',', $updatedValue[$field_key . '_old']);
+              $files_in_db = json_decode($file_exists[0]->meta_value, true);
+              if (!is_array($files_in_db)) {
+                $files_in_db = [];
+              }
+              $files_old = $this->normalizeOldFileValues($files_in_db, empty($updatedValue[$field_key . '_old']) ? [] : $updatedValue[$field_key . '_old']);
               $deleted_file = array_diff($files_in_db, $files_old);
               if (count($deleted_file) > 0) {
                 $fileHandler->deleteFiles($formID, $entryID, $deleted_file);

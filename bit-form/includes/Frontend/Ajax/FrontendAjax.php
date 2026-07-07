@@ -45,6 +45,9 @@ final class FrontendAjax
       wp_send_json_error(__('Form ID not found', 'bit-form'), 400);
     }
     $FrontendFormManager = FrontendFormManager::getInstance($form_id);
+    if (!$FrontendFormManager->checkStatus()) {
+      wp_send_json_error(__('Form is not active', 'bit-form'), 403);
+    }
     $FrontendFormManager->fieldNameReplaceOfPost();
     $validateStatus = $FrontendFormManager->beforeSubmittedValidate(false);
     if (is_wp_error($validateStatus)) {
@@ -60,6 +63,9 @@ final class FrontendAjax
     // CSRF verified inside FrontendFormManager::handleSubmission() via verifySubmissionNonce() using HMAC-SHA256 token (Helpers::csrfDecrypted).
     $form_id = isset($_POST['bitforms_id']) ? str_replace('bitforms_', '', sanitize_text_field(wp_unslash($_POST['bitforms_id']))) : '';
     $FrontendFormManager = FrontendFormManager::getInstance($form_id);
+    if (!$FrontendFormManager->checkStatus()) {
+      wp_send_json_error(__('Form is not active', 'bit-form'), 403);
+    }
     $submitSatus = $FrontendFormManager->handleSubmission();
     if (is_wp_error($submitSatus)) {
       do_action('bitform_submit_error', $form_id, $submitSatus);
@@ -86,6 +92,9 @@ final class FrontendAjax
     $GLOBALS['bitform_entry_id'] = $entryId;
     if (Helpers::validateEntryTokenAndUser($entryToken, $entryId) || FrontendHelpers::is_current_user_can_access($form_id, 'entryEditAccess')) {
       $FrontendFormManager = FrontendFormManager::getInstance($form_id);
+      if (!$FrontendFormManager->checkStatus()) {
+        wp_send_json_error(__('Form is not active', 'bit-form'), 403);
+      }
       $updateStatus = $FrontendFormManager->handleUpdateEntry();
       if (is_wp_error($updateStatus)) {
         do_action('bitform_update_error', $form_id, $updateStatus);
@@ -148,6 +157,10 @@ final class FrontendAjax
         wp_send_json_error('Form Id not found', 400);
       } else {
         $formId = absint($data->formId);
+        $frontendFormManager = FrontendFormManager::getInstance($formId);
+        if (!$frontendFormManager->isExist() || !$frontendFormManager->checkStatus()) {
+          wp_send_json_error(__('Form is not active', 'bit-form'), 403);
+        }
         $fields = $this->hiddenFields($formId);
         $properties = $this->hiddenPropeties($formId);
         wp_send_json_success(['hidden_fields'=>$fields, 'hidden_properties'=>$properties]);
@@ -167,6 +180,11 @@ final class FrontendAjax
       $submitted_fields = [];
       if (isset($request->id, $request->cronNotOk)) {
         $formID = absint(str_replace('bitforms_', '', sanitize_text_field($request->id)));
+        $frontendFormManager = FrontendFormManager::getInstance($formID);
+        if (!$frontendFormManager->isExist() || !$frontendFormManager->checkStatus()) {
+          Log::debug_log('Inactive or non-existent form for workflow trigger. FormID=' . $formID);
+          wp_send_json_error(['message' => 'Form is not active'], 403);
+        }
         $cronNotOk = $request->cronNotOk;
 
         // Validate and sanitize entry ID and log ID

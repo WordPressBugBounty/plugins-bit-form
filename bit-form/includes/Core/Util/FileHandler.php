@@ -122,11 +122,57 @@ final class FileHandler
     return $file_upoalded;
   }
 
+  public static function isSafeFileName($name)
+  {
+    if (!is_string($name)) {
+      return false;
+    }
+
+    $trimmed = trim($name);
+    if ('' === $trimmed) {
+      return false;
+    }
+
+    $baseName = basename($trimmed);
+    if ('' === $baseName || $baseName !== $trimmed || 'index.php' === $baseName) {
+      return false;
+    }
+
+    return sanitize_file_name($trimmed) === $trimmed;
+  }
+
   public function deleteFiles($form_id, $entry_id, $files)
   {
     $_upload_dir = self::getEntriesFileUploadDir($form_id, $entry_id);
-    foreach ($files as $name) {
-      wp_delete_file($_upload_dir . DIRECTORY_SEPARATOR . $name);
+    $resolvedBitformsUploadDir = realpath(BITFORMS_UPLOAD_DIR);
+    $resolvedUploadDir = realpath($_upload_dir);
+    if (false === $resolvedBitformsUploadDir || false === $resolvedUploadDir) {
+      return;
+    }
+
+    $bitformsUploadDirPrefix = trailingslashit(wp_normalize_path($resolvedBitformsUploadDir));
+    $uploadDirPrefix = trailingslashit(wp_normalize_path($resolvedUploadDir));
+    if (0 !== strpos($uploadDirPrefix, $bitformsUploadDirPrefix)) {
+      return;
+    }
+
+    foreach ((array) $files as $name) {
+      if (!self::isSafeFileName($name)) {
+        continue;
+      }
+
+      $candidatePath = $resolvedUploadDir . DIRECTORY_SEPARATOR . $name;
+      $resolvedPath = realpath($candidatePath);
+      if (false === $resolvedPath || !is_file($resolvedPath)) {
+        continue;
+      }
+
+      $normalizedPath = wp_normalize_path($resolvedPath);
+      if (0 !== strpos($normalizedPath, $uploadDirPrefix)) {
+        continue;
+      }
+
+      wp_delete_file($resolvedPath);
     }
   }
 
