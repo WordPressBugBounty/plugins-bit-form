@@ -15,7 +15,7 @@ class AddressField
     }
 
     $formManager = FormManager::getInstance($formID);
-    $fields      = $formManager->getFormContent()->fields;
+    $fields = $formManager->getFormContent()->fields;
     $childFields = $field->childFields;
 
     $parentChildHTML = '';
@@ -25,7 +25,7 @@ class AddressField
         continue;
       }
 
-      $fldKey     = $childFldKey->fldKey;
+      $fldKey = $childFldKey->fldKey;
       $childField = $fields->{$fldKey};
       $isDeactive = property_exists($childField, 'isDeactive') && $childField->isDeactive;
 
@@ -35,7 +35,7 @@ class AddressField
 
       preg_match('/\[(\w+)\]$/', $childField->fieldName, $matches);
       $subFieldName = $matches[1] ?? '';
-      $colSpan      = property_exists($childField, 'colSpan') ? (int) $childField->colSpan : 12;
+      $colSpan = property_exists($childField, 'colSpan') ? (int) $childField->colSpan : 12;
 
       if ('country' === $childField->typ) {
         $input = CountryField::init($childField, $fldKey, $field_name . '_address', $form_atomic_Cls_map, $formID, $error, $value);

@@ -28,6 +28,8 @@ class DropdownField
     $activeList = isset($field->config->activeList) ? $field->config->activeList : null;
     $optionIcon = '';
     $allowCustomOption = isset($field->config->allowCustomOption) ? $field->config->allowCustomOption : false;
+    $showSearch = !$fh->property_exists_nested($field, 'config->showSearch', false);
+    $searchMarkup = '';
     $img = htmlentities("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>");
 
     if ($fh->property_exists_nested($field, 'config->optionIcon', true)) {
@@ -295,6 +297,64 @@ class DropdownField
 
       $multiChipClass = ($fh->property_exists_nested($field, 'config->multipleSelect', true) && $fh->property_exists_nested($field, 'config->showChip', true)) ? 'multi-chip' : '';
 
+      if ($showSearch) {
+        $searchMarkup = '            <div
+              ' . $fh->getCustomAttributes('option-search-wrp') . '
+              class="' . $fh->getConversationalMultiCls('option-search-wrp') . ' ' . $fh->getCustomClasses('option-search-wrp') . '"
+            >
+              <input
+                ' . $fh->getCustomAttributes('opt-search-input') . '
+                type="search"
+                class="' . $fh->getConversationalMultiCls('opt-search-input') . ' ' . $fh->getCustomClasses('opt-search-input') . '"
+                placeholder="Search Country"
+                aria-label="Search Options"
+                aria-hidden="true"
+                tabIndex="-1"
+              />
+              <svg
+                ' . $fh->getCustomAttributes('opt-search-icn') . '
+                class="' . $fh->getConversationalMultiCls('icn') . ' ' . $fh->getConversationalMultiCls('opt-search-icn') . ' ' . $fh->getCustomClasses('opt-search-icn') . '"
+                aria-hidden="true"
+                width="22"
+                height="22"
+                role="img"
+                title="Search icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <button
+                ' . $fh->getCustomAttributes('search-clear-btn') . '
+                type="button"
+                aria-label="Clear search"
+                class="' . $fh->getConversationalMultiCls('icn') . ' ' . $fh->getConversationalMultiCls('search-clear-btn') . ' ' . $fh->getCustomClasses('search-clear-btn') . '"
+                tabIndex="-1"
+              >
+                <svg
+                  width="13"
+                  height="13"
+                  role="img"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+';
+      }
+
       return '    <div class="' . $fh->getConversationalMultiCls('dpd-fld-container') . ' ' . $fh->getCustomClasses('dpd-fld-container') . '">
       <div
         ' . $fh->getCustomAttributes('dpd-fld-wrp') . '
@@ -391,60 +451,7 @@ class DropdownField
             ' . $fh->getCustomAttributes('option-inner-wrp') . '
             class="' . $fh->getConversationalMultiCls('option-inner-wrp') . ' ' . $fh->getCustomClasses('option-inner-wrp') . '"
           >
-            <div 
-              ' . $fh->getCustomAttributes('option-search-wrp') . '
-              class="' . $fh->getConversationalMultiCls('option-search-wrp') . ' ' . $fh->getCustomClasses('option-search-wrp') . '"
-            >
-              <input
-                ' . $fh->getCustomAttributes('opt-search-input') . '
-                type="search"
-                class="' . $fh->getConversationalMultiCls('opt-search-input') . ' ' . $fh->getCustomClasses('opt-search-input') . '"
-                placeholder="Search Country"
-                aria-label="Search Options"
-                aria-hidden="true"
-                tabIndex="-1"
-              />
-              <svg
-                ' . $fh->getCustomAttributes('opt-search-icn') . '
-                class="' . $fh->getConversationalMultiCls('icn') . ' ' . $fh->getConversationalMultiCls('opt-search-icn') . ' ' . $fh->getCustomClasses('opt-search-icn') . '"
-                aria-hidden="true"
-                width="22"
-                height="22"
-                role="img"
-                title="Search icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <button
-                ' . $fh->getCustomAttributes('search-clear-btn') . '
-                type="button"
-                aria-label="Clear search"
-                class="' . $fh->getConversationalMultiCls('icn') . ' ' . $fh->getConversationalMultiCls('search-clear-btn') . ' ' . $fh->getCustomClasses('search-clear-btn') . '"
-                tabIndex="-1"
-              >
-                <svg
-                  width="13"
-                  height="13"
-                  role="img"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
+            ' . $searchMarkup . '
             ' . $optionsList . '
           </div>
         </div>

@@ -14,7 +14,7 @@ class PhoneNumberField
   private static function field($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error = null, $value = null)
   {
     $fh = new ClassicFieldHelpers($field, $rowID, $form_atomic_Cls_map);
-    $img_url = BITFORMS_ASSET_URI . '/../static/countries/';
+    $img_url = BITFORMS_ROOT_URI . '/static/countries/';
     $req = $fh->required();
     $disabled = $fh->disabled();
     $readonly = $fh->readonly();

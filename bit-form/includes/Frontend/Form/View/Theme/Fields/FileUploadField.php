@@ -28,8 +28,6 @@ class FileUploadField
     $showSelectStatus = '';
     $maxSizeSection = '';
     $multiple = '';
-    $maxSize = isset($field->config->maxSize) ? $field->config->maxSize : '';
-    $sizeUnit = isset($field->config->sizeUnit) ? $field->config->sizeUnit : '';
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
 

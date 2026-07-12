@@ -168,7 +168,7 @@ class FieldsConversionFormate
           'fieldName'        => 'file-up',
           'phHide'           => true,
           'adminLblHide'     => true,
-          'prefixIcn'        => str_replace('/v1', '', BITFORMS_ASSET_URI) . '/../static/file-upload/paperclip.svg',
+          'prefixIcn'        => BITFORMS_ROOT_URI . '/static/file-upload/paperclip.svg',
           'btnTxt'           => 'Attach File',
           'config'           => [
             'multiple'        => false,
@@ -311,6 +311,7 @@ class FieldsConversionFormate
             'selectedOptImage'    => false,
             'selectedOptClearable'=> true,
             'searchClearable'     => true,
+            'showSearch'          => true,
             'optionIcon'          => false,
             'placeholder'         => 'Select an option',
             'showSearchPh'        => true,

@@ -686,6 +686,26 @@ class FormManager
     foreach ($repeaterFields as $repeaterFldKey => $repeatedFields) {
       $repeatIndexes = $submitted_data["{$form_fields[$repeaterFldKey]['name']}-repeat-index"];
       $repeatIndexes = explode(',', $repeatIndexes);
+      foreach ($repeatedFields as $repeatedField) {
+        $oldFileKey = "{$repeatedField}_old";
+        if (isset($submitted_data[$oldFileKey]) && is_array($submitted_data[$oldFileKey])) {
+          $oldFileValues = $submitted_data[$oldFileKey];
+          $oldFileKeys = array_map('strval', array_keys($oldFileValues));
+          $repeatIndexKeys = array_map('strval', $repeatIndexes);
+          $oldFilesUseRepeatIndexes = empty(array_diff($oldFileKeys, $repeatIndexKeys));
+          $normalizedOldFileValues = [];
+
+          foreach ($repeatIndexes as $slNo => $repeatIndex) {
+            $oldFileSourceIndex = $oldFilesUseRepeatIndexes ? $repeatIndex : $slNo;
+            if (array_key_exists($oldFileSourceIndex, $oldFileValues)) {
+              $normalizedOldFileValues[$slNo] = $oldFileValues[$oldFileSourceIndex];
+            }
+          }
+
+          $submitted_data[$oldFileKey] = $normalizedOldFileValues;
+        }
+      }
+
       foreach ($repeatIndexes as $slNo => $repeatIndex) {
         foreach ($repeatedFields as $repeatedField) {
           if (!isset($submitted_data[$repeatedField][$repeatIndex])) {
@@ -912,7 +932,11 @@ class FormManager
   private function normalizeOldFileValues($stored_files, $old_values)
   {
     $stored_files = is_array($stored_files) ? $stored_files : [];
-    $old_values = is_array($old_values) ? $old_values : explode(',', (string) $old_values);
+    if (!is_array($old_values)) {
+      $old_values_string = trim((string) $old_values);
+      $decoded_old_values = json_decode($old_values_string, true);
+      $old_values = is_array($decoded_old_values) ? $decoded_old_values : explode(',', $old_values_string);
+    }
 
     $normalized_values = [];
     foreach ($old_values as $value) {
@@ -1039,17 +1063,31 @@ class FormManager
               $repeaterExistFiles = [];
               $repeaterDeleted_files = [];
               $repeaterFiles_old = [];
+              $submittedRepeaterOldFiles = is_array($updatedValue[$field_key . '_old']) ? $updatedValue[$field_key . '_old'] : [];
               foreach ($repeaterExistData as $index => $repeaterRow) {
                 $repeaterExistFiles[$index] = [];
-                if (isset($repeaterRow[$field_key]) && !empty($repeaterRow[$field_key])) {
+                if (isset($repeaterRow[$field_key]) && !empty($repeaterRow[$field_key]) && is_string($repeaterRow[$field_key])) {
                   $repeaterExistFiles[$index] = json_decode($repeaterRow[$field_key], true);
+                }
+                if (isset($repeaterRow[$field_key]) && !empty($repeaterRow[$field_key]) && is_array($repeaterRow[$field_key])) {
+                  $repeaterExistFiles[$index] = $repeaterRow[$field_key];
                 }
                 if (!is_array($repeaterExistFiles[$index])) {
                   $repeaterExistFiles[$index] = [];
                 }
-                $repeaterFiles_old[$index] = $this->normalizeOldFileValues($repeaterExistFiles[$index], empty($updatedValue[$field_key . '_old'][$index]) ? [] : $updatedValue[$field_key . '_old'][$index]);
+                $oldFileInputExists = array_key_exists($index, $submittedRepeaterOldFiles);
+                $repeaterRowExists = $oldFileInputExists || (isset($updatedValue[$repeaterFldKey][$index]) && is_array($updatedValue[$repeaterFldKey][$index]));
+                $oldFileValues = ($repeaterRowExists && $oldFileInputExists) ? $submittedRepeaterOldFiles[$index] : [];
+                $repeaterFiles_old[$index] = $this->normalizeOldFileValues($repeaterExistFiles[$index], $oldFileValues);
                 $repeaterDeleted_files[$index] = array_diff($repeaterExistFiles[$index], $repeaterFiles_old[$index]);
+                $repeaterFiles_old[$index] = array_values(array_diff($repeaterFiles_old[$index], $repeaterDeleted_files[$index]));
                 $fileHandler->deleteFiles($formID, $entryID, $repeaterDeleted_files[$index]);
+                if ($repeaterRowExists) {
+                  if (!isset($updatedValue[$repeaterFldKey][$index]) || !is_array($updatedValue[$repeaterFldKey][$index])) {
+                    $updatedValue[$repeaterFldKey][$index] = [];
+                  }
+                  $updatedValue[$repeaterFldKey][$index][$field_key] = $repeaterFiles_old[$index];
+                }
               }
             }
           } else {
@@ -1066,12 +1104,13 @@ class FormManager
               if (!is_array($files_in_db)) {
                 $files_in_db = [];
               }
-              $files_old = $this->normalizeOldFileValues($files_in_db, empty($updatedValue[$field_key . '_old']) ? [] : $updatedValue[$field_key . '_old']);
-              $deleted_file = array_diff($files_in_db, $files_old);
-              if (count($deleted_file) > 0) {
-                $fileHandler->deleteFiles($formID, $entryID, $deleted_file);
+              $retained_files = $this->normalizeOldFileValues($files_in_db, empty($updatedValue[$field_key . '_old']) ? [] : $updatedValue[$field_key . '_old']);
+              $deleted_files = array_diff($files_in_db, $retained_files);
+              $retained_files = array_values(array_diff($retained_files, $deleted_files));
+              if (count($deleted_files) > 0) {
+                $fileHandler->deleteFiles($formID, $entryID, $deleted_files);
               }
-              $updatedValue[$field_key] = wp_json_encode($files_old);
+              $updatedValue[$field_key] = $retained_files;
             }
           }
         }
@@ -1080,9 +1119,10 @@ class FormManager
             // Handle repeater field files
             $file_details = $_FILES[$field_key];
             foreach ($file_details['name'] as $index => $file) {
+              $old_meta_value = [];
               // Retrieve existing old files for this specific repeater index
               if (isset($repeaterFiles_old[$index - 1]) && count($repeaterFiles_old[$index - 1]) > 0) {
-                $old_meta_value = empty($repeaterFiles_old[$index - 1]) ? [] : $repeaterFiles_old[$index - 1];
+                $old_meta_value = $repeaterFiles_old[$index - 1];
                 // json format causing issue with repeater file in mail attachment as it's sending broken url(for multistep and abandonment form)
                 // $updatedValue[$repeaterFldKey][$index - 1][$field_key] = wp_json_encode($old_meta_value);
                 $updatedValue[$repeaterFldKey][$index - 1][$field_key] = $old_meta_value;
@@ -1096,7 +1136,7 @@ class FormManager
               ];
               $meta_value = $fileHandler->moveUploadedFiles($repeateFileDetails, $formID, $entryID, $index);
               if (!empty($meta_value)) {
-                $mergedMetaValueWithOld = isset($old_meta_value) ? array_merge($old_meta_value, (array) $meta_value) : (array) $meta_value;
+                $mergedMetaValueWithOld = array_merge($old_meta_value, (array) $meta_value);
                 // json format causing issue with repeater file in mail attachment as it's sending broken url(for multistep and abandonment form)
                 // $updatedValue[$repeaterFldKey][$index - 1][$field_key] = wp_json_encode($mergedMetaValueWithOld);
                 $updatedValue[$repeaterFldKey][$index - 1][$field_key] = $mergedMetaValueWithOld;
@@ -1111,7 +1151,7 @@ class FormManager
             if (!empty($meta_value)) {
               $_FILES[$field_key]['new_name'] = $meta_value;
               if (isset($updatedValue[$field_key . '_old']) && !is_wp_error($file_exists) && count($file_exists) > 0) {
-                $meta_value = empty($files_old) ? $meta_value : array_merge($meta_value, $files_old);
+                $meta_value = empty($retained_files) ? $meta_value : array_merge($meta_value, $retained_files);
                 $updatedValue[$field_key] = $meta_value;
               } else {
                 $updatedValue[$field_key] = $meta_value;

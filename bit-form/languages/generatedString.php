@@ -3094,6 +3094,8 @@ $bitforms_i18n_strings = array(
 
     'Configure how users track their progress' => __('Configure how users track their progress', 'bit-form'),
 
+    'Display a visual progress bar at the bottom of each step' => __('Display a visual progress bar at the bottom of each step', 'bit-form'),
+
     'Show Progress Label' => __('Show Progress Label', 'bit-form'),
 
     'Display a text label showing completion progress' => __('Display a text label showing completion progress', 'bit-form'),
@@ -3101,8 +3103,6 @@ $bitforms_i18n_strings = array(
     'Label Format' => __('Label Format', 'bit-form'),
 
     'Format string for the progress label. Use ${bc-percent}, ${bc-step}, ${bc-total-steps}' => __('Format string for the progress label. Use ${bc-percent}, ${bc-step}, ${bc-total-steps}', 'bit-form'),
-
-    'Display a visual progress bar at the bottom of each step' => __('Display a visual progress bar at the bottom of each step', 'bit-form'),
 
     'Branding' => __('Branding', 'bit-form'),
 
@@ -3550,158 +3550,6 @@ $bitforms_i18n_strings = array(
 
     'Integrate your form with your favorite apps and services.' => __('Integrate your form with your favorite apps and services.', 'bit-form'),
 
-    'Date Time (Advanced)' => __('Date Time (Advanced)', 'bit-form'),
-
-    'Advanced Date Time' => __('Advanced Date Time', 'bit-form'),
-
-    'Please Select a Date' => __('Please Select a Date', 'bit-form'),
-
-    'Spacer' => __('Spacer', 'bit-form'),
-
-    'First Name' => __('First Name', 'bit-form'),
-
-    'Last Name' => __('Last Name', 'bit-form'),
-
-    'Text' => __('Text', 'bit-form'),
-
-    'Placeholder...' => __('Placeholder...', 'bit-form'),
-
-    'Multiline Text' => __('Multiline Text', 'bit-form'),
-
-    'Multi-Line Text' => __('Multi-Line Text', 'bit-form'),
-
-    'example@mail.com' => __('example@mail.com', 'bit-form'),
-
-    'Number' => __('Number', 'bit-form'),
-
-    'e.g. 123' => __('e.g. 123', 'bit-form'),
-
-    'Select' => __('Select', 'bit-form'),
-
-    'Radio Button' => __('Radio Button', 'bit-form'),
-
-    'Radio' => __('Radio', 'bit-form'),
-
-    'Option 1' => __('Option 1', 'bit-form'),
-
-    'Option 2' => __('Option 2', 'bit-form'),
-
-    'Option 3' => __('Option 3', 'bit-form'),
-
-    'Checkbox' => __('Checkbox', 'bit-form'),
-
-    'Check Boxs' => __('Check Boxs', 'bit-form'),
-
-    'Dropdown' => __('Dropdown', 'bit-form'),
-
-    'File Upload' => __('File Upload', 'bit-form'),
-
-    'Advance File Upload' => __('Advance File Upload', 'bit-form'),
-
-    'Advanced File Upload' => __('Advanced File Upload', 'bit-form'),
-
-    'Country' => __('Country', 'bit-form'),
-
-    'Enter Amount..' => __('Enter Amount..', 'bit-form'),
-
-    'Phone Number' => __('Phone Number', 'bit-form'),
-
-    'Enter Phone Number' => __('Enter Phone Number', 'bit-form'),
-
-    'Username' => __('Username', 'bit-form'),
-
-    'e.g. John Doe' => __('e.g. John Doe', 'bit-form'),
-
-    'Password' => __('Password', 'bit-form'),
-
-    'Password Field' => __('Password Field', 'bit-form'),
-
-    'Slider' => __('Slider', 'bit-form'),
-
-    'Date' => __('Date', 'bit-form'),
-
-    'Pick A Date' => __('Pick A Date', 'bit-form'),
-
-    'Time' => __('Time', 'bit-form'),
-
-    'Date-Time' => __('Date-Time', 'bit-form'),
-
-    'Select Date-Time' => __('Select Date-Time', 'bit-form'),
-
-    'Week' => __('Week', 'bit-form'),
-
-    'Select Week' => __('Select Week', 'bit-form'),
-
-    'Month' => __('Month', 'bit-form'),
-
-    'Month Input' => __('Month Input', 'bit-form'),
-
-    'URL' => __('URL', 'bit-form'),
-
-    'https://www.example.com' => __('https://www.example.com', 'bit-form'),
-
-    'GDPR Agreement' => __('GDPR Agreement', 'bit-form'),
-
-    'I consent to having this website store my submitted information so they can respond to my inquiry. Learn more in' => __('I consent to having this website store my submitted information so they can respond to my inquiry. Learn more in', 'bit-form'),
-
-    'Our Privacy Policy.' => __('Our Privacy Policy.', 'bit-form'),
-
-    'Decision Box' => __('Decision Box', 'bit-form'),
-
-    'reCAPTCHA v2' => __('reCAPTCHA v2', 'bit-form'),
-
-    'Turnstile' => __('Turnstile', 'bit-form'),
-
-    'Repeater' => __('Repeater', 'bit-form'),
-
-    'Signature' => __('Signature', 'bit-form'),
-
-    'Rating' => __('Rating', 'bit-form'),
-
-    'Terrible' => __('Terrible', 'bit-form'),
-
-    'Bad' => __('Bad', 'bit-form'),
-
-    'Satisfied' => __('Satisfied', 'bit-form'),
-
-    'Good' => __('Good', 'bit-form'),
-
-    'Excellent' => __('Excellent', 'bit-form'),
-
-    'Image Select' => __('Image Select', 'bit-form'),
-
-    'Option 4' => __('Option 4', 'bit-form'),
-
-    'Hidden Field' => __('Hidden Field', 'bit-form'),
-
-    'Set Default Value' => __('Set Default Value', 'bit-form'),
-
-    'Pay with Stripe' => __('Pay with Stripe', 'bit-form'),
-
-    'Pay now' => __('Pay now', 'bit-form'),
-
-    'Pay with Mollie' => __('Pay with Mollie', 'bit-form'),
-
-    'Shortcode' => __('Shortcode', 'bit-form'),
-
-    'Button' => __('Button', 'bit-form'),
-
-    'Draft Button' => __('Draft Button', 'bit-form'),
-
-    'Save Draft' => __('Save Draft', 'bit-form'),
-
-    'Next Step' => __('Next Step', 'bit-form'),
-
-    'Previous Step' => __('Previous Step', 'bit-form'),
-
-    'Previous' => __('Previous', 'bit-form'),
-
-    'Section' => __('Section', 'bit-form'),
-
-    'Image' => __('Image', 'bit-form'),
-
-    'Divider' => __('Divider', 'bit-form'),
-
     'Migration Issue Detected' => __('Migration Issue Detected', 'bit-form'),
 
     'There may have been a problem during auto-migrating your Bit Forms from V1 to V2.' => __('There may have been a problem during auto-migrating your Bit Forms from V1 to V2.', 'bit-form'),
@@ -3875,6 +3723,10 @@ $bitforms_i18n_strings = array(
     'Font Size (Pixels)' => __('Font Size (Pixels)', 'bit-form'),
 
     'Watermark' => __('Watermark', 'bit-form'),
+
+    'Text' => __('Text', 'bit-form'),
+
+    'Image' => __('Image', 'bit-form'),
 
     'Watermark Text' => __('Watermark Text', 'bit-form'),
 
@@ -4348,6 +4200,8 @@ $bitforms_i18n_strings = array(
 
     'Show Option Flag Image' => __('Show Option Flag Image', 'bit-form'),
 
+    'Show Search Input' => __('Show Search Input', 'bit-form'),
+
     'Button Texts' => __('Button Texts', 'bit-form'),
 
     'Customize the label text shown on the Send, Resend, and Verify buttons.' => __('Customize the label text shown on the Send, Resend, and Verify buttons.', 'bit-form'),
@@ -4514,6 +4368,34 @@ $bitforms_i18n_strings = array(
 
     'Try searching with different keywords' => __('Try searching with different keywords', 'bit-form'),
 
+    'Multiline Text' => __('Multiline Text', 'bit-form'),
+
+    'Multi-Line Text' => __('Multi-Line Text', 'bit-form'),
+
+    'Placeholder...' => __('Placeholder...', 'bit-form'),
+
+    'example@mail.com' => __('example@mail.com', 'bit-form'),
+
+    'Number' => __('Number', 'bit-form'),
+
+    'e.g. 123' => __('e.g. 123', 'bit-form'),
+
+    'Username' => __('Username', 'bit-form'),
+
+    'e.g. John Doe' => __('e.g. John Doe', 'bit-form'),
+
+    'Password' => __('Password', 'bit-form'),
+
+    'Slider' => __('Slider', 'bit-form'),
+
+    'URL' => __('URL', 'bit-form'),
+
+    'https://www.example.com' => __('https://www.example.com', 'bit-form'),
+
+    'reCAPTCHA v2' => __('reCAPTCHA v2', 'bit-form'),
+
+    'Turnstile' => __('Turnstile', 'bit-form'),
+
     'Email OTP' => __('Email OTP', 'bit-form'),
 
     'A verification code will be sent to the specified email address.' => __('A verification code will be sent to the specified email address.', 'bit-form'),
@@ -4522,7 +4404,121 @@ $bitforms_i18n_strings = array(
 
     'Resend available in ${bf_resend_countdown}s.' => __('Resend available in ${bf_resend_countdown}s.', 'bit-form'),
 
+    'Repeater' => __('Repeater', 'bit-form'),
+
+    'Signature' => __('Signature', 'bit-form'),
+
+    'Rating' => __('Rating', 'bit-form'),
+
+    'Terrible' => __('Terrible', 'bit-form'),
+
+    'Bad' => __('Bad', 'bit-form'),
+
+    'Satisfied' => __('Satisfied', 'bit-form'),
+
+    'Good' => __('Good', 'bit-form'),
+
+    'Excellent' => __('Excellent', 'bit-form'),
+
+    'Image Select' => __('Image Select', 'bit-form'),
+
+    'Option 1' => __('Option 1', 'bit-form'),
+
+    'Option 2' => __('Option 2', 'bit-form'),
+
+    'Option 3' => __('Option 3', 'bit-form'),
+
+    'Option 4' => __('Option 4', 'bit-form'),
+
+    'Select' => __('Select', 'bit-form'),
+
+    'Button' => __('Button', 'bit-form'),
+
+    'Section' => __('Section', 'bit-form'),
+
+    'Divider' => __('Divider', 'bit-form'),
+
+    'Radio Button' => __('Radio Button', 'bit-form'),
+
+    'Radio' => __('Radio', 'bit-form'),
+
+    'Checkbox' => __('Checkbox', 'bit-form'),
+
+    'Check Boxs' => __('Check Boxs', 'bit-form'),
+
+    'Dropdown' => __('Dropdown', 'bit-form'),
+
+    'File Upload' => __('File Upload', 'bit-form'),
+
+    'Date' => __('Date', 'bit-form'),
+
+    'Pick A Date' => __('Pick A Date', 'bit-form'),
+
+    'Time' => __('Time', 'bit-form'),
+
+    'Date-Time' => __('Date-Time', 'bit-form'),
+
+    'Select Date-Time' => __('Select Date-Time', 'bit-form'),
+
+    'Week' => __('Week', 'bit-form'),
+
+    'Select Week' => __('Select Week', 'bit-form'),
+
+    'Month' => __('Month', 'bit-form'),
+
+    'Month Input' => __('Month Input', 'bit-form'),
+
+    'Date Time (Advanced)' => __('Date Time (Advanced)', 'bit-form'),
+
+    'Advanced Date Time' => __('Advanced Date Time', 'bit-form'),
+
+    'Please Select a Date' => __('Please Select a Date', 'bit-form'),
+
+    'Spacer' => __('Spacer', 'bit-form'),
+
+    'Advance File Upload' => __('Advance File Upload', 'bit-form'),
+
+    'Advanced File Upload' => __('Advanced File Upload', 'bit-form'),
+
     'Address' => __('Address', 'bit-form'),
+
+    'Country' => __('Country', 'bit-form'),
+
+    'Enter Amount..' => __('Enter Amount..', 'bit-form'),
+
+    'Phone Number' => __('Phone Number', 'bit-form'),
+
+    'Enter Phone Number' => __('Enter Phone Number', 'bit-form'),
+
+    'Hidden Field' => __('Hidden Field', 'bit-form'),
+
+    'Set Default Value' => __('Set Default Value', 'bit-form'),
+
+    'GDPR Agreement' => __('GDPR Agreement', 'bit-form'),
+
+    'I consent to having this website store my submitted information so they can respond to my inquiry. Learn more in' => __('I consent to having this website store my submitted information so they can respond to my inquiry. Learn more in', 'bit-form'),
+
+    'Our Privacy Policy.' => __('Our Privacy Policy.', 'bit-form'),
+
+    'Decision Box' => __('Decision Box', 'bit-form'),
+
+    'Pay with Stripe' => __('Pay with Stripe', 'bit-form'),
+
+    'Pay now' => __('Pay now', 'bit-form'),
+
+    'Pay with Mollie' => __('Pay with Mollie', 'bit-form'),
+
+    'Shortcode' => __('Shortcode', 'bit-form'),
+
+    'Draft Button' => __('Draft Button', 'bit-form'),
+
+    'Save Draft' => __('Save Draft', 'bit-form'),
+
+    'Next Step' => __('Next Step', 'bit-form'),
+
+    'Previous Step' => __('Previous Step', 'bit-form'),
+
+    'Previous' => __('Previous', 'bit-form'),
 
     'Create New Theme' => __('Create New Theme', 'bit-form'),
 

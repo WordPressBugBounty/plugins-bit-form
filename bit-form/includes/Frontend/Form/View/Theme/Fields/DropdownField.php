@@ -25,6 +25,8 @@ class DropdownField
     $optionsList = '';
     $activeList = isset($field->config->activeList) ? $field->config->activeList : null;
     $allowCustomOption = apply_filters('bitform_dropdown_allow_custom_option', false, $field);
+    $showSearch = !$fh->property_exists_nested($field, 'config->showSearch', false);
+    $searchMarkup = '';
     $img = htmlentities("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>");
 
     $selectedOptImage = apply_filters('bitform_dropdown_selected_opt_image', '', $field, $fh);
@@ -246,6 +248,80 @@ class DropdownField
 
       $multiChipClass = ($fh->property_exists_nested($field, 'config->multipleSelect', true) && $fh->property_exists_nested($field, 'config->showChip', true)) ? 'multi-chip' : '';
 
+      if ($showSearch) {
+        $searchMarkup = sprintf(
+          '<div
+            %1$s
+            class="%2$s %3$s"
+          >
+            <input
+              %4$s
+              type="search"
+              class="%5$s %6$s"
+              placeholder="Search Country"
+              aria-label="Search Options"
+              aria-hidden="true"
+              tabIndex="-1"
+              inert
+            />
+            <svg
+              %7$s
+              class="%8$s %9$s %10$s"
+              aria-hidden="true"
+              width="22"
+              height="22"
+              role="img"
+              title="Search icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <button
+              %11$s
+              type="button"
+              aria-label="Clear search"
+              class="%12$s %13$s %14$s"
+              tabIndex="-1"
+            >
+              <svg
+                width="13"
+                height="13"
+                role="img"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>',
+          $fh->getCustomAttributes('option-search-wrp'),
+          $fh->getAtomicCls('option-search-wrp'),
+          $fh->getCustomClasses('option-search-wrp'),
+          $fh->getCustomAttributes('opt-search-input'),
+          $fh->getAtomicCls('opt-search-input'),
+          $fh->getCustomClasses('opt-search-input'),
+          $fh->getCustomAttributes('opt-search-icn'),
+          $fh->getAtomicCls('icn'),
+          $fh->getAtomicCls('opt-search-icn'),
+          $fh->getCustomClasses('opt-search-icn'),
+          $fh->getCustomAttributes('search-clear-btn'),
+          $fh->getAtomicCls('icn'),
+          $fh->getAtomicCls('search-clear-btn'),
+          $fh->getCustomClasses('search-clear-btn')
+        );
+      }
+
       return sprintf(
         '<div class="%1$s %2$s">
           <div
@@ -341,62 +417,8 @@ class DropdownField
                 %38$s
                 class="%39$s %40$s"
               >
-                <div
-                  %41$s
-                  class="%42$s %43$s"
-                >
-                  <input
-                    %44$s
-                    type="search"
-                    class="%45$s %46$s"
-                    placeholder="Search Country"
-                    aria-label="Search Options"
-                    aria-hidden="true"
-                    tabIndex="-1"
-                    inert
-                  />
-                  <svg
-                    %47$s
-                    class="%48$s %49$s %50$s"
-                    aria-hidden="true"
-                    width="22"
-                    height="22"
-                    role="img"
-                    title="Search icon"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="11" cy="11" r="8" />
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                  <button
-                    %51$s
-                    type="button"
-                    aria-label="Clear search"
-                    class="%52$s %53$s %54$s"
-                    tabIndex="-1"
-                  >
-                    <svg
-                      width="13"
-                      height="13"
-                      role="img"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </button>
-                </div>
-                %55$s
+                %41$s
+                %42$s
               </div>
             </div>
           </div>
@@ -441,21 +463,8 @@ class DropdownField
         $fh->getCustomAttributes('option-inner-wrp'),   // 38
         $fh->getAtomicCls('option-inner-wrp'),          // 39
         $fh->getCustomClasses('option-inner-wrp'),      // 40
-        $fh->getCustomAttributes('option-search-wrp'),  // 41
-        $fh->getAtomicCls('option-search-wrp'),         // 42
-        $fh->getCustomClasses('option-search-wrp'),     // 43
-        $fh->getCustomAttributes('opt-search-input'),   // 44
-        $fh->getAtomicCls('opt-search-input'),          // 45
-        $fh->getCustomClasses('opt-search-input'),      // 46
-        $fh->getCustomAttributes('opt-search-icn'),     // 47
-        $fh->getAtomicCls('icn'),                        // 48
-        $fh->getAtomicCls('opt-search-icn'),            // 49
-        $fh->getCustomClasses('opt-search-icn'),        // 50
-        $fh->getCustomAttributes('search-clear-btn'),   // 51
-        $fh->getAtomicCls('icn'),                        // 52
-        $fh->getAtomicCls('search-clear-btn'),          // 53
-        $fh->getCustomClasses('search-clear-btn'),      // 54
-        $optionsList                                    // 55
+        $searchMarkup,                                  // 41
+        $optionsList                                    // 42
       );
     }
   }

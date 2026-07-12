@@ -1,7 +1,7 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.1.2
-Stable tag: 3.1.2
+Version: 3.1.3
+Stable tag: 3.1.3
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin
@@ -479,8 +479,20 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.1.3 =
+* Release Date: 12 July, 2026
+* Improvements:
+    1. Added a setting to show or hide the search input in Dropdown fields.
+    2. Improved handling of previously uploaded files during entry updates.
+
+* Fixes:
+    1. Fixed an escaping issue during redirect URL parameter value sanitization.
+    2. Fixed inconsistent behavior when saving partial form progress in Form Abandonment.
+    3. Added missing Button field style options to the Style Editor.
+
+
 = 3.1.2 =
-* Release Date: 4 July, 2026
+* Release Date: 7th July, 2026
 * Fixes:
     1. Hardened file upload entry updates to prevent path traversal from deleting arbitrary files through the file field "_old" value.
     2. Restricted file deletion to files that remain inside the entry upload directory and belong to the current entry metadata.

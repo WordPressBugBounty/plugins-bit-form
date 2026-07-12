@@ -14,7 +14,7 @@ class CurrencyField
   private static function field($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error = null, $value = '')
   {
     $fh = new ConversationalFieldHelpers($formID, $field, $rowID, $form_atomic_Cls_map);
-    $img_url = BITFORMS_ASSET_URI . '/../static/currencies/';
+    $img_url = BITFORMS_ROOT_URI . '/static/currencies/';
 
     $req = $fh->required();
     $disabled = $fh->disabled();

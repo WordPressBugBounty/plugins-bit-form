@@ -318,6 +318,7 @@ class Admin_Bar
       'nonce'               => wp_create_nonce('bitforms_save'),
       'isPro'               => false,
       'siteURL'             => site_url(),
+      'rootURL'             => BITFORMS_ROOT_URI,
       'assetsURL'           => BITFORMS_ASSET_URI,
       'baseURL'             => $base_path_admin . 'admin.php?page=bitform#',
       'baseDLURL'           => $baseDLURL,

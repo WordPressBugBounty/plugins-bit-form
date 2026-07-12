@@ -59,6 +59,11 @@ wp_enqueue_script('bitform-preview-page-' . $formIdSafe);
 if (isset($bfGlobals) && '' !== $bfGlobals) {
   wp_add_inline_script('bitform-preview-' . $formIdSafe, (string) $bfGlobals, 'before');
 }
+wp_add_inline_script(
+  'bitform-preview-' . $formIdSafe,
+  'if(!window.__bfShowPickerBound){window.__bfShowPickerBound=true;document.addEventListener("click",function(e){var t=e.target;if(t&&t.matches&&t.matches("input[data-bf-show-picker=\"1\"]")&&typeof t.showPicker==="function"){try{t.showPicker();}catch(_){}}});}',
+  'after'
+);
 
 $jsSize = bitforms_readable_filesize(filesize(BITFORMS_CONTENT_DIR . '/form-scripts/preview-' . $formID . '.js'));
 $cssSize = bitforms_readable_filesize(filesize(BITFORMS_CONTENT_DIR . '/form-styles/bitform-' . $formID . '.css'));

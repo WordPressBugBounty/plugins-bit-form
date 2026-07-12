@@ -17,10 +17,9 @@ use BitCode\BitForm\Core\Util\EscapingHelper;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\FileDownloadProvider;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
-use BitCode\BitForm\Core\Util\SmartTags;
 use BitCode\BitForm\Core\Util\SmartTagRegistry;
+use BitCode\BitForm\Core\Util\SmartTags;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
-use Error;
 
 final class FrontendFormHandler
 {
@@ -299,19 +298,18 @@ final class FrontendFormHandler
     // Read-only: query string parsed to pre-fill form fields. Values are sanitized per field before use.
     $queryParamsValue = [];
     if (isset($_SERVER['QUERY_STRING']) && !empty($_SERVER['QUERY_STRING'])) {
-      $reqField = sanitize_text_field(wp_unslash($_SERVER['QUERY_STRING']));
+      $reqField = wp_unslash($_SERVER['QUERY_STRING']);
       foreach (explode('&', $reqField) as $keyValue) {
-        // $pattern = '/([a-zA-Z0-9])([a-zA-Z])\=+/';
-        $pattern = '/([^.]+)=(.*?)([^.]+)/';
-        $matches = preg_match($pattern, $keyValue, $matchFormat);
-        if ($matches) {
+        if (false !== strpos($keyValue, '=')) {
           list($field, $value) = explode('=', $keyValue, 2);
 
           if (!trim($value)) {
             continue;
           }
-
-          $queryParamsValue[$field][] = sanitize_text_field(urldecode($value));
+          $field = sanitize_text_field(urldecode($field));
+          if (!empty($field)) {
+            $queryParamsValue[$field][] = sanitize_text_field(urldecode($value));
+          }
         }
       }
     }
@@ -551,7 +549,7 @@ final class FrontendFormHandler
     if (!empty($isAbandoned)) {
       $bitFormFrontArr['oldValues'] = $this->getFieldsValue($formID, $isAbandoned);
       if (empty($entryId)) {
-        $bitFormFrontArr['entryId'] = $isAbandoned;
+        $bitFormFrontArr['entryId'] = $entryId;
       }
     }
 
@@ -662,7 +660,7 @@ final class FrontendFormHandler
       }
       // Match '${' . key prefix so keys containing spaces/slashes/commas are handled.
       if (false !== strpos($haystack, '${' . $key)) {
-        $referenced[]   = $key;
+        $referenced[] = $key;
         $frontendSmartTags[$key] = SmartTagRegistry::resolve($key, $ctx);
       }
     }
@@ -767,6 +765,21 @@ final class FrontendFormHandler
       ]
     );
     if (!is_wp_error($metaValues)) {
+      $urlQuery = wp_parse_url(FileDownloadProvider::getBaseDownloadURL(), PHP_URL_QUERY);
+      $baseDLURL = FileDownloadProvider::getBaseDownloadURL();
+      $baseDLURL = empty($urlQuery) ? $baseDLURL . '?' : $baseDLURL . '&';
+      $baseDLURL .= "formID={$formID}&entryID={$entryID}";
+
+      foreach ($fields as $field) {
+        if ('file-up' === $field->typ || 'advanced-file-up' === $field->typ) {
+          if (!isset($field->config)) {
+            $field->config = (object) [];
+          } elseif (is_array($field->config)) {
+            $field->config = (object) $field->config;
+          }
+          $field->config->baseDLURL = $baseDLURL;
+        }
+      }
       foreach ($metaValues as $metaValue) {
         $metaKey = $metaValue->meta_key;
         $metaVal = $metaValue->meta_value;
@@ -785,10 +798,6 @@ final class FrontendFormHandler
           if ('file-up' === $fields->{$metaKey}->typ || 'advanced-file-up' === $fields->{$metaKey}->typ) {
             $fields->{$metaKey}->val = $metaValue->meta_value;
             $fields->{$metaKey}->config->oldFiles = $metaValue->meta_value;
-            $urlQuery = wp_parse_url(FileDownloadProvider::getBaseDownloadURL(), PHP_URL_QUERY);
-            $baseDLURL = FileDownloadProvider::getBaseDownloadURL();
-            $baseDLURL = empty($urlQuery) ? $baseDLURL . '?' : $baseDLURL . '&';
-            $fields->{$metaKey}->config->baseDLURL = $baseDLURL . "formID={$formID}&entryID={$entryID}";
           }
         }
       }

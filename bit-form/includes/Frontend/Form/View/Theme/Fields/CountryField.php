@@ -15,7 +15,7 @@ class CountryField
   {
     $fieldHelpers = new ClassicFieldHelpers($field, $rowID, $form_atomic_Cls_map);
     $asset_url = BITFORMS_ASSET_URI;
-    $img_url = BITFORMS_ASSET_URI . '/../static/countries/';
+    $img_url = BITFORMS_ROOT_URI . '/static/countries/';
     $req = $fieldHelpers->required();
     $disabled = $fieldHelpers->disabled();
     $readonly = $fieldHelpers->readonly();

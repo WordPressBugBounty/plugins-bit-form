@@ -31,10 +31,10 @@ namespace BitCode\BitForm\Core\Util;
  */
 final class SmartTagRegistry
 {
-  const CAT_STATIC   = 'static';
-  const CAT_IDENTITY = 'identity';
-  const CAT_REQUEST  = 'request';
-  const CAT_PARAM    = 'param';
+  public const CAT_STATIC = 'static';
+  public const CAT_IDENTITY = 'identity';
+  public const CAT_REQUEST = 'request';
+  public const CAT_PARAM = 'param';
 
   /** @var array<string,array>|null memoized definitions for the current request */
   private static $defs = null;
