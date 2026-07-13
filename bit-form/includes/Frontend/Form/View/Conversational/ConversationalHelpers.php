@@ -36,16 +36,17 @@ class ConversationalHelpers
     if (!empty($welcomePageSettings->title)) {
       $welcomeTitle =
         '      <div class="bc' . $this->_formId . '-welcome-title">' . "\n"
-        . '        <h2>' . $welcomePageSettings->title . '</h2>' . "\n"
+        . '        <h2>' . $this->escHtml($welcomePageSettings->title) . '</h2>' . "\n"
         . '      </div>';
     }
 
     $startBtnPreIcn = $this->conversationalSettingsIcon($welcomePageSettings, 'startBtnPreIcn', 'btn-pre-icon', 'Start Button Pre Icon');
     $startBtnSufIcn = $this->conversationalSettingsIcon($welcomePageSettings, 'startBtnSufIcn', 'btn-suf-icon', 'Start Button Suf Icon');
 
-    $startBtnText = !empty($welcomePageSettings->btnTxt) ? $welcomePageSettings->btnTxt : 'Start';
+    $startBtnText = $this->escHtml(!empty($welcomePageSettings->btnTxt) ? $welcomePageSettings->btnTxt : 'Start');
 
-    $stepHints = !empty($welcomePageSettings->stepHints) ? $welcomePageSettings->stepHints : '';
+    $stepHints = !empty($welcomePageSettings->stepHints) ? $this->ksesPost($welcomePageSettings->stepHints) : '';
+    $welcomeContent = !empty($welcomePageSettings->content) ? $this->ksesPost($welcomePageSettings->content) : '';
 
     $buttonMarkup =
       '    <div class="bc' . $this->_formId . '-step-btn-wrpr">' . "\n"
@@ -66,7 +67,7 @@ class ConversationalHelpers
     $welcomePageMarkup =
       '    <div class="bc' . $this->_formId . '-welcome-content">' . "\n"
       . '      ' . $welcomeTitle . "\n"
-      . '      ' . $welcomePageSettings->content . "\n"
+      . '      ' . $welcomeContent . "\n"
       . '      ' . $buttonMarkup . "\n"
       . '    </div>';
     $imageContent = $this->conversationalSettingsIcon($welcomePageSettings, 'layoutImage', 'step-img', 'Background Image');
@@ -92,7 +93,7 @@ class ConversationalHelpers
       $progressLabelMarkup =
         '      <div class="bc' . $formId . '-progress-lbl-wrpr' . $hiddenCls . '">' . "\n"
         . '        <span class="bc' . $formId . '-progress-lbl">' . "\n"
-        . '          ' . $navigationSettings->progressLabel . "\n"
+        . '          ' . $this->escHtml($navigationSettings->progressLabel) . "\n"
         . '        </span>' . "\n"
         . '      </div>';
     }
@@ -169,11 +170,11 @@ class ConversationalHelpers
   {
     $formId = $this->_formId;
     $isFieldRequired = !empty($fieldData->valid->req) && $fieldData->valid->req;
-    $btnTxt = $isFieldRequired ? $stepSettings->nextBtnTxt : $stepSettings->btnTxt;
+    $btnTxt = $this->escHtml($isFieldRequired ? $stepSettings->nextBtnTxt : $stepSettings->btnTxt);
     $btnPreIcn = $this->conversationalSettingsIcon($stepSettings, 'btnPreIcn', 'btn-pre-icon', 'Button Prefix Icon');
     $btnSufIcn = $this->conversationalSettingsIcon($stepSettings, 'btnSufIcn', 'btn-suf-icon', 'Button Suffix Icon');
     $hiddenClass = $isFieldRequired ? 'bc-grid-hide' : '';
-    $stepHints = !empty($stepSettings->stepHints) ? $stepSettings->stepHints : '';
+    $stepHints = !empty($stepSettings->stepHints) ? $this->ksesPost($stepSettings->stepHints) : '';
 
     $dataBtnTxt = esc_attr(!empty($stepSettings->btnTxt) ? $stepSettings->btnTxt : 'Skip');
     $dataNextBtnTxt = esc_attr(!empty($stepSettings->nextBtnTxt) ? $stepSettings->nextBtnTxt : 'Next');
@@ -200,6 +201,7 @@ class ConversationalHelpers
 
   public static function getStepLayout($formID, $imageContent, $fieldContent, $layoutName, $layoutClassNames = '')
   {
+    $stepWrapperClass = esc_attr('bc' . $formID . '-step-wrapper bc' . $formID . '-step bc-step-deactive ' . $layoutClassNames);
     $imageContentWrapper =
       '    <div class="bc' . $formID . '-step-img-cntnr">' . "\n"
       . '      <picture class="bc' . $formID . '-step-img-wrpr">' . "\n"
@@ -210,7 +212,7 @@ class ConversationalHelpers
     $imageContentWrapper = in_array($layoutName, $noImageLayouts, true) ? '' : $imageContentWrapper;
 
     return
-      '    <div class="bc' . $formID . '-step-wrapper bc' . $formID . '-step bc-step-deactive ' . $layoutClassNames . '">' . "\n"
+      '    <div class="' . $stepWrapperClass . '">' . "\n"
       . '      <div class="bc' . $formID . '-step-content">' . "\n"
       . '        ' . $imageContentWrapper . "\n"
       . '        <div class="bc' . $formID . '-step-fld-wrpr">' . "\n"
@@ -224,11 +226,13 @@ class ConversationalHelpers
   {
     if (Helpers::property_exists_nested($data, $icnPropName, '', 1)) {
       $url = esc_url($data->$icnPropName);
+      $class = esc_attr('bc' . $this->_formId . '-' . $element);
+      $alt = esc_attr($alt);
       return
         '              <img' . "\n"
-        . '                class="bc' . $this->_formId . '-' . $element . '"' . "\n"
+        . '                class="' . $class . '"' . "\n"
         . '                src="' . $url . '"' . "\n"
-        . '                alt=' . $alt . "\n"
+        . '                alt="' . $alt . '"' . "\n"
         . '              />';
     }
     return '';
@@ -272,5 +276,15 @@ class ConversationalHelpers
     $mergedSettings = (object) array_merge((array) $allStepsSettings, (array) $stepSettings);
 
     return $mergedSettings;
+  }
+
+  private function escHtml($value)
+  {
+    return esc_html((string) $value);
+  }
+
+  private function ksesPost($value)
+  {
+    return wp_kses_post((string) $value);
   }
 }
