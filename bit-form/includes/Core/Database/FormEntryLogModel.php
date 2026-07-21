@@ -91,6 +91,26 @@ class FormEntryLogModel extends Model
     return $this->execute($sql)->getResult();
   }
 
+  /**
+   * Queued workflow-trigger rows (response_type 'queued', integration_id 0)
+   * whose browser trigger and per-entry reclaim event were both lost, joined
+   * to the entry log for the form/entry ids the executor needs.
+   */
+  public function getStaleQueuedWorkflows($minAgeMinutes, $maxAgeHours, $limit)
+  {
+    $sql = "SELECT ld.id AS queue_log_id, ld.log_id, el.form_id, el.form_entry_id
+      FROM `{$this->app_db->prefix}bitforms_form_log_details` ld
+      JOIN `{$this->app_db->prefix}bitforms_form_entry_log` el ON el.id = ld.log_id
+      WHERE ld.integration_id = 0
+        AND ld.response_type = 'queued'
+        AND ld.created_at < DATE_SUB(%s, INTERVAL %d MINUTE)
+        AND ld.created_at > DATE_SUB(%s, INTERVAL %d HOUR)
+      ORDER BY ld.id ASC
+      LIMIT %d";
+    $now = current_time('mysql');
+    return $this->execute($sql, [$now, absint($minAgeMinutes), $now, absint($maxAgeHours), absint($limit)])->getResult();
+  }
+
   public function logUpdate($updateValue, $logID)
   {
     if (empty($logID)) {

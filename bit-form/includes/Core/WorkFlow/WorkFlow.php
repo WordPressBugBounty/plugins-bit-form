@@ -25,7 +25,7 @@ final class WorkFlow
     $this->_actions = new Actions($formID);
   }
 
-  public function getWorkFlow($workFlowRun, $workFlowType, $workFlowIds = null, $orderColumn = 'id', $workFlowStatus = 1)
+  public function getWorkFlow($workFlowRun, $workFlowType, $workFlowIds = null, $orderColumn = 'id', $workFlowStatus = 1, $workFlowCategories = null)
   {
     if (null === $workFlowIds) {
       $condition = [
@@ -63,6 +63,18 @@ final class WorkFlow
         ]
       );
     }
+    // Free/Pro separation: Free only ever processes non-advanced rows. Pro runs its own
+    // pass that fetches category 'advanced' (see bitform_process_advanced_workflows).
+    // This single chokepoint excludes advanced rows from every execute* lifecycle method.
+    $categories = null === $workFlowCategories
+      ? apply_filters('bitform_workflow_categories_to_process', ['classic', 'basic'])
+      : $workFlowCategories;
+    $condition = \array_merge(
+      $condition,
+      [
+        'workflow_category' => $categories,
+      ]
+    );
     $workFlows = static::$_workFlowModel->get(
       [
         'id',
@@ -71,6 +83,7 @@ final class WorkFlow
         'workflow_behaviour',
         'workflow_condition',
         'workflow_info',
+        'workflow_category',
         'workflow_name',
         'workflow_order',
         'workflow_status',
@@ -91,12 +104,29 @@ final class WorkFlow
   public function executeOnLoad($workFlowRun, $fields)
   {
     $workFlows = $this->getWorkFlow(['create_edit', $workFlowRun], ['always', 'onload'], null, 'workflow_order');
-    $workFlowReturnable = [];
     if (empty($workFlows) || is_wp_error($workFlows)) {
-      return [];
+      // No classic/basic onload rows. Pro may still apply advanced field show/hide; no-op when inactive.
+      return apply_filters('bitform_process_advanced_workflows_onload', [], $workFlowRun, $fields, static::$_formID);
     }
     $workFlows = array_reverse($workFlows);
     $fieldData = Helper::getFieldData($fields);
+    $data = $this->runLoadWorkflowFields($workFlows, $fields, $fieldData);
+    $fields = $data[0];
+
+    $workFlowReturnable = ['fields' => $fields];
+    // Pro advanced pass (field show/hide on load). No-op when no listener (Pro inactive).
+    $workFlowReturnable = apply_filters('bitform_process_advanced_workflows_onload', $workFlowReturnable, $workFlowRun, $fields, static::$_formID);
+    return $workFlowReturnable;
+  }
+
+  /**
+   * Apply onload field-property actions for a set of workflow rows. Extracted so Pro can reuse it
+   * for category 'advanced' rows (excluded from Free's getWorkFlow).
+   *
+   * @return array [$fields, $fieldData]
+   */
+  public function runLoadWorkflowFields(array $workFlows, $fields, $fieldData)
+  {
     foreach ($workFlows as $workFlow) {
       $conditions = json_decode($workFlow->workflow_condition);
       $conditionBehaviour = $workFlow->workflow_behaviour;
@@ -128,9 +158,7 @@ final class WorkFlow
         }
       }
     }
-    $workFlowReturnable['fields'] = $fields;
-
-    return $workFlowReturnable;
+    return [$fields, $fieldData];
   }
 
   public function executeOnUserInput($workFlowRun)
@@ -138,7 +166,7 @@ final class WorkFlow
     $workFlows = $this->getWorkFlow(['create_edit', $workFlowRun], ['always', 'oninput'], null, 'workflow_order');
     $workFlowReturnable = [];
     if (empty($workFlows) || is_wp_error($workFlows)) {
-      return $workFlowReturnable;
+      return apply_filters('bitform_advanced_oninput_conditions', $workFlowReturnable, $workFlowRun, static::$_formID);
     }
     $onUserInputRun = [];
     foreach ($workFlows as $index => $value) {
@@ -148,6 +176,8 @@ final class WorkFlow
 
       $workFlowReturnable['onfield_input_conditions'][$index] = $onUserInputRun;
     }
+    // Pro advanced pass (appends advanced on-input conditions). No-op when no listener.
+    $workFlowReturnable = apply_filters('bitform_advanced_oninput_conditions', $workFlowReturnable, $workFlowRun, static::$_formID);
     return $workFlowReturnable;
   }
 
@@ -155,10 +185,22 @@ final class WorkFlow
   {
     $workFlows = $this->getWorkFlow(['create_edit', $workFlowRun], 'onvalidate', null, 'workflow_order');
     $workFlowReturnable = [];
-    if (empty($workFlows) || is_wp_error($workFlows)) {
-      return [];
+    if (!empty($workFlows) && !is_wp_error($workFlows)) {
+      $workFlowReturnable = $this->runValidateWorkflow($workFlows, $workFlowReturnable, $fieldData, $fieldValue);
     }
+    // Pro advanced pass (advanced validation routing). No-op when no listener.
+    $workFlowReturnable = apply_filters('bitform_process_advanced_workflows_onvalidate', $workFlowReturnable, $workFlowRun, $fieldData, $fieldValue, static::$_formID);
+    return $workFlowReturnable;
+  }
 
+  /**
+   * Evaluate onvalidate rows and resolve the failure (validation) message. Extracted so Pro can
+   * reuse it for category 'advanced' rows.
+   *
+   * @return array $workFlowReturnable
+   */
+  public function runValidateWorkflow(array $workFlows, $workFlowReturnable, $fieldData, $fieldValue)
+  {
     foreach ($workFlows as $workFlow) {
       $conditions = json_decode($workFlow->workflow_condition);
       $conditionBehaviour = $workFlow->workflow_behaviour;
@@ -214,27 +256,51 @@ final class WorkFlow
     $workFlowReturnable = [];
     $workFlowReturnable = $this->isExistDoubleOptin($workFlowReturnable);
     if (empty($workFlows) || is_wp_error($workFlows)) {
-      $defaultConfimation = Helper::setDefaultSubmitConfirmation('successMsg', $fieldValue, static::$_formID, 0);
+      $defaultConfimation = Helper::setDefaultSubmitConfirmation('successMsg', $fieldValue, static::$_formID, 0, $workFlowRun);
       if (empty($defaultConfimation['confirmation'])) {
         $workFlowReturnable['message'] = 'edit' !== $workFlowRun ? __('Form Submitted Successfully', 'bit-form')
         : __('Entry Updated Successfully', 'bit-form');
+        $workFlowReturnable['msg_id'] = 0;
       } else {
         $workFlowReturnable['message'] = $defaultConfimation['confirmation'];
+        $workFlowReturnable['msg_id'] = $defaultConfimation['msg_id'];
       }
-      $workFlowReturnable['msg_id'] = 0;
+      if (!empty($defaultConfimation['afterSubmit'])) {
+        $workFlowReturnable['afterSubmit'] = $defaultConfimation['afterSubmit'];
+      }
+      if (!empty($defaultConfimation['msg_duration'])) {
+        $workFlowReturnable['msg_duration'] = $defaultConfimation['msg_duration'];
+      }
       $workFlowReturnable['dflt_message'] = true;
-      $defaultConfimation = Helper::setDefaultSubmitConfirmation('redirectPage', $fieldValue, static::$_formID, 0);
+      $defaultConfimation = Helper::setDefaultSubmitConfirmation('redirectPage', $fieldValue, static::$_formID, 0, $workFlowRun);
 
       $workFlowReturnable['redirectPage'] = $defaultConfimation['confirmation'];
+      $isCronOK = !defined('DOING_CRON') && wp_doing_ajax() && (!defined('DISABLE_WP_CRON') || (defined('DISABLE_WP_CRON') && DISABLE_WP_CRON));
+      if ($isCronOK) {
+        $gmt_time = microtime(true);
+        $lock = get_transient('doing_cron');
+        if ($lock > $gmt_time + 10 * MINUTE_IN_SECONDS) {
+          $lock = 0;
+        }
+        if ($lock + WP_CRON_LOCK_TIMEOUT > $gmt_time) {
+          $isCronOK = false;
+        }
+      }
       $data = [
-        'integrations' => [Helper::setDefaultSubmitConfirmation('webHooks', $fieldValue, static::$_formID, $logID)],
+        'mail'         => Helper::getDefaultMailNotifications(static::$_formID, $workFlowRun),
+        'integrations' => Helper::getDefaultIntegrations(static::$_formID, $workFlowRun),
         'entryID'      => $entryID,
         'logID'        => $logID,
         'formID'       => static::$_formID,
       ];
       $workFlowReturnable['triggerData'] = $data;
-      $workFlowReturnable['cron'] = false;
-      return $workFlowReturnable;
+      $workFlowReturnable['cron'] = $isCronOK;
+      if (!$isCronOK) {
+        $workFlowReturnable['cronNotOk'] = [$entryID, $logID];
+      }
+      // Pro advanced pass: even with no classic/basic rows, advanced (Pro) rows may add confirmation/redirect/mail/integration.
+      $workFlowReturnable = apply_filters('bitform_process_advanced_workflows', $workFlowReturnable, $workFlowRun, $fields, $fieldValue, $entryID, $logID, static::$_formID);
+      return $this->suppressFallbackMessageOnRedirect($workFlowReturnable);
     }
 
     $fieldData = Helper::getFieldData($fields);
@@ -260,6 +326,91 @@ final class WorkFlow
       'isWebHookQueued'    => false,
     ];
 
+    $onFormSuccessActionDefault = $this->runSubmitWorkflowActions($workFlows, $onFormSuccessActionDefault, $fieldData, $fieldValue, $entryID);
+    if (isset($onFormSuccessActionDefault['workFlowReturnable']['fields'])) {
+      $fieldValue = $onFormSuccessActionDefault['workFlowReturnable']['fields'];
+    }
+    $workFlowReturnable = $onFormSuccessActionDefault['workFlowReturnable'];
+    $integrationsToExc = $onFormSuccessActionDefault['integrationsToExc'];
+    if (empty($workFlowReturnable['message'])) {
+      $defaultConfimation = Helper::setDefaultSubmitConfirmation('successMsg', $fieldValue, static::$_formID, $logID, $workFlowRun);
+      $workFlowReturnable['message'] = $defaultConfimation['confirmation'];
+      $workFlowReturnable['msg_id'] = $defaultConfimation['msg_id'];
+
+      if (empty($defaultConfimation['confirmation'])) {
+        $workFlowReturnable['message'] = 'edit' !== $workFlowRun ? __('Form Submitted Successfully', 'bit-form')
+        : __('Entry Updated Successfully', 'bit-form');
+        $workFlowReturnable['msg_id'] = 0;
+      }
+      if (!empty($defaultConfimation['afterSubmit'])) {
+        $workFlowReturnable['afterSubmit'] = $defaultConfimation['afterSubmit'];
+      }
+      if (!empty($defaultConfimation['msg_duration'])) {
+        $workFlowReturnable['msg_duration'] = $defaultConfimation['msg_duration'];
+      }
+      $workFlowReturnable['dflt_message'] = true;
+    }
+    if (empty($workFlowReturnable['redirectPage'])) {
+      $defaultConfimation = Helper::setDefaultSubmitConfirmation('redirectPage', $fieldValue, static::$_formID, $logID, $workFlowRun);
+
+      $workFlowReturnable['redirectPage'] = $defaultConfimation['confirmation'];
+    }
+    // Default-execute every enabled email/integration NOT gated by a workflow (classic/basic/advanced).
+    // getDefault* exclude ids referenced by workflows (Free filter) and advanced CL (Pro filter), so the
+    // workflow-queued actions above are not duplicated and gated actions are not run unconditionally.
+    $data = [
+      'mail'         => array_merge($onFormSuccessActionDefault['mailData'], Helper::getDefaultMailNotifications(static::$_formID, $workFlowRun)),
+      'dblOptin'     => $onFormSuccessActionDefault['dblOptin'],
+      'integrations' => array_merge($integrationsToExc, Helper::getDefaultIntegrations(static::$_formID, $workFlowRun)),
+      'entryID'      => $entryID,
+      'logID'        => $logID,
+      'formID'       => static::$_formID,
+    ];
+    $workFlowReturnable['triggerData'] = $data;
+    if ($isCronOK) {
+      $workFlowReturnable['cron'] = true;
+    } else {
+      $workFlowReturnable['cron'] = false;
+    }
+    // }
+    // Pro advanced pass: queries category 'advanced' rows and merges/overrides confirmation, redirect, mail and integrations.
+    $workFlowReturnable = apply_filters('bitform_process_advanced_workflows', $workFlowReturnable, $workFlowRun, $fields, $fieldValue, $entryID, $logID, static::$_formID);
+    return $this->suppressFallbackMessageOnRedirect($workFlowReturnable);
+  }
+
+  /**
+   * When only a redirect is configured (no confirmation message), skip the hardcoded
+   * fallback message so the frontend redirects immediately instead of flashing it.
+   * Only the fallback ever has dflt_message with msg_id 0; configured messages always
+   * carry a DB msg_id. Message is blanked ('' not unset) so maybeSetCronForIntegration
+   * still forwards hidden_fields/msg_id, and dflt_message is kept so the WP-registration
+   * success-message override in FrontendFormManager still applies.
+   */
+  private function suppressFallbackMessageOnRedirect($workFlowReturnable)
+  {
+    if (
+      !empty($workFlowReturnable['dflt_message'])
+      && empty($workFlowReturnable['msg_id'])
+      && !empty($workFlowReturnable['redirectPage'])
+    ) {
+      $workFlowReturnable['message'] = '';
+    }
+    return $workFlowReturnable;
+  }
+
+  /**
+   * Evaluate a set of onsubmit workflow rows and accumulate their success actions.
+   * Extracted from executeOnSubmit so BitForm Pro can reuse the exact same evaluation/action
+   * pipeline for category 'advanced' rows (which Free's getWorkFlow excludes).
+   *
+   * @param array $workFlows                  rows from getWorkFlow()
+   * @param array $onFormSuccessActionDefault accumulator: workFlowReturnable, mailData, dblOptin, integrationsToExc, isWebHookQueued
+   * @param array $fieldData                  result of Helper::getFieldData($fields)
+   *
+   * @return array updated $onFormSuccessActionDefault (latest field values under ['workFlowReturnable']['fields'])
+   */
+  public function runSubmitWorkflowActions(array $workFlows, array $onFormSuccessActionDefault, $fieldData, $fieldValue, $entryID)
+  {
     foreach ($workFlows as $workFlow) {
       $conditions = json_decode($workFlow->workflow_condition);
 
@@ -293,49 +444,7 @@ final class WorkFlow
         $onFormSuccessActionDefault['workFlowReturnable']['fields'] = $fieldValue;
       }
     }
-    $workFlowReturnable = $onFormSuccessActionDefault['workFlowReturnable'];
-    $integrationsToExc = $onFormSuccessActionDefault['integrationsToExc'];
-    if (empty($workFlowReturnable['message'])) {
-      $defaultConfimation = Helper::setDefaultSubmitConfirmation('successMsg', $fieldValue, static::$_formID, $logID);
-      $workFlowReturnable['message'] = $defaultConfimation['confirmation'];
-      $workFlowReturnable['msg_id'] = 0;
-
-      if (empty($defaultConfimation['confirmation'])) {
-        $workFlowReturnable['message'] = 'edit' !== $workFlowRun ? __('Form Submitted Successfully', 'bit-form')
-        : __('Entry Updated Successfully', 'bit-form');
-      }
-      $workFlowReturnable['dflt_message'] = true;
-    }
-    if (empty($workFlowReturnable['redirectPage'])) {
-      $defaultConfimation = Helper::setDefaultSubmitConfirmation('redirectPage', $fieldValue, static::$_formID, $logID);
-
-      $workFlowReturnable['redirectPage'] = $defaultConfimation['confirmation'];
-    }
-    if (!$onFormSuccessActionDefault['isWebHookQueued']) {
-      //checked korte hobe
-      $webWooks = Helper::setDefaultSubmitConfirmation('webHooks', $fieldValue, 1, static::$_formID);
-      if (!empty($webWooks['confirmation'])) {
-        $integrationsToExc[] = $webWooks['confirmation'];
-      }
-    }
-
-    // if (!empty($integrationsToExc)) {
-    $data = [
-      'mail'         => $onFormSuccessActionDefault['mailData'],
-      'dblOptin'     => $onFormSuccessActionDefault['dblOptin'],
-      'integrations' => $integrationsToExc,
-      'entryID'      => $entryID,
-      'logID'        => $logID,
-      'formID'       => static::$_formID,
-    ];
-    $workFlowReturnable['triggerData'] = $data;
-    if ($isCronOK) {
-      $workFlowReturnable['cron'] = true;
-    } else {
-      $workFlowReturnable['cron'] = false;
-    }
-    // }
-    return $workFlowReturnable;
+    return $onFormSuccessActionDefault;
   }
 
   public function executeOnDelete(AdminFormManager $formManager, $formID, $deletedIds)

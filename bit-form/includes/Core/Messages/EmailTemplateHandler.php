@@ -33,7 +33,9 @@ final class EmailTemplateHandler
         'id',
         'title',
         'sub',
-        'body'
+        'body',
+        'status',
+        'config'
       ],
       $condition
     );
@@ -51,6 +53,8 @@ final class EmailTemplateHandler
         'title'     => $templateDetail->title,
         'sub'       => $templateDetail->sub,
         'body'      => $templateDetail->body,
+        'status'    => isset($templateDetail->status) ? (int) $templateDetail->status : 1,
+        'config'    => isset($templateDetail->config) ? wp_json_encode($templateDetail->config) : null,
         'form_id'   => static::$_formID,
         'user_id'   => $this->_user_details['id'],
         'user_ip'   => $this->_user_details['ip'],
@@ -67,6 +71,8 @@ final class EmailTemplateHandler
         'title'     => $templateDetail->title,
         'sub'       => $templateDetail->sub,
         'body'      => $templateDetail->body,
+        'status'    => isset($templateDetail->status) ? (int) $templateDetail->status : 1,
+        'config'    => isset($templateDetail->config) ? wp_json_encode($templateDetail->config) : null,
         'form_id'   => static::$_formID,
         'user_id'   => $this->_user_details['id'],
         'user_ip'   => $this->_user_details['ip'],

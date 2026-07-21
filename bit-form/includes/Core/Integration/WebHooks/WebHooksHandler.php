@@ -14,6 +14,7 @@ if (!defined('ABSPATH')) {
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\ApiResponse as UtilApiResponse;
 use BitCode\BitForm\Core\Util\HttpHelper;
+use BitCode\BitForm\Core\Util\Utilities;
 use BitCode\BitForm\GlobalHelper;
 
 /**
@@ -54,7 +55,7 @@ class WebHooksHandler
         wp_send_json_error($e->getMessage(), 400);
       }
 
-      $details = is_string($webhookDetails) ? json_decode($webhookDetails)->hookDetails : $webhookDetails->hookDetails;
+      $details = is_string($webhookDetails) ? (Utilities::jsonObj($webhookDetails)->hookDetails ?? null) : ($webhookDetails->hookDetails ?? null);
       $method = isset($details->method) ? $details->method : 'get';
       $data = isset($details->url) ? WebHooksHandler::urlParserWrapper($details->url) : false;
       $response = null;

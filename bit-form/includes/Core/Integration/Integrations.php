@@ -195,11 +195,15 @@ final class Integrations
           return;
         }
         $currentFieldValues = $baseFieldValues;
-        $integrationID = intval(json_decode($integrationIDStr)->id, 10);
+        $integrationID = intval(Utilities::jsonObj($integrationIDStr)->id ?? 0, 10);
         if (!empty($integrationID) && is_int($integrationID)) {
           $integrationResult
             = $integrationHandler->getAIntegration($integrationID);
           $integrationDetails = is_wp_error($integrationResult) ? null : $integrationResult[0];
+          // Honor enable/disable: a disabled integration is never executed.
+          if (!is_null($integrationDetails) && isset($integrationDetails->status) && empty($integrationDetails->status)) {
+            continue;
+          }
           $integrationName = is_null($integrationDetails) ? null : ucfirst(str_replace(' ', '', $integrationDetails->integration_type));
           if ('Brevo(SendinBlue)' === $integrationName) {
             $integrationName = 'SendinBlue';
@@ -215,7 +219,25 @@ final class Integrations
               $sptagData = self::specialTagFields($integDetails->field_map);
               $currentFieldValues = $currentFieldValues + $sptagData;
             }
-            $handler->execute($integrationHandler, $integrationDetails, $currentFieldValues, $entryID, $logID);
+            // fresh time budget per handler: a chain of slow integrations (30s HTTP
+            // timeout each) must not be killed by max_execution_time mid-loop
+            if (\function_exists('set_time_limit') && false === strpos((string) ini_get('disable_functions'), 'set_time_limit')) {
+              set_time_limit(60);
+            }
+            try {
+              $handler->execute($integrationHandler, $integrationDetails, $currentFieldValues, $entryID, $logID);
+            } catch (\Throwable $executionError) {
+              // one failing integration must not abort the remaining ones
+              Log::debug_log('[+] Integration execution threw: ' . $executionError->getMessage());
+              $logResponse->apiResponse(
+                $logID,
+                $integrationID,
+                ['type' => 'record', 'type_name' => $integrationName ?: 'Integration'],
+                'errors',
+                $executionError->getMessage(),
+                $entryDetails
+              );
+            }
           } else {
             do_action('bitform_integration_run_failure', $integrationID, $formID);
 

@@ -28,27 +28,28 @@ final class MailConfig
     $integrationHandler = new IntegrationHandler(0);
     $formIntegrations = $integrationHandler->getAllIntegration('mail', 'smtp', 1);
     if (!isset($formIntegrations->errors['result_empty'])) {
-      if (1 === (int) $formIntegrations[0]->status) {
-        $integration_details = json_decode($formIntegrations[0]->integration_details);
+      $integrationRow = Utilities::firstRow($formIntegrations);
+      if ($integrationRow && 1 === (int) $integrationRow->status) {
+        $integration_details = Utilities::jsonObj($integrationRow->integration_details ?? '');
         $phpmailer->Mailer = 'smtp';
-        $phpmailer->Host = $integration_details->smtp_host;
+        $phpmailer->Host = $integration_details->smtp_host ?? '';
         $phpmailer->SMTPAuth = true;
         if (!empty($integration_details->re_email_address)) {
           $phpmailer->addReplyTo($integration_details->re_email_address, 'reply-to');
         }
-        $phpmailer->Port = $integration_details->port;
-        $phpmailer->Username = $integration_details->smtp_user_name;
-        $phpmailer->Password = $integration_details->smtp_password;
-        $phpmailer->SMTPSecure = $integration_details->encryption;
+        $phpmailer->Port = $integration_details->port ?? '';
+        $phpmailer->Username = $integration_details->smtp_user_name ?? '';
+        $phpmailer->Password = $integration_details->smtp_password ?? '';
+        $phpmailer->SMTPSecure = $integration_details->encryption ?? '';
         // $phpmailer->SMTPDebug = 1;
         // $phpmailer->Debugoutput = 'error_log';
-        $phpmailer->From = $integration_details->form_email_address;
-        $phpmailer->Sender = $integration_details->form_email_address;
+        $phpmailer->From = $integration_details->form_email_address ?? '';
+        $phpmailer->Sender = $integration_details->form_email_address ?? '';
         if (isset($this->config['from_email']) && !empty($this->config['from_email'])) {
           $phpmailer->From = $this->config['from_email'];
           $phpmailer->Sender = $this->config['from_email'];
         }
-        $from_name = $integration_details->form_name;
+        $from_name = $integration_details->form_name ?? '';
         if (isset($this->config['from_name']) && !empty($this->config['from_name'])) {
           $from_name = $this->config['from_name'];
         }

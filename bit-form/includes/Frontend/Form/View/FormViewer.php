@@ -123,7 +123,7 @@ class FormViewer
 
   public function fields($rowID)
   {
-    return $this->_fields->{$rowID};
+    return $this->_fields->{$rowID} ?? null;
   }
 
   public function getNestedLayout($rowID)
@@ -179,7 +179,7 @@ class FormViewer
     }
     $conversationNavigationHtml = $conversationalHelper->getNavigationView();
 
-    $confMsg = $this->_form->getSuccessMessageMarkups();
+    // $confMsg = $this->_form->getSuccessMessageMarkups();
     $abandonmentMsg = $this->_form->getFormAbandonmentMessage();
 
     // if (!empty($this->_buttons)) {

@@ -48,7 +48,6 @@ class ZohoCRMHandler
     add_action('wp_ajax_bitforms_zcrm_get_users', [__CLASS__, 'refreshUsersAjaxHelper']);
     add_action('wp_ajax_bitforms_zcrm_get_tags', [__CLASS__, 'refreshTagListAjaxHelper']);
     add_action('wp_ajax_bitforms_zcrm_get_assignment_rules', [__CLASS__, 'getAssignmentRulesAjaxHelper']);
-    add_action('wp_ajax_nopriv_bitforms_zcrm_get_assignment_rules', [__CLASS__, 'getAssignmentRulesAjaxHelper']);
     add_action('wp_ajax_bitforms_zcrm_get_related_lists', [__CLASS__, 'getRelatedListsAjaxHelper']);
   }
 

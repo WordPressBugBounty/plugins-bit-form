@@ -57,13 +57,13 @@ class FieldHelpers
   {
     $meaningfulElementClass = "bf-{$this->getMeaningfullElementClass($element)}";
     if (empty($this->_fld) && empty($this->_fk)) {
-      if (property_exists($this->_form_atomic_Cls_map, ".$element")) {
+      if (is_object($this->_form_atomic_Cls_map) && property_exists($this->_form_atomic_Cls_map, ".$element")) {
         $getAtomicCls = $this->_form_atomic_Cls_map->{".$element"};
         return implode(' ', $getAtomicCls) . " {$element} {$meaningfulElementClass}";
       }
       return "$element {$meaningfulElementClass}";
     }
-    if ('advanced-file-up' === $this->_fld->typ && isset($this->_form_atomic_Cls_map->{".$element"})) {
+    if (isset($this->_fld->typ) && 'advanced-file-up' === $this->_fld->typ && isset($this->_form_atomic_Cls_map->{".$element"})) {
       $getAtomicCls = $this->_form_atomic_Cls_map->{".$element"};
       return implode(' ', $getAtomicCls) . " {$this->_fk}-{$element} {$meaningfulElementClass}";
     }

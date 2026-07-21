@@ -25,7 +25,7 @@ class RadioBoxField
     $radioBoxOptions = '';
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
-    if (property_exists($field, 'opt') && count($field->opt) > 0) {
+    if (is_object($field) && property_exists($field, 'opt') && is_countable($field->opt) && count($field->opt) > 0) {
       $defaultValue = isset($field->val) ? $field->val : '';
       foreach ($field->opt as $key => $opt) {
         $value = isset($opt->val) ? $opt->val : $opt->lbl;
@@ -92,7 +92,7 @@ class RadioBoxField
     }
 
     //Other Option
-    $optCount = property_exists($field, 'opt') ? count($field->opt) : 0;
+    $optCount = isset($field->opt) && is_countable($field->opt) ? count($field->opt) : 0;
     $otherOptLbl = !empty($field->otherOptLbl) ? $field->otherOptLbl : __('Other...', 'bit-form');
     $inputPh = isset($field->otherInpPh) ? $field->otherInpPh : 'Other...';
     $inpReq = isset($field->valid->otherOptReq) ? ($field->valid->otherOptReq ? 'required' : '') : '';

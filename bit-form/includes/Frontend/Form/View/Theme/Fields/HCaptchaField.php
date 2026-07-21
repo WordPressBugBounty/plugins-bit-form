@@ -3,6 +3,7 @@
 namespace BitCode\BitForm\Frontend\Form\View\Theme\Fields;
 
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
+use BitCode\BitForm\Core\Util\Utilities;
 
 class HCaptchaField
 {
@@ -13,7 +14,8 @@ class HCaptchaField
     if (is_wp_error($allFormIntegrations)) {
       return '';
     }
-    $siteKey = json_decode($allFormIntegrations[0]->integration_details)->siteKey;
+    $row = Utilities::firstRow($allFormIntegrations);
+    $siteKey = Utilities::jsonObj($row->integration_details ?? '')->siteKey ?? '';
     return self::field($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $siteKey, $error, $value);
   }
 

@@ -74,6 +74,7 @@ final class WorkFlowHandler
         'workflow_behaviour',
         'workflow_condition',
         'workflow_info',
+        'workflow_category',
         'workflow_order',
         'workflow_status',
       ],
@@ -97,6 +98,7 @@ final class WorkFlowHandler
       $workFlow['action_behaviour'] = $value->workflow_behaviour;
       $workFlow['conditions'] = json_decode($value->workflow_condition ?? '');
       $workFlow['info'] = json_decode($value->workflow_info ?? '');
+      $workFlow['workflow_category'] = $value->workflow_category;
       $workFlow['status'] = (int) $value->workflow_status;
       foreach ((array) $workFlow['conditions'] as $conIndex => $condition) {
         if (property_exists($condition, 'logics')) {
@@ -160,6 +162,19 @@ final class WorkFlowHandler
 
             $workFlowDetails->conditions[$conIndex]->actions->success[$actionKey]->details->pdfId = $value;
           }
+          // pdfIds update (multi-PDF attachments)
+          if (isset($actionIntegrationDetails['pdfTem']) && !empty($actionValue->details->pdfIds) && is_array($actionValue->details->pdfIds)) {
+            foreach ($actionValue->details->pdfIds as $pdfKey => $pdfDetailId) {
+              $actionIntegrationID = \json_decode($pdfDetailId);
+              if (isset($actionIntegrationID->index)) {
+                $value = wp_json_encode(['id' => (string) $actionIntegrationDetails['pdfTem'][$actionIntegrationID->index]]);
+                $errorCode['workflow'] = 1;
+              } else {
+                $value = $pdfDetailId;
+              }
+              $workFlowDetails->conditions[$conIndex]->actions->success[$actionKey]->details->pdfIds[$pdfKey] = $value;
+            }
+          }
         }
       }
       if (!empty($actions->failure)) {
@@ -187,7 +202,8 @@ final class WorkFlowHandler
         'workflow_run'       => $workFlowDetails->action_run,
         'workflow_behaviour' => $workFlowDetails->action_behaviour,
         'workflow_condition' => wp_json_encode($conditions),
-        'workflow_info'      => wp_json_encode($workFlowDetails->info),
+        'workflow_info'      => wp_json_encode($this->maybeRemapCLRef($workFlowDetails->info ?? null, $actionIntegrationDetails)),
+        'workflow_category'  => $this->deriveWorkflowCategory($workFlowDetails->info ?? null),
         // "workflow_action" => wp_json_encode($workFlowActions),
         'workflow_order'     => $workFlowOrder,
         'workflow_status'    => $workFlowDetails->status,
@@ -241,6 +257,16 @@ final class WorkFlowHandler
 
             $workFlowDetails->conditions[$conIndex]->actions->success[$actionKey]->details->pdfId = false === $value ? $pdfDetailId : wp_json_encode(['id' => "$value"]);
           }
+
+          // pdfIds update (multi-PDF attachments)
+          if (isset($actionIntegrationDetails['pdfTem']) && !empty($actionValue->details->pdfIds) && is_array($actionValue->details->pdfIds)) {
+            foreach ($actionValue->details->pdfIds as $pdfKey => $pdfDetailId) {
+              $actionIntegrationID = \json_decode($pdfDetailId);
+              $value = $this->maybeGetSuccessActionID($actionIntegrationID, $actionIntegrationDetails, 'pdfTem');
+
+              $workFlowDetails->conditions[$conIndex]->actions->success[$actionKey]->details->pdfIds[$pdfKey] = false === $value ? $pdfDetailId : wp_json_encode(['id' => "$value"]);
+            }
+          }
         }
       }
 
@@ -269,7 +295,8 @@ final class WorkFlowHandler
         'workflow_run'       => $workFlowDetails->action_run,
         'workflow_behaviour' => $workFlowDetails->action_behaviour,
         'workflow_condition' => wp_json_encode($conditions),
-        'workflow_info'      => wp_json_encode($workFlowDetails->info),
+        'workflow_info'      => wp_json_encode($this->maybeRemapCLRef($workFlowDetails->info ?? null, $actionIntegrationDetails)),
+        'workflow_category'  => $this->deriveWorkflowCategory($workFlowDetails->info ?? null),
         'workflow_order'     => $workFlowOrder,
         'workflow_status'    => isset($workFlowDetails->status) ? $workFlowDetails->status : 1,
         'form_id'            => static::$_formID,
@@ -356,7 +383,7 @@ final class WorkFlowHandler
   {
     $workFlowCols = [
       'workflow_name', 'workflow_type', 'workflow_run', 'workflow_behaviour',
-      'workflow_condition', 'workflow_info', 'workflow_action', 'workflow_status', 'form_id', 'user_id',
+      'workflow_condition', 'workflow_info', 'workflow_category', 'workflow_action', 'workflow_status', 'form_id', 'user_id',
       'user_ip', 'user_location', 'user_device', 'created_at', 'updated_at',
     ];
     $dupData = [
@@ -366,6 +393,7 @@ final class WorkFlowHandler
       'workflow_behaviour',
       'workflow_condition',
       'workflow_info',
+      'workflow_category',
       'workflow_action',
       'workflow_status',
       static::$_formID,
@@ -387,6 +415,41 @@ final class WorkFlowHandler
         'form_id' => static::$_formID,
       ]
     );
+  }
+
+  /**
+   * Reconcile a brand-new feature record's inline-CL temp ref (info.targetId) to the real id assigned
+   * on save. New confirmation messages / redirects / integrations bind their CL row to a client ref;
+   * the corresponding save records $actionIntegrationDetails['<action>CLRef'][ref] => realId, applied
+   * here before persisting. Works for action = confirmation | redirect | email | integration.
+   */
+  public function maybeRemapCLRef($info, $actionIntegrationDetails)
+  {
+    if (!empty($info) && isset($info->action, $info->targetId)) {
+      $mapKey = $info->action . 'CLRef';
+      if (isset($actionIntegrationDetails[$mapKey][$info->targetId])) {
+        $info->targetId = (string) $actionIntegrationDetails[$mapKey][$info->targetId];
+      }
+    }
+    return $info;
+  }
+
+  /**
+   * Derive the storage category used to split Free vs Pro processing.
+   * classic = legacy combined workflows (Free), basic = field show/hide (Free),
+   * advanced = Pro multi-condition routing. Source of truth is info.type sent by the UI.
+   */
+  public function deriveWorkflowCategory($info)
+  {
+    if (!empty($info) && isset($info->type)) {
+      if ('advanced' === $info->type) {
+        return 'advanced';
+      }
+      if ('basic' === $info->type) {
+        return 'basic';
+      }
+    }
+    return 'classic';
   }
 
   public function maybeGetSuccessActionID($actionIntegrationID, $actionIntegrationDetails, $actionType)

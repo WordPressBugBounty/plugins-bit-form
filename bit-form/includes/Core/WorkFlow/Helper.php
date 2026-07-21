@@ -3,9 +3,11 @@
 namespace BitCode\BitForm\Core\WorkFlow;
 
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
+use BitCode\BitForm\Core\Messages\EmailTemplateHandler;
 use BitCode\BitForm\Core\Messages\SuccessMessageHandler;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\SmartTags;
+use BitCode\BitForm\Core\Util\Utilities;
 
 final class Helper
 {
@@ -56,49 +58,67 @@ final class Helper
     return $fieldData;
   }
 
-  public static function replaceFieldWithValue($stringToReplaceField, $fieldValues, $evalMathExpr = true, $formID = null)
+  public static function replaceFieldWithValue($stringToReplaceField, $fieldValues, $evalMathExpr = true, $formID = null, $stripShortcodesFromValues = false)
   {
-    $stringToReplaceField = FieldValueHandler::replaceFieldWithValue($stringToReplaceField, $fieldValues, $formID);
+    $stringToReplaceField = FieldValueHandler::replaceFieldWithValue($stringToReplaceField, $fieldValues, $formID, $stripShortcodesFromValues);
     if ($evalMathExpr) {
       return self::evalMathExpression($stringToReplaceField);
     }
     return $stringToReplaceField;
   }
 
-  public static function setDefaultSubmitConfirmation($confirmationType, $fieldValue, $formId, $logID = 0)
+  public static function setDefaultSubmitConfirmation($confirmationType, $fieldValue, $formId, $logID = 0, $workFlowRun = null)
   {
     $messageId = 0;
     $returnableData = null;
-    return [
-      'msg_id'       => $messageId,
-      'confirmation' => $returnableData,
-    ];
+    $afterSubmit = null;
+    $msgDuration = null;
     $integrationHandler = new IntegrationHandler($formId);
+    $conditionalActionIds = self::getDefaultSubmitExcludedActionIds($formId, $workFlowRun);
     switch ($confirmationType) {
       case 'successMsg':
-        $successMessageHandler
-        = new SuccessMessageHandler($formId);
+        // Standalone confirmation: show the first ENABLED success message without requiring a workflow.
+        $successMessageHandler = new SuccessMessageHandler($formId);
         $successMessage = $successMessageHandler->getAllMessage();
-        if (!is_wp_error($successMessage) && !empty($successMessage) && count($successMessage) > 0) {
-          $returnableData = self::replaceFieldWithValue($successMessage[0]->message_content, $fieldValue);
-          $messageId = $successMessage[0]->id;
+        if (!is_wp_error($successMessage) && !empty($successMessage)) {
+          foreach ($successMessage as $msg) {
+            $msgConfig = Utilities::jsonObj($msg->message_config);
+            if (
+              isset($msgConfig->status) && empty($msgConfig->status)
+              || isset($conditionalActionIds['successMsg'][(string) $msg->id])
+            ) {
+              continue;
+            }
+            $returnableData = self::replaceFieldWithValue($msg->message_content, $fieldValue, true, null, true);
+            $messageId = $msg->id;
+            if (isset($msgConfig->afterSubmit)) {
+              $afterSubmit = $msgConfig->afterSubmit;
+            }
+            if (!empty($msgConfig->autoHide)) {
+              $msgDuration = abs(floatval($msgConfig->duration ?? 0) * 1000);
+            }
+            break;
+          }
         }
         break;
       case 'redirectPage':
-        $redirectPage = $integrationHandler->getAllIntegration('form', 'redirectPage');
-        if (!is_wp_error($redirectPage) && !empty($redirectPage) && count($redirectPage) > 0) {
-          $url = json_decode($redirectPage[0]->integration_details)->url;
-          if (!empty($url)) {
-            $url = self::replaceFieldWithValue($url, $fieldValue);
+        $redirectPages = $integrationHandler->getAllIntegration('form', 'redirectPage', 1);
+        if (!is_wp_error($redirectPages) && !empty($redirectPages)) {
+          foreach ($redirectPages as $redirectPage) {
+            if (isset($conditionalActionIds['redirectPage'][(string) $redirectPage->id])) {
+              continue;
+            }
+            $url = Utilities::jsonObj($redirectPage->integration_details ?? '')->url ?? '';
+            if (!empty($url)) {
+              $url = self::replaceFieldWithValue($url, $fieldValue);
+            }
+            $returnableData = empty($url) ? '' : esc_url_raw($url);
+            break;
           }
-          $returnableData = empty($url) ? '' : esc_url_raw($url);
         }
         break;
       case 'webHooks':
-        $webHooks = $integrationHandler->getAllIntegration('form', 'webHooks');
-        if (!is_wp_error($webHooks) && !empty($webHooks) && 1 === count($webHooks)) {
-          $returnableData = ["{\"id\":{$webHooks[0]->id}}"];
-        }
+        // Default redirect/webhook remain workflow-driven for now (revisited in the Redirect/Integration phases).
         break;
       default:
         break;
@@ -107,7 +127,182 @@ final class Helper
     return [
       'msg_id'       => $messageId,
       'confirmation' => $returnableData,
+      'afterSubmit'  => $afterSubmit,
+      'msg_duration' => $msgDuration,
     ];
+  }
+
+  private static function getDefaultSubmitExcludedActionIds($formId, $workFlowRun = null)
+  {
+    $actionIds = [
+      'successMsg'   => [],
+      'redirectPage' => [],
+      'mailNotify'   => [],
+      'integrations' => [],
+    ];
+    $filteredActionIds = apply_filters(
+      'bitform_default_submit_confirmation_excluded_action_ids',
+      $actionIds,
+      $formId,
+      $workFlowRun
+    );
+
+    return is_array($filteredActionIds) ? $filteredActionIds : $actionIds;
+  }
+
+  public static function getDefaultMailNotifications($formId, $workFlowRun = null)
+  {
+    $mailData = [];
+    $emailTemplateHandler = new EmailTemplateHandler($formId);
+    $templates = $emailTemplateHandler->getAllTemplate();
+    if (empty($templates) || is_wp_error($templates)) {
+      return $mailData;
+    }
+    $excludedActionIds = self::getDefaultSubmitExcludedActionIds($formId, $workFlowRun);
+    $arrayFields = ['to', 'cc', 'bcc', 'replyto', 'attachment', 'mediaAttachment', 'pdfIds'];
+    foreach ($templates as $template) {
+      $status = isset($template->status) ? (int) $template->status : 1;
+      if (
+        1 !== $status
+        || isset($excludedActionIds['mailNotify'][(string) $template->id])
+      ) {
+        continue;
+      }
+      $config = json_decode($template->config);
+      $details = new \stdClass();
+      $details->id = wp_json_encode(['id' => (string) $template->id]);
+      foreach (['to', 'from', 'from_name', 'cc', 'bcc', 'replyto', 'attachment', 'mediaAttachment', 'pdfId', 'pdfIds'] as $key) {
+        $details->$key = isset($config->$key) ? $config->$key : (in_array($key, $arrayFields, true) ? [] : '');
+      }
+      $mailData[] = $details;
+    }
+    return $mailData;
+  }
+
+  public static function getDefaultIntegrations($formId, $workFlowRun = null)
+  {
+    $integrationIds = [];
+    $integrationHandler = new IntegrationHandler($formId);
+    $allIntegrations = $integrationHandler->getAllIntegration('form', null, 1);
+    if (empty($allIntegrations) || is_wp_error($allIntegrations)) {
+      return $integrationIds;
+    }
+    $excludedActionIds = self::getDefaultSubmitExcludedActionIds($formId, $workFlowRun);
+    foreach ($allIntegrations as $integration) {
+      if (
+        'redirectPage' === $integration->integration_type
+        || isset($excludedActionIds['integrations'][(string) $integration->id])
+      ) {
+        continue;
+      }
+      // triggerData['integrations'] is a list of GROUPS; each group is an array of JSON id strings
+      // (Integrations::executeIntegrations requires is_array() with string members). Wrap each id.
+      $integrationIds[] = [wp_json_encode(['id' => (string) $integration->id])];
+    }
+    return $integrationIds;
+  }
+
+  /**
+   * Free implementation of the default-submit exclusion filter: any message / redirect / email /
+   * integration referenced by a classic/basic onsubmit workflow success action is workflow-gated,
+   * so it must NOT be default-executed (Pro adds the advanced-CL ids separately). Registered in Hooks.
+   */
+  public static function workflowReferencedActionIds($actionIds, $formId, $workFlowRun = null)
+  {
+    static $cache = [];
+
+    $actionIds = is_array($actionIds) ? $actionIds : [];
+    foreach (['successMsg', 'redirectPage', 'mailNotify', 'integrations'] as $bucket) {
+      if (empty($actionIds[$bucket]) || !is_array($actionIds[$bucket])) {
+        $actionIds[$bucket] = [];
+      }
+    }
+
+    $cacheKey = (string) $formId . ':' . (string) $workFlowRun;
+    if (!isset($cache[$cacheKey])) {
+      $workFlow = new WorkFlow($formId);
+      $rows = $workFlow->getWorkFlow(['create_edit', $workFlowRun ?? 'create'], ['onsubmit'], null, 'workflow_order');
+      $cache[$cacheKey] = self::collectReferencedActionIds(is_wp_error($rows) ? [] : $rows);
+    }
+
+    foreach ($cache[$cacheKey] as $bucket => $ids) {
+      $actionIds[$bucket] = $actionIds[$bucket] + $ids;
+    }
+    return $actionIds;
+  }
+
+  /**
+   * Extract the message / redirect / email / integration ids referenced by workflow-row success
+   * actions, grouped into the four exclusion buckets. Shared by the runtime default-submit filter
+   * and the one-time orphan-deactivation migration (SubmitActionFallback).
+   *
+   * @param array $rows workflow rows each having a ->workflow_condition JSON string
+   *
+   * @return array{successMsg:array,redirectPage:array,mailNotify:array,integrations:array}
+   */
+  public static function collectReferencedActionIds($rows)
+  {
+    $referenced = ['successMsg' => [], 'redirectPage' => [], 'mailNotify' => [], 'integrations' => []];
+    if (empty($rows) || !is_array($rows)) {
+      return $referenced;
+    }
+    foreach ($rows as $row) {
+      $conditions = json_decode($row->workflow_condition ?? '');
+      if (empty($conditions) || !is_array($conditions)) {
+        continue;
+      }
+      foreach ($conditions as $condition) {
+        if (empty($condition->actions->success)) {
+          continue;
+        }
+        foreach ($condition->actions->success as $success) {
+          if (empty($success->type) || empty($success->details->id)) {
+            continue;
+          }
+          $bucket = self::actionExclusionBucket($success->type);
+          if (null === $bucket) {
+            continue;
+          }
+          foreach (self::extractActionIds($success->details->id) as $id) {
+            $referenced[$bucket][$id] = true;
+          }
+        }
+      }
+    }
+    return $referenced;
+  }
+
+  private static function actionExclusionBucket($type)
+  {
+    switch ($type) {
+      case 'successMsg':
+        return 'successMsg';
+      case 'redirectPage':
+        return 'redirectPage';
+      case 'mailNotify':
+        return 'mailNotify';
+      case 'integ':
+      case 'webHooks':
+        return 'integrations';
+      default:
+        return null;
+    }
+  }
+
+  private static function extractActionIds($detailId)
+  {
+    $ids = [];
+    $items = is_array($detailId) ? $detailId : [$detailId];
+    foreach ($items as $item) {
+      if (!is_string($item)) {
+        continue;
+      }
+      $decoded = json_decode($item);
+      if (isset($decoded->id)) {
+        $ids[] = (string) $decoded->id;
+      }
+    }
+    return $ids;
   }
 
   public static function calculte($firstOperand, $secondOperand, $operator)

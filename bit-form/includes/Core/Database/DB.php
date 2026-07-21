@@ -21,6 +21,64 @@ final class DB
    *
    * @return void
    */
+
+  /**
+   * Idempotently add the email-template status/config columns.
+   *
+   * @return void
+   */
+  public static function ensureEmailTemplateStatusColumn()
+  {
+    global $wpdb;
+    $emailTable = $wpdb->prefix . 'bitforms_email_template';
+    if (null === $wpdb->get_var("SHOW COLUMNS FROM `{$emailTable}` LIKE 'status'")) {
+      // Schema migration: table name interpolation only (no user input). $wpdb->prepare() cannot parameterize DDL.
+      $wpdb->query(
+        "ALTER TABLE `{$emailTable}`
+            ADD COLUMN `status` TINYINT(1) DEFAULT 1 AFTER `body`,
+            ADD COLUMN `config` LONGTEXT NULL AFTER `status`"
+      );
+    }
+  }
+
+  /**
+   * Idempotently add the workflows `workflow_info` column.
+   *
+   * @return void
+   */
+  public static function ensureWorkflowInfoColumn()
+  {
+    global $wpdb;
+    $table = $wpdb->prefix . 'bitforms_workflows';
+    if (null === $wpdb->get_var("SHOW COLUMNS FROM `{$table}` LIKE 'workflow_info'")) {
+      // Schema migration: table name interpolation only (no user input). $wpdb->prepare() cannot parameterize DDL.
+      $wpdb->query(
+        "ALTER TABLE `{$table}`
+            ADD COLUMN `workflow_info` LONGTEXT NULL AFTER `workflow_condition`"
+      );
+    }
+  }
+
+  /**
+   * Idempotently add the workflows `workflow_category` column (conditional-logic classic/basic split).
+   *
+   * @return void
+   */
+  public static function ensureWorkflowCategoryColumn()
+  {
+    self::ensureWorkflowInfoColumn();
+    global $wpdb;
+    $table = $wpdb->prefix . 'bitforms_workflows';
+    if (null === $wpdb->get_var("SHOW COLUMNS FROM `{$table}` LIKE 'workflow_category'")) {
+      // Schema migration: table name interpolation only (no user input). $wpdb->prepare() cannot parameterize DDL.
+      $wpdb->query(
+        "ALTER TABLE `{$table}`
+            ADD COLUMN `workflow_category` VARCHAR(20) DEFAULT 'classic' AFTER `workflow_info`,
+            ADD KEY `workflow_category` (`workflow_category`)"
+      );
+    }
+  }
+
   public static function migrate()
   {
     global $wpdb;
@@ -81,6 +139,7 @@ final class DB
                 `workflow_behaviour` varchar(25) NOT NULL,
                 `workflow_condition` longtext DEFAULT NULL,
                 `workflow_info` longtext DEFAULT NULL,
+                `workflow_category` varchar(20) DEFAULT 'classic',/* classic = legacy, basic = field show/hide, advanced = multi-condition routing */
                 `workflow_order` int(11) unsigned DEFAULT NULL,
                 `workflow_status` tinyint(1) DEFAULT 1,/* 0 disable, 1 enable,  2 enable in field settings */
                 `form_id` bigint(20) unsigned DEFAULT NULL,
@@ -91,7 +150,8 @@ final class DB
                 `created_at` datetime DEFAULT NULL,
                 `updated_at` datetime DEFAULT NULL,
                 PRIMARY KEY (`id`),
-                KEY `form_id` (`form_id`)
+                KEY `form_id` (`form_id`),
+                KEY `workflow_category` (`workflow_category`)
             ) $collate;",
 
       "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}bitforms_success_messages` (
@@ -112,6 +172,8 @@ final class DB
                 `title` text DEFAULT NULL,
                 `sub` text DEFAULT NULL,
                 `body` longtext DEFAULT NULL,
+                `status` tinyint(1) DEFAULT 1,/* 0 disabled, 1 enabled */
+                `config` longtext DEFAULT NULL,/* SendTo / From / From Name / CC / BCC / Reply-To / attachments JSON */
                 `form_id` bigint(20) unsigned DEFAULT NULL,
                 `user_id` bigint(20) unsigned DEFAULT NULL,
                 `user_ip` int(11) unsigned DEFAULT NULL,
@@ -280,13 +342,15 @@ final class DB
 
       // add workflow_info column if not exists
       if ($installed_db_version && version_compare('3.0', $installed_db_version, '>=')) {
-        $table_name = $wpdb->prefix . 'bitforms_workflows';
-        if (null === $wpdb->get_var("SHOW COLUMNS FROM `{$table_name}` LIKE 'workflow_info'")) {
-          $wpdb->query(
-            "ALTER TABLE `{$table_name}`
-                ADD COLUMN `workflow_info` LONGTEXT NULL AFTER `workflow_condition`"
-          );
-        }
+        self::ensureWorkflowInfoColumn();
+      }
+
+      // add workflow_category column if not exists (conditional logic separation)
+      // existing rows default to 'classic' so Free keeps executing them unchanged; data normalization in Fallback WorkFlow@normalizeCategory
+      if ($installed_db_version && version_compare('3.2', $installed_db_version, '>=')) {
+        self::ensureWorkflowCategoryColumn();
+        // email template enable/disable + per-template config (SendTo/From/CC/BCC/Reply-To/attachments)
+        self::ensureEmailTemplateStatusColumn();
       }
 
       update_option('bitforms_db_version', $bitforms_db_version, true);

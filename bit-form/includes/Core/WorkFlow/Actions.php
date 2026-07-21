@@ -1,11 +1,10 @@
 <?php
 
-?><?php
-
 namespace BitCode\BitForm\Core\WorkFlow;
 
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Messages\SuccessMessageHandler;
+use BitCode\BitForm\Core\Util\Utilities;
 
 final class Actions
 {
@@ -199,10 +198,15 @@ final class Actions
 
   public function confirmationMessage($workFlowReturnable, $successActionDetailId, $fieldValue, $entryID = null)
   {
-    $id = json_decode($successActionDetailId)->id;
+    $id = Utilities::jsonObj($successActionDetailId)->id ?? null;
     $messageHandler = new SuccessMessageHandler(static::$_formID);
     $message = $messageHandler->getAMessage($id);
     if (!is_wp_error($message) && !empty($message)) {
+      $msgConfig = Utilities::jsonObj($message[0]->message_config ?? '');
+      // Honor enable/disable: a disabled confirmation message is skipped so the default confirmation applies.
+      if (isset($msgConfig->status) && empty($msgConfig->status)) {
+        return $workFlowReturnable;
+      }
       $messageContent = $message[0]->message_content;
 
       // replace pdf link and password
@@ -212,14 +216,18 @@ final class Actions
         $messageContent = $downloadFile->replaceShortCodeToPdfPassword($messageContent, static::$_formID, $entryID);
       }
 
-      $workFlowReturnable['message'] = Helper::replaceFieldWithValue($messageContent, $fieldValue, true, static::$_formID);
+      $workFlowReturnable['message'] = Helper::replaceFieldWithValue($messageContent, $fieldValue, true, static::$_formID, true);
       if (!empty($workFlowReturnable['message'])) {
         $workFlowReturnable['message'] = do_shortcode($workFlowReturnable['message']);
       }
       $workFlowReturnable['msg_id'] = $message[0]->id;
-      $msgConfig = json_decode($message[0]->message_config);
-      if ($msgConfig->autoHide) {
-        $workFlowReturnable['msg_duration'] = abs(floatval($msgConfig->duration) * 1000);
+      $msgConfig = Utilities::jsonObj($message[0]->message_config ?? '');
+      if (!empty($msgConfig->autoHide)) {
+        $workFlowReturnable['msg_duration'] = abs(floatval($msgConfig->duration ?? 0) * 1000);
+      }
+      // expose the form's after-submission behaviour ('reset' | 'hide' | 'keep') to the frontend
+      if (isset($msgConfig->afterSubmit)) {
+        $workFlowReturnable['afterSubmit'] = $msgConfig->afterSubmit;
       }
     }
     return $workFlowReturnable;
@@ -227,11 +235,15 @@ final class Actions
 
   public function redirectPage($workFlowReturnable, $successActionDetailId, $fieldValue)
   {
-    $id = json_decode($successActionDetailId)->id;
+    $id = Utilities::jsonObj($successActionDetailId)->id ?? null;
     $integrationHandler = new IntegrationHandler(static::$_formID);
     $redirectPage = $integrationHandler->getAIntegration($id, 'form', 'redirectPage');
     if (!is_wp_error($redirectPage) && !empty($redirectPage)) {
-      $url = json_decode($redirectPage[0]->integration_details)->url;
+      // Honor enable/disable: a disabled redirect is skipped.
+      if (isset($redirectPage[0]->status) && empty($redirectPage[0]->status)) {
+        return $workFlowReturnable;
+      }
+      $url = Utilities::jsonObj($redirectPage[0]->integration_details ?? '')->url ?? '';
       if (!empty($url)) {
         $url = Helper::replaceFieldWithValue($url, $fieldValue);
       }

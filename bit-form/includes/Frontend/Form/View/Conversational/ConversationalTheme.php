@@ -43,6 +43,9 @@ class ConversationalTheme
     }
 
     $field = $formViewInstance->fields($rowID);
+    if (!is_object($field)) {
+      return '';
+    }
     $field_name = $formViewInstance->getFieldName($rowID);
     $form_atomic_Cls_map = $formViewInstance->getAtomicClaMap();
     $error = $formViewInstance->getError($rowID);
@@ -77,6 +80,10 @@ class ConversationalTheme
 
   public function getField($field, $rowID, $field_name, $form_atomic_Cls_map, $error, $value, $formID)
   {
+    if (!is_object($field)) {
+      return '';
+    }
+
     // Pro-only fields ship in the Bit Form Pro plugin. In the free plugin, we avoid rendering Pro implementations.
     $proMissingHtml = '<div class="bf-pro-field-missing"> <!-- Require Bit Form Pro --> </div>';
 

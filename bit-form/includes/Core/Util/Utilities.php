@@ -127,6 +127,39 @@ final class Utilities
     Helpers::saveFile($path, $fileName, $css, $mode);
   }
 
+  /**
+   * First row of a Model/get() style result, or null when the lookup failed
+   * (WP_Error), returned an empty set, or has no index 0. Prevents
+   * "Attempt to read property on null" when dereferencing $result[0]->col.
+   *
+   * @param mixed $result
+   * @return object|null
+   */
+  public static function firstRow($result)
+  {
+    if (is_wp_error($result) || empty($result) || !isset($result[0])) {
+      return null;
+    }
+    return $result[0];
+  }
+
+  /**
+   * Decode a JSON string to an object, guaranteed to return object|null so
+   * downstream `$obj->prop ?? default` reads never emit an undefined-property
+   * warning. Returns null for non-strings, empty strings and malformed JSON.
+   *
+   * @param mixed $json
+   * @return object|null
+   */
+  public static function jsonObj($json)
+  {
+    if (!is_string($json) || '' === $json) {
+      return null;
+    }
+    $decoded = json_decode($json);
+    return is_object($decoded) ? $decoded : null;
+  }
+
   public static function duplicateDbTable($oldTableName, $newTableName)
   {
     global $wpdb;

@@ -6,18 +6,13 @@ if (!defined('ABSPATH')) {
   exit;
 }
 
-use BitCode\BitForm\Admin\Form\AdminFormManager;
 use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Core\Database\FormEntryLogModel;
-use BitCode\BitForm\Core\Database\FormEntryMetaModel;
-use BitCode\BitForm\Core\Database\FormEntryModel;
-use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\Core\Util\Log;
-use BitCode\BitForm\Core\Util\MailNotifier;
-use BitCode\BitForm\Core\WorkFlow\WorkFlow;
+use BitCode\BitForm\Core\Util\Utilities;
+use BitCode\BitForm\Core\WorkFlow\WorkflowExecutor;
 use BitCode\BitForm\Frontend\Form\FrontendFormManager;
-use WP_Error;
 
 final class FrontendAjax
 {
@@ -174,193 +169,98 @@ final class FrontendAjax
 
     $rawInput = file_get_contents('php://input');
 
-    if ($rawInput) {
-      $inputJSON = is_string($rawInput) ? sanitize_text_field($rawInput) : $rawInput;
-      $request = is_string($inputJSON) ? \json_decode($inputJSON) : $inputJSON;
-      $submitted_fields = [];
-      if (isset($request->id, $request->cronNotOk)) {
-        $formID = absint(str_replace('bitforms_', '', sanitize_text_field($request->id)));
-        $frontendFormManager = FrontendFormManager::getInstance($formID);
-        if (!$frontendFormManager->isExist() || !$frontendFormManager->checkStatus()) {
-          Log::debug_log('Inactive or non-existent form for workflow trigger. FormID=' . $formID);
-          wp_send_json_error(['message' => 'Form is not active'], 403);
-        }
-        $cronNotOk = $request->cronNotOk;
+    if (!$rawInput) {
+      Log::debug_log('No Input data found');
+      wp_send_json_error('Invalid Request', 400);
+    }
+    // The raw body is JSON — sanitize_text_field on the whole string can mangle
+    // the payload. Individual values are validated/absint-ed below instead.
+    $request = Utilities::jsonObj($rawInput);
+    if (!isset($request->id, $request->cronNotOk)) {
+      Log::debug_log('Cron Not Ok data not found');
+      wp_send_json_error('Cron Not Ok data found', 400);
+    }
+    $formID = absint(str_replace('bitforms_', '', sanitize_text_field($request->id)));
+    $frontendFormManager = FrontendFormManager::getInstance($formID);
+    if (!$frontendFormManager->isExist() || !$frontendFormManager->checkStatus()) {
+      Log::debug_log('Inactive or non-existent form for workflow trigger. FormID=' . $formID);
+      wp_send_json_error(['message' => 'Form is not active'], 403);
+    }
+    $cronNotOk = $request->cronNotOk;
 
-        // Validate and sanitize entry ID and log ID
-        if (!isset($cronNotOk[0]) || !is_numeric($cronNotOk[0]) || !isset($cronNotOk[1]) || !is_numeric($cronNotOk[1])) {
-          Log::debug_log('Invalid cronNotOk data for formID=' . $formID);
-          wp_send_json_error(['message' => 'Invalid request data'], 400);
-        }
+    // Validate and sanitize entry ID and log ID
+    if (!isset($cronNotOk[0]) || !is_numeric($cronNotOk[0]) || !isset($cronNotOk[1]) || !is_numeric($cronNotOk[1])) {
+      Log::debug_log('Invalid cronNotOk data for formID=' . $formID);
+      wp_send_json_error(['message' => 'Invalid request data'], 400);
+    }
 
-        $entryID = absint($cronNotOk[0]);
-        $logID = absint($cronNotOk[1]);
-        $GLOBALS['bitform_entry_id'] = $entryID;
+    $entryID = absint($cronNotOk[0]);
+    $logID = absint($cronNotOk[1]);
+    $queueLogId = isset($cronNotOk[2]) && is_numeric($cronNotOk[2]) ? absint($cronNotOk[2]) : 0;
+    $GLOBALS['bitform_entry_id'] = $entryID;
+
+    // Quick admin check to allow retry of workflows
+    $isAdmin = false;
+    if (is_user_logged_in()) {
+      $user = wp_get_current_user();
+      $isAdmin = in_array('administrator', $user->roles) || current_user_can('manage_bitform');
+    }
+
+    // Check if already picked up (skip for administrators to allow retries)
+    if (!$isAdmin) {
+      if ($queueLogId) {
         $entryLog = new FormEntryLogModel();
-
-        // Quick admin check to allow retry of workflows
-        $isAdmin = false;
-        if (is_user_logged_in()) {
-          $user = wp_get_current_user();
-          $isAdmin = in_array('administrator', $user->roles) || current_user_can('manage_bitform');
-        }
-
-        // Check if already processed (skip for administrators to allow retries)
-        if (!$isAdmin) {
-          if (isset($cronNotOk[2]) && \is_int($cronNotOk[2])) {
-            $queueudEntry = $entryLog->get(
-              'response_obj',
-              ['id' => $cronNotOk[2]]
-            );
-            if ($queueudEntry) {
-              if (!empty($queueudEntry[0]->response_obj) && \strpos($queueudEntry[0]->response_obj, 'processed') > 0) {
-                Log::debug_log('Cron Not Ok[2] Already Processed');
-                wp_send_json_error();
-              }
-            } else {
-              Log::debug_log('Cron Not Ok[2] Query Entry data not found');
-              wp_send_json_error();
-            }
-          } else {
-            Log::debug_log('Cron Not Ok[2](Log Id) data not found');
+        $queueudEntry = $entryLog->get('response_obj', ['id' => $queueLogId]);
+        if (!is_wp_error($queueudEntry) && !empty($queueudEntry)) {
+          // status lives in the row JSON; a plain substring check would false-match
+          // user field values stored alongside it in the durable trigger copy
+          $rowObj = json_decode(isset($queueudEntry[0]->response_obj) ? $queueudEntry[0]->response_obj : '', true);
+          $rowStatus = isset($rowObj['status']) ? $rowObj['status'] : '';
+          if (in_array($rowStatus, ['processed', 'processing', 'failed'], true)) {
+            Log::debug_log('Cron Not Ok[2] Already Processed');
             wp_send_json_error();
           }
         } else {
-          Log::debug_log('Admin bypass: Skipping "already processed" check for workflow retry');
-        }
-
-        // SECURITY CHECK: Validate trigger token using helper function
-        $validation = Helpers::validateWorkflowTriggerToken($request, $formID);
-
-        if (!$validation['valid']) {
-          wp_send_json_error(['message' => $validation['error']], 403);
-        }
-
-        // Use validated trigger data if available (prevents transient overwrite bug)
-        $triggerData = null;
-        if ($validation['triggerData']) {
-          // Token was valid and transient data retrieved
-          $triggerData = $validation['triggerData'];
-        } else {
-          // Admin bypass or transient not found - fetch from transient/database
-          $trnasientData = get_transient("bitform_trigger_transient_{$entryID}");
-
-          if (!empty($trnasientData)) {
-            delete_transient("bitform_trigger_transient_{$entryID}");
-            $triggerData = is_string($trnasientData) ? json_decode($trnasientData) : $trnasientData;
-          } else {
-            $formManager = new AdminFormManager($formID);
-            if (!$formManager->isExist()) {
-              Log::debug_log('provided form does not exists');
-              return wp_send_json(new WP_Error('trigger_empty_form', __('provided form does not exists', 'bit-form')));
-            }
-            $formEntryModel = new FormEntryModel();
-            $entryMeta = new FormEntryMetaModel();
-
-            $formEntry = $formEntryModel->get(
-              '*',
-              [
-                'form_id' => $formID,
-                'id'      => $entryID,
-              ]
-            );
-
-            if (!$formEntry) {
-              Log::debug_log('provided form entries does not exists. EntryId=' . $entryID . ', FormId=' . $formID);
-              return new WP_Error('trigger_empty_form', __('provided form entries does not exists', 'bit-form'));
-            }
-            $formEntryMeta = $entryMeta->get(
-              [
-                'meta_key',
-                'meta_value',
-              ],
-              [
-                'bitforms_form_entry_id' => $entryID,
-              ]
-            );
-            $entries = [];
-            foreach ($formEntryMeta as $key => $value) {
-              $entries[$value->meta_key] = $value->meta_value;
-            }
-            $formContent = $formManager->getFormContent();
-            $submitted_fields = $formContent->fields;
-            foreach ($submitted_fields as $key => $value) {
-              if (isset($entries[$key])) {
-                $submitted_fields->{$key}->val = $entries[$key];
-                $submitted_fields->{$key}->name = $key;
-              }
-            }
-
-            $workFlowRunHelper = new WorkFlow($formID);
-            $workFlowreturnedOnSubmit = $workFlowRunHelper->executeOnSubmit(
-              'create',
-              $submitted_fields,
-              $entries,
-              $entryID,
-              $logID
-            );
-
-            $triggerData = isset($workFlowreturnedOnSubmit['triggerData']) ? $workFlowreturnedOnSubmit['triggerData'] : null;
-            $triggerData['fields'] = $entries;
-          }
-        } // Close else block
-
-        if (!empty($triggerData)) {
-          if (isset($triggerData['integrationRun']) && !$triggerData['integrationRun']) {
-            $entryModel = new FormEntryModel();
-            $updatedStatus = $entryModel->update(
-              [
-                'status' => 2,
-              ],
-              [
-                'form_id' => $triggerData['formID'],
-                'id'      => $entryID,
-              ]
-            );
-            if (is_wp_error($updatedStatus)) {
-              wp_send_json_error($updatedStatus->get_error_message(), 411);
-            } else {
-              if ($triggerData['dbl_opt_dflt_template']) {
-                do_action('bitform_double_optin_confirmation', $triggerData['dbl_opt_donf'], $triggerData);
-              } elseif (isset($triggerData['dblOptin'])) {
-                foreach ($triggerData['dblOptin'] as $value) {
-                  MailNotifier::notify($value, $triggerData['formID'], $triggerData['fields'], $entryID, true, $logID);
-                }
-              }
-              wp_send_json_success();
-            }
-          }
-
-          if (isset($triggerData['mail'])) {
-            $formManager = new AdminFormManager($formID);
-            $formContent = $formManager->getFormContent();
-            $submitted_fields = $formContent->fields;
-            $fieldValueForMail = FieldValueHandler::formatFieldValueForMail($submitted_fields, $triggerData['fields']);
-            foreach ($triggerData['mail'] as $value) {
-              MailNotifier::notify($value, $triggerData['formID'], $fieldValueForMail, $entryID);
-            }
-          }
-
-          do_action('bitforms_exec_integrations', $triggerData['integrations'], $triggerData['fields'], $triggerData['formID'], $triggerData['entryID'], $triggerData['logID']);
-          if (isset($cronNotOk[2]) && \is_int($cronNotOk[2])) {
-            $queueuEntry = $entryLog->update(
-              [
-                'response_type' => 'success',
-                'response_obj'  => wp_json_encode(['status' => 'processed']),
-              ],
-              ['id' => $cronNotOk[2]]
-            );
-          }
-        } else {
-          Log::debug_log('No Trigger Data Found');
+          Log::debug_log('Cron Not Ok[2] Query Entry data not found');
+          wp_send_json_error();
         }
       } else {
-        Log::debug_log('Cron Not Ok data not found');
-        wp_send_json_error('Cron Not Ok data found', 400);
+        Log::debug_log('Cron Not Ok[2](Log Id) data not found');
+        wp_send_json_error();
       }
     } else {
-      Log::debug_log('No Input data found');
-      wp_send_json_error('Invalid Request', 400);
+      Log::debug_log('Admin bypass: Skipping "already processed" check for workflow retry');
+    }
+
+    // SECURITY CHECK: Validate trigger token using helper function
+    $validation = Helpers::validateWorkflowTriggerToken($request, $formID);
+
+    if (!$validation['valid']) {
+      wp_send_json_error(['message' => $validation['error']], 403);
+    }
+
+    // Use validated trigger data if available (prevents transient overwrite bug);
+    // otherwise fall back to transient -> durable log-row copy -> rebuild
+    $triggerData = !empty($validation['triggerData'])
+      ? (array) $validation['triggerData']
+      : WorkflowExecutor::loadTriggerData($entryID, $formID, $logID, $queueLogId);
+
+    if (empty($triggerData)) {
+      Log::debug_log('No Trigger Data Found');
+      wp_send_json_success();
+    }
+
+    // Atomic claim: if the reclaim cron (or a duplicate request) already picked
+    // this run up, do not execute it a second time. Admin retries bypass.
+    $claimed = WorkflowExecutor::claimQueuedLog($queueLogId, 'browser', $triggerData);
+    if (!$claimed && !$isAdmin) {
+      Log::debug_log('Workflow already claimed by another trigger');
+      wp_send_json_error();
+    }
+
+    $result = WorkflowExecutor::execute($triggerData, $formID, $entryID, $logID, $queueLogId, 'browser');
+    if (is_wp_error($result)) {
+      wp_send_json_error($result->get_error_message(), 411);
     }
 
     wp_send_json_success();

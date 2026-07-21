@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb1636013be4e69e483046dd9f9d08344
+class ComposerStaticInit835a75bca87391345e39b3cfab692dde
 {
     public static $prefixLengthsPsr4 = array (
         'e' =>
@@ -85,7 +85,6 @@ class ComposerStaticInitb1636013be4e69e483046dd9f9d08344
         'BitCode\\BitForm\\Core\\Database\\Helper' => __DIR__ . '/../..' . '/includes/Core/Database/Helper.php',
         'BitCode\\BitForm\\Core\\Database\\IntegrationModel' => __DIR__ . '/../..' . '/includes/Core/Database/IntegrationModel.php',
         'BitCode\\BitForm\\Core\\Database\\Model' => __DIR__ . '/../..' . '/includes/Core/Database/Model.php',
-        'BitCode\\BitForm\\Core\\Database\\PdfTemplateModel' => __DIR__ . '/../..' . '/includes/Core/Database/PdfTemplateModel.php',
         'BitCode\\BitForm\\Core\\Database\\ReportsModel' => __DIR__ . '/../..' . '/includes/Core/Database/ReportsModel.php',
         'BitCode\\BitForm\\Core\\Database\\SuccessMessageModel' => __DIR__ . '/../..' . '/includes/Core/Database/SuccessMessageModel.php',
         'BitCode\\BitForm\\Core\\Database\\WorkFlowModel' => __DIR__ . '/../..' . '/includes/Core/Database/WorkFlowModel.php',
@@ -98,7 +97,9 @@ class ComposerStaticInitb1636013be4e69e483046dd9f9d08344
         'BitCode\\BitForm\\Core\\Fallback\\FormFallback' => __DIR__ . '/../..' . '/includes/Core/Fallback/FormFallback.php',
         'BitCode\\BitForm\\Core\\Fallback\\Message' => __DIR__ . '/../..' . '/includes/Core/Fallback/Message.php',
         'BitCode\\BitForm\\Core\\Fallback\\Report' => __DIR__ . '/../..' . '/includes/Core/Fallback/Report.php',
+        'BitCode\\BitForm\\Core\\Fallback\\SchemaFallback' => __DIR__ . '/../..' . '/includes/Core/Fallback/SchemaFallback.php',
         'BitCode\\BitForm\\Core\\Fallback\\StylesFallback' => __DIR__ . '/../..' . '/includes/Core/Fallback/StylesFallback.php',
+        'BitCode\\BitForm\\Core\\Fallback\\SubmitActionFallback' => __DIR__ . '/../..' . '/includes/Core/Fallback/SubmitActionFallback.php',
         'BitCode\\BitForm\\Core\\Fallback\\Validation' => __DIR__ . '/../..' . '/includes/Core/Fallback/Validation.php',
         'BitCode\\BitForm\\Core\\Fallback\\WorkFlow' => __DIR__ . '/../..' . '/includes/Core/Fallback/WorkFlow.php',
         'BitCode\\BitForm\\Core\\Form\\FormHandler' => __DIR__ . '/../..' . '/includes/Core/Form/FormHandler.php',
@@ -210,7 +211,6 @@ class ComposerStaticInitb1636013be4e69e483046dd9f9d08344
         'BitCode\\BitForm\\Core\\Integration\\ZohoWorkDrive\\RecordApiHelper' => __DIR__ . '/../..' . '/includes/Core/Integration/ZohoWorkDrive/RecordApiHelper.php',
         'BitCode\\BitForm\\Core\\Integration\\ZohoWorkDrive\\ZohoWorkDriveHandler' => __DIR__ . '/../..' . '/includes/Core/Integration/ZohoWorkDrive/ZohoWorkDriveHandler.php',
         'BitCode\\BitForm\\Core\\Messages\\EmailTemplateHandler' => __DIR__ . '/../..' . '/includes/Core/Messages/EmailTemplateHandler.php',
-        'BitCode\\BitForm\\Core\\Messages\\PdfTemplateHandler' => __DIR__ . '/../..' . '/includes/Core/Messages/PdfTemplateHandler.php',
         'BitCode\\BitForm\\Core\\Messages\\SuccessMessageHandler' => __DIR__ . '/../..' . '/includes/Core/Messages/SuccessMessageHandler.php',
         'BitCode\\BitForm\\Core\\Migration\\BitformDefaultStyle' => __DIR__ . '/../..' . '/includes/Core/Migration/BitformDefaultStyle.php',
         'BitCode\\BitForm\\Core\\Migration\\FieldsConversionFormate' => __DIR__ . '/../..' . '/includes/Core/Migration/FieldsConversionFormate.php',
@@ -247,6 +247,7 @@ class ComposerStaticInitb1636013be4e69e483046dd9f9d08344
         'BitCode\\BitForm\\Core\\WorkFlow\\Helper' => __DIR__ . '/../..' . '/includes/Core/WorkFlow/Helper.php',
         'BitCode\\BitForm\\Core\\WorkFlow\\WorkFlow' => __DIR__ . '/../..' . '/includes/Core/WorkFlow/WorkFlow.php',
         'BitCode\\BitForm\\Core\\WorkFlow\\WorkFlowHandler' => __DIR__ . '/../..' . '/includes/Core/WorkFlow/WorkFlowHandler.php',
+        'BitCode\\BitForm\\Core\\WorkFlow\\WorkflowExecutor' => __DIR__ . '/../..' . '/includes/Core/WorkFlow/WorkflowExecutor.php',
         'BitCode\\BitForm\\Frontend\\Ajax\\FrontendAjax' => __DIR__ . '/../..' . '/includes/Frontend/Ajax/FrontendAjax.php',
         'BitCode\\BitForm\\Frontend\\ConversationalFormView' => __DIR__ . '/../..' . '/includes/Frontend/ConversationalFormView.php',
         'BitCode\\BitForm\\Frontend\\CustomRoutes' => __DIR__ . '/../..' . '/includes/Frontend/CustomRoutes.php',
@@ -363,9 +364,9 @@ class ComposerStaticInitb1636013be4e69e483046dd9f9d08344
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb1636013be4e69e483046dd9f9d08344::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb1636013be4e69e483046dd9f9d08344::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitb1636013be4e69e483046dd9f9d08344::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit835a75bca87391345e39b3cfab692dde::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit835a75bca87391345e39b3cfab692dde::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit835a75bca87391345e39b3cfab692dde::$classMap;
 
         }, null, ClassLoader::class);
     }

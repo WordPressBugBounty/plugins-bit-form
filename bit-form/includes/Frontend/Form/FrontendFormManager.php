@@ -20,8 +20,8 @@ use BitCode\BitForm\Core\Messages\SuccessMessageHandler;
 use BitCode\BitForm\Core\Util\ApiResponse as UtilApiResponse;
 use BitCode\BitForm\Core\Util\HttpHelper;
 use BitCode\BitForm\Core\Util\IpTool;
+use BitCode\BitForm\Core\Util\Utilities;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
-use BitCode\BitForm\Core\WorkFlow\WorkFlowHandler;
 use BitCode\BitForm\Frontend\Form\View\FormViewer;
 use BitCode\BitForm\GlobalHelper;
 use WP_Error;
@@ -31,7 +31,6 @@ final class FrontendFormManager extends FormManager
   private $_form_identifier;
   private $_form_token;
   private $_form_id;
-  private $_work_flows;
   private $_conf_messages;
   private static $_instance = [];
 
@@ -287,9 +286,11 @@ final class FrontendFormManager extends FormManager
         if (!is_wp_error($allFormIntegrations)) {
           foreach ($allFormIntegrations as $integration) {
             if (!is_null($integration->integration_type) && 'gReCaptchaV3' === $integration->integration_type) {
-              $integrationDetails = json_decode($integration->integration_details);
-              $integrationDetails->id = $integration->id;
-              $reCAPTCHA = $integrationDetails;
+              $integrationDetails = Utilities::jsonObj($integration->integration_details);
+              if ($integrationDetails) {
+                $integrationDetails->id = $integration->id;
+                $reCAPTCHA = $integrationDetails;
+              }
             }
           }
         }
@@ -393,9 +394,11 @@ final class FrontendFormManager extends FormManager
         if (!is_wp_error($allFormIntegrations)) {
           foreach ($allFormIntegrations as $integration) {
             if (!is_null($integration->integration_type) && 'gReCaptchaV3' === $integration->integration_type) {
-              $integrationDetails = json_decode($integration->integration_details);
-              $integrationDetails->id = $integration->id;
-              $reCAPTCHA = $integrationDetails;
+              $integrationDetails = Utilities::jsonObj($integration->integration_details);
+              if ($integrationDetails) {
+                $integrationDetails->id = $integration->id;
+                $reCAPTCHA = $integrationDetails;
+              }
             }
           }
         }
@@ -493,28 +496,65 @@ final class FrontendFormManager extends FormManager
         $validateForm = $this->validateFormSubmission($postData);
         $validateFormFiles = $this->validateFormSubmission($filesData);
         $validateForm = array_merge($validateForm, $validateFormFiles);
-        $form_fields = $this->getFields();
+        // Validate only provably-rendered fields: a field stranded in form_content->fields
+        // with no layout entry (orphan) is never shown to the user and must not block
+        // submission. getRenderedFields() unions ALL breakpoints × steps × nested layouts
+        // + childFields of rendered parents, derives only from DB-stored form_content,
+        // and fails closed (returns all fields) when the layout is unusable.
+        $form_fields = $this->getRenderedFields();
         // check if form-current-step is set and form is multi-step
         $formCurrentStep = isset($_POST['form-current-step']) ? sanitize_text_field(wp_unslash($_POST['form-current-step'])) : null;
         if (!is_null($formCurrentStep)) {
+          // Narrow validation to the current step's fields. SECURITY: the step
+          // key set unions ALL breakpoints (lg/md/sm) — an md/sm-only field was
+          // previously null-skipped by the validator (silent bypass). A forged
+          // step index or malformed layout skips the narrowing entirely so every
+          // rendered field stays validated (fail closed).
           $formContents = $this->getFormContent();
-          $layout = $formContents->layout;
+          $layout = isset($formContents->layout) ? $formContents->layout : null;
           $stepIndex = (int) $formCurrentStep - 1;
-          $stepLayout = $layout[$stepIndex]->layout->lg;
-          $nestedLayout = $formContents->nestedLayout;
-          $step_fields = [];
-          foreach ($stepLayout as $lay) {
-            $fk = $lay->i;
-            if (isset($nestedLayout->{$fk})) {
-              $nestedLg = $nestedLayout->{$fk}->lg;
-              foreach ($nestedLg as $nestedLay) {
-                $nestedFk = $nestedLay->i;
-                $step_fields[$nestedFk] = $form_fields[$nestedFk];
+          if (is_array($layout) && isset($layout[$stepIndex]->layout) && is_object($layout[$stepIndex]->layout)) {
+            $stepLayout = $layout[$stepIndex]->layout;
+            $nestedLayout = isset($formContents->nestedLayout) && is_object($formContents->nestedLayout)
+              ? $formContents->nestedLayout : null;
+            $stepKeys = [];
+            foreach (['lg', 'md', 'sm'] as $brkpnt) {
+              if (!isset($stepLayout->{$brkpnt}) || !is_array($stepLayout->{$brkpnt})) {
+                continue;
+              }
+              foreach ($stepLayout->{$brkpnt} as $lay) {
+                if (!is_object($lay) || !isset($lay->i)) {
+                  continue;
+                }
+                $fk = $lay->i;
+                $stepKeys[$fk] = true;
+                if (!is_null($nestedLayout) && isset($nestedLayout->{$fk})) {
+                  foreach (['lg', 'md', 'sm'] as $nBrkpnt) {
+                    if (!isset($nestedLayout->{$fk}->{$nBrkpnt}) || !is_array($nestedLayout->{$fk}->{$nBrkpnt})) {
+                      continue;
+                    }
+                    foreach ($nestedLayout->{$fk}->{$nBrkpnt} as $nestedLay) {
+                      if (is_object($nestedLay) && isset($nestedLay->i)) {
+                        $stepKeys[$nestedLay->i] = true;
+                      }
+                    }
+                  }
+                }
               }
             }
-            $step_fields[$fk] = $form_fields[$fk];
+            // Name/Address/Email/Password children live outside layouts; a child
+            // is part of this step iff its parent is.
+            self::expandChildFieldKeys($stepKeys, $form_fields);
+            if (!empty($stepKeys)) {
+              $step_fields = [];
+              foreach (array_keys($stepKeys) as $fk) {
+                if (isset($form_fields[$fk])) {
+                  $step_fields[$fk] = $form_fields[$fk];
+                }
+              }
+              $form_fields = $step_fields;
+            }
           }
-          $form_fields = $step_fields;
         }
         $formFieldValidator = new FormFieldValidator($form_fields, $postData, $filesData);
         $validUniuqFields = [];
@@ -568,9 +608,11 @@ final class FrontendFormManager extends FormManager
       if (!is_wp_error($allFormIntegrations)) {
         foreach ($allFormIntegrations as $integration) {
           if (!is_null($integration->integration_type) && $integration->integration_type === ($captchaSettings ? 'gReCaptcha' : 'gReCaptchaV3')) {
-            $integrationDetails = json_decode($integration->integration_details);
-            $integrationDetails->id = $integration->id;
-            $reCAPTCHA = $integrationDetails;
+            $integrationDetails = Utilities::jsonObj($integration->integration_details);
+            if ($integrationDetails) {
+              $integrationDetails->id = $integration->id;
+              $reCAPTCHA = $integrationDetails;
+            }
           }
         }
       }
@@ -616,9 +658,11 @@ final class FrontendFormManager extends FormManager
       if (!is_wp_error($allFormIntegrations)) {
         foreach ($allFormIntegrations as $integration) {
           if (!is_null($integration->integration_type) && 'hcaptcha' === $integration->integration_type) {
-            $integrationDetails = json_decode($integration->integration_details);
-            $integrationDetails->id = $integration->id;
-            $hCaptcha = $integrationDetails;
+            $integrationDetails = Utilities::jsonObj($integration->integration_details);
+            if ($integrationDetails) {
+              $integrationDetails->id = $integration->id;
+              $hCaptcha = $integrationDetails;
+            }
           }
         }
       }
@@ -843,9 +887,12 @@ final class FrontendFormManager extends FormManager
 
     $payments = [];
     foreach ($fields as $fldData) {
+      if (!is_object($fldData)) {
+        continue;
+      }
       if ('paypal' === $fldData->typ && property_exists($fldData, 'payIntegID')) {
         $payments['paypalKey'] = $this->getClientKey($fldData->payIntegID, 'clientID');
-      } elseif ('razorpay' === $fldData->typ && property_exists($fldData->options, 'payIntegID')) {
+      } elseif ('razorpay' === $fldData->typ && isset($fldData->options) && is_object($fldData->options) && property_exists($fldData->options, 'payIntegID')) {
         $payments['razorpayKey'] = $this->getClientKey($fldData->options->payIntegID, 'apiKey');
       }
     }
@@ -860,8 +907,11 @@ final class FrontendFormManager extends FormManager
       $integrationHandler = new IntegrationHandler(0);
       $integration = $integrationHandler->getAIntegration($integID, 'app', 'payments');
       if (!is_wp_error($integration)) {
-        $integration_details = json_decode($integration[0]->integration_details);
-        $client = base64_encode($integration_details->{$keyName});
+        $integrationRow = Utilities::firstRow($integration);
+        $integration_details = Utilities::jsonObj($integrationRow->integration_details ?? '');
+        if ($integration_details && isset($integration_details->{$keyName})) {
+          $client = base64_encode($integration_details->{$keyName});
+        }
       }
     }
     return $client;
@@ -869,36 +919,9 @@ final class FrontendFormManager extends FormManager
 
   public function getSuccessMessageMarkups()
   {
-    if (is_null($this->_work_flows)) {
-      $workFlowManager = new WorkFlowHandler($this->form_id);
-      $this->_work_flows = $workFlowManager->getAllworkFlow();
-    }
-
-    $ids = [];
-    foreach ($this->_work_flows as $msgItem) {
-      foreach ($msgItem['conditions'] as $condition) {
-        if (isset($condition->actions->success)) {
-          foreach ($condition->actions->success as $msg) {
-            if ('successMsg' === $msg->type && isset($msg->details->id)) {
-              $idObj = json_decode(stripslashes($msg->details->id));
-              if (is_object($idObj) && !empty($idObj->id)) {
-                array_push($ids, $idObj->id);
-              }
-            }
-          }
-        }
-        if (isset($condition->actions->failure)) {
-          $idObj = json_decode(stripslashes($condition->actions->failure));
-          if (is_object($idObj) && !empty($idObj->id)) {
-            array_push($ids, $idObj->id);
-          }
-        }
-      }
-    }
-    $ids = array_unique($ids);
     if (is_null($this->_conf_messages)) {
       $successMsgHandler = new SuccessMessageHandler($this->form_id);
-      $this->_conf_messages = $successMsgHandler->getMessages($ids);
+      $this->_conf_messages = $successMsgHandler->getAllMessage();
     }
 
     $messageMarkups = '';
@@ -907,6 +930,10 @@ final class FrontendFormManager extends FormManager
     }
 
     foreach ($this->_conf_messages as $msgItem) {
+      $msgConfig = json_decode($msgItem->message_config);
+      if (is_object($msgConfig) && property_exists($msgConfig, 'status') && empty($msgConfig->status)) {
+        continue;
+      }
       $messageMarkups .= $this->messageMarkup($msgItem);
     }
 
@@ -928,7 +955,8 @@ final class FrontendFormManager extends FormManager
   {
     $msgId = $msg->id;
     $msgConfig = json_decode($msg->message_config);
-    $scrollClass = 'below' === $msgConfig->msgType ? 'scroll' : '';
+    $msgType = (is_object($msgConfig) && isset($msgConfig->msgType)) ? $msgConfig->msgType : 'below';
+    $scrollClass = 'below' === $msgType ? 'scroll' : '';
 
     return '<div 
               role="dialog"

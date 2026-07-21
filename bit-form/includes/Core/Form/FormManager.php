@@ -23,8 +23,10 @@ use BitCode\BitForm\Core\Util\FileHandler;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\Core\Util\IpTool;
 use BitCode\BitForm\Core\Util\Log;
+use BitCode\BitForm\Core\Util\Utilities;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
 use BitCode\BitForm\Core\WorkFlow\WorkFlowHandler;
+use BitCode\BitForm\enshrined\svgSanitize\Sanitizer;
 use stdClass;
 use WP_Error;
 
@@ -117,10 +119,10 @@ class FormManager
 
   public function getStyle()
   {
-    $builerState = \json_decode(static::$form[0]->builder_helper_state);
+    $builerState = Utilities::jsonObj(static::$form[0]->builder_helper_state ?? '');
     $style = '';
-    $themeVars = $builerState->themeVars;
-    $themeColors = $builerState->themeColors;
+    $themeVars = $builerState->themeVars ?? null;
+    $themeColors = $builerState->themeColors ?? null;
 
     if (!empty($themeVars)) {
       $style .= ':root {';
@@ -165,13 +167,15 @@ class FormManager
 
   public function getFormContentWithValue($defaultValues = [])
   {
-    $form_content = \json_decode(static::$form[0]->form_content);
+    $form_content = Utilities::jsonObj(static::$form[0]->form_content ?? '');
     // this filter just use private purpose
-    $form_content->fields = apply_filters('bitform_dynamic_field_filter', $form_content->fields);
+    if (isset($form_content->fields)) {
+      $form_content->fields = apply_filters('bitform_dynamic_field_filter', $form_content->fields);
+    }
     if (!is_array($defaultValues) || 0 === count($defaultValues)) {
       return $form_content;
     }
-    foreach ($form_content->fields as $fieldKey => $fieldDetails) {
+    foreach (($form_content->fields ?? []) as $fieldKey => $fieldDetails) {
       // $field_name = empty($fieldDetails->lbl) ? null : \preg_replace('/[\`\~\!\@\#\$\'\.\s\?\+\-\*\&\|\/\\!]/', '_', $fieldDetails->lbl);
       $fieldName = $fieldDetails->fieldName;
       $defaultValue = isset($defaultValues[$fieldName]) ? $defaultValues[$fieldName] : null;
@@ -201,10 +205,10 @@ class FormManager
 
   public function getFormContent()
   {
-    $formContent = json_decode(static::$form[0]->form_content);
+    $formContent = Utilities::jsonObj(static::$form[0]->form_content ?? '');
     $types = ['check', 'radio', 'select'];
     $filter = false;
-    foreach ($formContent->fields as $field) {
+    foreach (($formContent->fields ?? []) as $field) {
       if (in_array($field->typ, $types) && property_exists($field, 'customType')) {
         $filter = true;
         break; // reduce unnecessary loop
@@ -321,6 +325,321 @@ class FormManager
     }
 
     return $layout;
+  }
+
+  /**
+   * Union of field keys referenced by ANY breakpoint (lg/md/sm) of the root
+   * layout (all steps) plus nested layouts of RENDERED containers.
+   *
+   * Nested layout entries are gated by their parent key being in the root
+   * layout — the renderer (FormViewer) only renders nested children of
+   * containers present in the root layout, so a stale nestedLayout entry
+   * (parent removed) must not mark its children as rendered.
+   *
+   * Returns [] when the layout is missing or unparseable — callers MUST
+   * fail closed (validate all fields) on an empty result.
+   *
+   * @return string[]
+   */
+  public function getLayoutFieldKeys()
+  {
+    try {
+      $layout = $this->getFormLayout();
+      $nestedLayout = $this->getFormNestedLayout();
+      if ('array' === gettype($layout)) {
+        // multi step form layout
+        $layout = $this->flatMultistepFormLayout();
+      }
+    } catch (\Throwable $e) {
+      return [];
+    }
+    $rootKeys = self::collectLayoutKeys($layout);
+    if (empty($rootKeys)) {
+      return [];
+    }
+    $keys = array_fill_keys($rootKeys, true);
+    if (is_object($nestedLayout) || is_array($nestedLayout)) {
+      foreach ($nestedLayout as $parentKey => $nLay) {
+        if (!isset($keys[$parentKey])) {
+          continue; // stale entry: container no longer rendered
+        }
+        foreach (self::collectLayoutKeys($nLay) as $nestedKey) {
+          $keys[$nestedKey] = true;
+        }
+      }
+    }
+    return array_keys($keys);
+  }
+
+  /**
+   * Collect field keys from every breakpoint of a layout object.
+   *
+   * @param object $layout layout with ->lg/->md/->sm arrays of {i} items
+   *
+   * @return string[]
+   */
+  private static function collectLayoutKeys($layout)
+  {
+    if (!is_object($layout)) {
+      return [];
+    }
+    $keys = [];
+    foreach (['lg', 'md', 'sm'] as $brkpnt) {
+      if (!isset($layout->{$brkpnt}) || !is_array($layout->{$brkpnt})) {
+        continue;
+      }
+      foreach ($layout->{$brkpnt} as $item) {
+        if (is_object($item) && isset($item->i)) {
+          $keys[$item->i] = true;
+        }
+      }
+    }
+    return array_keys($keys);
+  }
+
+  /**
+   * Extract a child field key from a childFields[] entry (stdClass or array shape).
+   *
+   * @return string|null
+   */
+  private static function childFldKey($child)
+  {
+    if (is_object($child) && isset($child->fldKey)) {
+      return $child->fldKey;
+    }
+    if (is_array($child) && isset($child['fldKey'])) {
+      return $child['fldKey'];
+    }
+    return null;
+  }
+
+  /**
+   * Add childFields of every rendered parent into $renderedKeys (by ref).
+   *
+   * Several field types keep their children flat in `fields` and NEVER in
+   * any layout — Name (first/middle/last), Address (street/city/zip/...),
+   * Email and Password (confirm fields). A child is rendered iff its
+   * parent is, so each rendered parent's childFields[].fldKey must join
+   * the rendered set or their validation would be wrongly skipped.
+   *
+   * Runs to a fixpoint so expansion is safe regardless of field order or
+   * nesting depth.
+   *
+   * @param array $renderedKeys key => true map, mutated in place
+   * @param iterable $fields    fields keyed by field key; each field may be
+   *                            a processed array (getFields()) or raw stdClass
+   */
+  protected static function expandChildFieldKeys(array &$renderedKeys, $fields)
+  {
+    do {
+      $grew = false;
+      foreach ($fields as $key => $field) {
+        if (!isset($renderedKeys[$key])) {
+          continue;
+        }
+        $childFields = null;
+        if (is_object($field) && isset($field->childFields)) {
+          $childFields = $field->childFields;
+        } elseif (is_array($field) && isset($field['childFields'])) {
+          $childFields = $field['childFields'];
+        }
+        if (empty($childFields) || !is_iterable($childFields)) {
+          continue;
+        }
+        foreach ($childFields as $child) {
+          $childKey = self::childFldKey($child);
+          if ($childKey && !isset($renderedKeys[$childKey])) {
+            $renderedKeys[$childKey] = true;
+            $grew = true;
+          }
+        }
+      }
+    } while ($grew);
+  }
+
+  /**
+   * getFields() narrowed to provably-rendered fields: key present in any
+   * breakpoint of any step/nested layout, OR a childField of a rendered
+   * parent (name/address/email/password children live outside layouts),
+   * OR the synthetic GCLID key.
+   *
+   * SECURITY: fail-closed — if the layout yields no keys, ALL fields are
+   * returned (current behavior). Derives exclusively from DB-stored
+   * form_content, never from POST, so submitters cannot influence which
+   * fields are validated.
+   */
+  public function getRenderedFields()
+  {
+    $fields = $this->getFields();
+    try {
+      $renderedKeys = self::renderedKeyMap($this->getFormLayout(), $this->getFormNestedLayout(), $fields);
+    } catch (\Throwable $e) {
+      return $fields; // fail-closed: unusable layout validates all fields
+    }
+    if (null === $renderedKeys) {
+      return $fields;
+    }
+    $rendered = [];
+    foreach ($fields as $key => $field) {
+      // renderedKeys already includes NON_LAYOUT_FIELD_KEYS (GCLID, ...)
+      if (isset($renderedKeys[$key])) {
+        $rendered[$key] = $field;
+      }
+    }
+    return $rendered;
+  }
+
+  /**
+   * Field keys that are legitimately part of a form yet never appear in any
+   * layout — synthetic/system fields the renderer always keeps. They must
+   * never be flagged as orphan (save guard) or dropped from validation
+   * (renderer). Extend this list as new non-layout system fields are added.
+   *
+   * @var string[]
+   */
+  protected const NON_LAYOUT_FIELD_KEYS = ['GCLID'];
+
+  /**
+   * True when $fields (object or array) holds $key.
+   *
+   * @param object|array $fields
+   * @param string       $key
+   */
+  private static function fieldExists($fields, $key)
+  {
+    return is_object($fields) ? isset($fields->{$key}) : (is_array($fields) && isset($fields[$key]));
+  }
+
+  /**
+   * Flatten a raw layout into one object unioning lg/md/sm across all steps.
+   * Accepts a single layout object or an array of multi-step entries (each
+   * wrapping its layout in ->layout). Shared by the frontend renderer
+   * (getRenderedFields) and the admin save/import orphan guard
+   * (computeOrphanFieldKeys) so both flatten identically.
+   *
+   * @param array|object $layout
+   *
+   * @return object {lg,md,sm} arrays of {i} items
+   */
+  private static function flattenLayout($layout)
+  {
+    $flat = new stdClass();
+    $flat->lg = [];
+    $flat->md = [];
+    $flat->sm = [];
+    $addLayout = function ($lay) use ($flat) {
+      if (!is_object($lay)) {
+        return;
+      }
+      foreach (['lg', 'md', 'sm'] as $brkpnt) {
+        if (isset($lay->{$brkpnt}) && is_array($lay->{$brkpnt})) {
+          $flat->{$brkpnt} = array_merge($flat->{$brkpnt}, $lay->{$brkpnt});
+        }
+      }
+    };
+    if (is_array($layout)) {
+      // multi-step: each entry wraps its layout in ->layout
+      foreach ($layout as $step) {
+        $addLayout(isset($step->layout) ? $step->layout : $step);
+      }
+    } else {
+      $addLayout($layout);
+    }
+    return $flat;
+  }
+
+  /**
+   * SINGLE SOURCE OF TRUTH for "which field keys the renderer would show":
+   * unions all breakpoints across steps, adds nested-layout children of
+   * RENDERED containers only, then expands childFields of rendered parents
+   * (name/address/email/password children live outside layouts).
+   *
+   * Both getRenderedFields (frontend validation) and computeOrphanFieldKeys
+   * (admin save guard) route through this so the two can never diverge — a
+   * divergence would prune a real field or wrongly validate an orphan.
+   *
+   * @param array|object $layout       single layout or array of steps
+   * @param object|null  $nestedLayout keyed by parent field key
+   * @param object|array $fields       form_content->fields
+   *
+   * @return array<string,true>|null key=>true map, or null when the layout is
+   *                                 unusable (callers MUST fail closed)
+   */
+  protected static function renderedKeyMap($layout, $nestedLayout, $fields)
+  {
+    // Fail closed on a partial/unloaded multi-step layout: a step with no
+    // layout items at all almost always means the layout never finished
+    // loading/syncing (not a real "every field on this step was deleted").
+    // Treating it as usable would flag that step's real fields as orphan.
+    if (is_array($layout)) {
+      if (empty($layout)) {
+        return null;
+      }
+      foreach ($layout as $step) {
+        $stepLayout = is_object($step) && isset($step->layout) ? $step->layout : $step;
+        if (empty(self::collectLayoutKeys(self::flattenLayout($stepLayout)))) {
+          return null;
+        }
+      }
+    }
+    $flat = self::flattenLayout($layout);
+    $rootKeys = self::collectLayoutKeys($flat);
+    if (empty($rootKeys)) {
+      return null;
+    }
+    $renderedKeys = array_fill_keys($rootKeys, true);
+    // nested children count as rendered only when their container is —
+    // matches the renderer, which skips stale nestedLayout entries
+    if (is_object($nestedLayout) || is_array($nestedLayout)) {
+      foreach ($nestedLayout as $parentKey => $nLay) {
+        if (!isset($renderedKeys[$parentKey])) {
+          continue;
+        }
+        foreach (self::collectLayoutKeys($nLay) as $nestedKey) {
+          $renderedKeys[$nestedKey] = true;
+        }
+      }
+    }
+    self::expandChildFieldKeys($renderedKeys, $fields);
+    // synthetic/system fields (e.g. GCLID) live outside every layout; the
+    // renderer always keeps them, so they must never count as orphan
+    foreach (self::NON_LAYOUT_FIELD_KEYS as $sysKey) {
+      if (self::fieldExists($fields, $sysKey)) {
+        $renderedKeys[$sysKey] = true;
+      }
+    }
+    return $renderedKeys;
+  }
+
+  /**
+   * Pure variant of the orphan rule for the admin save/import guard: returns
+   * the keys of $fields absent from every layout (children of rendered
+   * parents excluded). Uses renderedKeyMap — the exact flattening the
+   * renderer uses — so the save guard and the renderer never diverge.
+   *
+   * @param array|object $layout       single layout or array of steps ({layout} each)
+   * @param object|null  $nestedLayout keyed by parent field key
+   * @param object|array $fields       raw form_content->fields
+   *
+   * @return string[]|null orphan keys to drop, or null when the layout is
+   *                       unusable (fail closed: drop nothing)
+   */
+  public static function computeOrphanFieldKeys($layout, $nestedLayout, $fields)
+  {
+    if (!is_object($fields) && !is_array($fields)) {
+      return null;
+    }
+    $renderedKeys = self::renderedKeyMap($layout, $nestedLayout, $fields);
+    if (null === $renderedKeys) {
+      return null; // unusable layout: fail closed, drop nothing
+    }
+    $orphans = [];
+    foreach ($fields as $key => $field) {
+      if (!isset($renderedKeys[$key])) {
+        $orphans[] = $key;
+      }
+    }
+    return $orphans;
   }
 
   public function getFieldsBasedOnLayout()
@@ -512,6 +831,16 @@ class FormManager
         throw new \RuntimeException('Invalid or corrupt signature data URI');
       }
 
+      // An attacker-controlled SVG signature is written to a web-served path, so a raw write is a
+      // stored-XSS sink. Sanitize with the same enshrined library the upload path uses (FileHandler).
+      if ('svg' === $imgTypes[$imgType]) {
+        $clean = (new Sanitizer())->sanitize($decoded_image);
+        if (false === $clean) {
+          throw new \RuntimeException('Invalid or unsafe SVG signature data');
+        }
+        $decoded_image = $clean;
+      }
+
       $_upload_dir = FileHandler::getEntriesFileUploadDir($form_id, $entry_id);
       FileHandler::createIndexFile($_upload_dir);
       $uniqueId = time() . '-' . bin2hex(\random_bytes(4));
@@ -590,7 +919,10 @@ class FormManager
       $field_type = $field_data->typ;
       $normalizedParentValue = $this->normalizeSubmittedValue($value);
       $parentFieldName = isset($field_data->fieldName) ? $field_data->fieldName : '';
-      if (!empty($field_data->childFields) && is_array($field_data->childFields)) {
+      // Confirm child of a repeated email/password never persists — the non-repeated
+      // path drops it too (the validator collapses the parent to its primary value).
+      $isRepeatedConfirmComposite = in_array($field_type, ['email', 'password'], true) && $this->isRepeatedField($key);
+      if (!$isRepeatedConfirmComposite && !empty($field_data->childFields) && is_array($field_data->childFields)) {
         foreach ($field_data->childFields as $childFieldRef) {
           $childFieldKey = isset($childFieldRef->fldKey) ? $childFieldRef->fldKey : '';
           if (empty($childFieldKey) || !isset($form_fields->{$childFieldKey})) {
@@ -611,8 +943,18 @@ class FormManager
         }
       }
 
-      if ($this->isRepeatedField($key) && in_array($field_type, ['name', 'address'])) {
-        $submitted_data[$key] = $this->normalizeRepeatedCompositeFieldInput($normalizedParentValue);
+      if ($this->isRepeatedField($key) && in_array($field_type, ['name', 'address', 'email', 'password'])) {
+        $normalizedRows = $this->normalizeRepeatedCompositeFieldInput($normalizedParentValue);
+        if ($isRepeatedConfirmComposite && is_array($normalizedRows)) {
+          // Keep only the primary value per row, matching the non-repeated behavior
+          // where a confirm-enabled field collapses to its primary value.
+          foreach ($normalizedRows as $rowIndex => $rowValue) {
+            if (is_array($rowValue) && array_key_exists('primary', $rowValue)) {
+              $normalizedRows[$rowIndex] = $rowValue['primary'];
+            }
+          }
+        }
+        $submitted_data[$key] = $normalizedRows;
       }
 
       if ('select' === $field_type && !empty($field_data->config->multipleSelect)) {
@@ -904,6 +1246,9 @@ class FormManager
   {
     foreach ($repeaterData as $rptr_entry_index => $rptr_entries) {
       foreach ($rptr_entries as $entry_key => $entry_value) {
+        if (!isset($formFields->{$entry_key})) {
+          continue;
+        }
         $rptr_entry_info = $formFields->{$entry_key};
 
         if ('signature' === $rptr_entry_info->typ) {

@@ -220,30 +220,6 @@ $bitforms_i18n_strings = array(
 
     'How to set up' => __('How to set up', 'bit-form'),
 
-    'Delete' => __('Delete', 'bit-form'),
-
-    'Are you sure to delete this template' => __('Are you sure to delete this template', 'bit-form'),
-
-    'Duplicate' => __('Duplicate', 'bit-form'),
-
-    'Are you sure to duplicate this template?' => __('Are you sure to duplicate this template?', 'bit-form'),
-
-    'Template Name' => __('Template Name', 'bit-form'),
-
-    'Action' => __('Action', 'bit-form'),
-
-    'Email Templates' => __('Email Templates', 'bit-form'),
-
-    'How to setup Email Templates & Send Email Notification:' => __('How to setup Email Templates & Send Email Notification:', 'bit-form'),
-
-    'YouTube' => __('YouTube', 'bit-form'),
-
-    'Documentation' => __('Documentation', 'bit-form'),
-
-    'Add New Template' => __('Add New Template', 'bit-form'),
-
-    'Empty' => __('Empty', 'bit-form'),
-
     'Post Type cann\'t be empty' => __('Post Type cann\'t be empty', 'bit-form'),
 
     'Post Status cann\'t be empty' => __('Post Status cann\'t be empty', 'bit-form'),
@@ -444,6 +420,8 @@ $bitforms_i18n_strings = array(
 
     'Integration Info' => __('Integration Info', 'bit-form'),
 
+    'Delete' => __('Delete', 'bit-form'),
+
     'Add New' => __('Add New', 'bit-form'),
 
     'App' => __('App', 'bit-form'),
@@ -495,6 +473,10 @@ $bitforms_i18n_strings = array(
     'Dropbox Folder' => __('Dropbox Folder', 'bit-form'),
 
     'Integration Settings' => __('Integration Settings', 'bit-form'),
+
+    'Execute' => __('Execute', 'bit-form'),
+
+    'Don\'t Execute' => __('Don\'t Execute', 'bit-form'),
 
     'Status' => __('Status', 'bit-form'),
 
@@ -1946,6 +1928,10 @@ $bitforms_i18n_strings = array(
 
     'How to setup WP Authentication:' => __('How to setup WP Authentication:', 'bit-form'),
 
+    'YouTube' => __('YouTube', 'bit-form'),
+
+    'Documentation' => __('Documentation', 'bit-form'),
+
     'Enable' => __('Enable', 'bit-form'),
 
     'Note :' => __('Note :', 'bit-form'),
@@ -2942,15 +2928,11 @@ $bitforms_i18n_strings = array(
 
     'Are you sure to delete this message ?' => __('Are you sure to delete this message ?', 'bit-form'),
 
+    'Empty' => __('Empty', 'bit-form'),
+
     'Add More Alternative Success Message' => __('Add More Alternative Success Message', 'bit-form'),
 
     'Add' => __('Add', 'bit-form'),
-
-    'Message Styles' => __('Message Styles', 'bit-form'),
-
-    'Message Type' => __('Message Type', 'bit-form'),
-
-    'Close Icon Color' => __('Close Icon Color', 'bit-form'),
 
     'Confirmations' => __('Confirmations', 'bit-form'),
 
@@ -2960,7 +2942,7 @@ $bitforms_i18n_strings = array(
 
     'Redirect Page' => __('Redirect Page', 'bit-form'),
 
-    'Be sure to configure conditional logic for displaying Success/Error messages and Redirect Page. If no conditional logic is set, the default confirmation will be displayed.' => __('Be sure to configure conditional logic for displaying Success/Error messages and Redirect Page. If no conditional logic is set, the default confirmation will be displayed.', 'bit-form'),
+    'By default, the first enabled Success/Error Message and Redirect Page are used automatically. Add conditional logic only to show a specific message or redirect based on submitted values.' => __('By default, the first enabled Success/Error Message and Redirect Page are used automatically. Add conditional logic only to show a specific message or redirect based on submitted values.', 'bit-form'),
 
     'Theme Colors' => __('Theme Colors', 'bit-form'),
 
@@ -3195,16 +3177,6 @@ $bitforms_i18n_strings = array(
     'Generate a default UI for managing this post type' => __('Generate a default UI for managing this post type', 'bit-form'),
 
     'Update Post Type' => __('Update Post Type', 'bit-form'),
-
-    'Update Template' => __('Update Template', 'bit-form'),
-
-    'Template Name:' => __('Template Name:', 'bit-form'),
-
-    'Browse Template' => __('Browse Template', 'bit-form'),
-
-    'Email Templates Coming soon' => __('Email Templates Coming soon', 'bit-form'),
-
-    'Save Template' => __('Save Template', 'bit-form'),
 
     'Payment' => __('Payment', 'bit-form'),
 
@@ -3540,6 +3512,8 @@ $bitforms_i18n_strings = array(
 
     'Integration deletion failed. please try again' => __('Integration deletion failed. please try again', 'bit-form'),
 
+    'Failed to update integration status' => __('Failed to update integration status', 'bit-form'),
+
     'Are you sure to delete this integration?' => __('Are you sure to delete this integration?', 'bit-form'),
 
     'Are you sure to clone this integration?' => __('Are you sure to clone this integration?', 'bit-form'),
@@ -3549,6 +3523,10 @@ $bitforms_i18n_strings = array(
     'Integration clone failed.' => __('Integration clone failed.', 'bit-form'),
 
     'Integrate your form with your favorite apps and services.' => __('Integrate your form with your favorite apps and services.', 'bit-form'),
+
+    'Enabled' => __('Enabled', 'bit-form'),
+
+    'By default, all enabled Integrations execute automatically. Add conditional logic only to run a specific integration based on submitted values.' => __('By default, all enabled Integrations execute automatically. Add conditional logic only to run a specific integration based on submitted values.', 'bit-form'),
 
     'Migration Issue Detected' => __('Migration Issue Detected', 'bit-form'),
 
@@ -3688,27 +3666,17 @@ $bitforms_i18n_strings = array(
 
     'Available Font for PDF' => __('Available Font for PDF', 'bit-form'),
 
-    'PDF Templates' => __('PDF Templates', 'bit-form'),
+    'Learn more about PDF Attachment' => __('Learn more about PDF Attachment', 'bit-form'),
 
-    'How to setup PDF Templates:' => __('How to setup PDF Templates:', 'bit-form'),
+    'This global settings will be set as the default for any new PDF attachment generated from your forms.' => __('This global settings will be set as the default for any new PDF attachment generated from your forms.', 'bit-form'),
 
-    'PDF File Name' => __('PDF File Name', 'bit-form'),
+    'Remember,' => __('Remember,', 'bit-form'),
 
-    'PDF Password' => __('PDF Password', 'bit-form'),
+    'If you haven\'t used PDFs yet, you\'ll need to click the "Save" button to apply these global PDF settings. You can also customize settings for a specific PDF template by accessing the PDF templates in your form settings.' => __('If you haven\'t used PDFs yet, you\'ll need to click the "Save" button to apply these global PDF settings. You can also customize settings for a specific PDF template by accessing the PDF templates in your form settings.', 'bit-form'),
 
-    'Static Password' => __('Static Password', 'bit-form'),
+    'Please update your PHP version is 7.4 or higher.' => __('Please update your PHP version is 7.4 or higher.', 'bit-form'),
 
-    'PDF Password Shortcode' => __('PDF Password Shortcode', 'bit-form'),
-
-    'Allow Download (Link)' => __('Allow Download (Link)', 'bit-form'),
-
-    'All User' => __('All User', 'bit-form'),
-
-    'Only Logged In User' => __('Only Logged In User', 'bit-form'),
-
-    'Download Link Shortcode' => __('Download Link Shortcode', 'bit-form'),
-
-    'Override Default Settings' => __('Override Default Settings', 'bit-form'),
+    'PHP extension is missing in your server. Please install it.' => __('PHP extension is missing in your server. Please install it.', 'bit-form'),
 
     'Paper Size' => __('Paper Size', 'bit-form'),
 
@@ -3719,6 +3687,10 @@ $bitforms_i18n_strings = array(
     'Landscape' => __('Landscape', 'bit-form'),
 
     'Font Family' => __('Font Family', 'bit-form'),
+
+    'To use Arabic, Chinese, Japanese and Korean languages, you need to install additional fonts! Please navigate to the' => __('To use Arabic, Chinese, Japanese and Korean languages, you need to install additional fonts! Please navigate to the', 'bit-form'),
+
+    'tab to proceed.' => __('tab to proceed.', 'bit-form'),
 
     'Font Size (Pixels)' => __('Font Size (Pixels)', 'bit-form'),
 
@@ -3731,6 +3703,8 @@ $bitforms_i18n_strings = array(
     'Watermark Text' => __('Watermark Text', 'bit-form'),
 
     'Watermark Image' => __('Watermark Image', 'bit-form'),
+
+    'Upload' => __('Upload', 'bit-form'),
 
     'Position X (Units in millimeters)' => __('Position X (Units in millimeters)', 'bit-form'),
 
@@ -3745,36 +3719,6 @@ $bitforms_i18n_strings = array(
     'LTR' => __('LTR', 'bit-form'),
 
     'RTL' => __('RTL', 'bit-form'),
-
-    'Go to PDF Settings' => __('Go to PDF Settings', 'bit-form'),
-
-    'Please configure PDF settings first.' => __('Please configure PDF settings first.', 'bit-form'),
-
-    'Upload' => __('Upload', 'bit-form'),
-
-    'Image width' => __('Image width', 'bit-form'),
-
-    'Image height' => __('Image height', 'bit-form'),
-
-    'Position X' => __('Position X', 'bit-form'),
-
-    'Position Y' => __('Position Y', 'bit-form'),
-
-    'Learn more about PDF Attachment' => __('Learn more about PDF Attachment', 'bit-form'),
-
-    'This global settings will be set as the default for any new PDF attachment generated from your forms.' => __('This global settings will be set as the default for any new PDF attachment generated from your forms.', 'bit-form'),
-
-    'Remember,' => __('Remember,', 'bit-form'),
-
-    'If you haven\'t used PDFs yet, you\'ll need to click the "Save" button to apply these global PDF settings. You can also customize settings for a specific PDF template by accessing the PDF templates in your form settings.' => __('If you haven\'t used PDFs yet, you\'ll need to click the "Save" button to apply these global PDF settings. You can also customize settings for a specific PDF template by accessing the PDF templates in your form settings.', 'bit-form'),
-
-    'Please update your PHP version is 7.4 or higher.' => __('Please update your PHP version is 7.4 or higher.', 'bit-form'),
-
-    'PHP extension is missing in your server. Please install it.' => __('PHP extension is missing in your server. Please install it.', 'bit-form'),
-
-    'To use Arabic, Chinese, Japanese and Korean languages, you need to install additional fonts! Please navigate to the' => __('To use Arabic, Chinese, Japanese and Korean languages, you need to install additional fonts! Please navigate to the', 'bit-form'),
-
-    'tab to proceed.' => __('tab to proceed.', 'bit-form'),
 
     'Copy Shortcode' => __('Copy Shortcode', 'bit-form'),
 
@@ -3797,6 +3741,10 @@ $bitforms_i18n_strings = array(
     'set Form Field' => __('set Form Field', 'bit-form'),
 
     'Select Form Field' => __('Select Form Field', 'bit-form'),
+
+    'Redirect' => __('Redirect', 'bit-form'),
+
+    'Don\'t Redirect' => __('Don\'t Redirect', 'bit-form'),
 
     'Add More Alternative URL' => __('Add More Alternative URL', 'bit-form'),
 
@@ -4330,6 +4278,12 @@ $bitforms_i18n_strings = array(
 
     'Click to Highlight Element in Builder' => __('Click to Highlight Element in Builder', 'bit-form'),
 
+    'Are you sure to delete this conditional logic?' => __('Are you sure to delete this conditional logic?', 'bit-form'),
+
+    'Add Conditional Logic' => __('Add Conditional Logic', 'bit-form'),
+
+    'Conditional logics execute according to the sequence of their logic groups. A group placed higher will have greater priority. To adjust the priority, simply drag and drop the logic groups as needed.' => __('Conditional logics execute according to the sequence of their logic groups. A group placed higher will have greater priority. To adjust the priority, simply drag and drop the logic groups as needed.', 'bit-form'),
+
     'Enable Conditional Logic' => __('Enable Conditional Logic', 'bit-form'),
 
     'Configure when this field should be shown or hidden' => __('Configure when this field should be shown or hidden', 'bit-form'),
@@ -4347,6 +4301,226 @@ $bitforms_i18n_strings = array(
     'Need Advanced Conditional Logic?' => __('Need Advanced Conditional Logic?', 'bit-form'),
 
     'Switch now' => __('Switch now', 'bit-form'),
+
+    'Don\'t Show' => __('Don\'t Show', 'bit-form'),
+
+    'Advanced Logic' => __('Advanced Logic', 'bit-form'),
+
+    'Record Create/Edit' => __('Record Create/Edit', 'bit-form'),
+
+    'Record Create' => __('Record Create', 'bit-form'),
+
+    'Record Edit' => __('Record Edit', 'bit-form'),
+
+    'this when' => __('this when', 'bit-form'),
+
+    'Evaluate on' => __('Evaluate on', 'bit-form'),
+
+    'Message Content' => __('Message Content', 'bit-form'),
+
+    'What the user sees after submitting' => __('What the user sees after submitting', 'bit-form'),
+
+    'Display' => __('Display', 'bit-form'),
+
+    'How and where the message appears' => __('How and where the message appears', 'bit-form'),
+
+    'Behavior' => __('Behavior', 'bit-form'),
+
+    'Configure Conditions' => __('Configure Conditions', 'bit-form'),
+
+    'Configure when this message will or won\'t show' => __('Configure when this message will or won\'t show', 'bit-form'),
+
+    'Auto-hide' => __('Auto-hide', 'bit-form'),
+
+    'Hide after' => __('Hide after', 'bit-form'),
+
+    'Confirmation auto hide after duration' => __('Confirmation auto hide after duration', 'bit-form'),
+
+    'seconds' => __('seconds', 'bit-form'),
+
+    'After submit' => __('After submit', 'bit-form'),
+
+    'Form behaviour after submission' => __('Form behaviour after submission', 'bit-form'),
+
+    'Hide Form' => __('Hide Form', 'bit-form'),
+
+    'Reset Form' => __('Reset Form', 'bit-form'),
+
+    'Keep Form Values' => __('Keep Form Values', 'bit-form'),
+
+    'Below form' => __('Below form', 'bit-form'),
+
+    'Inline, always visible' => __('Inline, always visible', 'bit-form'),
+
+    'Snackbar' => __('Snackbar', 'bit-form'),
+
+    'Brief toast pop-up' => __('Brief toast pop-up', 'bit-form'),
+
+    'Modal' => __('Modal', 'bit-form'),
+
+    'Overlay dialog' => __('Overlay dialog', 'bit-form'),
+
+    'Position' => __('Position', 'bit-form'),
+
+    'Style' => __('Style', 'bit-form'),
+
+    'Custom Style' => __('Custom Style', 'bit-form'),
+
+    'Edit styles' => __('Edit styles', 'bit-form'),
+
+    'Animation' => __('Animation', 'bit-form'),
+
+    'Position on Screen' => __('Position on Screen', 'bit-form'),
+
+    'Confirmation Style' => __('Confirmation Style', 'bit-form'),
+
+    'Message Background Color' => __('Message Background Color', 'bit-form'),
+
+    'Message Text Color' => __('Message Text Color', 'bit-form'),
+
+    'Close Button Background Color' => __('Close Button Background Color', 'bit-form'),
+
+    'Hover' => __('Hover', 'bit-form'),
+
+    'Close Icon Color' => __('Close Icon Color', 'bit-form'),
+
+    'Thickness' => __('Thickness', 'bit-form'),
+
+    'Radius' => __('Radius', 'bit-form'),
+
+    'Spread' => __('Spread', 'bit-form'),
+
+    'Inset' => __('Inset', 'bit-form'),
+
+    'Outset' => __('Outset', 'bit-form'),
+
+    'Delete shadow' => __('Delete shadow', 'bit-form'),
+
+    'Add shadow' => __('Add shadow', 'bit-form'),
+
+    'recipients' => __('recipients', 'bit-form'),
+
+    'file' => __('file', 'bit-form'),
+
+    'files' => __('files', 'bit-form'),
+
+    'Conditional' => __('Conditional', 'bit-form'),
+
+    '—' => __('—', 'bit-form'),
+
+    'Are you sure to delete this template' => __('Are you sure to delete this template', 'bit-form'),
+
+    'Duplicate' => __('Duplicate', 'bit-form'),
+
+    'Are you sure to duplicate this template?' => __('Are you sure to duplicate this template?', 'bit-form'),
+
+    'Add new template' => __('Add new template', 'bit-form'),
+
+    'Template Name' => __('Template Name', 'bit-form'),
+
+    'Subject' => __('Subject', 'bit-form'),
+
+    'Other Info' => __('Other Info', 'bit-form'),
+
+    'Email Templates' => __('Email Templates', 'bit-form'),
+
+    'How to setup Email Templates & Send Email Notification:' => __('How to setup Email Templates & Send Email Notification:', 'bit-form'),
+
+    'Search templates...' => __('Search templates...', 'bit-form'),
+
+    'Showing' => __('Showing', 'bit-form'),
+
+    'of' => __('of', 'bit-form'),
+
+    'templates' => __('templates', 'bit-form'),
+
+    'By default, all enabled Email Templates are sent automatically. Add conditional logic only to send a specific email based on submitted values.' => __('By default, all enabled Email Templates are sent automatically. Add conditional logic only to send a specific email based on submitted values.', 'bit-form'),
+
+    'Select Email Attachments' => __('Select Email Attachments', 'bit-form'),
+
+    'Add to Email' => __('Add to Email', 'bit-form'),
+
+    'Active Status' => __('Active Status', 'bit-form'),
+
+    'Update Template' => __('Update Template', 'bit-form'),
+
+    'Save Template' => __('Save Template', 'bit-form'),
+
+    'Recipients Emails & Others' => __('Recipients Emails & Others', 'bit-form'),
+
+    'Who will receives this notification email.' => __('Who will receives this notification email.', 'bit-form'),
+
+    'To (Email)' => __('To (Email)', 'bit-form'),
+
+    'Conditional Email Routing' => __('Conditional Email Routing', 'bit-form'),
+
+    'Send the notification to a different recipient when a submitted value matches a condition.' => __('Send the notification to a different recipient when a submitted value matches a condition.', 'bit-form'),
+
+    'if' => __('if', 'bit-form'),
+
+    'Select' => __('Select', 'bit-form'),
+
+    'equal' => __('equal', 'bit-form'),
+
+    'not equal' => __('not equal', 'bit-form'),
+
+    'contains' => __('contains', 'bit-form'),
+
+    'not contains' => __('not contains', 'bit-form'),
+
+    'Enter a value' => __('Enter a value', 'bit-form'),
+
+    'Add Routing Rule' => __('Add Routing Rule', 'bit-form'),
+
+    'Other Email Configurations' => __('Other Email Configurations', 'bit-form'),
+
+    'CC, BCC, From, Reply-To —(optional).' => __('CC, BCC, From, Reply-To —(optional).', 'bit-form'),
+
+    'CC' => __('CC', 'bit-form'),
+
+    'BCC' => __('BCC', 'bit-form'),
+
+    'Add mail from address' => __('Add mail from address', 'bit-form'),
+
+    'From Mail' => __('From Mail', 'bit-form'),
+
+    'Some servers block emails if "From Email" differs from the authenticated (login) email — use the same email to ensure delivery.' => __('Some servers block emails if "From Email" differs from the authenticated (login) email — use the same email to ensure delivery.', 'bit-form'),
+
+    'Add mail from name' => __('Add mail from name', 'bit-form'),
+
+    'Reply To' => __('Reply To', 'bit-form'),
+
+    'Email Body' => __('Email Body', 'bit-form'),
+
+    'Select form file fields' => __('Select form file fields', 'bit-form'),
+
+    'Form File Fields' => __('Form File Fields', 'bit-form'),
+
+    'PDF Attachment Templates' => __('PDF Attachment Templates', 'bit-form'),
+
+    'Select PDF templates' => __('Select PDF templates', 'bit-form'),
+
+    'Add PDF' => __('Add PDF', 'bit-form'),
+
+    'No PDF templates found. Create one to attach to this email.' => __('No PDF templates found. Create one to attach to this email.', 'bit-form'),
+
+    'Create PDF Template' => __('Create PDF Template', 'bit-form'),
+
+    'WordPress Media Library' => __('WordPress Media Library', 'bit-form'),
+
+    'Drag & drop files here' => __('Drag & drop files here', 'bit-form'),
+
+    'or browse from media library' => __('or browse from media library', 'bit-form'),
+
+    'Browse Files' => __('Browse Files', 'bit-form'),
+
+    'selected' => __('selected', 'bit-form'),
+
+    'Add PDF Template' => __('Add PDF Template', 'bit-form'),
+
+    'Send' => __('Send', 'bit-form'),
+
+    'Don\'t Send' => __('Don\'t Send', 'bit-form'),
 
     'Theme Quick Tweaks' => __('Theme Quick Tweaks', 'bit-form'),
 
@@ -4429,8 +4603,6 @@ $bitforms_i18n_strings = array(
     'Option 3' => __('Option 3', 'bit-form'),
 
     'Option 4' => __('Option 4', 'bit-form'),
-
-    'Select' => __('Select', 'bit-form'),
 
     'Button' => __('Button', 'bit-form'),
 
@@ -4520,6 +4692,110 @@ $bitforms_i18n_strings = array(
 
     'Previous' => __('Previous', 'bit-form'),
 
+    'Header' => __('Header', 'bit-form'),
+
+    'Body' => __('Body', 'bit-form'),
+
+    'Footer' => __('Footer', 'bit-form'),
+
+    'All users' => __('All users', 'bit-form'),
+
+    'Logged-in' => __('Logged-in', 'bit-form'),
+
+    'Text Watermark' => __('Text Watermark', 'bit-form'),
+
+    'Image Watermark' => __('Image Watermark', 'bit-form'),
+
+    'PDF Name' => __('PDF Name', 'bit-form'),
+
+    'PDF Settings' => __('PDF Settings', 'bit-form'),
+
+    'PDF Templates' => __('PDF Templates', 'bit-form'),
+
+    'How to setup PDF Templates:' => __('How to setup PDF Templates:', 'bit-form'),
+
+    'Page Header' => __('Page Header', 'bit-form'),
+
+    'Page' => __('Page', 'bit-form'),
+
+    '+ Add field' => __('+ Add field', 'bit-form'),
+
+    'General Smart Codes' => __('General Smart Codes', 'bit-form'),
+
+    'Active' => __('Active', 'bit-form'),
+
+    'Save template' => __('Save template', 'bit-form'),
+
+    'PDF content' => __('PDF content', 'bit-form'),
+
+    'HEADER' => __('HEADER', 'bit-form'),
+
+    'File settings' => __('File settings', 'bit-form'),
+
+    'PDF file name' => __('PDF file name', 'bit-form'),
+
+    'PDF password' => __('PDF password', 'bit-form'),
+
+    'Static Password' => __('Static Password', 'bit-form'),
+
+    'PDF Password Shortcode' => __('PDF Password Shortcode', 'bit-form'),
+
+    'To use those feature (PDF Password, Allow Download, PDF Download Link), please update to Pro version 2.11.6 or later.' => __('To use those feature (PDF Password, Allow Download, PDF Download Link), please update to Pro version 2.11.6 or later.', 'bit-form'),
+
+    'Allow download (link)' => __('Allow download (link)', 'bit-form'),
+
+    'Only logged-in users' => __('Only logged-in users', 'bit-form'),
+
+    'Download Link Shortcode' => __('Download Link Shortcode', 'bit-form'),
+
+    'Override default PDF settings' => __('Override default PDF settings', 'bit-form'),
+
+    'Page Layout' => __('Page Layout', 'bit-form'),
+
+    'Paper size' => __('Paper size', 'bit-form'),
+
+    'Font family' => __('Font family', 'bit-form'),
+
+    'Font size (px)' => __('Font size (px)', 'bit-form'),
+
+    'Language direction' => __('Language direction', 'bit-form'),
+
+    'Watermark text' => __('Watermark text', 'bit-form'),
+
+    'Watermark image' => __('Watermark image', 'bit-form'),
+
+    'Width (mm)' => __('Width (mm)', 'bit-form'),
+
+    'Image width' => __('Image width', 'bit-form'),
+
+    'Height (mm)' => __('Height (mm)', 'bit-form'),
+
+    'Image height' => __('Image height', 'bit-form'),
+
+    'Position X (mm)' => __('Position X (mm)', 'bit-form'),
+
+    'Position X' => __('Position X', 'bit-form'),
+
+    'Position Y (mm)' => __('Position Y (mm)', 'bit-form'),
+
+    'Position Y' => __('Position Y', 'bit-form'),
+
+    'Show behind page content' => __('Show behind page content', 'bit-form'),
+
+    'e.g. 50' => __('e.g. 50', 'bit-form'),
+
+    'Please upload an image file.' => __('Please upload an image file.', 'bit-form'),
+
+    'Image added successfully.' => __('Image added successfully.', 'bit-form'),
+
+    'Failed to read image.' => __('Failed to read image.', 'bit-form'),
+
+    'Upload image' => __('Upload image', 'bit-form'),
+
+    'Click to browse or drag & drop' => __('Click to browse or drag & drop', 'bit-form'),
+
+    'Reading...' => __('Reading...', 'bit-form'),
+
     'Create New Theme' => __('Create New Theme', 'bit-form'),
 
     'Click to upload' => __('Click to upload', 'bit-form'),
@@ -4586,10 +4862,6 @@ $bitforms_i18n_strings = array(
 
     'Other' => __('Other', 'bit-form'),
 
-    'Send' => __('Send', 'bit-form'),
-
-    'Upgrade to Pro' => __('Upgrade to Pro', 'bit-form'),
-
     'This feature' => __('This feature', 'bit-form'),
 
     'is available in Pro' => __('is available in Pro', 'bit-form'),
@@ -4610,7 +4882,7 @@ $bitforms_i18n_strings = array(
 
     'to see what can you do with Pro version.' => __('to see what can you do with Pro version.', 'bit-form'),
 
-    'Available On Pro' => __('Available On Pro', 'bit-form'),
+    'Upgrade to Pro' => __('Upgrade to Pro', 'bit-form'),
 
     'Do You want Deplicate these' => __('Do You want Deplicate these', 'bit-form'),
 
@@ -4629,10 +4901,6 @@ $bitforms_i18n_strings = array(
     'Row Selected' => __('Row Selected', 'bit-form'),
 
     'Total Entries:' => __('Total Entries:', 'bit-form'),
-
-    'Page' => __('Page', 'bit-form'),
-
-    'of' => __('of', 'bit-form'),
 
     'No response from the server' => __('No response from the server', 'bit-form'),
 
@@ -4658,19 +4926,7 @@ $bitforms_i18n_strings = array(
 
     'Select Email Template' => __('Select Email Template', 'bit-form'),
 
-    'Add mail from address' => __('Add mail from address', 'bit-form'),
-
-    'From Mail' => __('From Mail', 'bit-form'),
-
-    'CC' => __('CC', 'bit-form'),
-
-    'BCC' => __('BCC', 'bit-form'),
-
-    'Reply To' => __('Reply To', 'bit-form'),
-
-    'PDF Attachment Template:' => __('PDF Attachment Template:', 'bit-form'),
-
-    'Select PDF Template' => __('Select PDF Template', 'bit-form'),
+    'Select PDF Templates' => __('Select PDF Templates', 'bit-form'),
 
     'Field Actions' => __('Field Actions', 'bit-form'),
 
@@ -4700,6 +4956,12 @@ $bitforms_i18n_strings = array(
 
     'Select Hooks to Call' => __('Select Hooks to Call', 'bit-form'),
 
+    'Conditional Logics' => __('Conditional Logics', 'bit-form'),
+
+    'Additional Actions' => __('Additional Actions', 'bit-form'),
+
+    'Email Notification' => __('Email Notification', 'bit-form'),
+
     'On Load' => __('On Load', 'bit-form'),
 
     'On Field Input' => __('On Field Input', 'bit-form'),
@@ -4708,27 +4970,11 @@ $bitforms_i18n_strings = array(
 
     'On Form Submit' => __('On Form Submit', 'bit-form'),
 
-    'Record Create/Edit' => __('Record Create/Edit', 'bit-form'),
-
-    'Record Create' => __('Record Create', 'bit-form'),
-
-    'Record Edit' => __('Record Edit', 'bit-form'),
-
     'Record Delete' => __('Record Delete', 'bit-form'),
 
     'Always' => __('Always', 'bit-form'),
 
     'With Condition' => __('With Condition', 'bit-form'),
-
-    'Conditional Logics' => __('Conditional Logics', 'bit-form'),
-
-    'Add Conditional Logic' => __('Add Conditional Logic', 'bit-form'),
-
-    'Conditional logics execute according to the sequence of their logic groups. A group placed higher will have greater priority. To adjust the priority, simply drag and drop the logic groups as needed.' => __('Conditional logics execute according to the sequence of their logic groups. A group placed higher will have greater priority. To adjust the priority, simply drag and drop the logic groups as needed.', 'bit-form'),
-
-    'Additional Actions' => __('Additional Actions', 'bit-form'),
-
-    'Email Notification' => __('Email Notification', 'bit-form'),
 
     'Action Run When:' => __('Action Run When:', 'bit-form'),
 
@@ -4912,8 +5158,6 @@ $bitforms_i18n_strings = array(
 
     'Setting' => __('Setting', 'bit-form'),
 
-    'Style' => __('Style', 'bit-form'),
-
     'Table Caption' => __('Table Caption', 'bit-form'),
 
     'Column Mapping' => __('Column Mapping', 'bit-form'),
@@ -5037,8 +5281,6 @@ $bitforms_i18n_strings = array(
     'Entry Status' => __('Entry Status', 'bit-form'),
 
     'Select Fields for Report:' => __('Select Fields for Report:', 'bit-form'),
-
-    'Other Info' => __('Other Info', 'bit-form'),
 
     'Total Entry:' => __('Total Entry:', 'bit-form'),
 
@@ -5213,6 +5455,8 @@ $bitforms_i18n_strings = array(
     'PDF Template' => __('PDF Template', 'bit-form'),
 
     'Custom Theme Feature' => __('Custom Theme Feature', 'bit-form'),
+
+    'Advanced Conditional Logic' => __('Advanced Conditional Logic', 'bit-form'),
 
     'Name is the unique identifier for the field. It is used to reference the field in the form submission data.' => __('Name is the unique identifier for the field. It is used to reference the field in the form submission data.', 'bit-form'),
 

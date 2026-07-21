@@ -52,13 +52,13 @@ class AdminAjax
     add_action('wp_ajax_bitforms_get_all_wp_pages', [$this, 'getAllWPPages']);
     add_action('wp_ajax_bitforms_delete_success_messsage', [$this, 'deleteSuccessMessage']);
     add_action('wp_ajax_bitforms_delete_integration', [$this, 'deleteAIntegration']);
+    add_action('wp_ajax_bitforms_update_integration_status', [$this, 'updateIntegrationStatus']);
     add_action('wp_ajax_bitforms_delete_workflow', [$this, 'deleteAWorkflow']);
     add_action('wp_ajax_bitforms_delete_mailtemplate', [$this, 'deleteAMailTemplate']);
     add_action('wp_ajax_bitforms_duplicate_mailtemplate', [$this, 'duplicateAMailTemplate']);
     add_action('wp_ajax_bitforms_save_allForm_report_prefs', [$this, 'setAllFormsReport']);
     add_action('wp_ajax_bitforms_save_grecaptcha', [$this, 'savegReCaptcha']);
     add_action('wp_ajax_bitforms_form_log_history', [$this, 'getLogHistory']);
-    add_action('wp_ajax_bitforms_import_file_data', [$this, 'importFileData']);
     add_action('wp_ajax_bitforms_filter_export_data', [$this, 'filterExportEntry']);
     add_action('wp_ajax_bitforms_api_key', [$this, 'saveApiKey']);
     add_action('wp_ajax_bitforms_form_helpers_state', [$this, 'builerHelperState']);
@@ -477,8 +477,12 @@ class AdminAjax
         $input = GlobalHelper::formatRequestData();
         $optionName = isset($input->optionName) ? $input->optionName : '';
         $optionValue = isset($input->optionValue) ? $input->optionValue : '';
-        update_option($optionName, $optionValue);
-        wp_send_json_success([$optionName, $optionValue], 200);
+        $allowedNoticeKeys = ['bitforms_hide_cashback', 'bitforms_hide_announcement'];
+        if (!in_array($optionName, $allowedNoticeKeys, true)) {
+          wp_send_json_error(__('Invalid option', 'bit-form'), 400);
+        }
+        update_option($optionName, (bool) $optionValue);
+        wp_send_json_success([$optionName, (bool) $optionValue], 200);
       } catch (\Exception | \InvalidArgumentException $e) {
         wp_send_json_error($e->getMessage(), 400);
       }
@@ -853,7 +857,10 @@ class AdminAjax
         wp_send_json_error($e->getMessage(), 400);
       }
 
-      $formId = $input->form_id;
+      $formId = isset($input->form_id) ? sanitize_text_field($input->form_id) : '';
+      if (!filter_var($formId, FILTER_VALIDATE_INT)) {
+        wp_send_json_error(__('Invalid form id', 'bit-form'), 400);
+      }
       if (isset($input->atomicCssText)) {
         $status = FrontEndScriptGenerator::saveCssFile($formId, $input->atomicCssText);
       }
@@ -1509,6 +1516,34 @@ class AdminAjax
     }
   }
 
+  public function updateIntegrationStatus()
+  {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
+      GlobalHelper::requirePostMethod();
+      try {
+        $input = GlobalHelper::formatRequestData();
+      } catch (\InvalidArgumentException $e) {
+        wp_send_json_error($e->getMessage(), 400);
+      }
+      $formID = isset($input->formID) ? sanitize_text_field(wp_unslash($input->formID)) : '';
+      $integrationID = isset($input->id) ? absint($input->id) : 0;
+      $status = isset($input->status) ? absint($input->status) : 0;
+      if (empty($formID) || empty($integrationID)) {
+        wp_send_json_error(__('Invalid request', 'bit-form'), 400);
+      }
+      $integrationHandler = new IntegrationHandler($formID);
+      $result = $integrationHandler->updateIntegrationStatus($integrationID, $status);
+      if (is_wp_error($result) && 'result_empty' !== $result->get_error_code()) {
+        wp_send_json_error($result->get_error_message(), 411);
+      } else {
+        wp_send_json_success(['id' => $integrationID, 'status' => $status], 200);
+      }
+    } else {
+      wp_send_json_error(__('Token expired', 'bit-form'), 401);
+    }
+  }
+
   public function deleteAWorkflow()
   {
     if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
@@ -1723,7 +1758,9 @@ class AdminAjax
 
   private function checkExtensionWithURL($urlStr)
   {
-    $pattern = '/^https?:\/\/.*(\.(svg|png|jpg|jpeg|gif))?$/i';
+    // Extension is mandatory (no optional group): the URL must end in a known image extension,
+    // otherwise any http(s) URL would pass and be fetched.
+    $pattern = '/^https?:\/\/.*\.(svg|png|jpg|jpeg|gif)$/i';
 
     return preg_match($pattern, $urlStr);
   }
@@ -1759,7 +1796,11 @@ class AdminAjax
         wp_mkdir_p($icnDir);
       }
 
-      $imageUrlData = file_get_contents($sanitize_url);
+      $response = wp_safe_remote_get($sanitize_url);
+      if (is_wp_error($response) || 200 !== (int) wp_remote_retrieve_response_code($response)) {
+        wp_send_json_error(__('Unable to fetch icon', 'bit-form'), 400);
+      }
+      $imageUrlData = wp_remote_retrieve_body($response);
 
       $filename = sanitize_file_name($input->id . '-' . basename($sanitize_url));
 
@@ -1768,6 +1809,12 @@ class AdminAjax
       $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
       $is_svg = 'svg' === $ext; // Check if the file is an SVG
       if ($type && 0 === strpos($type, 'image/') || $is_svg) {
+        if ($is_svg) {
+          $imageUrlData = (new \BitCode\BitForm\enshrined\svgSanitize\Sanitizer())->sanitize($imageUrlData);
+          if (false === $imageUrlData) {
+            wp_send_json_error(__('Invalid file type', 'bit-form'), 400);
+          }
+        }
         $uploaded = file_put_contents($icnDir . '/' . $filename, $imageUrlData);
 
         if ($uploaded) {

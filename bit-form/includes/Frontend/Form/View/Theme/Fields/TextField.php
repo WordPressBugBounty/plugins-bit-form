@@ -8,6 +8,9 @@ class TextField
 {
   public static function init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error = null, $value = null)
   {
+    if (!is_object($field)) {
+      return '';
+    }
     $inputWrapper = new ClassicInputWrapper($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
     $input = self::field($field, $rowID, $form_atomic_Cls_map, $value, $formID);
     return $inputWrapper->wrapper($input);
@@ -42,7 +45,7 @@ class TextField
 
     $showPickerAttr = self::showPickerAttr($field);
 
-    if (property_exists($field, 'suggestions') && count($field->suggestions) > 0) {
+    if (is_object($field) && property_exists($field, 'suggestions') && is_countable($field->suggestions) && count($field->suggestions) > 0) {
       $list = "list='{$rowID}-{$contentCount}-datalist'";
     }
 

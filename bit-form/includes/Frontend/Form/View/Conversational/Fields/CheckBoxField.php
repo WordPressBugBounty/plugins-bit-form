@@ -26,7 +26,7 @@ class CheckBoxField
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
 
-    if (property_exists($field, 'opt') && count($field->opt) > 0) {
+    if (is_object($field) && property_exists($field, 'opt') && is_countable($field->opt) && count($field->opt) > 0) {
       if (isset($field->val) && false !== strpos($field->val, BITFORMS_BF_SEPARATOR)) {
         $defaultValues = explode(BITFORMS_BF_SEPARATOR, $field->val);
       } else {
@@ -99,7 +99,7 @@ class CheckBoxField
     }
 
     //Other Option
-    $optCount = property_exists($field, 'opt') ? count($field->opt) : 0;
+    $optCount = isset($field->opt) && is_countable($field->opt) ? count($field->opt) : 0;
     $otherOptLbl = !empty($field->otherOptLbl) ? $field->otherOptLbl : __('Other...', 'bit-form');
     $inputPh = isset($field->otherInpPh) ? "placeholder='{$fieldHelpers->esc_attr($field->otherInpPh)}'" : "placeholder='Other...'";
     $inpReq = isset($field->valid->otherOptReq) ? ($field->valid->otherOptReq ? 'required' : '') : '';

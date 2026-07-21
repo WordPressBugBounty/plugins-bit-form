@@ -408,7 +408,7 @@ class FormEntryMetaModel extends Model
   {
     $formula = ['=', '-', '+', '@', "\t", "\r"];
     $valueFilter = preg_replace('/[\]["]/i', '', $value);
-    if (in_array(substr($value, 0, 1), $formula, true)) {
+    if (in_array(substr($valueFilter, 0, 1), $formula, true)) {
       $valueFilter = "'" . trim($valueFilter);
     }
 
@@ -446,7 +446,7 @@ class FormEntryMetaModel extends Model
 
         // Get label from fieldMap or use key
         $label = $fieldMap[$childKey]['adminLbl'] ?? $childKey;
-        $formattedPairs[] = "$label: " . self::unescapeString($value);
+        $formattedPairs[] = "$label: " . self::csvInjectionPrevent(self::unescapeString($value));
       }
 
       $rows[] = implode(', ', $formattedPairs);

@@ -19,6 +19,7 @@ use BitCode\BitForm\Core\Util\FileDownloadProvider;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\Core\Util\SmartTagRegistry;
 use BitCode\BitForm\Core\Util\SmartTags;
+use BitCode\BitForm\Core\Util\Utilities;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
 
 final class FrontendFormHandler
@@ -281,7 +282,7 @@ final class FrontendFormHandler
     return $fields;
   }
 
-  private function executeOnUserInput($formID, $shortCodeCounter, $fields)
+  private function executeOnUserInput($formID, $shortCodeCounter, $workFlowRunType = 'create')
   {
     $FrontendFormManager = FrontendFormManager::getInstance($formID, $shortCodeCounter);
     $previousValue = $this->getValuesFromQueryParams();
@@ -289,7 +290,7 @@ final class FrontendFormHandler
     $customCodesExist = strpos(FrontEndScriptGenerator::getCustomCodes($formID)['JavaScript'], 'bfVars');
     if ($customCodesExist || (!empty($formContent->workFlowExist) && !empty($formContent->workFlowExist->oninput))) {
       $workFlowRunHelper = new WorkFlow($formID);
-      return $workFlowRunHelper->executeOnUserInput('create', $fields);
+      return $workFlowRunHelper->executeOnUserInput($workFlowRunType);
     }
   }
 
@@ -411,7 +412,7 @@ final class FrontendFormHandler
     $fields = $this->triggerWorkflowOnLoad($formID, $shortCodeCounter, $fields, $workFlowRunType);
     $fields = apply_filters('bitform_filter_after_workflow_onload_fields', $fields, $formID);
     do_action('bitform_onload_fields', $fields, $formID);
-    $workFlowreturnedOnUserInput = $this->executeOnUserInput($formID, $shortCodeCounter, $fields);
+    $workFlowreturnedOnUserInput = $this->executeOnUserInput($formID, $shortCodeCounter, $workFlowRunType);
 
     // test for form before remove
     $noLabelFieldTypes = ['decision-box', 'gdpr', 'html', 'shortcode', 'button', 'paypal', 'razorpay', 'recaptcha', 'turnstile', 'hcaptcha', 'stripe', 'spacer'];
@@ -434,10 +435,12 @@ final class FrontendFormHandler
             && !is_null($integration->integration_type)
             && 'gReCaptcha' === $integration->integration_type
           ) {
-            $integrationDetails = json_decode($integration->integration_details);
-            $integrationDetails->id = $integration->id;
-            $reCAPTCHA = $integrationDetails;
-            $reCAPTCHAVersion = 'v2';
+            $integrationDetails = Utilities::jsonObj($integration->integration_details);
+            if ($integrationDetails) {
+              $integrationDetails->id = $integration->id;
+              $reCAPTCHA = $integrationDetails;
+              $reCAPTCHAVersion = 'v2';
+            }
           }
 
           if (
@@ -445,8 +448,8 @@ final class FrontendFormHandler
             && !is_null($integration->integration_type)
             && 'turnstileCaptcha' === $integration->integration_type
           ) {
-            $integrationDetails = json_decode($integration->integration_details);
-            $turnstileSiteKey = $integrationDetails->siteKey;
+            $integrationDetails = Utilities::jsonObj($integration->integration_details);
+            $turnstileSiteKey = $integrationDetails->siteKey ?? '';
           }
 
           if (
@@ -454,16 +457,18 @@ final class FrontendFormHandler
             && !is_null($integration->integration_type)
             && 'hcaptcha' === $integration->integration_type
           ) {
-            $integrationDetails = json_decode($integration->integration_details);
-            $hCaptchaSiteKey = $integrationDetails->siteKey;
+            $integrationDetails = Utilities::jsonObj($integration->integration_details);
+            $hCaptchaSiteKey = $integrationDetails->siteKey ?? '';
           }
 
           if ($captchaV3Settings) {
             if (!is_null($integration->integration_type) && 'gReCaptchaV3' === $integration->integration_type) {
-              $integrationDetails = json_decode($integration->integration_details);
-              $integrationDetails->id = $integration->id;
-              $reCAPTCHA = $integrationDetails;
-              $reCAPTCHAVersion = 'v3';
+              $integrationDetails = Utilities::jsonObj($integration->integration_details);
+              if ($integrationDetails) {
+                $integrationDetails->id = $integration->id;
+                $reCAPTCHA = $integrationDetails;
+                $reCAPTCHAVersion = 'v3';
+              }
             }
           }
         }
@@ -498,17 +503,18 @@ final class FrontendFormHandler
         if (is_wp_error($paymentIntegration)) {
           continue;
         }
+        $paymentIntegrationRow = Utilities::firstRow($paymentIntegration);
         if ('paypal' === $fldData->typ) {
-          $integrationDetails = json_decode($paymentIntegration[0]->integration_details);
-          $clientID = $integrationDetails->clientID;
+          $integrationDetails = Utilities::jsonObj($paymentIntegrationRow->integration_details ?? '');
+          $clientID = $integrationDetails->clientID ?? '';
           $fields->{$fldKey}->clientId = $clientID;
         } elseif ('razorpay' === $fldData->typ) {
-          $integrationDetails = json_decode($paymentIntegration[0]->integration_details);
-          $clientID = $integrationDetails->apiKey;
+          $integrationDetails = Utilities::jsonObj($paymentIntegrationRow->integration_details ?? '');
+          $clientID = $integrationDetails->apiKey ?? '';
           $fields->{$fldKey}->clientId = $clientID;
         } elseif ('stripe' === $fldData->typ) {
-          $integrationDetails = json_decode($paymentIntegration[0]->integration_details);
-          $publishableKey = $integrationDetails->publishableKey;
+          $integrationDetails = Utilities::jsonObj($paymentIntegrationRow->integration_details ?? '');
+          $publishableKey = $integrationDetails->publishableKey ?? '';
           $fields->{$fldKey}->publishableKey = $publishableKey;
         }
       }

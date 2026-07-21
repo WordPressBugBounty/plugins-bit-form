@@ -27,6 +27,9 @@ class FieldWithChild
       $parentInputHtml = TextField::init($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
       $parentChildHTML .= $inputWrapper->childFieldWrapper($parentInputHtml);
       foreach ($childFields as $childFldKey) {
+        if (!isset($childFldKey->fldKey) || !isset($fields->{$childFldKey->fldKey}) || !is_object($fields->{$childFldKey->fldKey})) {
+          continue;
+        }
         $fldKey = $childFldKey->fldKey;
         $childField = $fields->$fldKey;
 
@@ -45,7 +48,7 @@ class FieldWithChild
       }
       //  for name field there will be no primary field just child fields
       foreach ($childFields as $childFldKey) {
-        if (!isset($childFldKey->fldKey) || !isset($fields->{$childFldKey->fldKey})) {
+        if (!isset($childFldKey->fldKey) || !isset($fields->{$childFldKey->fldKey}) || !is_object($fields->{$childFldKey->fldKey})) {
           continue;
         }
         $fldKey = $childFldKey->fldKey;

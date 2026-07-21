@@ -1,7 +1,7 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.1.4
-Stable tag: 3.1.4
+Version: 3.2.0
+Stable tag: 3.2.0
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin
@@ -44,7 +44,7 @@ Bit Form Free includes:
 - Unlimited form submissions
 - [Drag-and-drop form builder](https://bit-form.com/feature/drag-and-drop-form-builder/)
 - Multi-step forms
-- [Conditional logic](https://bit-form.com/feature/conditional-logic/)
+- Show/hide Conditional logic
 - 38+ free form fields
 - Form templates
 - Email templates
@@ -129,16 +129,16 @@ The following fields are available in the free version of Bit Form:
 
 The following fields require Bit Form Pro:
 
-- Advanced Date-Time (Pro)
-- Email OTP Verification (Pro)
-- Signature Field (Pro)
-- Shortcode (Pro)
-- Draft Button (Pro)
-- Advanced File Upload (Pro)
-- PayPal Field (Pro)
-- Razorpay Field (Pro)
-- Stripe Field (Pro)
-- Mollie Field (Pro)
+- Advanced Date-Time 
+- Email OTP Verification 
+- Signature Field 
+- Shortcode 
+- Draft Button
+- Advanced File Upload
+- PayPal Field 
+- Razorpay Field
+- Stripe Field 
+- Mollie Field
 
 These fields help you create many types of WordPress forms without depending on multiple form plugins.
 
@@ -150,6 +150,7 @@ These fields help you create many types of WordPress forms without depending on 
 
 * Advanced **multi-step form** controls
 * Advanced file upload settings
+* Advanced conditional logic
 * Individual field styling
 * Advanced email notifications
 * PDF support in email notifications
@@ -257,7 +258,7 @@ This WordPress form builder plugin includes [**50+ free integrations**](https://
 
 ### Drag-and-Drop WordPress Form Builder
 
-Bit Form includes an intuitive drag-and-drop form builder. You can **add fields, arrange layouts, customize labels, set placeholders, configure validation, apply conditional logic, style your form,** and publish it on your WordPress site.
+Bit Form includes an intuitive drag-and-drop form builder. You can **add fields, arrange layouts, customize labels, set placeholders, configure validation, apply show hide conditional logic, style your form,** and publish it on your WordPress site.
 
 
 ### Fast and Lightweight Form Builder
@@ -289,11 +290,9 @@ Bit Form gives you detailed form settings so you can control how your forms beha
 
 ### Conditional Logic and Dynamic Forms
 
-Bit Form includes advanced conditional logic so your form can respond to user input.
+Bit Form Free includes basic conditional logic to show or hide fields based on user input.
 
-You can show or hide fields, enable or disable fields, change values, make fields read-only or writable, update labels, update helper text, and control form behavior based on user choices.
-
-Bit Form supports many condition operators. You can also organize advanced logic using **AND and OR rules, groups, nested conditions, Else If branches, and Else branches.**
+Bit Form Pro adds advanced rules and actions like enable or disable fields, change values, make fields read-only or writable, update labels, update helper text, and control form behavior based on user choices, including **AND and OR conditions, groups, nested conditions, Else If branches, and Else branches.**
 
 This makes Bit Form useful for quote forms, calculator forms, booking forms, payment forms, order forms, support forms, and advanced lead generation forms, where every user should not see the same fields.
 
@@ -479,6 +478,28 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.2.0 =
+* Release Date: 20 July, 2026
+* New:
+  1. **After Submit Behavior:** Added a new setting to control the form behavior after submission (Hide Form, Reset Form, or Keep Form Values).
+  2. **Active Status Toggle:** Added an enable/disable toggle for Success Message, Redirect URL, Email Notification, PDF Template, and Integration settings.
+  3. **WordPress Media Library Attachments:** Added an option to select files from the WordPress Media Library as email attachments in the Email Notification settings.
+  4. **Individual Conditional Logic (Pro):** Added support for enabling or disabling conditional logic for individual features (Success Message, Redirect URL, Email Notification, and Integrations).
+  5. **Conditional Email Routing (Pro):** Added support for conditional routing in the "Send To Email" setting of Email Notifications.
+  6. **PDF Header & Footer (Pro):** Added editors for configuring PDF headers and footers in the PDF Template settings.
+
+* Improvements:
+  1. **Execution Process:** Decoupled the execution of Success Messages, Redirect URLs, Email Notifications, and Integrations from the central conditional logic. Each feature can now execute independently and be controlled individually.
+  2. **Success Message:** Redesigned the UI/UX and improved the execution workflow for a better user experience.
+  3. **Email Templates:** Added Configuration Info and Status columns to the list table, redesigned the editor UI/UX for improved usability, and enhanced the email execution workflow.
+  4. **Email Configuration:** Added configuration options for To, CC, BCC, From Name, From Email, Reply-To Email, and Attachments. Also added support for attaching multiple PDF(Pro) templates to email notifications.
+  5. **PDF Templates (Pro):** Added PDF Name and Settings Info columns to the list table and redesigned the editor UI/UX for improved usability and management.
+
+* Fixes:
+  1. **Field Cloning:** Fixed a name property conflict when cloning composite fields with child fields.
+  2. **Submission Validation:** Fixed an issue where validation errors were not displayed when a required field existed in the field list but was missing from the form layout.
+  3. **Conditional Record Edit Action:** Fixed an issue where conditional logic configured for the "On Record Edit" action was not executed correctly during entry updates.
+
 = 3.1.4 =
 * Release Date: 13 July, 2026
 * Improvements:
@@ -597,265 +618,12 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
     1. Refactored code by moving certain Pro features to the Pro plugin, aligning with WordPress plugin guidelines and best practices.
     2. Converted selected Pro features into free features and adjusted default values of some existing features to enhance user experience.
 
-= 2.21.13 =
-*Release Date: 17 March, 2026*
-*Improvements:
-    1. Refactored unsafe SQL queries to use prepared statements for enhanced security against SQL injection attacks.
-    2. Updated the codebase to follow WordPress Plugin Checker best practices for improved code quality and maintainability.
-
-*Fixes:
-    1. Resolve Dark Mode style issues with multiple class selectors.
-
-= 2.21.12 =
-*Release Date: 23 February, 2026*
-*Improvements:
-    1. Replaced heredoc markups with sprintf for better performance and security in the codebase.
-    2. Added escaping for all markup in the codebase for improved security.
-    3. Followed WordPress Plugin Checker best practices for code structure and formatting.
-
-= 2.21.11 =
-*Release Date: 18 February, 2026*
-*Improvements: 
-    1. Security: Improved query validation to prevent SQL injections.
-    2. File validation: Improved PDF file validation for the File Upload and Advance File Upload fields.
-*Fix: 
-    1. Entry edit modal: Fixed the submit button in the entry edit modal.
-    2. FluentCRM integration: Fixed custom-data mapping for FluentCRM.
-    3. Stripe payment field: Fixed stripe payment submission issue with payment processing status. 
-
-= 2.21.10 = 
-*Release Date: 02 February, 2026*
-*Improvements:
-    1. Export Entries: Enhanced filtering options for exporting entries.
-    
-*Fixes:
-    1. Phone Number Field: Fixed country-specific pattern validation issues.
-    2. Repeater Field: Fixed single mapped Signature field preview in email/PDF templates.
-    3. Entries Table: Fixed sorted column preference not persisting on reload.
-
-= 2.21.9 =
-*Release Date: 12 January, 2026*
-*Fixes:
-    1. Fixed trigger workflows route's invalid trigger token validation.
-    2. Resolved hCaptcha field initialization error on form submission.
-    3. Fixed test mail form returning "undefined" response when sending emails
-
-= 2.21.8 =
-*Release Date: 07 January, 2026*
-*Fixes:
-    1. Resolved the dropdown value preview issue in the repeater field..
-    2. Fixed email sending issues on older PHP versions.
-
-= 2.21.7 =
-*Release Date: 29 December, 2025*
-"Improvements:
-    1. Enhanced authentication process for Workflow trigger (AJAX) Route.
-    2. Smart Tag: display field admin label or name in email & PDF templates in All Data smart tag when field label is empty.
-    3. Files Hyperlink: add files hyperlink display in email & PDF templates.
-
-*Fixes:
-    1. Brevo (Sendinblue) integration: fixed an contact update issue.
-    2. Resolve "Back" button issue in Single Entry Details View.
-    3. SMTP Status: SMTP status configuration not update issues.
-
-= 2.21.6 =
-*Release Date: 16 December, 2025*
-*Fixes:
-    1. Fixed an issue with the WordPress current data smart tag.
-    2. Resolved missing runtime dependency issues.
-
-*Improvements:
-    1. Enhanced the Mailchimp integration authentication process.
-
-= 2.21.5 =
-*Release Date: 10 December, 2025*
-*Fixes:
-    1. Resolved an issue where repeater-field file attachments were not included in email notifications for multistep and abandonment forms.
-    2. Added the missing post route for creating and updating Custom Post Types (CPT).
-
-*Improvements:
-    1. Improved the mapping of uploaded file URLs in Google Sheets and Zoho Sheets integrations.
-
-= 2.21.3 =
-*Release Date: 24 November, 2025*
-*New:
-    1. Added Advanced Filtering option for export entries. 
-
-*Fixes:
-    1. Fixed an issue PDF and email template repeater field display.
-    2. Resolved a problem with the single IP draft submission.
-    3. Fixed an issue with form preview routing unexpected slash (/).
-
-*Improvements:
-    1. Enhanced the webhook field mapping with smart tag.
-    2. Improved display of file link in email and PDF templates.
-    3. Expanded anonymous telemetry to include payment amount and currency metrics..
-
-= 2.21.2 =
-*Release Date: 09 November, 2025*
-*Fixes:
-    1. Fixed an issue where WP Auth changes the Update button not working.
-    2. Resolved a problem with the Make.com integration not functioning correctly.
-    3. Fixed an issue causing Table Data View routing to fail.
-
-*Improvements:
-    1. Enhanced the Table Data View to better display file and repeater field values.
-    2. Updated the Single Entry Details View to support the ${bf_all_data} smart tag.
-
-= 2.21.1 =
-*Release Date: 26 October, 2025*
-*Fixes:
-    1. Fixed an issue where Razorpay webhook was not working properly for some users.
-
-= 2.21.0 =
-*Release Date: 23 October, 2025*
-*New:
-    1. Razorpay: Added webhook support for Razorpay payments after form submission.
-    2. Stripe: Added MB Way payment method.
-
-*Improvements:
-    1. Routing: Optimized AJAX routing for improved performance.
-    2. MailChimp Integration: Enhanced birthdate field mapping for better compatibility.
-    3. Payment Information: Refined payment details display within the entry details section.
-    4. Smart Tags: Improved Smart Tag handling in integration field mappings.
-
-*Fixes:
-    1. Fixed issue Repeated field math calculations.
-    2. Fixed an issue where Razorpay and Mollie workflows were triggered after successful payment.
-    3. Fixed an issue that caused form entries to be deleted when deleting a form.
-    4. Fixed an issue with empty values in dropdown field group options.
-    5. Fixed an issue preventing Mailchimp contact updates from working correctly.
-    6. Fixed the PDF attachment download link not working in entry details.
-
-= 2.20.6 =
-*Release Date: 15 September, 2025*
-*New:
-    1. Input Mask: Added input mask format option for Text, Username, URL and Multiline text fields to enhance data consistency and user input accuracy.
-    2. Developer Filter Hooks (PDF & Email): Introduced bitform_filter_pdf_filename, bitform_filter_pdf_body, bitform_filter_email_subject, and bitform_filter_email_body filter hooks for customizing PDF and email content.
-    3. Developer FilterHooks (Translations): Added bitforms_filter_allow_translation and bitform_filter_translations filter hooks to disable or modify plugin translations.
-
-*Improvements:
-    1. Form Abandonment: Enhanced handling of partial form submissions by improving uploaded file visibility and triggering selected checkboxes actions.
-    2. Phone Field: Added support for landline numbers in the Phone Number field with custom regex pattern support.
-
-*Fixes:
-    1. Resolved repeated file field attachment issues in email templates.
-    2. Fixed issue where default conditional logic was not being disabled properly.
-    3. Fixed form save issues when the plugin was translated into other languages.
-
-= 2.20.5 =
-*Release Date: 25 August, 2025*
-*New:
-    1. Smart Tag: Added ${bf_all_data.onlyValues} smart tag to include all form field values (excluding empty and hidden fields) in Email & PDF templates.
-    2. Conditional Logic: Introduced an Enable/Disable option for better control over conditional logic.
-    3. Language Support: Added new translations for Dutch, French, German, Italian, Portuguese, Spanish, Turkish, and 25+ additional languages.
-
-*Improvements:
-    1. Limit Form Submission: Enhanced by adding options to set submission limits per user/IP or per date/week/month.
-    2. Smart Tags: Added new week tokens for the Format Date Time smart tag.
-    3. File Upload: Improved file type validation for the advanced file upload field.
-
-*Fix:
-    1. Resolved an issue where '0' values were not being included in email content.
-
-= 2.20.4 =
-*Release Date: 12 August, 2025*
-*Fix:
-    1. File Upload Security Enhancement: Strictly block uploading of executable files.
-
-*Improvements:
-    1. Ensure only a single preview tab is open and automatically reload it on every Preview button click.
-
-= 2.20.3 =
-*Release Date: 27 July, 2025*
-*Improvements:
-    1. Conditional Logic: Added support for using the "Next" button for an action to conditionally change steps in Multi Step forms.
-    2. Entry Export: Improved Unicode and Repeater field data formatting for exported entry files.
-
-*Fix:
-    1. Resolved Smart Tag mapping issue for ${bf_all_data} in Double Opt-In email templates.
-    2. Fixed Signature field path issue in email templates for Multi Step forms.
-    3. Fixed scrolling issue related to field validation messages.
-
-
-= 2.20.2 =
-*Release Date: 16 July, 2025*
-*Improvements:
-    1. Move existing field between Section,Repater and Steps.
-    2. Phone number field: added country list hide settings and similar country code validation
-
-= 2.20.1 =
-*Release Date: 08 July, 2025*
-*New:
-    1. Spacer Field: Added a new Spacer field to create visual gaps between form fields, improving form layout and appearance.
-    2. Smart Tag – ${_bf_format_datetime()}: Introduced a new smart tag to format date and time based on user-defined preferences, allowing better control over how date/time values are displayed.
-
-*Improvements:
-    1. Min/Max Date-Time Range: Added support for setting minimum and maximum ranges in Date, Time, Month, and Week fields to enhance validation and input control.
-    2. Conditional Logic Enhancements: Improved behavior of "Change" and "Click" logic by accurately targeting and comparing selected fields.
-
-*Fix:
-    1. Resolved missing "Logged In User" option in the ACF integration edit section.
-    2. Fixed an issue where entry owner/user was being overwritten during entry edits.
-    3. Resolved global validation message overwrite issue in default settings.
-
-= 2.20.0 =
-*Release Date: 30 June, 2025*
-*New:
-    1. Advanced Date-Time Field: Introduced a new field type that lets users select both date and time, improving form flexibility and user experience.
-    2. New Smart Tags (Functions): Added ${_bf_datetime_difference()} and ${_bf_add_subtract_datetime()} smart tags to support date and time calculations.
-    3. New Conditional Action: Added a "Config Option" action in conditional logic to dynamically change Date-Time field config based on user input.
-
-*Improvements:
-    1. Enhanced Logic for Date/Time Fields: Improved conditional logic support for Date, Time, Week, and Month fields, enabling more advanced scenarios.
-
-*Fix:
-    1. Fixed an issue with mismatched created time format in the entries table based on site date/time format settings.
-    2. Resolved PayPal transaction ID mismatch issue in the entry details section.
-    3. Fixed a signature file path issue in multi-step forms.
-    4. Resolved a frontend data view & edit issue related to edit access control.
-
-= 2.19.2 =
-*Release Date: 15 June, 2025*
-*Improvements:
-    1. Security Enhancements: Prevented JavaScript injection in field content areas such as labels, sub-titles, and helper texts within the form builder.
-    2. Conditional Logic: Added "Clone Condition & Logic" feature to enhance usability and speed up logic configuration.
-
-*Fix:
-    1. Fixed an issue with form JavaScript generation when the any form is also included in the footer section.
-
-= 2.19.1 =
-*Release Date: 29 May, 2025*
-*New:
-    1. Form Auto Fill Feature: Added a feature that automatically fills form fields in form preview with user data, streamlining the user experience and reducing manual entry.
-
-*Improvements:
-    1. Nonce Verification Improved: Enhanced nonce verification for better security and cache issue.
-
-*Fix:
-    1. HTML Escaping in Single Entry View: Fixed an issue where HTML tags were not properly escaped, ensuring correct display in the Single Entry View.
-
-= 2.19.0 =
-*Release Date: 20 May, 2025*
-*New:
-    1. Global validation messages: Added new settings under App Settings to globally customize validation error/invalid messages.
-    2. Bricks Builder Widget: Introduced the Bit Form widget for Bricks Builder, enabling easy form embedding.
-
-*Improvements:
-    1. "Other" Option Label: Added setting to customize the label of the "Other..." option in Checkbox and Radio fields.
-    2. Elementor & Gutenberg Widgets: Improved form rendering behavior when switching forms in the Bit Form selection dropdown.
-
-*Fix:
-    1. PayPal Integration: Resolved PayPal transaction ID mismatch issue.
-
-
-
 
 
 == Upgrade Notice ==
 
-= 3.0.0 =
-* Major Update: Introduced a completely redesigned form builder interface with enhanced usability and performance.
+= 3.2.0 =
+* Major Update: Separate execution process of Success Message,Redirect URL, Email Notification, and Integrations from Centeral conditional logic.
 
 
 For changelog of all versions please check [Changelog.txt](https://plugins.trac.wordpress.org/browser/bit-form/trunk/changelog.txt)

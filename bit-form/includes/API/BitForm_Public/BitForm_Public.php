@@ -3,6 +3,7 @@
 namespace BitCode\BitForm\API\BitForm_Public;
 
 use BitCode\BitForm\Core\Database\ApiModel;
+use BitCode\BitForm\Core\Util\Utilities;
 
 class BitForm_Public
 {
@@ -19,10 +20,14 @@ class BitForm_Public
     $formData = $db->getField($formId);
     if (!empty($formData)) {
       $unset_types = ['paypal', 'razorpay', 'stripe', 'recaptcha', 'hcaptcha'];
-      $formContent = json_decode($formData[0]->form_content);
+      $formRow = Utilities::firstRow($formData);
+      $formContent = Utilities::jsonObj($formRow->form_content ?? '');
+      if (!$formContent || !isset($formContent->fields)) {
+        return (object) [];
+      }
       foreach ($formContent->fields as $key => $field) {
         if (in_array($field->typ, $unset_types)) {
-          unset($formContent->fields->{$key}, $fieldsKey[$key]);
+          unset($formContent->fields->{$key});
         }
       }
       return $formContent->fields;

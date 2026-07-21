@@ -386,6 +386,8 @@ class ScriptFilePriorityManager
 
   public static function validationScriptFileMapping($fieldType)
   {
+    // Pro filter callbacks type-hint string; never let null/non-string through.
+    $fieldType = is_string($fieldType) ? $fieldType : '';
     $textTypeField = ['text', 'password', 'username', 'color'];
     if (in_array($fieldType, $textTypeField)) {
       $fieldType = 'text';

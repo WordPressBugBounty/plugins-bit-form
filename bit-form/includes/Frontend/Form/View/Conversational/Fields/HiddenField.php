@@ -25,7 +25,7 @@ class HiddenField
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
 
-    if (property_exists($field, 'suggestions') && count($field->suggestions) > 0) {
+    if (is_object($field) && property_exists($field, 'suggestions') && is_countable($field->suggestions) && count($field->suggestions) > 0) {
       $list = "list='{$rowID}-{$contentCount}-datalist'";
       $sugg .= "<datalist id='{$rowID}-{$contentCount}-datalist'>";
       foreach ($field->suggestions as $suggestion) {

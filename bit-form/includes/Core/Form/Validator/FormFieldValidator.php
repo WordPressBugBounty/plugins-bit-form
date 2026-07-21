@@ -46,6 +46,12 @@ final class FormFieldValidator
           continue;
         }
         $parentData = $this->_form_fields[$field_data['parentFieldKey']] ?? null;
+        if (!empty($parentData['repeated'])) {
+          // Parent lives inside a repeater: its value is row-transposed below and
+          // every row (incl. the confirm match) is validated via validateRepeatedField,
+          // so extracting the child here would misread the child-part-first POST shape.
+          continue;
+        }
         $parentValue = $this->_submitted_fields[$field_data['parentFieldKey']] ?? null;
         if (is_array($parentValue)) {
           $childName = FieldValueHandler::deriveChildName($field_data['name'] ?? '', isset($parentData['name']) ? $parentData['name'] : '');
@@ -59,6 +65,17 @@ final class FormFieldValidator
 
       if (('file-up' === $field_data['type'] || 'advanced-file-up' === $field_data['type']) && isset($this->_submitted_files[$field_name]['name'])) {
         $submittedFieldData = $this->_submitted_files[$field_name]['name'];
+      }
+      // Composite fields (email/password with confirm, name, address) under a repeater
+      // post child-part-first (e.g. $_POST['<field>']['primary'][<row>]). Transpose to
+      // row-first so the loop below iterates real row indexes, not child-part names.
+      if (
+        isset($field_data['repeated']) && $field_data['repeated']
+        && is_array($submittedFieldData)
+        && in_array($field_data['type'], ['email', 'password', 'name', 'address'], true)
+      ) {
+        $submittedFieldData = $this->transposeCompositeRows($submittedFieldData);
+        $this->_submitted_fields[$field_name] = $submittedFieldData;
       }
       if (isset($field_data['repeated']) && $field_data['repeated'] && is_array($submittedFieldData)) {
         foreach (array_keys($submittedFieldData) as $rowIndex) {
@@ -273,6 +290,11 @@ final class FormFieldValidator
                 $field_data['valid']['typMsg'] :
                 $field_data['label'] . __(' should be an email. please provide a valid email address.', 'bit-form');
           }
+          $this->validateConfirmFieldRow($field_name, $field_data, $rowIndex);
+          break;
+        }
+        case 'password': {
+          $this->validateConfirmFieldRow($field_name, $field_data, $rowIndex);
           break;
         }
         case 'time': {
@@ -365,14 +387,65 @@ final class FormFieldValidator
     }
   }
 
+  /**
+   * Transpose a repeated composite field's submitted value from child-part-first
+   * ([<part>][<row>] — how the frontend posts it) to row-first ([<row>][<part>]).
+   * Returns the value unchanged when it is already row-first (numeric top-level
+   * keys) or is not a composite child-first shape.
+   */
+  private function transposeCompositeRows($value)
+  {
+    if (!is_array($value) || empty($value)) {
+      return $value;
+    }
+    foreach ($value as $childKey => $childValues) {
+      if (is_int($childKey) || ctype_digit((string) $childKey) || !is_array($childValues)) {
+        return $value;
+      }
+    }
+    $rows = [];
+    foreach ($value as $childKey => $childValues) {
+      foreach ($childValues as $rowIndex => $rowValue) {
+        $rows[$rowIndex][$childKey] = $rowValue;
+      }
+    }
+    return $rows;
+  }
+
+  /**
+   * Per-row confirm match for repeated email/password fields. The row value is
+   * ['primary' => ..., 'confirm' => ...] after transposeCompositeRows().
+   */
+  private function validateConfirmFieldRow($field_name, $field_data, $rowIndex)
+  {
+    $rowValue = $this->_submitted_fields[$field_name][$rowIndex] ?? null;
+    if (!is_array($rowValue) || !array_key_exists('confirm', $rowValue)) {
+      return;
+    }
+    $confirmFieldKey = $field_data['childFields'][0]->fldKey ?? null;
+    $confirmFldData = $this->_form_fields[$confirmFieldKey] ?? null;
+    if (!$this->matchConfirmation($rowValue['primary'] ?? null, $rowValue['confirm'])) {
+      if ($confirmFldData && empty($confirmFldData['isDeactive'])) {
+        $this->_messages[$confirmFieldKey . '[' . $rowIndex . ']']
+            = !empty($confirmFldData['valid']['confMsg']) ?
+            $confirmFldData['valid']['confMsg'] :
+            __('The entered values do not match.', 'bit-form');
+      }
+    }
+  }
+
   private function validateEmail($value)
   {
     if (is_array($value)) {
-      $value = $value['primary'];
+      $value = $value['primary'] ?? null;
+    }
+
+    if (!is_string($value)) {
+      return false;
     }
     $validEmailPattern = "/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/";
 
-    return preg_match($validEmailPattern, $value);
+    return 1 === preg_match($validEmailPattern, $value);
   }
 
   private function matchConfirmation($value, $confirmValue)

@@ -7,7 +7,7 @@ use BitCode\BitForm\Core\Form\FormManager;
 
 final class FieldValueHandler
 {
-  public static function replaceFieldWithValue($stringToReplaceField, $fieldValues, $formID = null)
+  public static function replaceFieldWithValue($stringToReplaceField, $fieldValues, $formID = null, $stripShortcodesFromValues = false)
   {
     if (empty($stringToReplaceField)) {
       return $stringToReplaceField;
@@ -51,6 +51,10 @@ final class FieldValueHandler
           // $fieldValue = wp_json_encode($targetFieldValue);
         } else {
           $fieldValue = strval($targetFieldValue);
+        }
+        // Neutralize shortcodes in low-trust submitted values before they are merged into a
+        if ($stripShortcodesFromValues && is_string($fieldValue)) {
+          $fieldValue = strip_shortcodes($fieldValue);
         }
         $stringToReplaceField = str_replace($value, $fieldValue, $stringToReplaceField);
       } else {

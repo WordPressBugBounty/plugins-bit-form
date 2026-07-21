@@ -75,6 +75,11 @@ class MigrationHelper
     foreach ($fieldsArray as $fieldKey => $field) {
       // print_r(gettype($field));
       $convertFormate = $conversionFormate->getFormate($field->typ);
+      // Unknown field type: keep the field as-is instead of fataling the migration
+      if (empty($convertFormate)) {
+        $newFieldsArray[$fieldKey] = $field;
+        continue;
+      }
       $newFieldProperty = [];
 
       // convert unchange property

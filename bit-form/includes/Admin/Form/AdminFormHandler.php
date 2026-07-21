@@ -14,13 +14,12 @@ use BitCode\BitForm\Core\Database\FormEntryMetaModel;
 use BitCode\BitForm\Core\Database\FormEntryModel;
 use BitCode\BitForm\Core\Database\FormModel;
 use BitCode\BitForm\Core\Database\IntegrationModel;
-use BitCode\BitForm\Core\Database\PdfTemplateModel;
 use BitCode\BitForm\Core\Database\ReportsModel;
 use BitCode\BitForm\Core\Database\SuccessMessageModel;
 use BitCode\BitForm\Core\Database\WorkFlowModel;
+use BitCode\BitForm\Core\Form\FormManager;
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Messages\EmailTemplateHandler;
-use BitCode\BitForm\Core\Messages\PdfTemplateHandler;
 use BitCode\BitForm\Core\Messages\SuccessMessageHandler;
 use BitCode\BitForm\Core\Migration\MigrationHelper;
 use BitCode\BitForm\Core\Util\FileHandler;
@@ -88,7 +87,7 @@ class AdminFormHandler
     $lg_styles = '';
     $md_styles = '';
     $sm_styles = '';
-    for ($i = 0; $i < count($layout->lg); $i++) {
+    for ($i = 0; $i < count($layout->lg ?? []); $i++) {
       $fld = $layout->lg[$i];
 
       if ($fld->w < 10) {
@@ -242,6 +241,10 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         __('Form Name Should Be Within 50 Characters', 'bit-form')
       );
     }
+    // Guard: never persist orphan fields (in fields but in no layout) — they
+    // render nothing yet their validation rules block submission. Covers old
+    // clients and hand-edited imports (importAForm funnels through here).
+    $this->pruneOrphanFields($fields, $nestedLayout, $layout, null, $post);
     $form_content = [
       'fields'       => $fields,
       'layout'       => $layout,
@@ -322,6 +325,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
           if ($savedID) {
             $msgIdx = empty($messageDetail->id) ? $messageKey : wp_json_encode(['id' => $messageDetail->id]);
             $integartionIDForWorkflow['successMsg'][$msgIdx] = $savedID;
+            if (!empty($messageDetail->clRef)) {
+              $integartionIDForWorkflow['confirmationCLRef'][$messageDetail->clRef] = $savedID;
+            }
             $messageDetail->id = $savedID;
             $style = $this->updateSuccessMessageClassName($style, $messageKey, $savedID);
             $atomic_class_map = $this->updateSuccessMessageClassName($atomic_class_map, $messageKey, $savedID);
@@ -356,17 +362,23 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
           = new EmailTemplateHandler($formID, $user_details);
         foreach ($mailTem as $templateKey => $templateDetail) {
           $savedID = $emailTemplateHandler->saveTemplate($templateDetail);
-          if ($savedID) {
+          if ($savedID && !is_wp_error($savedID)) {
             $tempIdx = empty($templateDetail->id) ? $templateKey : wp_json_encode(['id' => $templateDetail->id]);
             $integartionIDForWorkflow['mailNotify'][$tempIdx] = $savedID;
+            if (!empty($templateDetail->clRef)) {
+              $integartionIDForWorkflow['emailCLRef'][$templateDetail->clRef] = $savedID;
+            }
+            // return the new id (and drop the temp ref) so the frontend reconciles the template
+            $templateDetail->id = $savedID;
+            unset($templateDetail->clRef);
           }
         }
       }
       // Email Template [end] */
 
       // PDF Template [start]
-      if (!empty($pdfTem)) {
-        $pdfTemplateHandler = new PdfTemplateHandler($formID);
+      if (!empty($pdfTem) && class_exists('\BitCode\BitFormPro\Core\Messages\PdfTemplateHandler')) {
+        $pdfTemplateHandler = new \BitCode\BitFormPro\Core\Messages\PdfTemplateHandler($formID);
         $workFlowString = '';
         if (!empty($workFlows)) {
           $workFlowString = wp_json_encode($workFlows);
@@ -381,6 +393,15 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
           }
           if (!empty($workFlowString)) {
             $workFlowString = str_replace('"pdfId":"{\"id\":\"' . $templateDetail->id . '\"}"', '"pdfId":"{\"id\":\"' . $savedID . '\"}"', $workFlowString);
+            // Multi-PDF: remap ids inside "pdfIds":[...] segments only — email-template ids use
+            // the same {\"id\":N} token shape, so a global replace would corrupt them.
+            $workFlowString = preg_replace_callback(
+              '/"pdfIds":\[[^\]]*\]/',
+              function ($matches) use ($templateDetail, $savedID) {
+                return str_replace('{\"id\":\"' . $templateDetail->id . '\"}', '{\"id\":\"' . $savedID . '\"}', $matches[0]);
+              },
+              $workFlowString
+            );
           }
         }
         if (!empty($workFlowString) && !empty($workFlows)) {
@@ -394,6 +415,12 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         $allIntegrations = $formSettings->confirmation->type;
         foreach ($allIntegrations as $integrationType => $integrationGroup) {
           foreach ($integrationGroup as $singleIntegrationKey => $singleIntegrationDetail) {
+            $integrationStatus = isset($singleIntegrationDetail->status) ? (int) $singleIntegrationDetail->status : 1;
+            // Inline-CL temp ref for a brand-new redirect (reconciled to the real id for workflow rows).
+            $clRef = isset($singleIntegrationDetail->clRef) ? $singleIntegrationDetail->clRef : null;
+            if (is_object($singleIntegrationDetail)) {
+              unset($singleIntegrationDetail->status, $singleIntegrationDetail->clRef);
+            }
             if (empty($singleIntegrationDetail->details)) {
               $integrationName = $singleIntegrationDetail->title;
               unset($singleIntegrationDetail->title, $singleIntegrationDetail->id);
@@ -405,9 +432,12 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
               $integrationDetails = !is_string($singleIntegrationDetail->details) ?
                 wp_json_encode($singleIntegrationDetail->details) : $singleIntegrationDetail->details;
             }
-            $savedID = $integrationHandler->saveIntegration($integrationName, $integrationType, $integrationDetails, 'form');
+            $savedID = $integrationHandler->saveIntegration($integrationName, $integrationType, $integrationDetails, 'form', $integrationStatus);
             $integIdx = empty($singleIntegrationDetail->id) ? $savedID : wp_json_encode(['id' => $singleIntegrationDetail->id]);
             $integartionIDForWorkflow[$integrationType][$integIdx] = $savedID;
+            if (!empty($clRef) && 'redirectPage' === $integrationType) {
+              $integartionIDForWorkflow['redirectCLRef'][$clRef] = $savedID;
+            }
           }
         }
       }
@@ -427,6 +457,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
           unset($singleIntegrationDetail->type);
           $singleIntegrationDetailID = empty($singleIntegrationDetail->id) ? null : $singleIntegrationDetail->id;
           unset($singleIntegrationDetail->id);
+          // Inline-CL temp ref for a brand-new integration (reconciled to the real id for workflow rows).
+          $clRef = isset($singleIntegrationDetail->__bf_cl_ref) ? $singleIntegrationDetail->__bf_cl_ref : null;
+          unset($singleIntegrationDetail->__bf_cl_ref);
           if (empty($singleIntegrationDetail->details)) {
             $integrationDetails = !is_string($singleIntegrationDetail) ?
               wp_json_encode($singleIntegrationDetail) : $singleIntegrationDetail;
@@ -437,6 +470,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
           $savedID = $integrationHandler->saveIntegration($integrationName, $integrationType, $integrationDetails, 'form');
           $integIdx = empty($singleIntegrationDetailID) ? $singleIntegrationKey : wp_json_encode(['id' => $singleIntegrationDetailID]);
           $integartionIDForWorkflow['integ'][$integIdx] = $savedID;
+          if (!empty($clRef) && !is_wp_error($savedID)) {
+            $integartionIDForWorkflow['integrationCLRef'][$clRef] = $savedID;
+          }
         }
       }
       //Integrations [end]
@@ -547,6 +583,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
       return new WP_Error('empty_form', 'Can not update empty form.');
     }
 
+    // Guard: never persist orphan fields (see createNewForm). Fail closed.
+    $this->pruneOrphanFields($fields, $nestedLayout, $layout, $formID, $post);
+
     $form_content = [
       'fields'       => $fields,
       'layout'       => $layout,
@@ -589,6 +628,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
           if ($savedID) {
             $newData['settingConfiramation'] = 1;
             $integartionIDForWorkflow['successMsg'][$messageKey] = $savedID;
+            if (!empty($messageDetail->clRef)) {
+              $integartionIDForWorkflow['confirmationCLRef'][$messageDetail->clRef] = $savedID;
+            }
             $messageDetail->id = $savedID;
             $builder_helper_state->style = $this->updateSuccessMessageClassName($builder_helper_state->style, $messageKey, $savedID);
             if (isset($atomic_class_map)) {
@@ -615,6 +657,12 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
           } else {
             $newData['mailTemplate'] = 1;
             $integartionIDForWorkflow['mailTem'][$templateKey] = $savedID;
+            if (!empty($templateDetail->clRef)) {
+              $integartionIDForWorkflow['emailCLRef'][$templateDetail->clRef] = $savedID;
+            }
+            // return the new id (and drop the temp ref) so the frontend reconciles the template
+            $templateDetail->id = $savedID;
+            unset($templateDetail->clRef);
           }
         } else {
           $emailTemplateHandler->updateTemplate($templateDetail);
@@ -623,8 +671,8 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     }
     // return $formSettings;
     // Email Template [end] */
-    if (!empty($pdfTem)) {
-      $pdfTemplateHandler = new PdfTemplateHandler($formID);
+    if (!empty($pdfTem) && class_exists('\BitCode\BitFormPro\Core\Messages\PdfTemplateHandler')) {
+      $pdfTemplateHandler = new \BitCode\BitFormPro\Core\Messages\PdfTemplateHandler($formID);
 
       foreach ($pdfTem as $templateKey => $templateDetail) {
         if (isset($templateDetail->setting->font->name)) {
@@ -646,6 +694,13 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
       $allIntegrations = $formSettings->confirmation->type;
       foreach ($allIntegrations as $integrationType => $integrationGroup) {
         foreach ($integrationGroup as $singleIntegrationKey => $singleIntegrationDetail) {
+          // Redirect (and webhook) enable/disable toggle persists to the integration status column.
+          $integrationStatus = isset($singleIntegrationDetail->status) ? (int) $singleIntegrationDetail->status : 1;
+          // Inline-CL temp ref for a brand-new redirect (reconciled to the real id for workflow rows).
+          $clRef = isset($singleIntegrationDetail->clRef) ? $singleIntegrationDetail->clRef : null;
+          if (is_object($singleIntegrationDetail)) {
+            unset($singleIntegrationDetail->status, $singleIntegrationDetail->clRef);
+          }
           if (empty($singleIntegrationDetail->details)) {
             $integrationName = $singleIntegrationDetail->title;
             unset($singleIntegrationDetail->title);
@@ -661,11 +716,14 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
               wp_json_encode($singleIntegrationDetail->details) : $singleIntegrationDetail->details;
           }
           if (empty($singleIntegrationDetailID)) {
-            $savedID = $integrationHandler->saveIntegration($integrationName, $integrationType, $integrationDetails, 'form');
+            $savedID = $integrationHandler->saveIntegration($integrationName, $integrationType, $integrationDetails, 'form', $integrationStatus);
             $newData['settingConfiramation'] = 1;
             $integartionIDForWorkflow[$integrationType][$singleIntegrationKey] = $savedID;
+            if (!empty($clRef) && 'redirectPage' === $integrationType) {
+              $integartionIDForWorkflow['redirectCLRef'][$clRef] = $savedID;
+            }
           } else {
-            $integrationHandler->updateIntegration($singleIntegrationDetailID, $integrationName, $integrationType, $integrationDetails, 'form');
+            $integrationHandler->updateIntegration($singleIntegrationDetailID, $integrationName, $integrationType, $integrationDetails, 'form', $integrationStatus);
           }
         }
       }
@@ -678,6 +736,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         unset($singleIntegrationDetail->type);
         $singleIntegrationDetailID = empty($singleIntegrationDetail->id) ? null : $singleIntegrationDetail->id;
         unset($singleIntegrationDetail->id);
+        // Inline-CL temp ref for a brand-new integration (reconciled to the real id for workflow rows).
+        $clRef = isset($singleIntegrationDetail->__bf_cl_ref) ? $singleIntegrationDetail->__bf_cl_ref : null;
+        unset($singleIntegrationDetail->__bf_cl_ref);
         if (empty($singleIntegrationDetail->details)) {
           $integrationDetails = !is_string($singleIntegrationDetail) ?
             wp_json_encode($singleIntegrationDetail) : $singleIntegrationDetail;
@@ -688,6 +749,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         if (empty($singleIntegrationDetailID)) {
           $savedID = $integrationHandler->saveIntegration($integrationName, $integrationType, $integrationDetails, 'form');
           $integartionIDForWorkflow[$integrationType][$singleIntegrationKey] = $savedID;
+          if (!empty($clRef) && !is_wp_error($savedID)) {
+            $integartionIDForWorkflow['integrationCLRef'][$clRef] = $savedID;
+          }
           if (is_wp_error($savedID) && 'result_empty' !== $savedID->get_error_code()) {
             $newData['integation'] = 2;
           } else {
@@ -874,6 +938,52 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     }
   }
 
+  /**
+   * Drop orphan fields (present in `fields` but in no layout) from form_content
+   * before persisting, and remove now-childless nestedLayout entries.
+   *
+   * Entry meta is NEVER touched here — only explicit user deletes clear meta
+   * (see setEmptyMetaValue). Fail closed: an unusable/partial layout, or a
+   * client that flagged a failed pre-save layout sync (->skipOrphanPrune),
+   * prunes nothing. Pruned keys are logged, never silently dropped.
+   *
+   * @param object|array    $fields       by ref; orphan keys removed
+   * @param object|null     $nestedLayout by ref; stale container entries removed
+   * @param array|object    $layout       raw layout (single or multi-step)
+   * @param int|string|null $formID       for logging ('new' when absent)
+   * @param object          $post         raw request; honors ->skipOrphanPrune
+   */
+  private function pruneOrphanFields(&$fields, &$nestedLayout, $layout, $formID, $post)
+  {
+    $formLabel = $formID ? $formID : 'new';
+    if (isset($post->skipOrphanPrune) && $post->skipOrphanPrune) {
+      Log::debug_log('Bit Form: orphan prune skipped (client reported failed layout sync). FormID=' . $formLabel);
+      return;
+    }
+    $orphanFldKeys = FormManager::computeOrphanFieldKeys($layout, $nestedLayout, $fields);
+    // null = unusable/partial layout (fail closed); [] = nothing to prune
+    if (!is_array($orphanFldKeys) || empty($orphanFldKeys)) {
+      return;
+    }
+    Log::debug_log('Bit Form: pruning orphan fields (absent from every layout). FormID=' . $formLabel . ' keys=' . implode(',', $orphanFldKeys));
+    foreach ($orphanFldKeys as $orphanKey) {
+      if (is_object($fields)) {
+        unset($fields->{$orphanKey});
+      } elseif (is_array($fields)) {
+        unset($fields[$orphanKey]);
+      }
+    }
+    // prune stale nestedLayout entries — containers that no longer exist in fields
+    if (is_object($nestedLayout)) {
+      foreach (array_keys(get_object_vars($nestedLayout)) as $nKey) {
+        $parentExists = is_object($fields) ? isset($fields->{$nKey}) : isset($fields[$nKey]);
+        if (!$parentExists) {
+          unset($nestedLayout->{$nKey});
+        }
+      }
+    }
+  }
+
   public function setEmptyMetaValue($fieldkeys)
   {
     global $wpdb;
@@ -1028,26 +1138,35 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         foreach ($emailTemplates as $emailTemplatekey => $emailTemplatevalue) {
           $mailTem[] =
             [
-              'id'    => $emailTemplatevalue->id,
-              'title' => $emailTemplatevalue->title,
-              'sub'   => $emailTemplatevalue->sub,
-              'body'  => $emailTemplatevalue->body,
+              'id'     => $emailTemplatevalue->id,
+              'title'  => $emailTemplatevalue->title,
+              'sub'    => $emailTemplatevalue->sub,
+              'body'   => $emailTemplatevalue->body,
+              'status' => isset($emailTemplatevalue->status) ? (int) $emailTemplatevalue->status : 1,
+              'config' => !empty($emailTemplatevalue->config) ? json_decode($emailTemplatevalue->config) : (object) [],
             ];
         }
       }
       // get all pdf template
-      $pdfTemplateHandler = new PdfTemplateHandler($formID);
-      $pdfTemplates = $pdfTemplateHandler->getAll();
+      if (class_exists('\BitCode\BitFormPro\Core\Messages\PdfTemplateHandler')) {
+        $pdfTemplateHandler = new \BitCode\BitFormPro\Core\Messages\PdfTemplateHandler($formID);
+        $pdfTemplates = $pdfTemplateHandler->getAll();
 
-      if (!is_wp_error($pdfTemplates)) {
-        foreach ($pdfTemplates as $value) {
-          $pdfTem[] =
-            [
-              'id'      => $value->id,
-              'title'   => $value->title,
-              'setting' => json_decode($value->setting),
-              'body'    => $value->body,
-            ];
+        if (!is_wp_error($pdfTemplates)) {
+          foreach ($pdfTemplates as $value) {
+            $pdfTem[] =
+              [
+                'id'         => $value->id,
+                'title'      => $value->title,
+                'setting'    => json_decode($value->setting),
+                'pdf_config' => !empty($value->pdf_config) ? json_decode($value->pdf_config) : (object) [
+                  'status' => 1,
+                  'header' => '',
+                  'footer' => '',
+                ],
+                'body'    => $value->body,
+              ];
+          }
         }
       }
 
@@ -1057,8 +1176,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         foreach ($formIntegrations as $integrationkey => $integrationValue) {
           if ('redirectPage' === $integrationValue->integration_type || 'webHooks' === $integrationValue->integration_type) {
             $integrationData = [
-              'id'    => $integrationValue->id,
-              'title' => $integrationValue->integration_name,
+              'id'     => $integrationValue->id,
+              'title'  => $integrationValue->integration_name,
+              'status' => isset($integrationValue->status) ? (int) $integrationValue->status : 1,
             ];
             if (!empty($integrationValue->integration_details)) {
               $integration_details = (array) json_decode($integrationValue->integration_details);
@@ -1301,9 +1421,10 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         foreach ($successMessages as $sucessMessagekey => $sucessMessagevalue) {
           $allConfirmation['type']['successMsg'][$sucessMessagekey] =
             [
-              'id'    => $sucessMessagevalue->id,
-              'title' => $sucessMessagevalue->message_title,
-              'msg'   => $sucessMessagevalue->message_content,
+              'id'     => $sucessMessagevalue->id,
+              'title'  => $sucessMessagevalue->message_title,
+              'msg'    => $sucessMessagevalue->message_content,
+              'config' => !empty($sucessMessagevalue->message_config) ? json_decode($sucessMessagevalue->message_config) : (object) [],
             ];
         }
       }
@@ -1314,10 +1435,12 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         foreach ($emailTemplates as $emailTemplatekey => $emailTemplatevalue) {
           $mailTem[] =
             [
-              'id'    => $emailTemplatevalue->id,
-              'title' => $emailTemplatevalue->title,
-              'sub'   => $emailTemplatevalue->sub,
-              'body'  => $emailTemplatevalue->body,
+              'id'     => $emailTemplatevalue->id,
+              'title'  => $emailTemplatevalue->title,
+              'sub'    => $emailTemplatevalue->sub,
+              'body'   => $emailTemplatevalue->body,
+              'status' => isset($emailTemplatevalue->status) ? (int) $emailTemplatevalue->status : 1,
+              'config' => !empty($emailTemplatevalue->config) ? json_decode($emailTemplatevalue->config) : (object) [],
             ];
         }
       }
@@ -1327,8 +1450,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         foreach ($formIntegrations as $integrationkey => $integrationValue) {
           if ('redirectPage' === $integrationValue->integration_type || 'webHooks' === $integrationValue->integration_type) {
             $integrationData = [
-              'id'    => $integrationValue->id,
-              'title' => $integrationValue->integration_name,
+              'id'     => $integrationValue->id,
+              'title'  => $integrationValue->integration_name,
+              'status' => isset($integrationValue->status) ? (int) $integrationValue->status : 1,
             ];
             if (!empty($integrationValue->integration_details)) {
               // var_dump(json_decode($integrationValue->integration_details));
@@ -1515,8 +1639,10 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     $emailTemplateModel = new EmailTemplateModel();
     $deleteTemplateStatus = $emailTemplateModel->delete(['form_id' => $formID]);
 
-    $pdfTemplateModel = new PdfTemplateModel();
-    $deletePdfTemplateStatus = $pdfTemplateModel->delete(['form_id' => $formID]);
+    if (class_exists('\BitCode\BitFormPro\Core\Database\PdfTemplateModel')) {
+      $pdfTemplateModel = new \BitCode\BitFormPro\Core\Database\PdfTemplateModel();
+      $deletePdfTemplateStatus = $pdfTemplateModel->delete(['form_id' => $formID]);
+    }
 
     $integrationModel = new IntegrationModel();
     $deleteIntegrationStatus = $integrationModel->delete(['form_id' => $formID]);
@@ -1608,8 +1734,10 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     $emailTemplateModel = new EmailTemplateModel();
     $deleteTemplateStatus = $emailTemplateModel->bulkDelete(['form_id' => $formID]);
 
-    $pdfTemplateModel = new PdfTemplateModel();
-    $deletePdfTemplateStatus = $pdfTemplateModel->bulkDelete(['form_id' => $formID]);
+    if (class_exists('\BitCode\BitFormPro\Core\Database\PdfTemplateModel')) {
+      $pdfTemplateModel = new \BitCode\BitFormPro\Core\Database\PdfTemplateModel();
+      $deletePdfTemplateStatus = $pdfTemplateModel->bulkDelete(['form_id' => $formID]);
+    }
 
     $integrationModel = new IntegrationModel();
     $deleteIntegrationStatus = $integrationModel->bulkDelete(['form_id' => $formID]);

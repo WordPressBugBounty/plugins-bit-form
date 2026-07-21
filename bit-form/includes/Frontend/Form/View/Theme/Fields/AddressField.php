@@ -21,7 +21,7 @@ class AddressField
     $parentChildHTML = '';
 
     foreach ($childFields as $childFldKey) {
-      if (!isset($childFldKey->fldKey) || !isset($fields->{$childFldKey->fldKey})) {
+      if (!isset($childFldKey->fldKey) || !isset($fields->{$childFldKey->fldKey}) || !is_object($fields->{$childFldKey->fldKey})) {
         continue;
       }
 

@@ -66,7 +66,7 @@ class RecordApiHelper
   public function executeRecordApi($workbook, $worksheet, $headerRow, $dataCenter, $actions, $defaultConf, $fieldValues, $fieldMap)
   {
     $fieldValues = IntegrationHandler::assignRepeaterFieldValue($fieldValues, $this->_formId);
-    $fieldValues = IntegrationHandler::formattedRepeaterValue($fieldValues, 'string');
+    $fieldValues = IntegrationHandler::formattedRepeaterValue($fieldValues, 'string', $this->_formId);
     $entryDetails = [
       'formId'      => $this->_formId,
       'entryId'     => $this->_entryId,

@@ -9,12 +9,13 @@ use BitCode\BitForm\Core\Database\FormEntryModel;
 use BitCode\BitForm\Core\Database\IntegrationModel;
 use BitCode\BitForm\Core\Form\FormManager;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
+use BitCode\BitForm\Core\Util\Log;
 use BitCode\BitForm\Core\Util\MailNotifier;
 use BitCode\BitForm\Frontend\Form\FrontendFormManager;
 
 final class IntegrationHandler
 {
-  private static $_formID;
+  private $_formID;
   private static $_integrationModel;
   private $_user_details;
 
@@ -28,7 +29,7 @@ final class IntegrationHandler
    */
   public function __construct($formID, $user_details = null)
   {
-    static::$_formID = $formID;
+    $this->_formID = $formID;
     static::$_integrationModel = new IntegrationModel();
     $this->_user_details = $user_details;
   }
@@ -36,7 +37,7 @@ final class IntegrationHandler
   public function getAIntegration($integrationID, $integrationCategory = null, $integrationType = null)
   {
     $conditions = [
-      'form_id' => static::$_formID,
+      'form_id' => $this->_formID,
       'id'      => $integrationID,
     ];
     if (!is_null($integrationType)) {
@@ -51,6 +52,7 @@ final class IntegrationHandler
         'integration_name',
         'integration_type',
         'integration_details',
+        'status',
         'form_id',
       ],
       $conditions
@@ -60,7 +62,7 @@ final class IntegrationHandler
   public function getAllIntegration($integrationCategory = null, $integrationType = null, $status = null, $id = null)
   {
     $conditions = [
-      'form_id' => static::$_formID,
+      'form_id' => $this->_formID,
     ];
     if (!is_null($integrationType)) {
       $conditions = array_merge($conditions, ['integration_type' => $integrationType]);
@@ -128,7 +130,7 @@ final class IntegrationHandler
         'integration_type'    => $integrationType,
         'integration_details' => $integrationDetails,
         'category'            => $integrationCategory,
-        'form_id'             => static::$_formID,
+        'form_id'             => $this->_formID,
         'user_id'             => $this->_user_details['id'],
         'user_ip'             => $this->_user_details['ip'],
         'status'              => $status,
@@ -149,7 +151,7 @@ final class IntegrationHandler
         'integration_type'    => $integrationType,
         'integration_details' => $integrationDetails,
         'category'            => $integrationCategory,
-        'form_id'             => static::$_formID,
+        'form_id'             => $this->_formID,
         'user_id'             => $this->_user_details['id'],
         'user_ip'             => $this->_user_details['ip'],
         'status'              => $status,
@@ -157,6 +159,21 @@ final class IntegrationHandler
       ],
       [
         'id' => $integrationID,
+      ]
+    );
+  }
+
+  public function updateIntegrationStatus($integrationID, $status)
+  {
+    $data = ['status' => (int) $status];
+    if (!empty($this->_user_details['time'])) {
+      $data['updated_at'] = $this->_user_details['time'];
+    }
+    return static::$_integrationModel->update(
+      $data,
+      [
+        'id'      => $integrationID,
+        'form_id' => $this->_formID,
       ]
     );
   }
@@ -169,7 +186,7 @@ final class IntegrationHandler
       'integration_type',
       'integration_details',
       'category',
-      static::$_formID,
+      $this->_formID,
       $this->_user_details['id'],
       $this->_user_details['ip'],
       'status',
@@ -184,7 +201,7 @@ final class IntegrationHandler
     return static::$_integrationModel->delete(
       [
         'id'      => $integrationID,
-        'form_id' => static::$_formID,
+        'form_id' => $this->_formID,
       ]
     );
   }
@@ -282,6 +299,9 @@ final class IntegrationHandler
       if (isset($workFlowReturnedData['msg_duration'])) {
         $responseData['msg_duration'] = $workFlowReturnedData['msg_duration'];
       }
+      if (isset($workFlowReturnedData['afterSubmit'])) {
+        $responseData['afterSubmit'] = $workFlowReturnedData['afterSubmit'];
+      }
     }
     if (isset($workFlowReturnedData['redirectPage'])) {
       $responseData['redirectPage'] = $workFlowReturnedData['redirectPage'];
@@ -351,7 +371,12 @@ final class IntegrationHandler
             do_action('bitform_double_optin_confirmation', $workFlowReturnedData['integrationDetails'], $triggerData);
           } elseif (isset($triggerData['dblOptin'])) {
             foreach ($triggerData['dblOptin'] as $value) {
-              MailNotifier::notify($value, $triggerData['formID'], $triggerData['fields'], $triggerData['entryID'], true, $triggerData['logID']);
+              try {
+                MailNotifier::notify($value, $triggerData['formID'], $triggerData['fields'], $triggerData['entryID'], true, $triggerData['logID']);
+              } catch (\Throwable $mailError) {
+                // response already flushed — a mail failure here must not kill the rest of the run
+                Log::debug_log('[+] Double opt-in mail failed: ' . $mailError->getMessage());
+              }
             }
           }
         }
@@ -364,14 +389,18 @@ final class IntegrationHandler
         }
         return $workFlowReturnedData;
       }
-
       if (isset($triggerData['mail']) && !empty($triggerData['mail'])) {
         $formManager = new AdminFormManager($triggerData['formID']);
         $formContent = $formManager->getFormContent();
         $submitted_fields = $formContent->fields;
         $fieldValueForMail = FieldValueHandler::formatFieldValueForMail($submitted_fields, $workFlowReturnedData['fields']);
         foreach ($triggerData['mail'] as $value) {
-          MailNotifier::notify($value, $triggerData['formID'], $fieldValueForMail, $triggerData['entryID'], false, $triggerData['logID']);
+          try {
+            MailNotifier::notify($value, $triggerData['formID'], $fieldValueForMail, $triggerData['entryID'], false, $triggerData['logID']);
+          } catch (\Throwable $mailError) {
+            // response already flushed — a mail failure here must not skip the integrations below
+            Log::debug_log('[+] Mail notification failed: ' . $mailError->getMessage());
+          }
         }
       }
       do_action('bitforms_exec_integrations', $triggerData['integrations'], $workFlowReturnedData['fields'], $triggerData['formID'], $triggerData['entryID'], $triggerData['logID']);
@@ -387,7 +416,7 @@ final class IntegrationHandler
     }
 
     $entryID = $triggerData['entryID'];
-    if (isset($workFlowReturnedData['cron']) && $workFlowReturnedData['cron'] && !isset($triggerData['mail']) && isset($workFlowReturnedData['integrationRun']) && $workFlowReturnedData['integrationRun']) {
+    if (isset($workFlowReturnedData['cron']) && $workFlowReturnedData['cron'] && empty($triggerData['mail']) && isset($workFlowReturnedData['integrationRun']) && $workFlowReturnedData['integrationRun']) {
       $eventScheuled = wp_schedule_single_event(time(), 'bitforms_exec_integrations', [$triggerData['integrations'], $workFlowReturnedData['fields'], $triggerData['formID'], $triggerData['entryID'], $triggerData['logID']]);
       $scheduleTime = wp_next_scheduled('bitforms_exec_integrations', [$triggerData['integrations'], $workFlowReturnedData['fields'], $triggerData['formID'], $triggerData['entryID'], $triggerData['logID']]);
       $responseData['cron'] = get_site_url(null, "/wp-cron.php?doing_wp_cron&{$scheduleTime}");
@@ -404,6 +433,7 @@ final class IntegrationHandler
       $triggerData['trigger_token'] = $triggerToken;
 
       set_transient("bitform_trigger_transient_{$entryID}", $triggerData, HOUR_IN_SECONDS);
+      $queuedAt = current_time('mysql');
       $entryLog = new FormEntryLogModel();
       $queueuEntry = $entryLog->log_history_insert(
         [
@@ -411,10 +441,25 @@ final class IntegrationHandler
           'integration_id' => 0,
           'api_type'       => wp_json_encode(['type' => 'trigger', 'type_name' => 'Workflow', 'on' => $opType]),
           'response_type'  => 'queued',
-          'response_obj'   => wp_json_encode(['status' => 'queued']),
-          'created_at'     => current_time('mysql'),
+          // 'trigger' is a durable copy of the transient payload: object-cache hosts can
+          // evict the transient (and it expires after 1h), which would otherwise lose the run
+          'response_obj'   => wp_json_encode(['status' => 'queued', 'queued_at' => $queuedAt, 'trigger' => $triggerData]),
+          'created_at'     => $queuedAt,
         ]
       );
+      if (\is_int($queueuEntry)) {
+        // Safety net: the browser-fired bitforms_trigger_workflow request can be lost
+        // (navigation abort, WAF, network drop). This event re-runs the queued workflow;
+        // it no-ops if the browser trigger already claimed the run.
+        wp_schedule_single_event(
+          time() + 2 * MINUTE_IN_SECONDS,
+          'bitforms_reclaim_workflow',
+          [(int) $entryID, (int) $triggerData['formID'], (int) $triggerData['logID'], $queueuEntry]
+        );
+        if (!wp_next_scheduled('bitforms_reclaim_sweep')) {
+          wp_schedule_event(time() + HOUR_IN_SECONDS, 'hourly', 'bitforms_reclaim_sweep');
+        }
+      }
       $responseData['cronNotOk'] = [
         $triggerData['entryID'],
         $triggerData['logID'],
@@ -452,9 +497,10 @@ final class IntegrationHandler
    *
    * @param mixed $fieldValues
    * @param mixed $returnRepeaterValue default is array
+   * @param mixed $formID              form ID required for string formatting
    * @return array  and repeater field value as array or string
    */
-  public static function formattedRepeaterValue($fieldValues, $returnRepeaterValue = '')
+  public static function formattedRepeaterValue($fieldValues, $returnRepeaterValue = '', $formID = null)
   {
     // get the repeater field and store it in an array
     $repeaterField = [];
@@ -489,7 +535,7 @@ final class IntegrationHandler
 
     // convert the array to string repeater field value
     if ('string' === $returnRepeaterValue) {
-      $form = new FormManager(static::$_formID);
+      $form = new FormManager($formID);
       foreach ($repeaterField as $key) {
         if (isset($fieldValues[$key]) && is_array($fieldValues[$key])) {
           $fieldValues[$key] = implode(', ', self::flattenArray($fieldValues[$key]));
@@ -502,7 +548,7 @@ final class IntegrationHandler
         }
         $repeaterValues = $fieldValues[$key];
 
-        $newFieldValues = self::constructRepeaterValue($repeaterValues, static::$_formID);
+        $newFieldValues = self::constructRepeaterValue($repeaterValues, $formID);
 
         $fieldValues[$key] = is_array($newFieldValues) ? json_encode(array_values($newFieldValues), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : $fieldValues[$key];
       }

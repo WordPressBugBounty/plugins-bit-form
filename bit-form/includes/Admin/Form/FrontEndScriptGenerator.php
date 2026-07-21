@@ -198,6 +198,10 @@ class FrontEndScriptGenerator
     foreach ($this->_fields as $flds) {
       foreach ($flds as $fld) {
         $fldData = $fld['field'];
+        // Corrupt/partial form JSON can produce a null field or one without typ.
+        if (!is_object($fldData)) {
+          continue;
+        }
         // for validation js files
         if (self::isValidationNeeded($fldData)) {
           $validation = $this->_validationJsFilesNeeded['validation'];

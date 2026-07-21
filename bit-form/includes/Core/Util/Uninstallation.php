@@ -108,6 +108,7 @@ final class Uninstallation
       'bitform_secret_api_key',
       'bitforms_migrated_to_v2',
       'bitforms_migrating_to_v2',
+      'bitform_orphan_submit_action_migrated',
       'bitforms_changelog_version',
       'bitforms_hide_announcement',
       'bitforms_hide_cashback',

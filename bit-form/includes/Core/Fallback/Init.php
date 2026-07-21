@@ -34,3 +34,7 @@ FallBack::add('2.17.5', 'AppStructureFallback@ensureIndexFileInUploadDirs');
 FallBack::add('2.20.0', 'AppOptionsFallback@appSettingsWithGlobalMessages');
 FallBack::add('2.20.3', 'StylesFallback@addStaticStyleForMultiStepContentFld');
 FallBack::add('3.0.3', 'AppStructureFallback@flushRewriteRulesForBitformsCpt');
+FallBack::add('3.1.4', 'SchemaFallback@ensureEmailTemplateStatusColumn');
+FallBack::add('3.1.4', 'SchemaFallback@ensureWorkflowCategoryColumn');
+FallBack::add('3.1.4', 'WorkFlow@normalizeCategory');
+FallBack::add('3.1.4', 'SubmitActionFallback@deactivateOrphanActions');

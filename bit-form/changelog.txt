@@ -1,3 +1,255 @@
+= 2.21.13 =
+*Release Date: 17 March, 2026*
+*Improvements:
+    1. Refactored unsafe SQL queries to use prepared statements for enhanced security against SQL injection attacks.
+    2. Updated the codebase to follow WordPress Plugin Checker best practices for improved code quality and maintainability.
+
+*Fixes:
+    1. Resolve Dark Mode style issues with multiple class selectors.
+
+= 2.21.12 =
+*Release Date: 23 February, 2026*
+*Improvements:
+    1. Replaced heredoc markups with sprintf for better performance and security in the codebase.
+    2. Added escaping for all markup in the codebase for improved security.
+    3. Followed WordPress Plugin Checker best practices for code structure and formatting.
+
+= 2.21.11 =
+*Release Date: 18 February, 2026*
+*Improvements: 
+    1. Security: Improved query validation to prevent SQL injections.
+    2. File validation: Improved PDF file validation for the File Upload and Advance File Upload fields.
+*Fix: 
+    1. Entry edit modal: Fixed the submit button in the entry edit modal.
+    2. FluentCRM integration: Fixed custom-data mapping for FluentCRM.
+    3. Stripe payment field: Fixed stripe payment submission issue with payment processing status. 
+
+= 2.21.10 = 
+*Release Date: 02 February, 2026*
+*Improvements:
+    1. Export Entries: Enhanced filtering options for exporting entries.
+    
+*Fixes:
+    1. Phone Number Field: Fixed country-specific pattern validation issues.
+    2. Repeater Field: Fixed single mapped Signature field preview in email/PDF templates.
+    3. Entries Table: Fixed sorted column preference not persisting on reload.
+
+= 2.21.9 =
+*Release Date: 12 January, 2026*
+*Fixes:
+    1. Fixed trigger workflows route's invalid trigger token validation.
+    2. Resolved hCaptcha field initialization error on form submission.
+    3. Fixed test mail form returning "undefined" response when sending emails
+
+= 2.21.8 =
+*Release Date: 07 January, 2026*
+*Fixes:
+    1. Resolved the dropdown value preview issue in the repeater field..
+    2. Fixed email sending issues on older PHP versions.
+
+= 2.21.7 =
+*Release Date: 29 December, 2025*
+"Improvements:
+    1. Enhanced authentication process for Workflow trigger (AJAX) Route.
+    2. Smart Tag: display field admin label or name in email & PDF templates in All Data smart tag when field label is empty.
+    3. Files Hyperlink: add files hyperlink display in email & PDF templates.
+
+*Fixes:
+    1. Brevo (Sendinblue) integration: fixed an contact update issue.
+    2. Resolve "Back" button issue in Single Entry Details View.
+    3. SMTP Status: SMTP status configuration not update issues.
+
+= 2.21.6 =
+*Release Date: 16 December, 2025*
+*Fixes:
+    1. Fixed an issue with the WordPress current data smart tag.
+    2. Resolved missing runtime dependency issues.
+
+*Improvements:
+    1. Enhanced the Mailchimp integration authentication process.
+
+= 2.21.5 =
+*Release Date: 10 December, 2025*
+*Fixes:
+    1. Resolved an issue where repeater-field file attachments were not included in email notifications for multistep and abandonment forms.
+    2. Added the missing post route for creating and updating Custom Post Types (CPT).
+
+*Improvements:
+    1. Improved the mapping of uploaded file URLs in Google Sheets and Zoho Sheets integrations.
+
+= 2.21.3 =
+*Release Date: 24 November, 2025*
+*New:
+    1. Added Advanced Filtering option for export entries. 
+
+*Fixes:
+    1. Fixed an issue PDF and email template repeater field display.
+    2. Resolved a problem with the single IP draft submission.
+    3. Fixed an issue with form preview routing unexpected slash (/).
+
+*Improvements:
+    1. Enhanced the webhook field mapping with smart tag.
+    2. Improved display of file link in email and PDF templates.
+    3. Expanded anonymous telemetry to include payment amount and currency metrics..
+
+= 2.21.2 =
+*Release Date: 09 November, 2025*
+*Fixes:
+    1. Fixed an issue where WP Auth changes the Update button not working.
+    2. Resolved a problem with the Make.com integration not functioning correctly.
+    3. Fixed an issue causing Table Data View routing to fail.
+
+*Improvements:
+    1. Enhanced the Table Data View to better display file and repeater field values.
+    2. Updated the Single Entry Details View to support the ${bf_all_data} smart tag.
+
+= 2.21.1 =
+*Release Date: 26 October, 2025*
+*Fixes:
+    1. Fixed an issue where Razorpay webhook was not working properly for some users.
+
+= 2.21.0 =
+*Release Date: 23 October, 2025*
+*New:
+    1. Razorpay: Added webhook support for Razorpay payments after form submission.
+    2. Stripe: Added MB Way payment method.
+
+*Improvements:
+    1. Routing: Optimized AJAX routing for improved performance.
+    2. MailChimp Integration: Enhanced birthdate field mapping for better compatibility.
+    3. Payment Information: Refined payment details display within the entry details section.
+    4. Smart Tags: Improved Smart Tag handling in integration field mappings.
+
+*Fixes:
+    1. Fixed issue Repeated field math calculations.
+    2. Fixed an issue where Razorpay and Mollie workflows were triggered after successful payment.
+    3. Fixed an issue that caused form entries to be deleted when deleting a form.
+    4. Fixed an issue with empty values in dropdown field group options.
+    5. Fixed an issue preventing Mailchimp contact updates from working correctly.
+    6. Fixed the PDF attachment download link not working in entry details.
+
+= 2.20.6 =
+*Release Date: 15 September, 2025*
+*New:
+    1. Input Mask: Added input mask format option for Text, Username, URL and Multiline text fields to enhance data consistency and user input accuracy.
+    2. Developer Filter Hooks (PDF & Email): Introduced bitform_filter_pdf_filename, bitform_filter_pdf_body, bitform_filter_email_subject, and bitform_filter_email_body filter hooks for customizing PDF and email content.
+    3. Developer FilterHooks (Translations): Added bitforms_filter_allow_translation and bitform_filter_translations filter hooks to disable or modify plugin translations.
+
+*Improvements:
+    1. Form Abandonment: Enhanced handling of partial form submissions by improving uploaded file visibility and triggering selected checkboxes actions.
+    2. Phone Field: Added support for landline numbers in the Phone Number field with custom regex pattern support.
+
+*Fixes:
+    1. Resolved repeated file field attachment issues in email templates.
+    2. Fixed issue where default conditional logic was not being disabled properly.
+    3. Fixed form save issues when the plugin was translated into other languages.
+
+= 2.20.5 =
+*Release Date: 25 August, 2025*
+*New:
+    1. Smart Tag: Added ${bf_all_data.onlyValues} smart tag to include all form field values (excluding empty and hidden fields) in Email & PDF templates.
+    2. Conditional Logic: Introduced an Enable/Disable option for better control over conditional logic.
+    3. Language Support: Added new translations for Dutch, French, German, Italian, Portuguese, Spanish, Turkish, and 25+ additional languages.
+
+*Improvements:
+    1. Limit Form Submission: Enhanced by adding options to set submission limits per user/IP or per date/week/month.
+    2. Smart Tags: Added new week tokens for the Format Date Time smart tag.
+    3. File Upload: Improved file type validation for the advanced file upload field.
+
+*Fix:
+    1. Resolved an issue where '0' values were not being included in email content.
+
+= 2.20.4 =
+*Release Date: 12 August, 2025*
+*Fix:
+    1. File Upload Security Enhancement: Strictly block uploading of executable files.
+
+*Improvements:
+    1. Ensure only a single preview tab is open and automatically reload it on every Preview button click.
+
+= 2.20.3 =
+*Release Date: 27 July, 2025*
+*Improvements:
+    1. Conditional Logic: Added support for using the "Next" button for an action to conditionally change steps in Multi Step forms.
+    2. Entry Export: Improved Unicode and Repeater field data formatting for exported entry files.
+
+*Fix:
+    1. Resolved Smart Tag mapping issue for ${bf_all_data} in Double Opt-In email templates.
+    2. Fixed Signature field path issue in email templates for Multi Step forms.
+    3. Fixed scrolling issue related to field validation messages.
+
+
+= 2.20.2 =
+*Release Date: 16 July, 2025*
+*Improvements:
+    1. Move existing field between Section,Repater and Steps.
+    2. Phone number field: added country list hide settings and similar country code validation
+
+= 2.20.1 =
+*Release Date: 08 July, 2025*
+*New:
+    1. Spacer Field: Added a new Spacer field to create visual gaps between form fields, improving form layout and appearance.
+    2. Smart Tag – ${_bf_format_datetime()}: Introduced a new smart tag to format date and time based on user-defined preferences, allowing better control over how date/time values are displayed.
+
+*Improvements:
+    1. Min/Max Date-Time Range: Added support for setting minimum and maximum ranges in Date, Time, Month, and Week fields to enhance validation and input control.
+    2. Conditional Logic Enhancements: Improved behavior of "Change" and "Click" logic by accurately targeting and comparing selected fields.
+
+*Fix:
+    1. Resolved missing "Logged In User" option in the ACF integration edit section.
+    2. Fixed an issue where entry owner/user was being overwritten during entry edits.
+    3. Resolved global validation message overwrite issue in default settings.
+
+= 2.20.0 =
+*Release Date: 30 June, 2025*
+*New:
+    1. Advanced Date-Time Field: Introduced a new field type that lets users select both date and time, improving form flexibility and user experience.
+    2. New Smart Tags (Functions): Added ${_bf_datetime_difference()} and ${_bf_add_subtract_datetime()} smart tags to support date and time calculations.
+    3. New Conditional Action: Added a "Config Option" action in conditional logic to dynamically change Date-Time field config based on user input.
+
+*Improvements:
+    1. Enhanced Logic for Date/Time Fields: Improved conditional logic support for Date, Time, Week, and Month fields, enabling more advanced scenarios.
+
+*Fix:
+    1. Fixed an issue with mismatched created time format in the entries table based on site date/time format settings.
+    2. Resolved PayPal transaction ID mismatch issue in the entry details section.
+    3. Fixed a signature file path issue in multi-step forms.
+    4. Resolved a frontend data view & edit issue related to edit access control.
+
+= 2.19.2 =
+*Release Date: 15 June, 2025*
+*Improvements:
+    1. Security Enhancements: Prevented JavaScript injection in field content areas such as labels, sub-titles, and helper texts within the form builder.
+    2. Conditional Logic: Added "Clone Condition & Logic" feature to enhance usability and speed up logic configuration.
+
+*Fix:
+    1. Fixed an issue with form JavaScript generation when the any form is also included in the footer section.
+
+= 2.19.1 =
+*Release Date: 29 May, 2025*
+*New:
+    1. Form Auto Fill Feature: Added a feature that automatically fills form fields in form preview with user data, streamlining the user experience and reducing manual entry.
+
+*Improvements:
+    1. Nonce Verification Improved: Enhanced nonce verification for better security and cache issue.
+
+*Fix:
+    1. HTML Escaping in Single Entry View: Fixed an issue where HTML tags were not properly escaped, ensuring correct display in the Single Entry View.
+
+= 2.19.0 =
+*Release Date: 20 May, 2025*
+*New:
+    1. Global validation messages: Added new settings under App Settings to globally customize validation error/invalid messages.
+    2. Bricks Builder Widget: Introduced the Bit Form widget for Bricks Builder, enabling easy form embedding.
+
+*Improvements:
+    1. "Other" Option Label: Added setting to customize the label of the "Other..." option in Checkbox and Radio fields.
+    2. Elementor & Gutenberg Widgets: Improved form rendering behavior when switching forms in the Bit Form selection dropdown.
+
+*Fix:
+    1. PayPal Integration: Resolved PayPal transaction ID mismatch issue.
+
+
 = 2.18.9 =
 *Release Date: 10 May, 2025*
 *Improvements:

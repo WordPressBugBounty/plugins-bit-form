@@ -50,8 +50,8 @@ class Model
   /**
    * Undocumented function
    *
-   * @param string $item
-   * @param array  $condition
+   * @param string|string[] $item
+   * @param array           $condition
    *
    * @return mixed
    */
@@ -160,7 +160,7 @@ class Model
    * @param array $data_to_update
    * @param array $condition
    *
-   * @return void
+   * @return mixed affected-row count on success, WP_Error on failure or when no row matched
    */
   public function update(array $data, array $condition)
   {

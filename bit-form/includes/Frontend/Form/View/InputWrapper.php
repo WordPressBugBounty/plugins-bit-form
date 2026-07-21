@@ -16,6 +16,9 @@ class InputWrapper
 
   public function __construct($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error = null, $value = null)
   {
+    // Corrupt/partial form JSON can hand us a null field; normalize so
+    // property_exists() calls never receive null (PHP 8 TypeError).
+    $field = is_object($field) ? $field : new \stdClass();
     $this->_fieldData = $field;
     $this->_fieldKey = $rowID;
     $this->_fieldName = $field_name;
@@ -145,7 +148,7 @@ class InputWrapper
     }
 
     // for subtitle
-    if (property_exists($this->_fieldData, 'subtitle') && $this->_fieldData->subtitleHide) {
+    if (property_exists($this->_fieldData, 'subtitle') && !empty($this->_fieldData->subtitleHide)) {
       $_subtitle = sprintf(
         '<div %1$s class="%2$s %3$s">%4$s%5$s%6$s</div>',
         $this->_fieldHelpers->getCustomAttributes('sub-titl'),

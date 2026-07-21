@@ -225,17 +225,17 @@ class FormViewHelper
     $totalSteps = is_array($this->_layout) ? count($this->_layout) : 1;
     return sprintf(
       '
-    <div class="%1$s">
-      <div class="%2$s">
+    <div class="%1$s _frm-b-stp-progress-wrpr">
+      <div class="%2$s _frm-b-stp-progress">
         <div 
-          class="%3$s"
+          class="%3$s _frm-b-stp-progress-bar"
           role="progressbar"
           aria-valuenow="0"
           aria-valuemin="0"
           aria-valuemax="100"
           aria-label="Form completion progress: Step 1 of %4$s"
         >
-          <div class="%5$s" style="width: 0%%;">
+          <div class="%5$s _frm-b-stp-progress-fill" style="width: 0%%;">
             %6$s
           </div>
         </div>

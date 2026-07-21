@@ -53,7 +53,7 @@ class RecordApiHelper
   {
     $fieldData = [];
     $allHeaders = $defaultConf->headers->{$spreadsheetId}->{$worksheetName}->{$headerRow};
-    $formattedFieldValues = IntegrationHandler::formattedRepeaterValue($fieldValues, 'string');
+    $formattedFieldValues = IntegrationHandler::formattedRepeaterValue($fieldValues, 'string', $formId);
 
     foreach ($fieldMap as $fieldPair) {
       if (!empty($fieldPair->googleSheetField)) {

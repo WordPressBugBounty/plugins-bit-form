@@ -15,6 +15,8 @@ class ConversationalInputWrapper extends InputWrapper
   public function __construct($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error = null, $value = null)
   {
     parent::__construct($field, $rowID, $field_name, $form_atomic_Cls_map, $formID, $error, $value);
+    // Same normalization as parent — this class shadows _fieldData with its own copy.
+    $field = is_object($field) ? $field : new \stdClass();
     $this->_fieldData = $field;
     $this->_fieldKey = $rowID;
     $this->_error = $error;

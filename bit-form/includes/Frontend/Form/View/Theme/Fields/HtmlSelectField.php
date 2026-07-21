@@ -20,7 +20,7 @@ class HtmlSelectField
       $selected = 'selected';
     } elseif (isset($opt->lbl) && $opt->lbl === $val) {
       $selected = 'selected';
-    } elseif (property_exists($opt, 'check')) {
+    } elseif (is_object($opt) && property_exists($opt, 'check')) {
       $selected = 'selected';
     }
     return $selected;
@@ -62,8 +62,11 @@ class HtmlSelectField
       );
     }
 
-    if (property_exists($field, 'opt')) {
+    if (property_exists($field, 'opt') && is_iterable($field->opt)) {
       foreach ($field->opt as $opt) {
+        if (!is_object($opt)) {
+          continue;
+        }
         $disabled = property_exists($opt, 'disabled') ? 'disabled' : '';
         if (property_exists($opt, 'type')) {
           $optionsHTML .= sprintf(
@@ -79,8 +82,12 @@ class HtmlSelectField
             $fieldHelpers->esc_attr($opt->title),
             $disabled
           );
-          foreach ($opt->childs as $child) {
-            $val = isset($child->val) ? $child->val : $child->lbl;
+          $optChilds = isset($opt->childs) && is_iterable($opt->childs) ? $opt->childs : [];
+          foreach ($optChilds as $child) {
+            if (!is_object($child)) {
+              continue;
+            }
+            $val = isset($child->val) ? $child->val : ($child->lbl ?? '');
             $selected = self::checkSelected($child, $value);
             $disabled = property_exists($child, 'disabled') ? 'disabled' : '';
             $optionsHTML .= sprintf(
@@ -105,7 +112,7 @@ class HtmlSelectField
           $optionsHTML .= '</optgroup>';
         } else {
           $selected = self::checkSelected($opt, $value);
-          $val = isset($opt->val) ? $opt->val : $opt->lbl;
+          $val = isset($opt->val) ? $opt->val : ($opt->lbl ?? '');
           $optionsHTML .= sprintf(
             '<option
               %1$s

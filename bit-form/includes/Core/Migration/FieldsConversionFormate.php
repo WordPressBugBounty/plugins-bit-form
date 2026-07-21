@@ -438,6 +438,8 @@ class FieldsConversionFormate
       ],
     ];
 
-    return $formate[$fieldType];
+    // Unknown field type must not fatal mid-migration (undefined index +
+    // null dereference in the caller would leave form_content half-migrated)
+    return isset($formate[$fieldType]) ? $formate[$fieldType] : null;
   }
 }

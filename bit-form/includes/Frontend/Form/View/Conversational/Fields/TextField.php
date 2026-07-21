@@ -40,7 +40,7 @@ class TextField
     $contentCount = count($bfFrontendFormIds);
     $sugg = apply_filters('bitform_field_suggestions_datalist', '', $field, $rowID, $contentCount);
 
-    if (property_exists($field, 'suggestions') && count($field->suggestions) > 0) {
+    if (is_object($field) && property_exists($field, 'suggestions') && is_countable($field->suggestions) && count($field->suggestions) > 0) {
       $list = "list='{$rowID}-{$contentCount}-datalist'";
     }
 

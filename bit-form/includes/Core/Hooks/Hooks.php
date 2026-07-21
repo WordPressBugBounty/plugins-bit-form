@@ -16,6 +16,7 @@ use BitCode\BitForm\Core\Form\FormHandler;
 use BitCode\BitForm\Core\Integration\Integrations;
 use BitCode\BitForm\Core\Util\FileDownloadProvider;
 use BitCode\BitForm\Core\Util\Utilities;
+use BitCode\BitForm\Core\WorkFlow\WorkflowExecutor;
 use BitCode\BitForm\Frontend\ConversationalFormView;
 use BitCode\BitForm\Frontend\StandaloneFormView;
 use BitCode\BitForm\Widgets\RegisterBitformBricksWidget;
@@ -30,6 +31,10 @@ class Hooks
     add_action('update_option_bitform_custom_post_types', [PostType::class, 'scheduleRewriteFlush']);
     add_filter('wp_robots', [PostType::class, 'noindexBitformsPages']);
     add_action('bitforms_exec_integrations', [Integrations::class, 'integrationExecutionHelper'], 1, 5);
+    // Reclaim safety net for queued workflows whose browser-fired trigger was lost
+    add_action('bitforms_reclaim_workflow', [WorkflowExecutor::class, 'reclaim'], 10, 4);
+    add_action('bitforms_reclaim_sweep', [WorkflowExecutor::class, 'sweep']);
+    add_filter('bitform_default_submit_confirmation_excluded_action_ids', ['BitCode\BitForm\Core\WorkFlow\Helper', 'workflowReferencedActionIds'], 10, 3);
     add_action('init', [Hooks::class, 'init_classes']);
     add_action('init', [Hooks::class, 'versionUpdateRunFallbacks']);
     add_action('rest_api_init', [Hooks::class, 'registerRoutes']);
@@ -85,8 +90,8 @@ class Hooks
         ];
         $forms = $formModel->get('generated_script_page_ids,id', $condtions);
         foreach ($forms as $form) {
-          $pageIds = json_decode($form->generated_script_page_ids);
-          if (property_exists($pageIds, $postId)) {
+          $pageIds = Utilities::jsonObj($form->generated_script_page_ids ?? '');
+          if ($pageIds && property_exists($pageIds, $postId)) {
             unset($pageIds->{$postId});
             $formModel->update(['generated_script_page_ids' => \wp_json_encode($pageIds)], ['id' => $form->id]);
           }
