@@ -416,6 +416,36 @@ $bitforms_i18n_strings = array(
 
     'Autonami Fields' => __('Autonami Fields', 'bit-form'),
 
+    'Please map all required fields to continue.' => __('Please map all required fields to continue.', 'bit-form'),
+
+    'Checking if Bit CRM is active!!!' => __('Checking if Bit CRM is active!!!', 'bit-form'),
+
+    'Please! First install & activate the Bit CRM plugin.' => __('Please! First install & activate the Bit CRM plugin.', 'bit-form'),
+
+    'Install Bit CRM' => __('Install Bit CRM', 'bit-form'),
+
+    'Bit CRM fields refreshed' => __('Bit CRM fields refreshed', 'bit-form'),
+
+    'Bit CRM fields refresh failed.' => __('Bit CRM fields refresh failed.', 'bit-form'),
+
+    'Bit CRM tags refreshed' => __('Bit CRM tags refreshed', 'bit-form'),
+
+    'Bit CRM tags refresh failed. please try again' => __('Bit CRM tags refresh failed. please try again', 'bit-form'),
+
+    'System Fields' => __('System Fields', 'bit-form'),
+
+    'Custom Fields' => __('Custom Fields', 'bit-form'),
+
+    'Bit CRM Tags:' => __('Bit CRM Tags:', 'bit-form'),
+
+    'Refresh Bit CRM Tags' => __('Refresh Bit CRM Tags', 'bit-form'),
+
+    'Type a new tag name & press enter to create it on submission' => __('Type a new tag name & press enter to create it on submission', 'bit-form'),
+
+    'Refresh Bit CRM Fields' => __('Refresh Bit CRM Fields', 'bit-form'),
+
+    'Bit CRM Fields' => __('Bit CRM Fields', 'bit-form'),
+
     'Loaded integration:' => __('Loaded integration:', 'bit-form'),
 
     'Integration Info' => __('Integration Info', 'bit-form'),
@@ -3178,6 +3208,14 @@ $bitforms_i18n_strings = array(
 
     'Update Post Type' => __('Update Post Type', 'bit-form'),
 
+    'Failed to update entry. please try again' => __('Failed to update entry. please try again', 'bit-form'),
+
+    'Entry updated successfully' => __('Entry updated successfully', 'bit-form'),
+
+    'Failed to update entry' => __('Failed to update entry', 'bit-form'),
+
+    'Dismiss error' => __('Dismiss error', 'bit-form'),
+
     'Payment' => __('Payment', 'bit-form'),
 
     'Timeline' => __('Timeline', 'bit-form'),
@@ -4852,6 +4890,8 @@ $bitforms_i18n_strings = array(
 
     'Could not sync layouts before save. Form will be saved with current layout state' => __('Could not sync layouts before save. Form will be saved with current layout state', 'bit-form'),
 
+    'Form creation failed' => __('Form creation failed', 'bit-form'),
+
     'ctrl + s' => __('ctrl + s', 'bit-form'),
 
     'Choose/Drop your file (.json)' => __('Choose/Drop your file (.json)', 'bit-form'),
@@ -5241,6 +5281,8 @@ $bitforms_i18n_strings = array(
     'Switch Form' => __('Switch Form', 'bit-form'),
 
     'Are you sure to duplicate this entry?' => __('Are you sure to duplicate this entry?', 'bit-form'),
+
+    'Form entry deletion failed.' => __('Form entry deletion failed.', 'bit-form'),
 
     'View Repeater Data' => __('View Repeater Data', 'bit-form'),
 

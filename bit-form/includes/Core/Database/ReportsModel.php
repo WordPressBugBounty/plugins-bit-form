@@ -15,9 +15,28 @@ class ReportsModel extends Model
 {
   protected static $table = 'bitforms_reports';
 
+  /**
+   * Whether a report payload carries enough to validate.
+   *
+   * The save path feeds this the request's `currentReport`, and the React `$reportSelector` atom
+   * yields `{}` whenever the report list has not resolved — an empty stdClass, which PHP's
+   * empty() reports as non-empty. Callers must therefore ask before acting on it.
+   *
+   * @param mixed $reportData
+   *
+   * @return bool
+   */
+  public static function isValidatableReport($reportData)
+  {
+    return \is_object($reportData) && !empty($reportData->type) && isset($reportData->details);
+  }
+
   public function validateReportFields($reportData, $fieldNames)
   {
     $reportDetails = [];
+    if (!self::isValidatableReport($reportData)) {
+      return $reportDetails;
+    }
     switch ($reportData->type) {
       case 'table':
         $tableAction = 'table_ac';

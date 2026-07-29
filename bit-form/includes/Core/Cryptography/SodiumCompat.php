@@ -9,10 +9,18 @@ class SodiumCompat
 {
   public function __construct()
   {
-    if (!class_exists('ParagonIE_Sodium_Compat')) {
-      require_once ABSPATH . WPINC . '/sodium_compat/autoload.php';
-      Log::debug_log(class_exists('ParagonIE_Sodium_Compat') ? 'Found' : 'ParagonIE\Sodium\Compat not found');
+    if (class_exists('ParagonIE_Sodium_Compat')) {
+      return;
     }
+
+    $autoloader = ABSPATH . WPINC . '/sodium_compat/autoload.php';
+    if (!is_readable($autoloader)) {
+      Log::debug_log('WordPress sodium_compat autoloader not readable at ' . $autoloader);
+
+      return;
+    }
+
+    require_once $autoloader;
   }
 
   /**

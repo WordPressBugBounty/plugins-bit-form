@@ -4,7 +4,7 @@
  * Plugin Name: Bit Form
  * Plugin URI:  https://www.bitapps.pro/bit-form
  * Description: Contact Form Builder Plugin: Multi Step Contact Form, Payment Form, Custom Contact Form Plugin by Bit Form
- * Version:     3.2.0
+ * Version:     3.2.1
  * Author:      Contact Form Builder - Bit Form
  * Author URI:  https://www.bitapps.pro
  * Text Domain: bit-form
@@ -22,9 +22,9 @@ if (!defined('ABSPATH')) {
 }
 
 // Define most essential constants.
-define('BITFORMS_VERSION', '3.2.0');
+define('BITFORMS_VERSION', '3.2.1');
 define('BITFORMS_PLUGIN_MAIN_FILE', __FILE__);
-define('BITFORMS_REQUIRED_BITFORMPRO_VERSION', '3.2.0');
+define('BITFORMS_REQUIRED_BITFORMPRO_VERSION', '3.2.1');
 
 global $bitforms_db_version;
 $bitforms_db_version = '3.2';
@@ -105,7 +105,21 @@ function bitformsProUpgradeNotice()
     return;
   }
 
-  $update_url = esc_url(admin_url('plugins.php?plugin_status=upgrade'));
+  // "Update now" triggers WordPress core's native plugin-update flow (Plugin_Upgrader:
+  // maintenance mode, filesystem creds, rollback UI) for users who can update plugins.
+  // Others fall back to the filtered Plugins screen. The update itself is staged into the
+  // update_plugins transient by Bit Form Pro's own Updater.
+  $pro_plugin_file = 'bitformpro/bitformpro.php';
+  if (current_user_can('update_plugins')) {
+    $update_url = wp_nonce_url(
+      self_admin_url('update.php?action=upgrade-plugin&plugin=' . $pro_plugin_file),
+      'upgrade-plugin_' . $pro_plugin_file
+    );
+  } else {
+    // Users who cannot update plugins: send them to the Updates screen with a forced
+    // refresh so Bit Form Pro's Updater re-checks and stages the update for detection.
+    $update_url = self_admin_url('update-core.php?force-check=1');
+  }
   $required = esc_html(BITFORMS_REQUIRED_BITFORMPRO_VERSION);
 
   // Keep HTML out of translatable strings to prevent translator HTML injection
@@ -115,7 +129,7 @@ function bitformsProUpgradeNotice()
         esc_html__('requires an update to version %s or higher for full compatibility.', 'bit-form'),
         '<strong>' . $required . '</strong>'
       )
-      . ' <a href="' . $update_url . '">' . esc_html__('Update now', 'bit-form') . '</a>';
+      . ' <a href="' . esc_url($update_url) . '">' . esc_html__('Update now', 'bit-form') . '</a>';
 
   wp_admin_notice(
     $message,

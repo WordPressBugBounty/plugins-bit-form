@@ -559,7 +559,13 @@ class FrontEndScriptGenerator
   private function jsHiddenFieldScript()
   {
     $appConfig = get_option('bitform_app_config');
-    if (Helpers::property_exists_nested($appConfig, 'cache_plugin', true)) {
+    $cacheTokenEnabled = true;
+    if (is_object($appConfig) && property_exists($appConfig, 'cache_plugin')) {
+      $cacheTokenEnabled = (bool) $appConfig->cache_plugin;
+    } elseif (is_array($appConfig) && array_key_exists('cache_plugin', $appConfig)) {
+      $cacheTokenEnabled = (bool) $appConfig['cache_plugin'];
+    }
+    if ($cacheTokenEnabled) {
       $fileArr = ScriptFilePriorityManager::frontendScriptFile()['hidden-token-field'];
       $this->addScriptInLoadedScriptsList($fileArr);
       return;

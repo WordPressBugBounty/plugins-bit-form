@@ -2007,7 +2007,7 @@ class AdminAjax
   {
     if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $this->verifyAdminPermission();
-      $data = get_option('bitform_app_config', (object) ['cache_plugin' => 0, 'delete_table' => 0]);
+      $data = get_option('bitform_app_config', (object) ['cache_plugin' => true, 'delete_table' => 0]);
 
       if (is_wp_error($data)) {
         wp_send_json_error($data->get_error_message(), 411);

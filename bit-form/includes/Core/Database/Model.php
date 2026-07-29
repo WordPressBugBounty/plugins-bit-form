@@ -10,6 +10,7 @@ namespace BitCode\BitForm\Core\Database;
  * Undocumented class
  */
 
+use BitCode\BitForm\Core\Util\Log;
 use WP_Error;
 
 class Model
@@ -31,9 +32,9 @@ class Model
   }
 
   /**
-   * Undocumented function
+   * Insert a row
    *
-   * @return void
+   * @return mixed insert id on success, WP_Error on failure
    */
   public function insert($data = [])
   {
@@ -80,7 +81,17 @@ class Model
     $order = null;
     if (!\is_null($order_by)) {
       $order_follow = \is_null($order_follow) ? 'ASC' : $order_follow;
-      $order .= " ORDER BY $order_by $order_follow";
+      $direction = \is_string($order_follow) ? strtoupper(trim($order_follow)) : '';
+      if ($this->isSafeConditionIdentifier($order_by) && \in_array($direction, ['ASC', 'DESC'], true)) {
+        $order .= ' ORDER BY ' . $this->quoteIdentifier($order_by) . ' ' . $direction;
+      } else {
+        Log::debug_log([
+          'message'      => 'Model::get() ignored an unsafe ORDER BY',
+          'table'        => $this->table_name,
+          'order_by'     => $order_by,
+          'order_follow' => $order_follow,
+        ]);
+      }
     }
     $paginate = null;
     if (!\is_null($limit)) {
@@ -376,6 +387,86 @@ class Model
         '%d' : (('double' === gettype($value)) ? '%f' : '%s');
   }
 
+  /**
+   *
+   * @param mixed $identifier
+   *
+   * @return bool
+   */
+  protected function isSafeConditionIdentifier($identifier)
+  {
+    if (!\is_string($identifier)) {
+      return false;
+    }
+    $identifier = trim($identifier);
+    if ('' === $identifier) {
+      return false;
+    }
+
+    // A condition column may be table-qualified and backtick-quoted — the multi-table JOIN DELETE
+    // in FormEntryModel::bulkDelete() *must* pass `wp_bitforms_form_entries`.`id`, because a bare
+    // `id` is ambiguous across the two joined tables. Validate each segment on its own.
+    $parts = explode('.', $identifier);
+    if (count($parts) > 2) {
+      return false;
+    }
+    foreach ($parts as $part) {
+      $part = trim($part);
+      if (\strlen($part) > 1 && '`' === $part[0] && '`' === substr($part, -1)) {
+        $part = substr($part, 1, -1);
+      }
+      if (1 !== preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $part)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Backtick-quote a validated identifier, leaving an already-quoted or table-qualified one alone.
+   * Only ever call this on a value isSafeConditionIdentifier() has approved.
+   *
+   * @param string $identifier
+   *
+   * @return string
+   */
+  protected function quoteIdentifier($identifier)
+  {
+    $identifier = trim($identifier);
+    if (false !== strpos($identifier, '`') || false !== strpos($identifier, '.')) {
+      return $identifier;
+    }
+
+    return '`' . $identifier . '`';
+  }
+
+  /**
+   * @param mixed $operator
+   *
+   * @return bool
+   */
+  protected function isSafeConditionOperator($operator)
+  {
+    static $allowed = ['=', '!=', '<>', '<', '>', '<=', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'IS', 'IS NOT'];
+
+    return \is_string($operator) && \in_array(strtoupper(trim($operator)), $allowed, true);
+  }
+
+  /**
+   * A WHERE that matches nothing. Keeps a placeholder so the caller's
+   * $wpdb->prepare($sql, $values) still has something to bind.
+   *
+   * @return array
+   */
+  private function impossibleCondition()
+  {
+    return [
+      'conditions' => ' WHERE 1=%d ',
+      'values'     => [0],
+    ];
+  }
+
   protected function getFormatedCondition($condition, $check_operator = null, $join_operator = ' AND ')
   {
     if (\is_null($condition)) {
@@ -386,11 +477,16 @@ class Model
     $condition_to_check = ' WHERE ';
     $all_values = [];
     foreach ($condition as $key => $value) {
+      if (!$this->isSafeConditionIdentifier($key)) {
+        return $this->impossibleCondition();
+      }
       $value_type = '';
       if (is_array($value)) {
         // Check for raw SQL values first
         if (isset($value['raw'])) {
-          // Handle raw SQL - don't format or add to prepared values
+          if (!\is_string($value['raw'])) {
+            return $this->impossibleCondition();
+          }
           $set_check_operator = isset($value['operator']) ? $value['operator'] : '=';
           $value_type = $value['raw']; // Use raw SQL directly
           // Don't add to $all_values since it's raw SQL
@@ -421,6 +517,9 @@ class Model
         $value_type .= $this->getFieldFormat($value);
         $all_values[] = $value;
       }
+      if (!$this->isSafeConditionOperator($set_check_operator)) {
+        return $this->impossibleCondition();
+      }
       $condition_to_check = $condition_to_check . $key . " $set_check_operator " . $value_type;
       if ($index_checker < $no_condition - 1) {
         $condition_to_check = $condition_to_check . " $join_operator ";
@@ -431,6 +530,22 @@ class Model
       'conditions' => $condition_to_check,
       'values'     => $all_values
     ];
+  }
+
+  /**
+   * @param array $values values about to be bound by $wpdb->prepare()
+   *
+   * @return string|null the offending PHP type, or null when every value is bindable
+   */
+  private function findUnbindableValue(array $values)
+  {
+    foreach ($values as $value) {
+      if (!is_scalar($value) && !is_null($value)) {
+        return \gettype($value);
+      }
+    }
+
+    return null;
   }
 
   protected function checkCondition(array $condition)
@@ -446,9 +561,24 @@ class Model
 
   protected function execute($sql, $values = null)
   {
+    // Clear the previous call's outcome before running a new query, so a failure can never be
+    // read back by whatever this instance is used for next.
+    $this->db_response = null;
     if (is_null($values)) {
       $preparedQuery = $sql;
     } else {
+      $invalid = $this->findUnbindableValue((array) $values);
+      if (null !== $invalid) {
+        Log::debug_log([
+          'message' => 'Model::execute() received an unbindable condition value',
+          'table'   => $this->table_name,
+          'type'    => $invalid,
+          'sql'     => $sql,
+        ]);
+        $this->db_response = new WP_Error('invalid_query_value', 'Query value must be scalar, ' . $invalid . ' given');
+
+        return $this;
+      }
       $preparedQuery = $this->app_db->prepare($sql, $values);
     }
     // echo " Q S " . $preparedQuery . " Q  EE";
@@ -464,7 +594,19 @@ class Model
 
   protected function getResult($db_response = null)
   {
-    $db_response = !empty($this->db_response) ? $this->db_response : $db_response;
+    // The caller's own result wins. $db_response is an instance property that only execute()
+    // writes, and models are reused (AdminFormHandler keeps a static FormModel for the whole
+    // request), so letting the property override an explicitly passed result made insert() and
+    // update() report the outcome of some earlier, unrelated query on the same object.
+    // Without this fallback, execute()->getResult() (which passes no argument) never sees the
+    // query it just ran and every read returns 'result_empty'.
+    if (null === $db_response) {
+      $db_response = $this->db_response;
+    }
+
+    if (is_wp_error($db_response)) {
+      return $db_response;
+    }
     if (!empty($this->app_db->last_error)) {
       return new WP_Error('db_error', $this->app_db->last_error);
     }

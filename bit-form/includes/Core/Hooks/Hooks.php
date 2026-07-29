@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 use BitCode\BitForm\Admin\Admin_Bar;
 use BitCode\BitForm\API\Route\Routes;
 use BitCode\BitForm\Core\Ajax\AjaxService;
+use BitCode\BitForm\Core\Api\BitFormPublicApi;
 use BitCode\BitForm\Core\Capability\Request;
 use BitCode\BitForm\Core\Database\FormModel;
 use BitCode\BitForm\Core\Fallback\FormFallback;
@@ -51,6 +52,11 @@ class Hooks
     add_action('init', [RegisterBitformBricksWidget::class, 'register_widgets'], 11);
     // Add Bit Form menu to admin bar by "manage_bitform" capability
     add_filter('bitforms_form_access_capability', [Hooks::class, 'bitformMenuAccessCapability']);
+
+    // Public API bridge for sibling Bit Apps plugins (Bit CRM). Consumers call
+    add_filter('bitform/api/crm_integrated_forms', fn ($default = null) => BitFormPublicApi::getCrmIntegratedForms(), 10, 1);
+    add_filter('bitform/api/toggle_form_status', fn ($default = null, $formId = 0, $status = 0) => BitFormPublicApi::toggleFormStatus($formId, $status), 10, 3);
+    add_filter('bitform/api/create_form_url', fn ($default = null, $args = []) => BitFormPublicApi::getCreateFormUrl($args), 10, 2);
   }
 
   public static function updateBitFormVersion()

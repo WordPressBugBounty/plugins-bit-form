@@ -235,35 +235,87 @@ final class FileHandler
     $destinationDir = self::getEntriesFileUploadDir($formId, $entryID) . DIRECTORY_SEPARATOR;
     self::createIndexFile($destinationDir);
 
+    $consumedFiles = [];
+
     foreach ($submitted_data as $key => $data) {
       if (isset($fields[$key]) && 'advanced-file-up' === $fields[$key]['type']) {
-        $files = $data;
         $fldData = $submitted_data[$key];
-        $files = explode(',', $fldData);
-        if (is_array($files) && count($files) > 0) {
-          foreach ($files as $file) {
-            self::fileCopy($tempDir, $destinationDir, trim($file));
+        // A repeater row (or a pre-split value) hands this field over as an array; explode()
+        // on an array is a TypeError on PHP 8, which would fatal mid-submission.
+        $files = \is_array($fldData) ? $fldData : explode(',', \is_scalar($fldData) ? (string) $fldData : '');
+        foreach ($files as $file) {
+          $safeFile = \is_scalar($file) ? trim((string) $file) : '';
+          if ('' === $safeFile) {
+            continue;
           }
-        } else {
-          self::fileCopy($tempDir, $destinationDir, trim($files));
+          self::fileCopy($tempDir, $destinationDir, $safeFile);
+          $consumedFiles[] = $safeFile;
         }
         if (!empty($files)) {
           $submitted_data[$key] = $files;
         }
       }
     }
-    $tempBase = realpath($tempDir);
-    if (false !== $tempBase) {
-      $tmpFiles = glob($tempBase . DIRECTORY_SEPARATOR . '*');
-      foreach ((array) $tmpFiles as $tmpFile) {
-        $resolved = realpath($tmpFile);
-        if (false !== $resolved && 0 === strpos($resolved, $tempBase . DIRECTORY_SEPARATOR)) {
-          wp_delete_file($resolved);
-        }
-      }
-    }
+
+    self::cleanupTempUploads($tempDir, $consumedFiles);
 
     return $submitted_data;
+  }
+
+  /**
+   * Clear the shared temp upload staging area after a submission has taken what it needs.
+   *
+   * @param string $tempDir       shared staging directory
+   * @param array  $consumedFiles file names copied into the entry directory by this submission
+   *
+   * @return void
+   */
+  private static function cleanupTempUploads($tempDir, array $consumedFiles)
+  {
+    $tempBase = realpath($tempDir);
+    if (false === $tempBase) {
+      return;
+    }
+    $boundary = $tempBase . DIRECTORY_SEPARATOR;
+
+    // Never remove the directory-hardening files the uploads dir relies on.
+    $protected = ['index.php', 'index.html', '.htaccess'];
+
+    foreach ($consumedFiles as $file) {
+      $resolved = realpath($boundary . $file);
+      if (false === $resolved || 0 !== strpos($resolved, $boundary) || !is_file($resolved)) {
+        continue;
+      }
+      if (\in_array(basename($resolved), $protected, true)) {
+        continue;
+      }
+      wp_delete_file($resolved);
+    }
+
+    // Sweep abandoned uploads. Anything still here after the retention window belongs to a form
+    // that was never submitted. Filterable so a site with very long multi-step forms can extend
+    // it; 0 or less disables the sweep entirely.
+    $retention = apply_filters('bitform_temp_upload_retention', DAY_IN_SECONDS);
+    $retention = is_numeric($retention) ? (int) $retention : DAY_IN_SECONDS;
+    if ($retention <= 0) {
+      return;
+    }
+
+    $cutoff = time() - $retention;
+    $tmpFiles = glob($boundary . '*');
+    foreach ((array) $tmpFiles as $tmpFile) {
+      $resolved = realpath($tmpFile);
+      if (false === $resolved || 0 !== strpos($resolved, $boundary) || !is_file($resolved)) {
+        continue;
+      }
+      if (\in_array(basename($resolved), $protected, true)) {
+        continue;
+      }
+      $modified = @filemtime($resolved);
+      if (false !== $modified && $modified < $cutoff) {
+        wp_delete_file($resolved);
+      }
+    }
   }
 
   private function getByteSizeByUnit($sizeString)

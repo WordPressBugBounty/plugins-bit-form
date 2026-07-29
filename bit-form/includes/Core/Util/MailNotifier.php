@@ -21,7 +21,6 @@ final class MailNotifier
     $emailTemplateHandler = new EmailTemplateHandler($formID);
     $attachments = [];
     $tempPdfLinks = [];
-
     if (is_string($notifyDetails->id)) {
       $mailTemplateID = Utilities::jsonObj($notifyDetails->id)->id ?? null;
       $mailTemplate = $emailTemplateHandler->getATemplate($mailTemplateID);
@@ -45,7 +44,7 @@ final class MailNotifier
           $from_mail = '';
           if (!empty($notifyDetails->from)) {
             $fromMail = FieldValueHandler::validateMailArry($notifyDetails->from, $fieldValue);
-            $headerFromName = !empty($notifyDetails->fromName) ? $notifyDetails->fromName : explode('@', $fromMail[0])[0];
+            $headerFromName = !empty($notifyDetails->from_name) ? $notifyDetails->from_name : explode('@', $fromMail[0])[0];
             $mailHeaders[] = "FROM: $headerFromName " . '<' . sanitize_email($fromMail[0]) . '>';
             $from_mail = $fromMail[0];
           }
@@ -198,6 +197,13 @@ final class MailNotifier
             add_action('phpmailer_init', $embedCb);
           }
           add_filter('wp_mail_content_type', [self::class, 'filterMailContentType']);
+          $fromNameCb = null;
+          if (!empty($from_name)) {
+            $fromNameCb = static function () use ($from_name) {
+              return $from_name;
+            };
+            add_filter('wp_mail_from_name', $fromNameCb);
+          }
           $status = wp_mail($mailTo, $mailSubject, $mailBody, $mailHeaders, $attachments);
 
           if (!$status) {
@@ -254,6 +260,9 @@ final class MailNotifier
             );
           }
           remove_filter('wp_mail_content_type', [self::class, 'filterMailContentType']);
+          if (null !== $fromNameCb) {
+            remove_filter('wp_mail_from_name', $fromNameCb);
+          }
           if (!empty($cidMap)) {
             remove_action('phpmailer_init', $embedCb);
           }

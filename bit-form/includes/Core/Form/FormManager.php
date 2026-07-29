@@ -619,7 +619,7 @@ class FormManager
    *
    * @param array|object $layout       single layout or array of steps ({layout} each)
    * @param object|null  $nestedLayout keyed by parent field key
-   * @param object|array $fields       raw form_content->fields
+   * @param mixed        $fields       raw form_content->fields (decoded JSON: shape is not guaranteed, hence the runtime guard)
    *
    * @return string[]|null orphan keys to drop, or null when the layout is
    *                       unusable (fail closed: drop nothing)
@@ -1696,10 +1696,14 @@ class FormManager
             $temp = $this->sanitize_text_recursive($_POST[$fldName]);
             unset($_POST[$fldName]);
             $_POST[$fieldKey] = $temp;
+          } elseif (array_key_exists($fieldKey, $_POST)) {
+            $_POST[$fieldKey] = $this->sanitize_text_recursive($_POST[$fieldKey]);
           } elseif (array_key_exists($fldName, $_FILES)) {
             $temp = $this->sanitize_text_recursive($_FILES[$fldName], false);
             unset($_FILES[$fldName]);
             $_FILES[$fieldKey] = $temp;
+          } elseif (array_key_exists($fieldKey, $_FILES)) {
+            $_FILES[$fieldKey] = $this->sanitize_text_recursive($_FILES[$fieldKey], false);
           }
           // Convert _session_id suffix (used by email-otp and similar fields)
           if (array_key_exists($fldName . '_session_id', $_POST)) {

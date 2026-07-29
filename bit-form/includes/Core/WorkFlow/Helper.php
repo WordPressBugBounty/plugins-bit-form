@@ -305,20 +305,13 @@ final class Helper
     return $ids;
   }
 
+  /**
+   * @deprecated misspelled duplicate of calculate(); kept because it is public API. Same
+   *             divide-by-zero guard so an external caller cannot fatal either.
+   */
   public static function calculte($firstOperand, $secondOperand, $operator)
   {
-    switch ($operator) {
-      case '+':
-        return $firstOperand + $secondOperand;
-      case '-':
-        return $firstOperand - $secondOperand;
-      case '*':
-        return $firstOperand * $secondOperand;
-      case '/':
-        return $firstOperand / $secondOperand;
-      case '^':
-        return $firstOperand ** $secondOperand;
-    }
+    return self::calculate($firstOperand, $secondOperand, $operator);
   }
 
   public static function filterMailContentType()
@@ -329,9 +322,24 @@ final class Helper
   public static function evalMathExpression($stringWithFieldValue)
   {
     $mathExpr = $stringWithFieldValue;
-    if (empty($mathExpr)) {
+    if (empty($mathExpr) || !\is_scalar($mathExpr)) {
       return $stringWithFieldValue;
     }
+    $mathExpr = (string) $mathExpr;
+
+    // The operand/operator checks below only look at \w+ runs and operator runs, so any other
+    // character was invisible to them. A quoted date ('2020-10-10') therefore passed as a
+    // subtraction chain and its quotes later surfaced as a bogus operator token. Require the whole
+    // string to be made of things a formula can contain.
+    if (1 !== preg_match('#^[0-9.+\-*/^()\[\]{}\s]+$#', $mathExpr)) {
+      return $stringWithFieldValue;
+    }
+
+    // A bare date is not a subtraction: 2020-10-10 must stay a date, not become 2000.
+    if (1 === preg_match('/^\s*\d{4}-\d{1,2}-\d{1,2}\s*$/', $mathExpr)) {
+      return $stringWithFieldValue;
+    }
+
     preg_match_all('/[\+\-\*\/\s]+/', $mathExpr, $isMathExpr);
     if (empty($isMathExpr[0])) {
       return $stringWithFieldValue;
@@ -355,7 +363,7 @@ final class Helper
     $mathExpr = preg_replace('/\{|\[|\(/', '(', $mathExpr);
     $mathExpr = preg_replace('/\}|\]/', ')', $mathExpr);
     $calculated = self::infixToPostfixEvalute($mathExpr);
-    if (!is_null($calculated)) {
+    if (!is_null($calculated) && isset($calculated[0])) {
       return (string) $calculated[0];
     }
 
@@ -381,8 +389,16 @@ final class Helper
         if ('(' === $token) {
           $operatorStack[] = $token;
         } elseif (')' === $token) {
+          // An unbalanced ')' used to read $operatorStack[-1] and warn on every iteration; treat
+          // the expression as non-arithmetic instead.
+          if (empty($operatorStack)) {
+            return null;
+          }
           while ('(' !== $operatorStack[count($operatorStack) - 1]) {
             $outputQueue[] = array_pop($operatorStack);
+            if (empty($operatorStack)) {
+              return null;
+            }
             if ('(' === $operatorStack[count($operatorStack) - 1]) {
               array_pop($operatorStack);
               break;
@@ -413,9 +429,20 @@ final class Helper
         $resultStack[] = $value;
         continue;
       }
+      // A token that is neither a number nor a real operator means the input was never an
+      // expression — e.g. a quoted date whose quotes accumulated into a token like "'2020".
+      // Bail out so evalMathExpression() returns the caller's string untouched; pushing the
+      // failure onto the stack would end up blanking that string.
+      if (!\in_array($value, ['+', '-', '*', '/', '^'], true) || count($resultStack) < 2) {
+        return null;
+      }
       $secondOperand = array_pop($resultStack);
       $firstOperand = array_pop($resultStack);
-      $resultStack[] = self::calculate($firstOperand, $secondOperand, $value);
+      $calculated = self::calculate($firstOperand, $secondOperand, $value);
+      if (\is_null($calculated)) {
+        return null;
+      }
+      $resultStack[] = $calculated;
     }
     return $resultStack;
   }
@@ -433,17 +460,37 @@ final class Helper
     return isset($precedence[$operator]) ? $precedence[$operator] : 0;
   }
 
+  /**
+   * Apply one arithmetic operator.
+   *
+   * @param mixed  $firstOperand
+   * @param mixed  $secondOperand
+   * @param string $operator
+   *
+   * @return float|int|null null on unknown operator, non-numeric operand, or division by zero
+   */
   public static function calculate($firstOperand, $secondOperand, $operator)
   {
-    $calculated = [
-      '+' => $firstOperand + $secondOperand,
-      '-' => $firstOperand - $secondOperand,
-      '*' => $firstOperand * $secondOperand,
-      '/' => $firstOperand / $secondOperand,
-      '^' => $firstOperand ** $secondOperand,
-    ];
+    if (!is_numeric($firstOperand) || !is_numeric($secondOperand)) {
+      return null;
+    }
+    $firstOperand = $firstOperand + 0;
+    $secondOperand = $secondOperand + 0;
 
-    return isset($calculated[$operator]) ? $calculated[$operator] : '';
+    switch ($operator) {
+      case '+':
+        return $firstOperand + $secondOperand;
+      case '-':
+        return $firstOperand - $secondOperand;
+      case '*':
+        return $firstOperand * $secondOperand;
+      case '/':
+        return 0 == $secondOperand ? null : $firstOperand / $secondOperand;
+      case '^':
+        return $firstOperand ** $secondOperand;
+    }
+
+    return null;
   }
 
   /**

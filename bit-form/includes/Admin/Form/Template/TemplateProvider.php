@@ -48,7 +48,7 @@ final class TemplateProvider
    * Undocumented function
    *
    * @param String $name
-   * @return void
+   * @return array|false
    */
   protected function setTemplate($name = 'Contact Form', $newFormId)
   {
@@ -71,7 +71,7 @@ final class TemplateProvider
   /**
    * This function helps to get TEMPLATE
    *
-   * @return bool setTemplate()
+   * @return array|false
    */
   public function getTemplate($name, $newFormId)
   {

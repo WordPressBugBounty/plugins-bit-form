@@ -320,7 +320,7 @@ final class IpTool
   /**
    * Provide user details
    *
-   * @return _setUserDetail user details array
+   * @return array user details array
    */
   public static function getUserDetail()
   {

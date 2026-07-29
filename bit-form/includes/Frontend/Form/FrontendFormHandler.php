@@ -17,6 +17,7 @@ use BitCode\BitForm\Core\Util\EscapingHelper;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\FileDownloadProvider;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
+use BitCode\BitForm\Core\Util\Log;
 use BitCode\BitForm\Core\Util\SmartTagRegistry;
 use BitCode\BitForm\Core\Util\SmartTags;
 use BitCode\BitForm\Core\Util\Utilities;
@@ -699,6 +700,13 @@ final class FrontendFormHandler
     $this->addInlineScript($code, 'bitform-show-picker-bridge', 'after');
   }
 
+  /**
+   * Does this form row exist?
+   *
+   * @param int $formID
+   *
+   * @return bool
+   */
   private function isExist($formID)
   {
     $formModel = new FormModel();
@@ -710,10 +718,30 @@ final class FrontendFormHandler
         'id' => $formID,
       ]
     );
-    if (!is_wp_error($form)) {
-      return true;
+
+    if (is_wp_error($form)) {
+      if ('result_empty' !== $form->get_error_code()) {
+        Log::debug_log([
+          'message' => 'Form lookup failed — reported to the visitor as a missing form',
+          'formID'  => $formID,
+          'code'    => $form->get_error_code(),
+          'error'   => $form->get_error_message(),
+        ]);
+      }
+
+      return false;
     }
-    return false;
+
+    if (empty($form)) {
+      Log::debug_log([
+        'message' => 'Form lookup returned no rows without an error (is the form table present?)',
+        'formID'  => $formID,
+      ]);
+
+      return false;
+    }
+
+    return true;
   }
 
   private function getFieldsValue($formID, $entryID)

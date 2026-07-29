@@ -212,7 +212,7 @@ final class FieldValueHandler
       if (in_array($fldData->typ, $file_upload_types)) {
         continue;
       }
-      if (array_key_exists($fldKey, $fieldValues)) {
+      if (is_array($fieldValues) && array_key_exists($fldKey, $fieldValues)) {
         $value = $fieldValues[$fldKey];
         // if (is_array($value)) {
         //   $formattedFldValues[$fldKey] = htmlspecialchars(implode(', ', $value));

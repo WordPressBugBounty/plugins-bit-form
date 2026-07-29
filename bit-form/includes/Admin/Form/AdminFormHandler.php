@@ -665,7 +665,12 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
             unset($templateDetail->clRef);
           }
         } else {
-          $emailTemplateHandler->updateTemplate($templateDetail);
+          $updated = $emailTemplateHandler->updateTemplate($templateDetail);
+          if (is_wp_error($updated) && 'db_error' === $updated->get_error_code()) {
+            $newData['mailTemplate'] = 2;
+          } elseif (0 === $newData['mailTemplate']) {
+            $newData['mailTemplate'] = 1;
+          }
         }
       }
     }
@@ -812,7 +817,11 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
       $fieldNames['__updated_at'] = __('Modified Time', 'bit-form');
 
       $reportIsDefault = null;
-      if (isset($form_content['report_id'])) {
+      // The client posts currentReport as {} whenever its report atom has not resolved yet. That
+      // is an empty stdClass, which empty() above treats as non-empty, so we reach here with
+      // nothing to save — and writing the validated result would replace the stored report's
+      // column order, hidden columns, page size and name with an empty list. Leave the row alone.
+      if (isset($form_content['report_id']) && ReportsModel::isValidatableReport($reports)) {
         $validDateReport = $reportsModel->validateReportFields($reports, $fieldNames);
         if (isset($reports->isDefault)) {
           $reportIsDefault = $reports->isDefault;
@@ -1113,7 +1122,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         'formInfo'      => !empty($form_content->formInfo) ? $form_content->formInfo : (object) ['formName' => $formManager->getFormName()],
         'fields'        => $form_content->fields,
         'form_name'     => $formManager->getFormName(),
-        'workFlowExist' => $form_content->workFlowExist,
+        'workFlowExist' => isset($form_content->workFlowExist) ? $form_content->workFlowExist : [],
         'report_id'     => isset($form_content->report_id) ? $form_content->report_id : null
       ];
       $successMessageHandler
@@ -1411,7 +1420,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         'layout'        => $form_content->layout,
         'fields'        => $form_content->fields,
         'form_name'     => $formManager->getFormName(),
-        'workFlowExist' => $form_content->workFlowExist,
+        'workFlowExist' => isset($form_content->workFlowExist) ? $form_content->workFlowExist : [],
         'report_id'     => isset($form_content->report_id) ? $form_content->report_id : null
       ];
       $successMessageHandler
@@ -2020,6 +2029,63 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     return $response;
   }
 
+  /**
+   * Sanitize a request-supplied entry query condition before it reaches the Model
+   * layer. Only known entry-table columns are allowed as condition keys, operators
+   * are restricted to a safe allow-list ['form_id' => $id] when nothing valid remains.
+   *
+   * @param mixed $queryCondition
+   * @param int   $id
+   * @return array
+   */
+  private function sanitizeEntryQueryCondition($queryCondition, $id)
+  {
+    $allowedColumns = [
+      'id', 'form_id', 'status', 'created_at', 'updated_at',
+      'user_id', 'user_ip', 'user_device', 'user_location', 'referer',
+    ];
+    $allowedOperators = ['=', '!=', '<>', '<', '>', '<=', '>=', 'LIKE', 'IN'];
+
+    if (!is_array($queryCondition)) {
+      return ['form_id' => $id];
+    }
+
+    $safe = [];
+    foreach ($queryCondition as $key => $value) {
+      if (!in_array($key, $allowedColumns, true)) {
+        continue;
+      }
+
+      if (is_array($value)) {
+        // Never honour a request-supplied raw SQL fragment.
+        unset($value['raw']);
+
+        if (array_key_exists('operator', $value) || array_key_exists('value', $value)) {
+          $operator = isset($value['operator']) && is_string($value['operator'])
+            ? strtoupper(trim($value['operator']))
+            : '=';
+          if (!in_array($operator, $allowedOperators, true)) {
+            $operator = '=';
+          }
+          $condValue = isset($value['value']) ? $value['value'] : '';
+          if (is_scalar($condValue)) {
+            $safe[$key] = ['operator' => $operator, 'value' => $condValue];
+          }
+        } else {
+          // IN-style list: keep scalar members only (bound by the Model).
+          $list = array_values(array_filter($value, 'is_scalar'));
+          if (!empty($list)) {
+            $safe[$key] = $list;
+          }
+        }
+      } elseif (is_scalar($value)) {
+        $safe[$key] = $value;
+      }
+    }
+
+    return empty($safe) ? ['form_id' => $id] : $safe;
+  }
+
   public function getFormEntry($Request, $post)
   {
     if (!empty($Request['id'])) {
@@ -2041,6 +2107,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         wp_unslash($post->pageSize) : 10;
       $queryCondition = isset($post->queryCondition) ? wp_unslash($post->queryCondition) : ['form_id' => $id];
     }
+    $queryCondition = $this->sanitizeEntryQueryCondition($queryCondition, $id);
     if (is_null($id)) {
       return new WP_Error('empty_form', __('Form id is empty.', 'bit-form'));
     }
