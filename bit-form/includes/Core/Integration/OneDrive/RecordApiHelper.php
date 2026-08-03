@@ -2,7 +2,6 @@
 
 namespace BitCode\BitForm\Core\Integration\OneDrive;
 
-use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Core\Util\ApiResponse;
 use BitCode\BitForm\Core\Util\FileHandler;
 use WP_Error;
@@ -107,9 +106,10 @@ class RecordApiHelper
 
   public function makeFilePath($filePath)
   {
-    $upDir = wp_upload_dir();
-    $encriptedPath = Helpers::getEncryptedEntryId($this->entryId);
-    return $upDir['basedir'] . '/bitforms/uploads/' . $this->formId . '/' . $encriptedPath . '/' . $filePath;
+    // Field values arrive as public file URLs (see IntegrationHandler::handleFileUrl),
+    // so reduce to the stored file name before resolving against the entry directory.
+    $fileName = basename(parse_url($filePath, PHP_URL_PATH) ?: $filePath);
+    return FileHandler::getEntriesFileUploadDir($this->formId, $this->entryId) . DIRECTORY_SEPARATOR . $fileName;
   }
 
   public function executeRecordApi($integrationId, $logID,  $fieldValues, $fieldMap, $actions, $folderId, $parentId, $formId)
@@ -119,11 +119,15 @@ class RecordApiHelper
 
     if (is_array($actionsAttachments)) {
       foreach ($actionsAttachments as $actionAttachment) {
-        foreach ($fieldValues[$actionAttachment] as $value) {
+        if (empty($fieldValues[$actionAttachment])) {
+          continue;
+        }
+        $files = is_array($fieldValues[$actionAttachment]) ? $fieldValues[$actionAttachment] : [$fieldValues[$actionAttachment]];
+        foreach ($files as $value) {
           $folderWithFile[] = ["$actionAttachment" => $value];
         }
-        $this->handleAllFiles($folderWithFile, $actions, $folderId, $parentId);
       }
+      $this->handleAllFiles($folderWithFile, $actions, $folderId, $parentId);
     }
 
     $entryDetails = [

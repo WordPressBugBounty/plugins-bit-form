@@ -63,6 +63,37 @@ final class FrontendFormHandler
     return $formScriptSrc;
   }
 
+  private function getJSFilePath($postId)
+  {
+    return BITFORMS_CONTENT_DIR . "/form-scripts/$postId/bitform-js-$postId.js";
+  }
+
+  /**
+   * Does this page's bundle need (re)generating?
+   *
+   * The DB flag alone is not enough: a page marked generated whose file was never written
+   * (crashed generation, unwritable uploads dir) would enqueue a 404 forever. Conversely a
+   * file that cannot be written must not make every request rebuild it, so a missing file
+   * is retried on a backoff window rather than on every hit.
+   *
+   * @param int  $postId
+   * @param bool $regenerateScriptFlag DB-side verdict from regenerateScriptChecker()
+   *
+   * @return bool
+   */
+  private function needsScriptGeneration($postId, $regenerateScriptFlag)
+  {
+    if (file_exists($this->getJSFilePath($postId))) {
+      return (bool) $regenerateScriptFlag;
+    }
+    $retryKey = 'bitforms_js_regen_' . $postId;
+    if (get_transient($retryKey)) {
+      return false;
+    }
+    set_transient($retryKey, 1, 5 * MINUTE_IN_SECONDS);
+    return true;
+  }
+
   public function generateJs($formID = null, $entryID = null, $formType = null)
   {
     // return true;
@@ -126,6 +157,8 @@ final class FrontendFormHandler
         $regenerateScriptFlag = $this->deleteUnusedFormPageIds($postId, $bfUniqFormIds);
       }
       $isJsGenerating = get_option('bitforms_frontend_js_generating');
+      // The fast path also requires the cached bundle to exist on disk, not just be flagged in the DB.
+      $regenerateScriptFlag = $this->needsScriptGeneration($postId, $regenerateScriptFlag);
       if (!$regenerateScriptFlag && !$isJsGenerating && !empty($formIDs)) {
         wp_enqueue_script('bit-form-all-script-test', $this->getJSFileSrc($postId), [], $formUpdateVersion, true);
         return;
@@ -159,6 +192,11 @@ final class FrontendFormHandler
     $frontendScriptGenObj->generateJsFile($formContents, $allFields, $contentIds, $postId, $formIDs, $previewMode);
     if ('preview' === $previewMode) {
       return;
+    }
+    // Only mark the page as generated once the bundle is verifiably on disk; otherwise the
+    // next request must retry generation instead of fast-pathing to a stale/missing file.
+    if (!empty($bfUniqFormIds) && file_exists($this->getJSFilePath($postId))) {
+      $this->markScriptGenerated($bfUniqFormIds, $postId);
     }
     wp_enqueue_script('bit-form-all-script-test', $this->getJSFileSrc($postId), [], $formUpdateVersion, true);
   }
@@ -207,8 +245,9 @@ final class FrontendFormHandler
       return;
     }
     $postId = $post->ID;
-    $regenerateScriptFlag = false;
-    $formModel = new FormModel();
+    // Read-only check. Marking the page as generated is deferred to markScriptGenerated(),
+    // called only after the bundle file is actually written — marking here left the DB
+    // saying "generated" while the file stayed stale whenever generation failed mid-way.
     foreach ($formsIds as $formId) {
       $formInstance = FormManager::getInstance($formId);
       if (!$formInstance->isExist()) {
@@ -216,15 +255,32 @@ final class FrontendFormHandler
       }
       $generatedPages = $formInstance->getFormData('generated_script_page_ids');
       if (empty($generatedPages)) {
-        $regenerateScriptFlag = true;
-      } elseif (is_object($generatedPages) && (!isset($generatedPages->{$postId}) || (isset($generatedPages->{$postId}) && false === $generatedPages->{$postId}))) {
-        $regenerateScriptFlag = true;
+        return true;
       }
-      if (!$regenerateScriptFlag) {
+      if (is_object($generatedPages) && (!isset($generatedPages->{$postId}) || false === $generatedPages->{$postId})) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private function markScriptGenerated($formsIds, $postId)
+  {
+    // Fetched via FormModel rather than FormManager: FormManager keeps its row in a static
+    // property shared across instances, so after the render loop it holds the last form's
+    // data regardless of which instance is asked.
+    $formModel = new FormModel();
+    foreach ($formsIds as $formId) {
+      $form = $formModel->get(['generated_script_page_ids'], ['id' => $formId]);
+      if (is_wp_error($form) || empty($form)) {
         continue;
       }
+      $generatedPages = Utilities::jsonObj($form[0]->generated_script_page_ids ?? '');
       if (!is_object($generatedPages)) {
         $generatedPages = (object) [];
+      }
+      if (!empty($generatedPages->{$postId})) {
+        continue;
       }
       $generatedPages->{$postId} = true;
       $formModel->update(
@@ -236,7 +292,6 @@ final class FrontendFormHandler
         ]
       );
     }
-    return $regenerateScriptFlag;
   }
 
   private function addInlineScript($code, $handle = '', $position = 'after')

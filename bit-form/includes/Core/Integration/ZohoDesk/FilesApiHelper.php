@@ -48,6 +48,7 @@ final class FilesApiHelper
    */
   public function uploadFiles($files, $ticketId, $dataCenter)
   {
+    $files = self::normalizeFileNames($files);
     $uploadFileEndpoint = "https://desk.zoho.{$dataCenter}/api/v1/tickets/{$ticketId}/attachments";
     $payload = '';
     if (is_array($files)) {
@@ -80,5 +81,21 @@ final class FilesApiHelper
     $uploadResponse = HttpHelper::post($uploadFileEndpoint, $payload, $this->_defaultHeader);
 
     return $uploadResponse;
+  }
+
+  /**
+   * Field values may arrive as public file URLs (see IntegrationHandler::handleFileUrl),
+   * so reduce each to the stored file name before resolving against the entry directory.
+   *
+   * @param mixed $files file name(s) or URL(s)
+   *
+   * @return mixed
+   */
+  private static function normalizeFileNames($files)
+  {
+    if (is_array($files)) {
+      return array_map([__CLASS__, 'normalizeFileNames'], $files);
+    }
+    return is_string($files) ? basename(parse_url($files, PHP_URL_PATH) ?: $files) : $files;
   }
 }

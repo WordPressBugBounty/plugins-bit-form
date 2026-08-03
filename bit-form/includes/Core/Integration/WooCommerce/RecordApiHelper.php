@@ -196,10 +196,14 @@ class RecordApiHelper
           if (!empty($fieldValues[$uploadField->formField])) {
             $uplaodFiles = $fieldValues[$uploadField->formField];
             if ('string' === gettype($fieldValues[$uploadField->formField])) {
-              $uplaodFiles = json_decode($fieldValues[$uploadField->formField]);
+              $decoded = json_decode($fieldValues[$uploadField->formField]);
+              $uplaodFiles = is_null($decoded) ? $uplaodFiles : $decoded;
             }
+            // Field values may arrive as public file URLs (see IntegrationHandler::handleFileUrl),
+            // so reduce each to the stored file name before resolving against the entry directory.
             if (is_array($uplaodFiles)) {
               foreach ($uplaodFiles as $singleFile) {
+                $singleFile = basename(parse_url($singleFile, PHP_URL_PATH) ?: $singleFile);
                 $url = $basepath . $singleFile;
                 $attach_id = $this->attach_product_attachments($product_id, $flag, $url, $singleFile);
                 if (1 === $flag && $attach_id) {
@@ -207,7 +211,7 @@ class RecordApiHelper
                 }
               }
             } else {
-              $filename = $uplaodFiles;
+              $filename = basename(parse_url($uplaodFiles, PHP_URL_PATH) ?: $uplaodFiles);
               $url = $basepath . $filename;
               $this->attach_product_attachments($product_id, $flag, $url, $filename);
             }

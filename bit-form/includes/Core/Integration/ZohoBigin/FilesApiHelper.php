@@ -46,6 +46,7 @@ final class FilesApiHelper
    */
   public function uploadFiles($files, $module, $recordID, $isPhoto = null)
   {
+    $files = self::normalizeFileNames($files);
     $uploadFileEndpoint = '';
 
     if ($isPhoto) {
@@ -82,5 +83,21 @@ final class FilesApiHelper
     $payload .= '--' . $this->_payloadBoundary . '--';
 
     return HttpHelper::post($uploadFileEndpoint, $payload, $this->_defaultHeader);
+  }
+
+  /**
+   * Field values may arrive as public file URLs (see IntegrationHandler::handleFileUrl),
+   * so reduce each to the stored file name before resolving against the entry directory.
+   *
+   * @param mixed $files file name(s) or URL(s)
+   *
+   * @return mixed
+   */
+  private static function normalizeFileNames($files)
+  {
+    if (is_array($files)) {
+      return array_map([__CLASS__, 'normalizeFileNames'], $files);
+    }
+    return is_string($files) ? basename(parse_url($files, PHP_URL_PATH) ?: $files) : $files;
   }
 }

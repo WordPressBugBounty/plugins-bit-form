@@ -1,7 +1,7 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.2.1
-Stable tag: 3.2.1
+Version: 3.2.2
+Stable tag: 3.2.2
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin
@@ -478,6 +478,17 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.2.2 =
+* Release Date: 3rd August, 2026
+* Improvements:
+    1. **Bit Form Pro Updates:** Improved the "Update Now" flow for updating Bit Form Pro from the plugins screen.
+
+* Fixes:
+    1. **Multi-Step Forms:** Fixed the form freezing when "Next" was clicked after a successful submission — validation repeated until it failed, so a second entry could not be started without reloading the page.
+    2. **File Uploads to Integrations:** Fixed uploaded files not reaching OneDrive and Dropbox ("Can't open or read file!") and being silently skipped by WooCommerce and the Zoho integrations (CRM, Bigin, Creator, Desk, Mail, Projects, Recruit, and WorkDrive).
+    3. **OneDrive:** Fixed the same file being uploaded more than once when a form mapped several file fields to the integration.
+    4. **Bit CRM Integration:** Fixed missing tag titles when a form was created from Bit CRM.
+
 = 3.2.1 =
 * Release Date: 28 July, 2026
 * New:
@@ -495,8 +506,9 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
     5. **Data Accuracy:** Fixed a failed database query returning the previous query's rows instead of reporting the error, which could show the wrong records on a page.
 
 * Security:
-    1. Hardened the database query layer so a query condition can never contribute an unrecognised column name or comparison operator to a statement. Thanks to security researcher **Artus KG** for the responsible disclosure.
+    1. Hardened the database query layer so a query condition can never contribute an unrecognised column name or comparison operator to a statement.
     2. Sanitized form submissions made through internal field keys, closing a stored cross-site-scripting and PDF request-forgery path.
+    3. Our thanks to security researchers **Artus KG**, **JING QIAN** and **Farid Narimanov** for responsibly disclosing the issues addressed in this release.
 
 = 3.2.0 =
 * Release Date: 20 July, 2026
