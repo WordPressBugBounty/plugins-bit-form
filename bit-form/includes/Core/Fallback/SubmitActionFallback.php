@@ -28,13 +28,9 @@ class SubmitActionFallback
       return;
     }
 
-    // This fallback runs on `init` (any request), but the schema migration that adds
-    // `workflow_category` is gated behind an admin (`manage_options`) request. If a non-admin /
-    // cron / frontend request reaches here first, the column is absent and the referenced-ids
-    // query below would return a WP_Error — which, treated as "nothing referenced", would wrongly
-    // deactivate every action. Ensure the schema exists first; if it still cannot be created, bail
-    // WITHOUT marking migrated so a later (admin) request retries.
-    if (!$this->workflowCategoryColumnReady()) {
+    // A missing column makes the referenced-ids query error, which would read as "nothing
+    // referenced" and disable every action. Bail without marking migrated so a later request retries.
+    if (!$this->workflowSchemaReady()) {
       return;
     }
 
@@ -52,26 +48,12 @@ class SubmitActionFallback
   }
 
   /**
-   * Guarantee the `workflow_category` column exists before the migration reads it. Tries to run the
-   * schema migration once if the column is missing (self-healing regardless of who serves the
-   * request). Returns false if the column still cannot be found.
+   * Self-heal the columns the referenced-ids query filters on (`workflow_category`,
+   * `workflow_status`); false when they still cannot be created, so the caller retries later.
    */
-  private function workflowCategoryColumnReady()
+  private function workflowSchemaReady()
   {
-    if ($this->hasWorkflowCategoryColumn()) {
-      return true;
-    }
-    // Column missing: run the schema migration now (idempotent) instead of waiting for an admin hit.
-    DB::migrate();
-    return $this->hasWorkflowCategoryColumn();
-  }
-
-  private function hasWorkflowCategoryColumn()
-  {
-    global $wpdb;
-    $table = $wpdb->prefix . 'bitforms_workflows';
-    // Table/column name interpolation only — SHOW COLUMNS cannot be parameterized via prepare().
-    return null !== $wpdb->get_var("SHOW COLUMNS FROM `{$table}` LIKE 'workflow_category'");
+    return DB::ensureWorkflowSchema();
   }
 
   /**

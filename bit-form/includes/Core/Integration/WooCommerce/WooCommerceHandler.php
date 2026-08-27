@@ -473,7 +473,7 @@ class WooCommerceHandler
     }
   }
 
-  public function searchProjectsAjaxHelper()
+  public static function searchProjectsAjaxHelper()
   {
     if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       GlobalHelper::requirePostMethod();

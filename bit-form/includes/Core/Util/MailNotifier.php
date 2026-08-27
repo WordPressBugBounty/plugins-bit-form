@@ -49,7 +49,15 @@ final class MailNotifier
             $from_mail = $fromMail[0];
           }
           (new MailConfig())->sendMail(['from_name' => $from_name, 'from_email' => $from_mail]);
-          $mailSubject = FieldValueHandler::replaceFieldWithValue($mailTemplate[0]->sub, $fieldValue, $formID);
+          // Translate before smart-tag replacement. One language per submission,
+          // shared by the admin and submitter emails.
+          $mailSubjectTemplate = (string) apply_filters(
+            'bitform_translate_form_string',
+            (string) $mailTemplate[0]->sub,
+            'mail-sub-' . $mailTemplateID,
+            $formID
+          );
+          $mailSubject = FieldValueHandler::replaceFieldWithValue($mailSubjectTemplate, $fieldValue, $formID);
 
           // allow developers to modify email subject
           $mailSubject = apply_filters(
@@ -64,7 +72,12 @@ final class MailNotifier
             ]
           );
 
-          $mailBody = $mailTemplate[0]->body;
+          $mailBody = (string) apply_filters(
+            'bitform_translate_form_string',
+            (string) $mailTemplate[0]->body,
+            'mail-body-' . $mailTemplateID,
+            $formID
+          );
           if (class_exists('\BitCode\BitFormPro\Admin\DownloadFile')) {
             $downloadFile = new \BitCode\BitFormPro\Admin\DownloadFile();
             $mailBody = $downloadFile->replacePdfShortCodeToLink($mailBody, $formID, $entryID);

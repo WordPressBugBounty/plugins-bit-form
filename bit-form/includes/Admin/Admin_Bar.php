@@ -372,7 +372,7 @@ class Admin_Bar
       $bits
     );
 
-    $allowBitFormTranslation = apply_filters('bitforms_filter_allow_translation', true);
+    $allowBitFormTranslation = apply_filters('bitform_filter_allow_translation', true);
     if ($allowBitFormTranslation && 'en_US' !== get_user_locale() && file_exists(BITFORMS_PLUGIN_DIR_PATH . '/languages/generatedString.php')) {
       include_once BITFORMS_PLUGIN_DIR_PATH . '/languages/generatedString.php';
       $bitforms['translations'] = $bitforms_i18n_strings;

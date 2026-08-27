@@ -96,7 +96,6 @@ final class Uninstallation
 
   public static function deleteOptions()
   {
-    global $wpdb;
     $pluginOptions = [
       'bitform_app_config',
       'bitform_app_settings',
@@ -115,14 +114,14 @@ final class Uninstallation
       'bitform_csrf_secret',
       'bitform_form_update_version',
       'bitforms_salt',
+      'bitforms_wpml_string_hashes',
     ];
 
-    $placeholders = implode(',', array_fill(0, count($pluginOptions), '%s'));
-    $wpdb->query(
-      $wpdb->prepare(
-        'DELETE FROM `' . $wpdb->prefix . 'options` WHERE option_name IN (' . $placeholders . ')',
-        ...$pluginOptions
-      )
-    );
+    // delete_option() rather than one DELETE: the raw query left the deleted rows
+    // behind in a persistent object cache, so an uninstall/reinstall cycle read
+    // stale values back. It also keeps the option names out of hand-built SQL.
+    foreach ($pluginOptions as $option) {
+      delete_option($option);
+    }
   }
 }

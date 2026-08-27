@@ -1,13 +1,13 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.2.2
-Stable tag: 3.2.2
+Version: 3.3.0
+Stable tag: 3.3.0
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin
 Tags:  contact form, form, form builder, wp forms, form plugin
-Requires at least: 6.4
-Tested up to: 7.0
+Requires at least: 6.5
+Tested up to: 7.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -478,6 +478,39 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.3.0 =
+* Release Date: 24 August, 2026
+* Heads up:
+    1. **WordPress 6.5 is now the minimum.** Translations now ship as compiled catalogs, which older WordPress versions cannot read. On WordPress 6.4 the plugin still runs, but every string stays in English.
+
+* New:
+    1. **Multilingual Forms:** Your form text now follows the visitor's language — labels, placeholders, options, buttons, validation and confirmation messages, redirect URLs and emails. Works with WPML, Polylang, TranslatePress and GTranslate, including forms built before this update. Each form can be left untranslated if you prefer.
+    2. **Redesigned Integrations Screen:** All your integrations now sit in one searchable table showing each one's status and when it last ran. Setup opens in a side drawer, so you stay on the form.
+    3. **Reusable Connected Accounts:** Connected accounts live in one panel, grouped by service. Rename or remove an account without touching the integrations that use it.
+    4. **Field Auto-Mapping:** Added an Auto Map button that matches your form fields to the service's fields in one click.
+    5. **Unsaved Setup Is Kept:** An unfinished integration setup is saved as a draft, so closing the drawer no longer loses it.
+    6. **Caching Plugin Support:** Saving a form now clears the cached pages that show it. Bit Form's scripts are excluded from W3 Total Cache, Hummingbird, Jetpack Boost and NitroPack, and Elementor's cache is cleared too.
+
+* Improvements:
+    1. **Bit Form's Own Text Translated:** Bit Form's built-in text — buttons, default messages and admin screens — is now translated. The 34 bundled languages shipped before but were never applied, and they now cover this release's new strings. Developers can turn this off with the `bitform_filter_allow_translation` filter.
+    2. **Telegram:** A message too long for Telegram's caption limit is now sent as its own message instead of being rejected, and several attachments go as one album.
+    3. **Integration Logs:** A failed API call is now recorded against the entry. Before, a silently broken integration left no trace at all.
+    4. **Phone Number Field:** Validation now accepts landline, toll-free, premium and service numbers. Only mobile numbers were accepted before, so those were rejected in every country. Forms you have already saved keep their existing patterns.
+    5. **Faster Multilingual Forms:** Translated form content is now cached, and the multilingual code no longer loads on sites without a translation plugin.
+
+* Fixes:
+    1. **Telegram:** Fixed uploaded files never reaching Telegram, and messages failing to send when the body used rich text. Paragraphs, bullet lists, the `${bf_all_data}` table and checkbox/radio values are now converted to text Telegram accepts.
+    2. **Forms In Popups:** Fixed forms opened later in a visit — in a popup, a tab or anything loaded on demand — having no validation or working submit button. Bit Form now watches for new forms the whole time the page is open.
+    3. **Signature On Entry Edit:** Fixed a saved signature disappearing when an entry is edited, which also blocked saving when the signature was required.
+    4. **Country Flag On Phone Fields:** Fixed the flag jumping to the wrong country while typing, where countries share a calling code.
+    5. **Workflows On Older Installs:** Fixed conditional logic and submit actions breaking when workflow database columns went missing after an interrupted update. They are now repaired automatically.
+    6. **HTML Field In The Builder:** Fixed the HTML field keeping its old height after its content was edited, so longer content spilled over the fields below it. The field now resizes as you edit, including once images inside it have loaded.
+
+* Security:
+    1. **REST API Key:** The Bit Form API key is now randomly generated; the old fallback was predictable. **If you have never set your own API key, open App Settings → API and generate a new one.**
+    2. **OAuth Return Endpoint:** The public OAuth return endpoint now accepts GET requests only, rejects addresses it cannot parse, and no longer repeats a rejected address back.
+    3. **Telegram Attachments:** Attachment file names coming from a submission are validated before the file is read from disk.
+
 = 3.2.2 =
 * Release Date: 3rd August, 2026
 * Improvements:

@@ -30,13 +30,14 @@ class ConversationalFormView
       $formHTML = $formViewObject->html;
       $font = $formViewObject->font;
       $bfGlobals = $formViewObject->bfGlobals;
+      $configTag = isset($formViewObject->configTag) ? $formViewObject->configTag : '';
       $formContent = isset($formViewObject->formContent) ? $formViewObject->formContent : null;
 
       if (defined('BITAPPS_DEV') && BITAPPS_DEV) {
         set_transient('bitform_form_preview', true);
         $frontendFormHandler->generateJs($formID);
         $title = 'BitForm Preview page';
-        Render::view('views/preview-page', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'formContent'));
+        Render::view('views/preview-page', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'configTag', 'formContent'));
       }
     }
   }
@@ -141,12 +142,13 @@ class ConversationalFormView
     $formHTML = $formViewObject->html;
     $font = $formViewObject->font;
     $bfGlobals = $formViewObject->bfGlobals;
+    $configTag = isset($formViewObject->configTag) ? $formViewObject->configTag : '';
     $formContent = isset($formViewObject->formContent) ? $formViewObject->formContent : null;
 
     set_transient('bitform_form_preview', true);
     $frontendFormHandler->generateJs($formID, null, $formType);
     $title = 'Bit Form';
-    Render::view('views/conversational-form', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'isPreview', 'formContent'));
+    Render::view('views/conversational-form', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'configTag', 'isPreview', 'formContent'));
 
     exit(200);
   }

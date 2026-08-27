@@ -18,16 +18,9 @@ class WorkFlow
    */
   public function normalizeCategory()
   {
-    // Runs on `init` (any request), but the `workflow_category` column is added by a migration gated
-    // behind an admin request. Ensure the column exists first (self-heal) so a non-admin/cron first
-    // request does not silently no-op and leave rows uncategorized.
-    global $wpdb;
-    $table = $wpdb->prefix . 'bitforms_workflows';
-    if (null === $wpdb->get_var("SHOW COLUMNS FROM `{$table}` LIKE 'workflow_category'")) {
-      DB::migrate();
-      if (null === $wpdb->get_var("SHOW COLUMNS FROM `{$table}` LIKE 'workflow_category'")) {
-        return '';
-      }
+    // Self-heal `workflow_category` first, else this pass silently leaves rows uncategorized.
+    if (!DB::ensureWorkflowSchema()) {
+      return '';
     }
 
     $workFlowModel = new WorkFlowModel();

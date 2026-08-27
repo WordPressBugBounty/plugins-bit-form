@@ -79,6 +79,62 @@ final class DB
     }
   }
 
+  /**
+   * Idempotently add the workflows `workflow_order` column.
+   *
+   * @return void
+   */
+  public static function ensureWorkflowOrderColumn()
+  {
+    global $wpdb;
+    $table = $wpdb->prefix . 'bitforms_workflows';
+    if (null === $wpdb->get_var("SHOW COLUMNS FROM `{$table}` LIKE 'workflow_order'")) {
+      $wpdb->query(
+        "ALTER TABLE `{$table}`
+            ADD COLUMN `workflow_order` INT(11) DEFAULT NULL AFTER `workflow_condition`"
+      );
+    }
+  }
+
+  /**
+   * Idempotently add the workflows `workflow_status` column.
+   *
+   * @return void
+   */
+  public static function ensureWorkflowStatusColumn()
+  {
+    self::ensureWorkflowOrderColumn();
+    global $wpdb;
+    $table = $wpdb->prefix . 'bitforms_workflows';
+    if (null === $wpdb->get_var("SHOW COLUMNS FROM `{$table}` LIKE 'workflow_status'")) {
+      $wpdb->query(
+        "ALTER TABLE `{$table}`
+            ADD COLUMN `workflow_status` TINYINT(1) DEFAULT 1 NOT NULL AFTER `workflow_order`"
+      );
+    }
+  }
+
+  /**
+   * Idempotently add every workflows column the queries reference, for installs whose
+   * `bitforms_db_version` ran ahead of their real schema (a version-gated ALTER failed once).
+   *
+   * @return bool true when all four columns exist afterwards
+   */
+  public static function ensureWorkflowSchema()
+  {
+    global $wpdb;
+    self::ensureWorkflowStatusColumn();
+    self::ensureWorkflowCategoryColumn();
+
+    $table = $wpdb->prefix . 'bitforms_workflows';
+    foreach (['workflow_order', 'workflow_info', 'workflow_category', 'workflow_status'] as $column) {
+      if (null === $wpdb->get_var("SHOW COLUMNS FROM `{$table}` LIKE '{$column}'")) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public static function migrate()
   {
     global $wpdb;

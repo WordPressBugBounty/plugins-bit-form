@@ -8,12 +8,16 @@
 namespace BitCode\BitForm\Core\Integration\Telegram;
 
 use BitCode\BitForm\Core\Util\FileHandler;
+use WP_Error;
 
 /**
  * Provide functionality for Upload files
  */
 final class FilesApiHelper
 {
+  /** sendMediaGroup accepts 2-10 items per call. */
+  private const MEDIA_GROUP_LIMIT = 10;
+
   private $_defaultHeader;
   private $_payloadBoundary;
   private $_basepath;
@@ -25,7 +29,8 @@ final class FilesApiHelper
    */
   public function __construct($formID, $entryID)
   {
-    $this->_payloadBoundary = wp_generate_password(24);
+    // No special chars: the boundary is echoed in the header and every part delimiter.
+    $this->_payloadBoundary = 'BitFormBoundary' . wp_generate_password(24, false);
     $this->_defaultHeader['Content-Type'] = 'multipart/form-data; boundary=' . $this->_payloadBoundary;
     $this->_basepath = FileHandler::getEntriesFileUploadDir($formID, $entryID) . DIRECTORY_SEPARATOR;
   }
@@ -36,105 +41,270 @@ final class FilesApiHelper
    * @param string $apiEndPoint Telegram API base URL
    * @param array  $data        Data to pass to API
    *
-   * @return array $uploadResponse Telegram API response
+   * @return string|WP_Error Telegram API response body
    */
   public function uploadFiles($apiEndPoint, $data)
   {
-    $filename = $this->getFileNameWithExtension($data['photo']) ?? $data['photo'];
-    $filePath = "{$this->_basepath}{$filename}";
-    $mimeType = mime_content_type($filePath);
-    $fileType = \explode('/', $mimeType);
+    $filePath = $this->resolveFilePath($data['photo']);
+    if (is_null($filePath)) {
+      return new WP_Error(
+        'TELEGRAM_FILE_NOT_FOUND',
+        /* translators: %s: uploaded file reference */
+        sprintf(__('Telegram attachment could not be read: %s', 'bit-form'), (string) $data['photo'])
+      );
+    }
 
-    switch ($fileType[0]) {
-      case 'image':
+    $mimeType = mime_content_type($filePath);
+    $mimeType = $mimeType ? $mimeType : 'application/octet-stream';
+    $param = self::classifyMime($mimeType);
+
+    switch ($param) {
+      case 'photo':
         $apiMethod = '/sendPhoto';
-        $param = 'photo';
         break;
 
       case 'audio':
         $apiMethod = '/sendAudio';
-        $param = 'audio';
         break;
+
       case 'video':
         $apiMethod = '/sendVideo';
-        $param = 'video';
         break;
 
       default:
         $apiMethod = '/sendDocument';
-        $param = 'document';
         break;
     }
     $uploadFileEndpoint = $apiEndPoint . $apiMethod;
 
-    $data[$param] = new \CURLFILE($filePath);
-    if ('photo' !== $param) {
-      unset($data['photo']);
+    unset($data['photo']);
+
+    $files = [
+      $param => [
+        'path' => $filePath,
+        'mime' => $mimeType,
+      ],
+    ];
+
+    return $this->post($uploadFileEndpoint, $data, $files);
+  }
+
+  /**
+   * Split attachment URLs into batches Telegram will accept.
+   *
+   * sendMediaGroup takes at most ten items and the group must be type-compatible:
+   * photo and video may share one, documents may not, audio may not. Bucket order
+   * follows first appearance, so a single-type upload behaves as before.
+   *
+   * @param array $urls Stored attachment URLs
+   *
+   * @return array List of batches; each batch is a list of
+   *               ['url' => string, 'path' => string, 'mime' => string, 'kind' => string].
+   *               Unreadable files are dropped.
+   */
+  public function buildMediaBatches($urls)
+  {
+    $buckets = [];
+
+    foreach ($urls as $url) {
+      $filePath = $this->resolveFilePath($url);
+      if (is_null($filePath)) {
+        continue;
+      }
+
+      $mimeType = mime_content_type($filePath);
+      $mimeType = $mimeType ? $mimeType : 'application/octet-stream';
+      $kind = self::classifyMime($mimeType);
+      // photo and video are the only pair Telegram lets share a media group
+      $bucket = ('photo' === $kind || 'video' === $kind) ? 'visual' : $kind;
+
+      $buckets[$bucket][] = [
+        'url'  => $url,
+        'path' => $filePath,
+        'mime' => $mimeType,
+        'kind' => $kind,
+      ];
     }
-    $args = [
-      'body'    => $data,
+
+    $batches = [];
+    foreach ($buckets as $items) {
+      foreach (array_chunk($items, self::MEDIA_GROUP_LIMIT) as $chunk) {
+        $batches[] = $chunk;
+      }
+    }
+
+    return $batches;
+  }
+
+  /**
+   * Send one type-compatible batch of at most ten files as a media group.
+   *
+   * @param string $apiEndPoint Telegram API base URL
+   * @param array  $data        chat_id, parse_mode, caption, and `media`: one
+   *                            batch from buildMediaBatches()
+   *
+   * @return string|WP_Error Telegram API response body
+   */
+  public function uploadMultipleFiles($apiEndPoint, $data)
+  {
+    $uploadMultipleFileEndpoint = $apiEndPoint . '/sendMediaGroup';
+    $postFields = ['chat_id' => $data['chat_id']];
+    $parseMode = empty($data['parse_mode']) ? 'HTML' : $data['parse_mode'];
+    $caption = isset($data['caption']) ? $data['caption'] : '';
+    $media = [];
+    $files = [];
+
+    foreach ($data['media'] as $key => $item) {
+      $attachName = "file{$key}";
+      $mediaItem = [
+        'type'  => $item['kind'],
+        'media' => "attach://{$attachName}",
+      ];
+
+      // Telegram shows the album caption from the first item only.
+      if (empty($media) && '' !== $caption) {
+        $mediaItem['caption'] = $caption;
+        $mediaItem['parse_mode'] = $parseMode;
+      }
+
+      $media[] = $mediaItem;
+      $files[$attachName] = [
+        'path' => $item['path'],
+        'mime' => $item['mime'],
+      ];
+    }
+
+    if (empty($media)) {
+      return new WP_Error('TELEGRAM_FILE_NOT_FOUND', __('None of the Telegram attachments could be read.', 'bit-form'));
+    }
+
+    $postFields['media'] = wp_json_encode($media);
+
+    return $this->post($uploadMultipleFileEndpoint, $postFields, $files);
+  }
+
+  /**
+   * Telegram's media type for a MIME type; also the sendX endpoint suffix.
+   *
+   * @param string $mimeType
+   *
+   * @return string photo|audio|video|document
+   */
+  private static function classifyMime($mimeType)
+  {
+    $group = strtok($mimeType, '/');
+
+    switch ($group) {
+      case 'image':
+        return 'photo';
+
+      case 'audio':
+        return 'audio';
+
+      case 'video':
+        return 'video';
+
+      default:
+        return 'document';
+    }
+  }
+
+  /**
+   * Post a hand-built multipart/form-data payload.
+   *
+   * wp_remote_post() runs array bodies through http_build_query(), which flattens a
+   * \CURLFile into params and never uploads it, so the body is encoded here.
+   *
+   * @param string $endpoint
+   * @param array  $fields   Scalar form fields
+   * @param array  $files    [name => ['path' => ..., 'mime' => ...]]
+   *
+   * @return string|WP_Error
+   */
+  private function post($endpoint, $fields, $files)
+  {
+    $payload = $this->buildMultipartBody($fields, $files);
+    if (is_wp_error($payload)) {
+      return $payload;
+    }
+
+    $response = wp_remote_post($endpoint, [
+      'body'    => $payload,
       'timeout' => 30,
       'headers' => $this->_defaultHeader,
-    ];
-    $response = wp_remote_post($uploadFileEndpoint, $args);
+    ]);
+
+    if (is_wp_error($response)) {
+      return $response;
+    }
+
     return wp_remote_retrieve_body($response);
   }
 
-  public function uploadMultipleFiles($apiEndPoint, $data)
+  /**
+   * @return string|WP_Error
+   */
+  private function buildMultipartBody($fields, $files)
   {
-    $param = 'media';
-    $uploadMultipleFileEndpoint = $apiEndPoint . '/sendMediaGroup';
-    $postFields = [
-      'chat_id' => $data['chat_id'],
-      'caption' => $data['caption']
-    ];
+    $boundary = $this->_payloadBoundary;
+    $payload = '';
 
-    foreach ($data['media'] as $key => $value) {
-      $filename = $this->getFileNameWithExtension($value) ?? $value;
-      $filePath = "{$this->_basepath}{$filename}";
-      $mimeType = mime_content_type($filePath);
-      $fileType = \explode('/', $mimeType);
-      unset($data['media'][$key]);
-
-      if ('image' === $fileType[0]) {
-        $type = 'photo';
-      } elseif ('application' === $fileType[0] || 'text' === $fileType[0]) {
-        $type = 'document';
-      } elseif ('application' === $fileType[0]) {
-        $type = 'document';
-      } else {
-        $type = $fileType[0];
+    foreach ($fields as $name => $value) {
+      if (is_null($value) || '' === $value || is_array($value) || is_object($value)) {
+        continue;
       }
-
-      $media[] = [
-        'type'       => $type,
-        'media'      => "attach://{$key}.path",
-        'caption'    => $data['caption'],
-        'parse_mode' => 'HTML'
-      ];
-      $nameK = "{$key}.path";
-      $postFields[$nameK] = new \CURLFILE($filePath);
-    }
-    $postFields['media'] = wp_json_encode($media);
-
-    if ('media' !== $param) {
-      unset($data['media']);
+      $payload .= "--{$boundary}\r\n";
+      $payload .= "Content-Disposition: form-data; name=\"{$name}\"\r\n\r\n";
+      $payload .= $value . "\r\n";
     }
 
-    $args = [
-      'body'    => $postFields,
-      'timeout' => 30,
-      'headers' => [
-        'Content-Type' => 'multipart/form-data'
-      ],
-    ];
-    $response = wp_remote_post($uploadMultipleFileEndpoint, $args);
-    return wp_remote_retrieve_body($response);
+    foreach ($files as $name => $file) {
+      $contents = file_get_contents($file['path']);
+      if (false === $contents) {
+        return new WP_Error(
+          'TELEGRAM_FILE_NOT_FOUND',
+          /* translators: %s: attachment file path */
+          sprintf(__('Telegram attachment could not be read: %s', 'bit-form'), $file['path'])
+        );
+      }
+      $filename = basename($file['path']);
+      $payload .= "--{$boundary}\r\n";
+      $payload .= "Content-Disposition: form-data; name=\"{$name}\"; filename=\"{$filename}\"\r\n";
+      $payload .= "Content-Type: {$file['mime']}\r\n\r\n";
+      $payload .= $contents . "\r\n";
+    }
+
+    $payload .= "--{$boundary}--\r\n";
+
+    return $payload;
+  }
+
+  /**
+   * Map a stored attachment URL back to its file inside this entry's upload dir.
+   *
+   * @param mixed $url
+   *
+   * @return string|null Absolute readable path, or null when it can't be resolved
+   */
+  private function resolveFilePath($url)
+  {
+    if (!is_string($url) || '' === $url) {
+      return null;
+    }
+
+    $filename = $this->getFileNameWithExtension(rawurldecode($url));
+    if (is_null($filename) || !FileHandler::isSafeFileName($filename)) {
+      return null;
+    }
+
+    $filePath = $this->_basepath . $filename;
+
+    return is_readable($filePath) && is_file($filePath) ? $filePath : null;
   }
 
   private function getFileNameWithExtension($url)
   {
-    $fileName = basename($url);
+    $fileName = basename(strtok($url, '?'));
     return false !== strpos($fileName, '.') ? $fileName : null;
   }
 }

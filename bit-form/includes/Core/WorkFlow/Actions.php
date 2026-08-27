@@ -256,7 +256,13 @@ final class Actions
       if (isset($msgConfig->status) && empty($msgConfig->status)) {
         return $workFlowReturnable;
       }
-      $messageContent = $message[0]->message_content;
+      // Translate before smart-tag replacement, so lookups hit the stored text.
+      $messageContent = (string) apply_filters(
+        'bitform_translate_form_string',
+        (string) $message[0]->message_content,
+        'msg-content-' . $message[0]->id,
+        static::$_formID
+      );
 
       // replace pdf link and password
       if (class_exists('\BitCode\BitFormPro\Admin\DownloadFile') && !empty($entryID)) {
@@ -294,6 +300,13 @@ final class Actions
       }
       $url = Utilities::jsonObj($redirectPage[0]->integration_details ?? '')->url ?? '';
       if (!empty($url)) {
+        // Translated before smart-tag replacement: per-language redirect targets.
+        $url = (string) apply_filters(
+          'bitform_translate_form_string',
+          (string) $url,
+          'redirect-url-' . $redirectPage[0]->id,
+          static::$_formID
+        );
         $url = Helper::replaceFieldWithValue($url, $fieldValue);
       }
       $workFlowReturnable['redirectPage'] = empty($url) ? false : esc_url_raw($url);

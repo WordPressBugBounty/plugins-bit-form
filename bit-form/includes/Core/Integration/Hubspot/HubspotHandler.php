@@ -29,7 +29,6 @@ final class HubspotHandler
   {
     add_action('wp_ajax_bitforms_hubspot_authorize', [__CLASS__, 'hubspotAuthorize']);
     add_action('wp_ajax_bitforms_hubspot_pipeline', [__CLASS__, 'getAllPipelines']);
-    add_action('wp_ajax_bitforms_hubspot_pipeline_tickets', [__CLASS__, 'getAllPipelinesTickets']);
     add_action('wp_ajax_bitforms_hubspot_owners', [__CLASS__, 'getAllOwners']);
     add_action('wp_ajax_bitforms_hubspot_contacts', [__CLASS__, 'getAllContacts']);
     add_action('wp_ajax_bitforms_hubspot_company', [__CLASS__, 'getAllCompany']);

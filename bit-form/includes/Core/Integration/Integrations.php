@@ -10,6 +10,7 @@ namespace BitCode\BitForm\Core\Integration;
 use BitCode\BitForm\Core\Database\FormEntryModel;
 use BitCode\BitForm\Core\Database\FormModel;
 use BitCode\BitForm\Core\Util\ApiResponse;
+use BitCode\BitForm\Core\Util\IpTool;
 use BitCode\BitForm\Core\Util\Log;
 use BitCode\BitForm\Core\Util\SmartTags;
 use BitCode\BitForm\Core\Util\Utilities;
@@ -298,7 +299,9 @@ final class Integrations
     }
     $connectionCategory = 'connected_integration_apps';
 
-    $integrationHandler = new IntegrationHandler(0);
+    // saveIntegration reads user_details['id'|'ip'|'time']; without them the insert
+    // raises null-offset warnings and stores null user_id/created_at
+    $integrationHandler = new IntegrationHandler(0, IpTool::getUserDetail());
 
     return $integrationHandler->saveIntegration($connectionName, $connectionType, $connectionDetails, $connectionCategory);
   }
@@ -334,5 +337,13 @@ final class Integrations
     $integrationHandler = new IntegrationHandler(0);
 
     return $integrationHandler->deleteIntegration($appId);
+  }
+
+  public function renameConnectedApp($appId, $name)
+  {
+    // User details carry the time renameConnectedApp() stamps into updated_at.
+    $integrationHandler = new IntegrationHandler(0, IpTool::getUserDetail());
+
+    return $integrationHandler->renameConnectedApp($appId, $name);
   }
 }

@@ -87,14 +87,17 @@ class Helpers
     if ('' === trim($input)) {
       return $input;
     }
+    // Line-boundary whitespace only. The previous regexes also rewrote the
+    // inside of string and template literals, corrupting generated config and
+    // custom JS. Inputs are already terser-minified, so the aggressive pass
+    // saved ~0.1% anyway.
     return preg_replace(
       [
-        '/ {2,}/',
-        '/\s*=\s*/',
-        '/\s*,\s*/',
-        '/\s+(?=\(|\{|\:|\?)|\t|(?:\r?\n[ \t]*)+/s'
+        '/^[ \t]+/m',      // leading indentation
+        '/[ \t]+$/m',      // trailing whitespace
+        '/(?:\r?\n){3,}/', // 3+ consecutive newlines -> 2
       ],
-      [' ', '=', ',', ''],
+      ['', '', "\n\n"],
       $input
     );
   }

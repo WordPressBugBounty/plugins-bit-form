@@ -16,6 +16,7 @@ use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Util\EscapingHelper;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\FileDownloadProvider;
+use BitCode\BitForm\Core\Util\FileHandler;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\Core\Util\Log;
 use BitCode\BitForm\Core\Util\SmartTagRegistry;
@@ -25,6 +26,9 @@ use BitCode\BitForm\Core\WorkFlow\WorkFlow;
 
 final class FrontendFormHandler
 {
+  /** Largest stored signature inlined into the page as a data URI. */
+  private const MAX_INLINE_SIGNATURE_BYTES = 2097152;
+
   public function __construct()
   {
     // before markup load - formids [], posts [1,2]
@@ -32,7 +36,9 @@ final class FrontendFormHandler
     // markup loads - formids []
     add_shortcode('bitform', [$this, 'handleFrontendRenderRequest']);
     // after markup load - formids [1,35,3]
-    add_action('wp_footer', [$this, 'generateJS']);
+    // After popup plugins render at 10 (that is when popup-only forms register
+    // their formID), before wp_print_footer_scripts at 20.
+    add_action('wp_footer', [$this, 'generateJS'], 15);
   }
 
   private function validPassowordResetToken($token, $userID, $formId)
@@ -96,6 +102,8 @@ final class FrontendFormHandler
 
   public function generateJs($formID = null, $entryID = null, $formType = null)
   {
+    // bitform-js-{postId}.js is disk-cached per post ID with no language key.
+    // Display strings must stay out of it and travel in bf_globals per request.
     // return true;
     $isFormPreview = get_transient('bitform_form_preview');
     if ($isFormPreview && !$formID) {
@@ -215,7 +223,7 @@ final class FrontendFormHandler
     $regenerateScriptFlag = false;
     foreach ($forms as $form) {
       $formId = $form->id;
-      $generatedScriptPageIdsDecoded = json_decode($form->generated_script_page_ids, true);
+      $generatedScriptPageIdsDecoded = json_decode((string) $form->generated_script_page_ids, true);
       $generatedScriptPageIds = is_array($generatedScriptPageIdsDecoded) ? array_keys($generatedScriptPageIdsDecoded) : [];
       if (!empty($generatedScriptPageIds) && !in_array($formId, $formIDs) && in_array($postId, $generatedScriptPageIds)) {
         unset($generatedScriptPageIdsDecoded[$postId]);
@@ -602,6 +610,7 @@ final class FrontendFormHandler
 
     if ($entryId) {
       $bitFormFrontArr['entryId'] = $entryId;
+      self::markResponseUncacheable();
     }
 
     if (isset($additional->enabled->validateFocusLost)) {
@@ -609,7 +618,9 @@ final class FrontendFormHandler
     }
 
     if (!empty($isAbandoned)) {
+      // One visitor's typed values, so this response must not be page-cached.
       $bitFormFrontArr['oldValues'] = $this->getFieldsValue($formID, $isAbandoned);
+      self::markResponseUncacheable();
       if (empty($entryId)) {
         $bitFormFrontArr['entryId'] = $entryId;
       }
@@ -648,25 +659,29 @@ final class FrontendFormHandler
     $buttons = wp_json_encode($buttons);
     $frontArr = wp_json_encode($bitFormFrontArr);
 
-    $bfGlobals = sprintf('   
-      if(!window.bf_globals) { 
-        window.bf_globals = {} 
-      } if(!window.bf_globals.%1$s) { 
-        window.bf_globals.%1$s = {} 
+    $bfGlobals = sprintf('
+      if(!window.bf_globals) {
+        window.bf_globals = {}
+      } if(!window.bf_globals.%1$s) {
+        window.bf_globals.%1$s = {}
       }
-      if(document.getElementById("%1$s")) {
-        window.bf_globals.%1$s = { 
-          ...window.bf_globals.%1$s, 
-          ...%2$s
-        };
-      }', $FormIdentifier, $frontArr);
+      window.bf_globals.%1$s = {
+        ...window.bf_globals.%1$s,
+        ...%2$s
+      };
+      if (typeof window.bitformInit === "function") { window.bitformInit("%1$s"); }', $FormIdentifier, $frontArr);
+
+    // Inert copy of the config. Optimizers only rewrite executable scripts, so
+    // this survives and travels with the markup; the runtime hydrates from it
+    // whenever bf_globals is missing.
+    $configTag = self::buildFormConfigTag($FormIdentifier, $bitFormFrontArr);
 
     if ('conversational' === $formType
     && isset($formContent->formInfo->conversationalSettings->enable)
     && $formContent->formInfo->conversationalSettings->enable) {
-      $html = $FrontendFormManager->conversationalFormView($fields, $file, $errorMessages);
+      $html = $FrontendFormManager->conversationalFormView($fields, $file, $errorMessages, null, !empty($entryId));
     } else {
-      $html = $FrontendFormManager->formView($fields, $file, $errorMessages);
+      $html = $FrontendFormManager->formView($fields, $file, $errorMessages, null, !empty($entryId));
     }
 
     // if form preview then return html otherwise echo with output buffer
@@ -676,6 +691,7 @@ final class FrontendFormHandler
       $formViewObject->html = $html;
       $formViewObject->font = $font;
       $formViewObject->bfGlobals = $bfGlobals;
+      $formViewObject->configTag = $configTag;
       $formViewObject->formContent = $formContent;
       return $formViewObject;
     }
@@ -684,8 +700,55 @@ final class FrontendFormHandler
     $this->addInlineScript($bfGlobals, $bfGlobalsHandle, 'after');
     $this->emitShowPickerBridge();
 
+    // Printed outside wp_kses rather than allowing <script> in form markup.
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by buildFormConfigTag(), JSON_HEX_* escaped.
+    echo $configTag;
     echo wp_kses(trim($html), EscapingHelper::getFormAllowedHtml($formContent));
     return ob_get_clean();
+  }
+
+  /**
+   * Keep per-visitor config (oldValues, entryId) out of full-page caches.
+   *
+   * @return void
+   */
+  public static function markResponseUncacheable()
+  {
+    // DONOTCACHEPAGE does the work; caches read it at shutdown. Rendering
+    // usually runs after headers are sent, so nocache_headers() is a bonus.
+    if (!defined('DONOTCACHEPAGE')) {
+      define('DONOTCACHEPAGE', true);
+    }
+    if (!headers_sent() && function_exists('nocache_headers')) {
+      nocache_headers();
+    }
+  }
+
+  /**
+   * Build the inert JSON config block for a rendered form.
+   *
+   * JSON_HEX_* escapes < > & as \u00XX so no field value can close the script
+   * element or inject markup.
+   *
+   * @param string $formIdentifier
+   * @param array  $config
+   *
+   * @return string
+   */
+  public static function buildFormConfigTag($formIdentifier, $config)
+  {
+    $json = wp_json_encode($config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    if (false === $json) {
+      return '';
+    }
+    // Some optimizers wrap any inline <script>, including application/json,
+    // in DOMContentLoaded boilerplate that corrupts the JSON. These attributes
+    // make the common ones skip it; the JS side also salvage-parses.
+    return sprintf(
+      '<script type="application/json" class="bf-form-config" id="bf-config-%1$s" data-bf-form="%1$s" data-no-optimize="1" data-no-defer="1" data-no-minify="1" data-cfasync="false" nowprocket>%2$s</script>',
+      esc_attr($formIdentifier),
+      $json
+    );
   }
 
   /**
@@ -888,10 +951,56 @@ final class FrontendFormHandler
             $fields->{$metaKey}->val = $metaValue->meta_value;
             $fields->{$metaKey}->config->oldFiles = $metaValue->meta_value;
           }
+          if ('signature' === $fields->{$metaKey}->typ) {
+            $this->setOldSignature($fields->{$metaKey}, $formID, $entryID, $metaValue->meta_value);
+          }
         }
       }
     }
     return $fields;
+  }
+
+  /** Give the signature field its stored signature: a data URI to redraw, and the name it posts back as `_old`. */
+  private function setOldSignature($field, $formID, $entryID, $storedValue)
+  {
+    $fileName = is_string($storedValue) ? trim($storedValue) : '';
+    $decoded = json_decode($fileName, true);
+    if (is_array($decoded)) {
+      $fileName = empty($decoded) ? '' : trim((string) reset($decoded));
+    }
+    // signature-failed.png means the stored signature was never usable.
+    if ('' === $fileName || 'signature-failed.png' === $fileName) {
+      return;
+    }
+    $fileName = sanitize_file_name($fileName);
+    if (!isset($field->config)) {
+      $field->config = (object) [];
+    } elseif (is_array($field->config)) {
+      $field->config = (object) $field->config;
+    }
+    $field->config->oldSignatureFile = $fileName;
+
+    $filePath = FileHandler::getEntriesFileUploadDir($formID, $entryID) . DIRECTORY_SEPARATOR . $fileName;
+    if (!is_file($filePath) || !is_readable($filePath)) {
+      return;
+    }
+    // The types getSignatureFilePath() writes; wp_check_filetype() reports none for SVG.
+    $signatureMimeTypes = ['png' => 'image/png', 'jpg' => 'image/jpeg', 'svg' => 'image/svg+xml'];
+    $extension = strtolower((string) pathinfo($fileName, PATHINFO_EXTENSION));
+    if (!isset($signatureMimeTypes[$extension])) {
+      return;
+    }
+    $mimeType = $signatureMimeTypes[$extension];
+    // A hand-drawn signature is a few KB; a larger file is not worth inlining.
+    if (filesize($filePath) > self::MAX_INLINE_SIGNATURE_BYTES) {
+      return;
+    }
+    // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_get_contents -- local upload dir read, inlined as a data URI for the signature pad.
+    $contents = file_get_contents($filePath);
+    if (false === $contents || '' === $contents) {
+      return;
+    }
+    $field->config->oldSignature = 'data:' . $mimeType . ';base64,' . base64_encode($contents);
   }
 
   public function loadAssets($formID = 0, $fromType = 'classic')

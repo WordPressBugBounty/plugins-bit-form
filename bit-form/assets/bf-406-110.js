@@ -1,0 +1,1 @@
+import{a as m,j as e,K as n,_ as t,L as o,h as u}from"./main-519.js";function x({isAuthorized:s,isLoading:a,handleAuthorize:r,disabled:c}){const{css:l}=m();return e.jsxs(n,{variant:s?"disabled":"success",onClick:r,disabled:s||a||c,className:l(u.mt3,{ml:3}),children:[s?t("Authorized ✔"):t("Authorize"),a&&e.jsx(o,{size:20,clr:"#022217",className:"ml-2"})]})}export{x as A};

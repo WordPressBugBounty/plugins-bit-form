@@ -43,7 +43,6 @@ class ZohoBiginHandler
   {
     add_action('wp_ajax_bitforms_zbigin_generate_token', [__CLASS__, 'generateTokens']);
     add_action('wp_ajax_bitforms_zbigin_refresh_modules', [__CLASS__, 'refreshModulesAjaxHelper']);
-    add_action('wp_ajax_bitforms_zbigin_refresh_notetypes', [__CLASS__, 'refreshNoteTypesAjaxHelper']);
     add_action('wp_ajax_bitforms_zbigin_refresh_related_lists', [__CLASS__, 'refreshRelatedModulesAjaxHelper']);
     add_action('wp_ajax_bitforms_zbigin_refresh_fields', [__CLASS__, 'getFields']);
     add_action('wp_ajax_bitforms_zbigin_refresh_tags', [__CLASS__, 'getTagList']);
@@ -369,7 +368,7 @@ class ZohoBiginHandler
     }
   }
 
-  public function getTagList()
+  public static function getTagList()
   {
     if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $authorizationHeader = null;
@@ -402,7 +401,7 @@ class ZohoBiginHandler
         $response['tokenDetails'] = ZohoBiginHandler::_refreshAccessToken($queryParams);
       }
 
-      $tagsMetaApiEndpoint = "http://www.zohoapis.{$queryParams->dataCenter}/bigin/v1/settings/tags?module={$queryParams->module}";
+      $tagsMetaApiEndpoint = "https://www.zohoapis.{$queryParams->dataCenter}/bigin/v1/settings/tags?module={$queryParams->module}";
       $authorizationHeader['Authorization'] = "Zoho-oauthtoken {$queryParams->tokenDetails->access_token}";
       $tagsMetaResponse = HttpHelper::get($tagsMetaApiEndpoint, null, $authorizationHeader);
 
@@ -441,7 +440,7 @@ class ZohoBiginHandler
     }
   }
 
-  public function getUsers()
+  public static function getUsers()
   {
     if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $authorizationHeader = null;

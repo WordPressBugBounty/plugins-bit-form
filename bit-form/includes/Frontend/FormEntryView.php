@@ -35,12 +35,13 @@ class FormEntryView
       $formHTML = $formViewObject->html;
       $font = $formViewObject->font;
       $bfGlobals = $formViewObject->bfGlobals;
+      $configTag = isset($formViewObject->configTag) ? $formViewObject->configTag : '';
       $formContent = isset($formViewObject->formContent) ? $formViewObject->formContent : null;
 
       set_transient('bitform_form_preview', true);
       $frontendFormHandler->generateJs($formID, $entryID);
       $title = 'BitForm Entry edit';
-      Render::view('views/entry-edit-page', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'formContent'));
+      Render::view('views/entry-edit-page', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'configTag', 'formContent'));
     }
   }
 }

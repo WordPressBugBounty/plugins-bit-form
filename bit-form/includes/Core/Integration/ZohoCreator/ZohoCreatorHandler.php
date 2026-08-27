@@ -42,8 +42,6 @@ class ZohoCreatorHandler
     add_action('wp_ajax_bitforms_zcreator_refresh_applications', [__CLASS__, 'refreshApplicationsAjaxHelper']);
     add_action('wp_ajax_bitforms_zcreator_refresh_forms', [__CLASS__, 'refreshFormsAjaxHelper']);
     add_action('wp_ajax_bitforms_zcreator_refresh_fields', [__CLASS__, 'refreshFieldsAjaxHelper']);
-    add_action('wp_ajax_bitforms_zcreator_refresh_owners', [__CLASS__, 'refreshTicketOwnersAjaxHelper']);
-    add_action('wp_ajax_bitforms_zcreator_refresh_products', [__CLASS__, 'refreshProductsAjaxHelper']);
   }
 
   /**

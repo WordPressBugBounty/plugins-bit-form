@@ -32,20 +32,30 @@ class FrontEndScriptGenerator
   {
     $contentidArray = wp_json_encode($contentIds);
     return '    if(!window.bf_globals){ window.bf_globals = {};}
-    ' . $contentidArray . '.forEach(function(contentId){
-      const form = document.getElementById(contentId);
-      if(!form){ 
-        delete window.bf_globals[contentId];
-        return;
-       }
-      if(!window.bf_globals[contentId]){
-        window.bf_globals[contentId] = {inits: {}, contentId: contentId};
-      }else{ 
-        window.bf_globals[contentId].inits = {};
-        window.bf_globals[contentId].contentId = contentId;
+    (function(){
+      var bfSetupGlobals = function(){
+        ' . $contentidArray . '.forEach(function(contentId){
+          const form = document.getElementById(contentId);
+          if(!form){
+            delete window.bf_globals[contentId];
+            return;
+           }
+          if(!window.bf_globals[contentId]){
+            window.bf_globals[contentId] = {inits: {}, contentId: contentId};
+          }else{
+            window.bf_globals[contentId].inits = {};
+            window.bf_globals[contentId].contentId = contentId;
+          }
+        });
+      };
+      // Wait for DOM ready: optimizers can run this before the form markup is
+      // parsed, and the not-found branch would then delete arrived config.
+      if(document.readyState === "loading"){
+        document.addEventListener("DOMContentLoaded", bfSetupGlobals);
+      } else {
+        bfSetupGlobals();
       }
-      
-    });';
+    })();';
   }
 
   private static function isValidationNeeded($fldData)
@@ -103,6 +113,8 @@ class FrontEndScriptGenerator
     $this->appendJs($this->generateFieldConfigsJs($contentIds), $postId, $preview);
     // init all js events and functions at last
     $this->appendJs(self::getFileFromAssetsJs('bitform-init.min.js'), $postId, $preview);
+    // picks up forms injected after load (AJAX, popups, lazy content)
+    $this->appendJs(self::getFileFromAssetsJs('bitform-observer.min.js'), $postId, $preview);
     if (defined('ELEMENTOR_PRO_VERSION')) {
       $this->appendJs(self::getFileFromAssetsJs('bitform-elementor.min.js'), $postId, $preview);
     }
@@ -581,15 +593,5 @@ class FrontEndScriptGenerator
         return;
       }
     }
-  }
-
-  public function dd($data, $exit = false)
-  {
-    echo '+++++++++++++';
-    echo '<pre>';
-    var_dump($data);
-    echo '</pre>';
-    echo '+++++++++++++';
-    $exit ? exit : '';
   }
 }

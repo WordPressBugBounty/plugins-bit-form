@@ -20,9 +20,20 @@ final class ApiResponse
    */
   public function apiResponse($logID, $integrationId, $apiType, $responseType, $apiResponse, $entryDetails = [])
   {
-    if (!$apiType || !$apiResponse) {
+    if (!$apiType) {
       return false;
     }
+
+    // An empty response means a failed HTTP call; log it or the failure leaves no trace.
+    if (is_wp_error($apiResponse)) {
+      $apiResponse = [
+        'error_code'  => $apiResponse->get_error_code(),
+        'description' => $apiResponse->get_error_message(),
+      ];
+    } elseif (!$apiResponse && !is_array($apiResponse)) {
+      $apiResponse = ['description' => __('Empty response received from the API.', 'bit-form')];
+    }
+
     $apiType = wp_json_encode($apiType);
     $apiResponse = wp_json_encode($apiResponse);
 

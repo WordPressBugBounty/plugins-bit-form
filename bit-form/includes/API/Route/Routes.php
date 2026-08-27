@@ -37,9 +37,9 @@ class Routes extends WP_REST_Controller
       $this->rest_base . '/oauth-redirect/',
       [
         [
-          'method'             => WP_REST_Server::READABLE,
-          'callback'           => [$this->entryController, 'authRedirect'],
-          'permission_callback'=> '__return_true'
+          'methods'             => WP_REST_Server::READABLE,
+          'callback'            => [$this->entryController, 'authRedirect'],
+          'permission_callback' => '__return_true'
         ]
       ]
     );

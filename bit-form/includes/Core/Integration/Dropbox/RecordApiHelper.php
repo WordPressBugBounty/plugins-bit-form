@@ -107,7 +107,7 @@ class RecordApiHelper
   {
     // Field values arrive as public file URLs (see IntegrationHandler::handleFileUrl),
     // so reduce to the stored file name before resolving against the entry directory.
-    $fileName = basename(parse_url($filePath, PHP_URL_PATH) ?: $filePath);
+    $fileName = basename(wp_parse_url($filePath, PHP_URL_PATH) ?: $filePath);
     return realpath(FileHandler::getEntriesFileUploadDir($this->formId, $this->entryId) . DIRECTORY_SEPARATOR . $fileName);
   }
 

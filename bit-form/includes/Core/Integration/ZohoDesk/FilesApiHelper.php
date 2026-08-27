@@ -96,6 +96,6 @@ final class FilesApiHelper
     if (is_array($files)) {
       return array_map([__CLASS__, 'normalizeFileNames'], $files);
     }
-    return is_string($files) ? basename(parse_url($files, PHP_URL_PATH) ?: $files) : $files;
+    return is_string($files) ? basename(wp_parse_url($files, PHP_URL_PATH) ?: $files) : $files;
   }
 }

@@ -15,7 +15,9 @@ use BitCode\BitForm\Core\Database\FormModel;
 use BitCode\BitForm\Core\Fallback\FormFallback;
 use BitCode\BitForm\Core\Form\FormHandler;
 use BitCode\BitForm\Core\Integration\Integrations;
+use BitCode\BitForm\Core\Util\CacheCompat;
 use BitCode\BitForm\Core\Util\FileDownloadProvider;
+use BitCode\BitForm\Core\Util\Translation\TranslationManager;
 use BitCode\BitForm\Core\Util\Utilities;
 use BitCode\BitForm\Core\WorkFlow\WorkflowExecutor;
 use BitCode\BitForm\Frontend\ConversationalFormView;
@@ -45,6 +47,7 @@ class Hooks
     add_action('init', [ConversationalFormView::class, 'conversationalFormView']);
     add_action('init', [StandaloneFormView::class, 'standaloneFormView']);
     add_action('bitform_admin_form_changed', [Hooks::class, 'invalidateCustomUrlCache']);
+    \BitCode\BitForm\Core\Util\CacheCompat::registerPurgeHooks();
     add_action('wp_footer', [Hooks::class, 'updateBitFormVersion'], 9999, 0);
 
     // Register the BitForm widget for Gutenberg, and Bricks Builder
@@ -65,6 +68,10 @@ class Hooks
     $installedBitFormVersion = get_option('bitforms_version');
     if ($currentBitFormVersion !== $installedBitFormVersion) {
       (new FormFallback())->resetJsGeneratedPageIds();
+      // Without this the regenerated bundle keeps its ?bfv= URL and browsers
+      // and CDNs keep serving the stale file.
+      $formUpdateVersion = (int) get_option('bitform_form_update_version');
+      update_option('bitform_form_update_version', $formUpdateVersion ? $formUpdateVersion + 1 : 1);
       update_option('bitforms_version', $currentBitFormVersion);
     }
   }
@@ -110,13 +117,17 @@ class Hooks
   {
     if (Request::Check('admin')) {
       (new Admin_Bar())->register();
+      TranslationManager::boot('admin');
     }
     if (Request::Check('ajax')) {
       new AjaxService();
+      TranslationManager::boot('ajax');
     }
     if (Request::Check('frontend')) {
       $formHandler = new FormHandler();
       $formHandler->frontend;
+      TranslationManager::boot('frontend');
+      CacheCompat::register();
     }
     if (Request::isPluginPage()) {
       (new FileDownloadProvider())->register();

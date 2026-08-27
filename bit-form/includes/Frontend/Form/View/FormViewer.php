@@ -3,6 +3,7 @@
 namespace BitCode\BitForm\Frontend\Form\View;
 
 use BitCode\BitForm\Admin\Form\Helpers;
+use BitCode\BitForm\Core\Util\Translation\TranslationManager;
 use BitCode\BitForm\Frontend\Form\FrontendFormManager;
 use BitCode\BitForm\Frontend\Form\View\Conversational\ConversationalHelpers;
 use BitCode\BitForm\Frontend\Form\View\Conversational\DefaultConversationalTheme;
@@ -64,6 +65,38 @@ class FormViewer
       return $honeypotInput;
     }
     return $honeypotInput;
+  }
+
+  /**
+   * Opt-out markers for HTML-layer translators (Google/GTranslate, TranslatePress)
+   * when a form disables translation. Empty otherwise, so markup is untouched.
+   *
+   * @return array{attrs:string, cls:string}
+   */
+  private function noTranslateMarkup()
+  {
+    // Pass the row we already hold; otherwise the lookup re-queries form_content per render.
+    $rawContent = $this->_form->isExist() ? $this->_form->getFieldsContent() : null;
+    $enabled = TranslationManager::isFormTranslationEnabled($this->getFormID(), $rawContent);
+    if ($enabled) {
+      return ['attrs' => '', 'cls' => ''];
+    }
+    return ['attrs' => ' translate="no" data-no-translation', 'cls' => ' notranslate'];
+  }
+
+  /**
+   * Carries the page language into the AJAX submission so validation and
+   * confirmation strings match it. Empty when no provider resolves one.
+   *
+   * @return string
+   */
+  private function languageField()
+  {
+    $lang = (string) apply_filters('bitform_current_language', '', $this->getFormID());
+    if ('' === $lang) {
+      return '';
+    }
+    return '<input type="text" class="d-none" name="bf_lang" value="' . esc_attr($lang) . '">';
   }
 
   public function setTheme($theme = 'Default')
@@ -148,6 +181,7 @@ class FormViewer
 
   public function getConversationalView($hasFile, $msg = null)
   {
+    $noTranslate = $this->noTranslateMarkup();
     $conversationSettings = $this->getFormInfo()->conversationalSettings;
     $this->_themeDetails = new DefaultConversationalTheme($conversationSettings);
     $file_upload_tag = null;
@@ -200,13 +234,14 @@ class FormViewer
     }
     $formHTML =
       '
-      <div id="' . $formIdentifier . '" class="b' . $formID . '-bit-form ' . $this->_form->getAtomicCls("_frm-bg-b{$formID}") . ' bit-form bf-form-wrapper">
+      <div id="' . $formIdentifier . '"' . $noTranslate['attrs'] . ' class="b' . $formID . '-bit-form ' . $this->_form->getAtomicCls("_frm-bg-b{$formID}") . ' bit-form bf-form-wrapper' . $noTranslate['cls'] . '">
       ' . $restrictionMsg . '
           <form novalidate id="form-' . $formIdentifier . '" class="_frm-bc' . $formID . ' bf-form" ' . $file_upload_tag . ' method=\'post\'>
               <input type="text" class="d-none" name="csrf" value="' . $this->_tokens['csrf'] . '">
               <input type="text" class="d-none" name="t_identity" value="' . $this->_tokens['t_identity'] . '">
               ' . $this->honeypotField() . '
               <input type="text" class="d-none" name="bitforms_id" value="bitforms_' . $this->_form->getFormID() . '">
+              ' . $this->languageField() . '
               <div class="bc' . $formID . '-steps-container">
                 ' . $welcomePageHtml . '
                 ' . $fieldHtml . '
@@ -223,6 +258,7 @@ class FormViewer
 
   private function setView($hasFile, $msg)
   {
+    $noTranslate = $this->noTranslateMarkup();
     $file_upload_tag = null;
     $restrictionMsg = '';
     $formID = $this->_form->getFormID();
@@ -302,13 +338,14 @@ class FormViewer
     }
     $formHTML =
       '
-      <div id="' . $formIdentifier . '" class="b' . $formID . '-bit-form ' . $this->_form->getAtomicCls("_frm-bg-b{$formID}") . ' bit-form bf-form-wrapper">
+      <div id="' . $formIdentifier . '"' . $noTranslate['attrs'] . ' class="b' . $formID . '-bit-form ' . $this->_form->getAtomicCls("_frm-bg-b{$formID}") . ' bit-form bf-form-wrapper' . $noTranslate['cls'] . '">
       ' . $restrictionMsg . '
           <form novalidate id="form-' . $formIdentifier . '" class="' . $this->_form->getAtomicCls("_frm-b{$formID}") . ' bf-form" ' . $file_upload_tag . ' method=\'post\'>
               <input type="text" class="d-none" name="csrf" value="' . $this->_tokens['csrf'] . '">
               <input type="text" class="d-none" name="t_identity" value="' . $this->_tokens['t_identity'] . '">
               ' . $this->honeypotField() . '
               <input type="text" class="d-none" name="bitforms_id" value="bitforms_' . $this->_form->getFormID() . '">
+              ' . $this->languageField() . '
                   ' . $fieldHtml . '
           </form>
           ' . $abandonmentMsg . '

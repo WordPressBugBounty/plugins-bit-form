@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 use BitCode\BitForm\Admin\Form\FrontEndScriptGenerator;
 use BitCode\BitForm\Admin\Form\Helpers;
 use BitCode\BitForm\Admin\Form\Template\TemplateProvider;
+use BitCode\BitForm\Core\Database\FormEntryLogModel;
 use BitCode\BitForm\Core\Database\FormEntryModel;
 use BitCode\BitForm\Core\Database\FormModel;
 use BitCode\BitForm\Core\Form\FormHandler;
@@ -29,6 +30,8 @@ class AdminAjax
     add_action('wp_ajax_bitforms_save_connected_integration_apps', [$this, 'saveConnectedIntegrationApps']);
     add_action('wp_ajax_bitforms_get_connected_integration_apps', [$this, 'getConnectedIntegrationApps']);
     add_action('wp_ajax_bitforms_delete_connected_app', [$this, 'deleteConnectedApp']);
+    add_action('wp_ajax_bitforms_update_connected_app', [$this, 'updateConnectedApp']);
+    add_action('wp_ajax_bitforms_integration_last_runs', [$this, 'integrationLastRuns']);
     add_action('wp_ajax_bitforms_update_form', [$this, 'updateForm']);
     add_action('wp_ajax_bitforms_templates', [$this, 'templates']);
     add_action('wp_ajax_bitforms_create_new_form', [$this, 'createNewForm']);
@@ -111,7 +114,6 @@ class AdminAjax
 
     // Notice Options
     add_action('wp_ajax_bitforms_handle_notice', [$this, 'handleNotice']);
-    add_action('wp_ajax_bitforms_dismiss_pro_notice', [$this, 'dismissProUpgradeNotice']);
 
     // conversational
     add_action('wp_ajax_bitforms_save_conversational_css', [$this, 'saveConversationalCSS']);
@@ -134,7 +136,13 @@ class AdminAjax
       $formId = isset($_REQUEST['formID']) ? sanitize_text_field(wp_unslash($_REQUEST['formID'])) : '';
 
       $FrontendFormManager = FrontendFormManager::getInstance($formId);
+      if (!$FrontendFormManager->isExist()) {
+        wp_send_json_error(__('Form is not exists.', 'bit-form'), 404);
+      }
       $formContent = $FrontendFormManager->getFormContentWithValue();
+      if (!is_object($formContent) || !isset($formContent->fields, $formContent->layout)) {
+        wp_send_json_error(__('Form content is unavailable.', 'bit-form'), 404);
+      }
       $fields = $formContent->fields;
       $layout = $formContent->layout;
       $file = count($FrontendFormManager->getUploadFields()) > 0 ? $FrontendFormManager->getUploadFields() : false;
@@ -291,9 +299,12 @@ class AdminAjax
         wp_send_json_error($e->getMessage(), 400);
       }
       // Nonce verified at handler entry (wp_verify_nonce 'bitforms_save', line 273).
-      $appId = isset($_REQUEST['appId']) && $_REQUEST['appId']
+      $requestedAppId = isset($_REQUEST['appId'])
         ? sanitize_text_field(wp_unslash($_REQUEST['appId']))
-        : sanitize_text_field(wp_unslash((string) $input->appId));
+        : '';
+      $appId = $requestedAppId
+        ? $requestedAppId
+        : sanitize_text_field(wp_unslash((string) ($input->appId ?? '')));
       $integrationHandler = Integrations::getInstance();
       $status = $integrationHandler->deleteConnectedApp($appId);
       if (is_wp_error($status)) {
@@ -301,6 +312,87 @@ class AdminAjax
       } else {
         wp_send_json_success($status, 200);
       }
+    } else {
+      wp_send_json_error(
+        __(
+          'Token expired',
+          'bit-form'
+        ),
+        401
+      );
+    }
+  }
+
+  /**
+   * Renames a connected account (category connected_integration_apps, form_id 0).
+   * Only integration_name is writable; updateIntegration would overwrite the rest.
+   *
+   * @return void
+   */
+  public function updateConnectedApp()
+  {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
+      GlobalHelper::requirePostMethod();
+      try {
+        $input = GlobalHelper::formatRequestData();
+      } catch (\InvalidArgumentException $e) {
+        wp_send_json_error($e->getMessage(), 400);
+      }
+      $appId = !empty($input->appId) ? sanitize_text_field((string) $input->appId) : '';
+      $name = isset($input->name) ? sanitize_text_field((string) $input->name) : '';
+      if (empty($appId) || '' === trim($name)) {
+        wp_send_json_error(__('Invalid request', 'bit-form'), 400);
+      }
+      $integrations = Integrations::getInstance();
+      $status = $integrations->renameConnectedApp($appId, $name);
+      if (is_wp_error($status)) {
+        wp_send_json_error($status->get_error_message(), 411);
+      } else {
+        wp_send_json_success($status, 200);
+      }
+    } else {
+      wp_send_json_error(
+        __(
+          'Token expired',
+          'bit-form'
+        ),
+        401
+      );
+    }
+  }
+
+  /**
+   * Last execution per integration of a form, for the integrations list Last Run column.
+   *
+   * @return void
+   */
+  public function integrationLastRuns()
+  {
+    if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
+      $this->verifyAdminPermission();
+      GlobalHelper::requirePostMethod();
+      try {
+        $input = GlobalHelper::formatRequestData();
+      } catch (\InvalidArgumentException $e) {
+        wp_send_json_error($e->getMessage(), 400);
+      }
+      $formID = !empty($input->formID) ? absint($input->formID) : 0;
+      if (empty($formID)) {
+        wp_send_json_error(__('Invalid request', 'bit-form'), 400);
+      }
+      $logModel = new FormEntryLogModel();
+      $rows = $logModel->getIntegrationLastRuns($formID);
+      if (is_wp_error($rows)) {
+        // result_empty means nothing has run yet, which is a success. Any other
+        // error is a failed query — answering [] would paint every integration
+        // as never executed. Message stays generic: no DB detail to the browser.
+        if ('result_empty' !== $rows->get_error_code()) {
+          wp_send_json_error(__('Could not load integration run history', 'bit-form'), 500);
+        }
+        $rows = [];
+      }
+      wp_send_json_success($rows, 200);
     } else {
       wp_send_json_error(
         __(
@@ -495,13 +587,6 @@ class AdminAjax
         401
       );
     }
-  }
-
-  public function dismissProUpgradeNotice()
-  {
-    check_ajax_referer('bitforms_dismiss_pro_notice', 'nonce');
-    update_user_meta(get_current_user_id(), 'bitforms_dismiss_pro_upgrade_notice', BITFORMS_REQUIRED_BITFORMPRO_VERSION);
-    wp_die();
   }
 
   private function formatFormContentForUpdate($formContents)
@@ -1741,7 +1826,11 @@ class AdminAjax
         $api_key = $input->api_key;
       }
       if (!$api_key) {
-        $api_key = hash('sha1', base64_encode(12345));
+        // The generated key authenticates the whole bitform/v1 data API. It was
+        // previously a constant (sha1 of a fixed string), so every install that
+        // never set one explicitly shared the same secret. Existing stored keys
+        // are left untouched — only first-time generation changes.
+        $api_key = wp_generate_password(64, false, false);
         update_option('bitform_secret_api_key', $api_key);
       }
       wp_send_json_success($api_key, 200);

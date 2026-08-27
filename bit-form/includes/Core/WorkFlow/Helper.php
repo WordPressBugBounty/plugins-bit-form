@@ -89,7 +89,14 @@ final class Helper
             ) {
               continue;
             }
-            $returnableData = self::replaceFieldWithValue($msg->message_content, $fieldValue, true, null, true);
+            // Translate before smart-tag replacement (identity when unhooked).
+            $messageContent = (string) apply_filters(
+              'bitform_translate_form_string',
+              (string) $msg->message_content,
+              'msg-content-' . $msg->id,
+              $formId
+            );
+            $returnableData = self::replaceFieldWithValue($messageContent, $fieldValue, true, null, true);
             $messageId = $msg->id;
             if (isset($msgConfig->afterSubmit)) {
               $afterSubmit = $msgConfig->afterSubmit;
@@ -110,6 +117,13 @@ final class Helper
             }
             $url = Utilities::jsonObj($redirectPage->integration_details ?? '')->url ?? '';
             if (!empty($url)) {
+              // Translated before smart-tag replacement: per-language redirect targets.
+              $url = (string) apply_filters(
+                'bitform_translate_form_string',
+                (string) $url,
+                'redirect-url-' . $redirectPage->id,
+                $formId
+              );
               $url = self::replaceFieldWithValue($url, $fieldValue);
             }
             $returnableData = empty($url) ? '' : esc_url_raw($url);
@@ -485,7 +499,9 @@ final class Helper
       case '*':
         return $firstOperand * $secondOperand;
       case '/':
-        return 0 == $secondOperand ? null : $firstOperand / $secondOperand;
+        // Compare as float, not with `0 ==`: PHP 8 made `0 == ''` false, so a
+        // non-numeric operand slipped past the old guard into DivisionByZeroError.
+        return 0.0 === (float) $secondOperand ? null : $firstOperand / $secondOperand;
       case '^':
         return $firstOperand ** $secondOperand;
     }

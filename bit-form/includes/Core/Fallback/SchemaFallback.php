@@ -19,4 +19,14 @@ class SchemaFallback
   {
     DB::ensureWorkflowCategoryColumn();
   }
+
+  /**
+   * Repair every workflows column the read path needs (order/info/category/status).
+   *
+   * @return bool
+   */
+  public function ensureWorkflowSchema()
+  {
+    return DB::ensureWorkflowSchema();
+  }
 }

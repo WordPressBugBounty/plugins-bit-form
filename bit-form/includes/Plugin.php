@@ -39,7 +39,7 @@ final class Plugin
   public function register()
   {
     add_action('plugins_loaded', [$this, 'init_plugin']);
-    // add_action('init', [$this, 'localization_setup']);
+    add_action('init', [$this, 'localization_setup']);
     (new Activation())->activate();
     (new Deactivation())->register();
     (new Uninstallation())->register();
@@ -179,8 +179,24 @@ final class Plugin
     }
   }
 
-  // public function localization_setup()
-  // {
-  //   // load_plugin_textdomain('bit-form', false, dirname(BITFORMS_PLUGIN_BASENAME) . '/languages');
-  // }
+  /**
+   * Registers the bundled translations directory for the `bit-form` text domain.
+   */
+  public function localization_setup()
+  {
+    /**
+     * Filters whether Bit Form loads its bundled translations at all.
+     *
+     * Returning false leaves every Free string untranslated — the same filter gates
+     * the React admin bundle in Admin_Bar. Pro has its own
+     * `bitformpro_filter_allow_translation`.
+     *
+     * @param bool $allow Whether to load translations. Default true.
+     */
+    if (!apply_filters('bitform_filter_allow_translation', true)) {
+      return;
+    }
+
+    load_plugin_textdomain('bit-form', false, \dirname(BITFORMS_PLUGIN_BASENAME) . '/languages');
+  }
 }

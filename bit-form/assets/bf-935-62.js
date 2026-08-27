@@ -1,0 +1,1 @@
+import{u as t}from"./bf-119-46.js";import{i as o,Z as u}from"./main-519.js";const n=u({userMail:[],user:{}});function c(){const[s,e]=o(n);return t("bitforms_get_wp_users",{},{fetchCondition:!s.userMail.length,onSuccess:r=>e(r)}),s}export{c as u};

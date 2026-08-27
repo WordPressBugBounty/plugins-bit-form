@@ -32,12 +32,13 @@ class StandaloneFormView
       $formHTML = $formViewObject->html;
       $font = $formViewObject->font;
       $bfGlobals = $formViewObject->bfGlobals;
+      $configTag = isset($formViewObject->configTag) ? $formViewObject->configTag : '';
       $formContent = isset($formViewObject->formContent) ? $formViewObject->formContent : null;
 
       set_transient('bitform_form_preview', true);
       $frontendFormHandler->generateJs($formID);
       $title = 'BitForm Preview page';
-      Render::view('views/preview-page', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'formContent'));
+      Render::view('views/preview-page', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'configTag', 'formContent'));
     }
   }
 
@@ -136,12 +137,13 @@ class StandaloneFormView
     $formHTML = $formViewObject->html;
     $font = $formViewObject->font;
     $bfGlobals = $formViewObject->bfGlobals;
+    $configTag = isset($formViewObject->configTag) ? $formViewObject->configTag : '';
     $formContent = isset($formViewObject->formContent) ? $formViewObject->formContent : null;
 
     set_transient('bitform_form_preview', true);
     $frontendFormHandler->generateJs($formID);
     $title = !empty($standaloneSettings->pageTitle) ? $standaloneSettings->pageTitle : 'Bit Form';
-    Render::view('views/standalone-form', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'formContent'));
+    Render::view('views/standalone-form', compact('formID', 'title', 'formHTML', 'font', 'bfGlobals', 'configTag', 'formContent'));
 
     exit(200);
   }

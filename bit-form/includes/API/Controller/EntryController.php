@@ -34,8 +34,10 @@ class EntryController extends WP_REST_Controller
     $site_url = $this->getDomain(get_site_url());
     $state_domain = $this->getDomain($state);
 
-    if ($site_url !== $state_domain) {
-      return new WP_Error('404', 'Invalid redirect URL: ' . $state_domain);
+    // the refused domain is caller-supplied; echoing it back reflects attacker
+    // input into the response of a public endpoint
+    if ('' === $state_domain || $site_url !== $state_domain) {
+      return new WP_Error('404', 'Invalid redirect URL');
     }
 
     $params = $request->get_params();
@@ -50,7 +52,12 @@ class EntryController extends WP_REST_Controller
 
   private function getDomain($url)
   {
-    $parsed_url = wp_parse_url($url);
+    // these endpoints are public: a missing or non-URL state must not raise
+    // notices, it must simply fail the same-origin comparison
+    $parsed_url = is_string($url) && '' !== $url ? wp_parse_url($url) : false;
+    if (!is_array($parsed_url) || empty($parsed_url['scheme']) || empty($parsed_url['host'])) {
+      return '';
+    }
     $domain = $parsed_url['scheme'] . '://' . $parsed_url['host'];
     $domain .= empty($parsed_url['port']) ? null : ':' . $parsed_url['port'];
     return $domain;

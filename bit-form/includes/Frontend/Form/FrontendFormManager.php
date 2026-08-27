@@ -18,6 +18,7 @@ use BitCode\BitForm\Core\Form\Validator\FormFieldValidator;
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Messages\SuccessMessageHandler;
 use BitCode\BitForm\Core\Util\ApiResponse as UtilApiResponse;
+use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\HttpHelper;
 use BitCode\BitForm\Core\Util\IpTool;
 use BitCode\BitForm\Core\Util\Utilities;
@@ -78,7 +79,7 @@ final class FrontendFormManager extends FormManager
     return array_keys($submitted_data);
   }
 
-  public function formView($fields = null, $hasFile = false, $errorMessages = null, $previousValue = null)
+  public function formView($fields = null, $hasFile = false, $errorMessages = null, $previousValue = null, $isEntryEdit = false)
   {
     $formContents = $this->getFormContent();
     $formAtomicClsMap = $this->getAtomicClsMap();
@@ -93,12 +94,12 @@ final class FrontendFormManager extends FormManager
       $formContents->fields = empty($workFlowreturnedOnLoad['fields']) ? $formContents->fields : $workFlowreturnedOnLoad['fields'];
     }
     $formViewer = new FormViewer($this, $formContents, $formAtomicClsMap, $errorMessages, $previousValue);
-    $isRestricted = $this->checkSubmissionRestriction(false);
+    $isRestricted = $this->checkSubmissionRestriction(false, $isEntryEdit);
     $msg = !empty($isRestricted) ? $isRestricted[0] : '';
     return $formViewer->getView($hasFile, $msg);
   }
 
-  public function conversationalFormView($fields = null, $hasFile = false, $errorMessages = null, $previousValue = null)
+  public function conversationalFormView($fields = null, $hasFile = false, $errorMessages = null, $previousValue = null, $isEntryEdit = false)
   {
     $formContents = $this->getFormContent();
     $formAtomicClsMap = $this->getAtomicClsMap();
@@ -113,12 +114,12 @@ final class FrontendFormManager extends FormManager
       $formContents->fields = empty($workFlowreturnedOnLoad['fields']) ? $formContents->fields : $workFlowreturnedOnLoad['fields'];
     }
     $formViewer = new FormViewer($this, $formContents, $formAtomicClsMap, $errorMessages, $previousValue);
-    $isRestricted = $this->checkSubmissionRestriction(false);
+    $isRestricted = $this->checkSubmissionRestriction(false, $isEntryEdit);
     $msg = !empty($isRestricted) ? $isRestricted[0] : '';
     return $formViewer->getConversationalView($hasFile, $msg);
   }
 
-  public function checkEmptySubmission($data, $file)
+  public function checkEmptySubmission($data, $file, $isEntryEdit = false)
   {
     $formFields = $this->getFields();
     foreach ($formFields as $key => $field) {
@@ -131,6 +132,14 @@ final class FrontendFormManager extends FormManager
         continue;
       }
       $isFileType = in_array($fieldType, $fileUploadFieldTypes);
+      // An edit keeps an untouched file/signature as `<fieldKey>_old`, not as an upload.
+      if (
+        $isEntryEdit
+        && ($isFileType || 'signature' === $fieldType)
+        && !empty(FieldValueHandler::retainedOldValues($data, $key))
+      ) {
+        return false;
+      }
       if ($this->isRepeatedField($key)) {
         $fileData = !empty($file[$key]) ? $file[$key] : [];
         $dataVal = !empty($data[$key]) ? $data[$key] : [];
@@ -332,7 +341,7 @@ final class FrontendFormManager extends FormManager
   {
     // Entry token or capability verified by caller (FrontendAjax::update_entry). All $_POST reads occur after that check.
     $this->fieldNameReplaceOfPost();
-    $validated = $this->beforeSubmittedValidate();
+    $validated = $this->beforeSubmittedValidate(true, true);
     $validated = apply_filters('bitform_filter_form_validation', $validated, $this->_form_id);
 
     $entryID = isset($_REQUEST['entryID']) ? sanitize_text_field(wp_unslash($_REQUEST['entryID'])) : null;
@@ -453,11 +462,11 @@ final class FrontendFormManager extends FormManager
     return $submitted_data;
   }
 
-  public function beforeSubmittedValidate($verifyCaptcha = true)
+  public function beforeSubmittedValidate($verifyCaptcha = true, $isEntryEdit = false)
   {
     if ($this->verifySubmissionNonce()) {
       if ($this->isExist()) {
-        $isRestricted = $this->checkSubmissionRestriction();
+        $isRestricted = $this->checkSubmissionRestriction(true, $isEntryEdit);
         if ($isRestricted && !empty($isRestricted)) {
           return new WP_Error('spam_detection', $isRestricted[0]);
         }
@@ -556,7 +565,11 @@ final class FrontendFormManager extends FormManager
             }
           }
         }
-        $formFieldValidator = new FormFieldValidator($form_fields, $postData, $filesData);
+        // Only an edit may satisfy a required upload/signature from a `_old` marker.
+        $editedEntryID = $isEntryEdit && isset($_REQUEST['entryID'])
+          ? sanitize_text_field(wp_unslash($_REQUEST['entryID']))
+          : null;
+        $formFieldValidator = new FormFieldValidator($form_fields, $postData, $filesData, $editedEntryID);
         $validUniuqFields = [];
         $existFilter = has_filter('bitform_check_duplicate_entry');
         if (true === $existFilter) {
@@ -748,7 +761,7 @@ final class FrontendFormManager extends FormManager
     if (!current_user_can('manage_options')) {
       $update_status = $this->formModel->update(
         [
-          'views' => intval(static::$form[0]->views) + 1
+          'views' => intval($this->form[0]->views) + 1
         ],
         [
           'id' => $this->form_id
@@ -757,7 +770,11 @@ final class FrontendFormManager extends FormManager
     }
   }
 
-  public function checkSubmissionRestriction($checkedEmptySubmitted = true)
+  /**
+   * @param bool $checkedEmptySubmitted whether the empty-submission rule applies here
+   * @param bool $isEntryEdit           true when an existing entry is being updated
+   */
+  public function checkSubmissionRestriction($checkedEmptySubmitted = true, $isEntryEdit = false)
   {
     $formContents = $this->getFormContent();
     $additionalSettings = isset($formContents->additional) ? $formContents->additional : null;
@@ -775,6 +792,19 @@ final class FrontendFormManager extends FormManager
 
     foreach ($fromRestrictionSetitingsEnabled as $restrictionKey => $isEnabled) {
       if ($isEnabled) {
+        // Quota rules gate creating an entry, so an edit skips them; access-control keys stay.
+        $skippableOnEdit = ['onePerIp', 'entry_limit', 'entry_limit_by_user', 'restrict_form'];
+        if ($isEntryEdit && in_array($restrictionKey, $skippableOnEdit, true)) {
+          $skipOnEdit = apply_filters(
+            'bitform_skip_restriction_on_entry_edit',
+            true,
+            $restrictionKey,
+            $this->form_id
+          );
+          if ($skipOnEdit) {
+            continue;
+          }
+        }
         /**
          * Allow add-ons to handle any restriction key (Pro-only restrictions
          * should be implemented in the add-on, not shipped in the free plugin).
@@ -846,7 +876,7 @@ final class FrontendFormManager extends FormManager
           $restrictionMessage[] = $is_login_messages;
         }
         if ($checkedEmptySubmitted && 'empty_submission' === $restrictionKey) {
-          $isEmpty = $this->checkEmptySubmission(wp_unslash($_POST), GlobalHelper::sanitize_files_input($_FILES));
+          $isEmpty = $this->checkEmptySubmission(wp_unslash($_POST), GlobalHelper::sanitize_files_input($_FILES), $isEntryEdit);
           if ($isEmpty) {
             $restriction = $fromRestrictionSetitings->empty_submission->message;
 

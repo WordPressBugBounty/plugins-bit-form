@@ -39,9 +39,6 @@ class ZohoMailHandler
   public static function registerAjax()
   {
     add_action('wp_ajax_bitforms_zmail_generate_token', [__CLASS__, 'generateTokens']);
-    add_action('wp_ajax_bitforms_zmail_refresh_workspaces', [__CLASS__, 'refreshWorkspacesAjaxHelper']);
-    add_action('wp_ajax_bitforms_zmail_refresh_tables', [__CLASS__, 'refreshTablesAjaxHelper']);
-    add_action('wp_ajax_bitforms_zmail_refresh_table_headers', [__CLASS__, 'refreshTableHeadersAjaxHelper']);
   }
 
   /**
@@ -89,19 +86,42 @@ class ZohoMailHandler
       ];
       $apiResponse = HttpHelper::post($apiEndpoint, $requestParams);
 
-      $accountIdEndpoint = "http://mail.zoho.{$requestsParams->dataCenter}/api/accounts";
-      $authorizationHeader['Authorization'] = "Zoho-oauthtoken {$apiResponse->access_token}";
-      $accountResponse = HttpHelper::get($accountIdEndpoint, null, $authorizationHeader);
-
-      $apiResponse->accountId = $accountResponse->data[0]->accountId;
-      $apiResponse->accountEmail = $accountResponse->data[0]->primaryEmailAddress;
-
-      if (is_wp_error($apiResponse) || !empty($apiResponse->error) || is_wp_error($accountResponse) || !empty($accountResponse->errors)) {
+      // Validate the token exchange before using the token: reading access_token
+      // off an error response fatals.
+      if (is_wp_error($apiResponse) || !empty($apiResponse->error) || empty($apiResponse->access_token)) {
         wp_send_json_error(
           empty($apiResponse->error) ? 'Unknown' : $apiResponse->error,
           400
         );
       }
+
+      // https, not http: the WP HTTP API drops the Authorization header on a
+      // redirect, so an http:// call reaches Zoho as INVALID_OAUTHTOKEN.
+      $accountIdEndpoint = "https://mail.zoho.{$requestsParams->dataCenter}/api/accounts";
+      $authorizationHeader['Authorization'] = "Zoho-oauthtoken {$apiResponse->access_token}";
+      $accountResponse = HttpHelper::get($accountIdEndpoint, null, $authorizationHeader);
+
+      // On success `data` is a list of accounts; on failure it is an object
+      // ({errorCode:...}), so check the shape before reading the account.
+      $account = null;
+      if (!is_wp_error($accountResponse) && isset($accountResponse->data) && is_array($accountResponse->data)) {
+        $account = reset($accountResponse->data);
+      }
+
+      if (empty($account) || empty($account->accountId)) {
+        $reason = __('Could not read the Zoho Mail account for this token', 'bit-form');
+        if (is_wp_error($accountResponse)) {
+          $reason = $accountResponse->get_error_message();
+        } elseif (!empty($accountResponse->data->errorCode)) {
+          $reason = $accountResponse->data->errorCode;
+        } elseif (!empty($accountResponse->status->description)) {
+          $reason = $accountResponse->status->description;
+        }
+        wp_send_json_error($reason, 400);
+      }
+
+      $apiResponse->accountId = $account->accountId;
+      $apiResponse->accountEmail = isset($account->primaryEmailAddress) ? $account->primaryEmailAddress : '';
       $apiResponse->generates_on = \time();
       wp_send_json_success($apiResponse, 200);
     } else {

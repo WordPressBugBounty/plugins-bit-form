@@ -163,6 +163,27 @@ final class IntegrationHandler
     );
   }
 
+  /**
+   * Name-only rename of a connected account row, scoped to
+   * category=connected_integration_apps and this handler's form id (0).
+   * updateIntegration() is unusable here: it overwrites details/type/category/status.
+   */
+  public function renameConnectedApp($integrationID, $integrationName)
+  {
+    $data = ['integration_name' => $integrationName];
+    if (!empty($this->_user_details['time'])) {
+      $data['updated_at'] = $this->_user_details['time'];
+    }
+    return static::$_integrationModel->update(
+      $data,
+      [
+        'id'       => $integrationID,
+        'form_id'  => $this->_formID,
+        'category' => 'connected_integration_apps',
+      ]
+    );
+  }
+
   public function updateIntegrationStatus($integrationID, $status)
   {
     $data = ['status' => (int) $status];
@@ -318,12 +339,17 @@ final class IntegrationHandler
 
     $triggerData = $workFlowReturnedData['triggerData'];
 
+    if (!isset($workFlowReturnedData['fields'])) {
+      $workFlowReturnedData['fields'] = isset($workFlowReturnedData['updatedData'])
+        ? $workFlowReturnedData['updatedData']
+        : [];
+    }
+
     $trnasientData = get_transient("bitform_trigger_transient_{$entryId}");
     $trnasientData = is_string($trnasientData) ? json_decode($trnasientData) : $trnasientData;
 
     if (!empty($trnasientData['fields'])) {
-      $fieldData = isset($workFlowReturnedData['fields']) ? $workFlowReturnedData['fields'] : $workFlowReturnedData['updatedData'];
-      $workFlowReturnedData['fields'] = array_merge($fieldData, $trnasientData['fields']);
+      $workFlowReturnedData['fields'] = array_merge($workFlowReturnedData['fields'], $trnasientData['fields']);
     }
 
     if (function_exists('fastcgi_finish_request') || !wp_doing_ajax()) {

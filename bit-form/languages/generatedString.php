@@ -220,65 +220,17 @@ $bitforms_i18n_strings = array(
 
     'How to set up' => __('How to set up', 'bit-form'),
 
-    'Post Type cann\'t be empty' => __('Post Type cann\'t be empty', 'bit-form'),
-
-    'Post Status cann\'t be empty' => __('Post Status cann\'t be empty', 'bit-form'),
-
-    'Please map mandatory fields' => __('Please map mandatory fields', 'bit-form'),
-
-    'Integration Name' => __('Integration Name', 'bit-form'),
-
-    'Integration Name...' => __('Integration Name...', 'bit-form'),
-
-    'Post Type' => __('Post Type', 'bit-form'),
-
-    'Refresh Post Types' => __('Refresh Post Types', 'bit-form'),
-
-    'Post Status' => __('Post Status', 'bit-form'),
-
-    'Select Status' => __('Select Status', 'bit-form'),
-
-    'Author' => __('Author', 'bit-form'),
-
-    'Select Author' => __('Select Author', 'bit-form'),
-
-    'Comment Status' => __('Comment Status', 'bit-form'),
-
-    'Field Mapping' => __('Field Mapping', 'bit-form'),
-
-    'Form Fields' => __('Form Fields', 'bit-form'),
-
-    'Post Fields' => __('Post Fields', 'bit-form'),
-
-    'ACF fields Mapping' => __('ACF fields Mapping', 'bit-form'),
-
-    'Refresh ACF fields' => __('Refresh ACF fields', 'bit-form'),
-
-    'ACF Fields' => __('ACF Fields', 'bit-form'),
-
-    'ACF File Upload Fields Map' => __('ACF File Upload Fields Map', 'bit-form'),
-
     'Error Occured' => __('Error Occured', 'bit-form'),
 
     'Loading ACF Fields...' => __('Loading ACF Fields...', 'bit-form'),
 
     'Loading Post Types...' => __('Loading Post Types...', 'bit-form'),
 
-    'Select one of the defined WordPress post types Or custom post types for the post.' => __('Select one of the defined WordPress post types Or custom post types for the post.', 'bit-form'),
-
-    'Select Post Type' => __('Select Post Type', 'bit-form'),
-
-    'Select the status for the post. If published status is selected and the post date is in the future, it will automatically be changed to scheduled' => __('Select the status for the post. If published status is selected and the post date is in the future, it will automatically be changed to scheduled', 'bit-form'),
-
-    'Select the user to be assigned to the post.' => __('Select the user to be assigned to the post.', 'bit-form'),
-
     'Select Field' => __('Select Field', 'bit-form'),
 
     'Custom...' => __('Custom...', 'bit-form'),
 
     'Custom Value' => __('Custom Value', 'bit-form'),
-
-    'Connect New Active Campaing API' => __('Connect New Active Campaing API', 'bit-form'),
 
     'Update ActiveCampaign' => __('Update ActiveCampaign', 'bit-form'),
 
@@ -292,7 +244,9 @@ $bitforms_i18n_strings = array(
 
     'Authorized Successfully' => __('Authorized Successfully', 'bit-form'),
 
-    'Integration Name:' => __('Integration Name:', 'bit-form'),
+    'Account Name:' => __('Account Name:', 'bit-form'),
+
+    'e.g. Marketing — work account' => __('e.g. Marketing — work account', 'bit-form'),
 
     'Access API URL:' => __('Access API URL:', 'bit-form'),
 
@@ -320,10 +274,6 @@ $bitforms_i18n_strings = array(
 
     'ActiveCampaign fields refresh failed. please try again' => __('ActiveCampaign fields refresh failed. please try again', 'bit-form'),
 
-    'Connected API:' => __('Connected API:', 'bit-form'),
-
-    'Select an App' => __('Select an App', 'bit-form'),
-
     'List:' => __('List:', 'bit-form'),
 
     'Select List' => __('Select List', 'bit-form'),
@@ -332,13 +282,15 @@ $bitforms_i18n_strings = array(
 
     'Refresh Activecapmaign Tags' => __('Refresh Activecapmaign Tags', 'bit-form'),
 
-    'Map Fields' => __('Map Fields', 'bit-form'),
-
     'Refresh Activecapmaign Field' => __('Refresh Activecapmaign Field', 'bit-form'),
+
+    'Form Fields' => __('Form Fields', 'bit-form'),
 
     'ActiveCampaign Fields' => __('ActiveCampaign Fields', 'bit-form'),
 
     'Actions' => __('Actions', 'bit-form'),
+
+    'Integration Name:' => __('Integration Name:', 'bit-form'),
 
     'To Get Auth token, Please Visit' => __('To Get Auth token, Please Visit', 'bit-form'),
 
@@ -362,10 +314,6 @@ $bitforms_i18n_strings = array(
 
     'Authorized failed' => __('Authorized failed', 'bit-form'),
 
-    'Connected API List:' => __('Connected API List:', 'bit-form'),
-
-    'Select API' => __('Select API', 'bit-form'),
-
     'Actions:' => __('Actions:', 'bit-form'),
 
     'Select Actions' => __('Select Actions', 'bit-form'),
@@ -373,8 +321,6 @@ $bitforms_i18n_strings = array(
     'All List:' => __('All List:', 'bit-form'),
 
     'Fetch Subscriber List' => __('Fetch Subscriber List', 'bit-form'),
-
-    'Field Map' => __('Field Map', 'bit-form'),
 
     'Refresh Acumbamail Fields' => __('Refresh Acumbamail Fields', 'bit-form'),
 
@@ -384,13 +330,13 @@ $bitforms_i18n_strings = array(
 
     'Authorize' => __('Authorize', 'bit-form'),
 
-    'Next' => __('Next', 'bit-form'),
-
     'Skip exist Contact' => __('Skip exist Contact', 'bit-form'),
 
     'Skip if contact already exist in Autonami' => __('Skip if contact already exist in Autonami', 'bit-form'),
 
     'Connect Successfully' => __('Connect Successfully', 'bit-form'),
+
+    'Integration Name...' => __('Integration Name...', 'bit-form'),
 
     'Autonami lists and tags refreshed' => __('Autonami lists and tags refreshed', 'bit-form'),
 
@@ -415,8 +361,6 @@ $bitforms_i18n_strings = array(
     'Refresh Autonami Fields' => __('Refresh Autonami Fields', 'bit-form'),
 
     'Autonami Fields' => __('Autonami Fields', 'bit-form'),
-
-    'Please map all required fields to continue.' => __('Please map all required fields to continue.', 'bit-form'),
 
     'Checking if Bit CRM is active!!!' => __('Checking if Bit CRM is active!!!', 'bit-form'),
 
@@ -446,17 +390,11 @@ $bitforms_i18n_strings = array(
 
     'Bit CRM Fields' => __('Bit CRM Fields', 'bit-form'),
 
-    'Loaded integration:' => __('Loaded integration:', 'bit-form'),
-
-    'Integration Info' => __('Integration Info', 'bit-form'),
-
     'Delete' => __('Delete', 'bit-form'),
 
     'Add New' => __('Add New', 'bit-form'),
 
     'App' => __('App', 'bit-form'),
-
-    'Authorize New Dropbox App' => __('Authorize New Dropbox App', 'bit-form'),
 
     'Delete File From Wordpress' => __('Delete File From Wordpress', 'bit-form'),
 
@@ -501,12 +439,6 @@ $bitforms_i18n_strings = array(
     'File Input' => __('File Input', 'bit-form'),
 
     'Dropbox Folder' => __('Dropbox Folder', 'bit-form'),
-
-    'Integration Settings' => __('Integration Settings', 'bit-form'),
-
-    'Execute' => __('Execute', 'bit-form'),
-
-    'Don\'t Execute' => __('Don\'t Execute', 'bit-form'),
 
     'Status' => __('Status', 'bit-form'),
 
@@ -596,8 +528,6 @@ $bitforms_i18n_strings = array(
 
     'Gist Fields' => __('Gist Fields', 'bit-form'),
 
-    'Authorize New Google App' => __('Authorize New Google App', 'bit-form'),
-
     'Update Row' => __('Update Row', 'bit-form'),
 
     'Control how the row gets updated.' => __('Control how the row gets updated.', 'bit-form'),
@@ -658,8 +588,6 @@ $bitforms_i18n_strings = array(
     'Secret key cann\'t be empty' => __('Secret key cann\'t be empty', 'bit-form'),
 
     'Authorization failed' => __('Authorization failed', 'bit-form'),
-
-    'Authorize App:' => __('Authorize App:', 'bit-form'),
 
     'Spreadsheets:' => __('Spreadsheets:', 'bit-form'),
 
@@ -813,7 +741,7 @@ $bitforms_i18n_strings = array(
 
     'Try our free webhook test website:' => __('Try our free webhook test website:', 'bit-form'),
 
-    'Authorize New Mailchimp App' => __('Authorize New Mailchimp App', 'bit-form'),
+    'Next' => __('Next', 'bit-form'),
 
     'Add Address Field' => __('Add Address Field', 'bit-form'),
 
@@ -846,8 +774,6 @@ $bitforms_i18n_strings = array(
     'Fields refreshed' => __('Fields refreshed', 'bit-form'),
 
     'Fields refresh failed. please try again' => __('Fields refresh failed. please try again', 'bit-form'),
-
-    'Authorized App:' => __('Authorized App:', 'bit-form'),
 
     'Audience List:' => __('Audience List:', 'bit-form'),
 
@@ -919,21 +845,7 @@ $bitforms_i18n_strings = array(
 
     'MailPoet Fields' => __('MailPoet Fields', 'bit-form'),
 
-    'MetaBox Fields Mapping' => __('MetaBox Fields Mapping', 'bit-form'),
-
-    'Refresh MetaBox List' => __('Refresh MetaBox List', 'bit-form'),
-
-    'Metabox Fields' => __('Metabox Fields', 'bit-form'),
-
-    'Metabox File Upload Fields Map' => __('Metabox File Upload Fields Map', 'bit-form'),
-
-    'Metaxbox Fields' => __('Metaxbox Fields', 'bit-form'),
-
-    'Metabox Fields Mapping' => __('Metabox Fields Mapping', 'bit-form'),
-
     'Loading MetaBox Fields...' => __('Loading MetaBox Fields...', 'bit-form'),
-
-    'Authorize New One Drive App' => __('Authorize New One Drive App', 'bit-form'),
 
     'Upload Files' => __('Upload Files', 'bit-form'),
 
@@ -974,14 +886,6 @@ $bitforms_i18n_strings = array(
     'Refresh All oneDrive Folders' => __('Refresh All oneDrive Folders', 'bit-form'),
 
     'Refresh Sub Folders' => __('Refresh Sub Folders', 'bit-form'),
-
-    'Pod Fields' => __('Pod Fields', 'bit-form'),
-
-    'Pod cann\'t be empty' => __('Pod cann\'t be empty', 'bit-form'),
-
-    'Pod' => __('Pod', 'bit-form'),
-
-    'Authorize New Rapidmail Account' => __('Authorize New Rapidmail Account', 'bit-form'),
 
     'Send Activation Email' => __('Send Activation Email', 'bit-form'),
 
@@ -1028,10 +932,6 @@ $bitforms_i18n_strings = array(
     'SendFox Fields' => __('SendFox Fields', 'bit-form'),
 
     'SendFox Unsubscribe Fields' => __('SendFox Unsubscribe Fields', 'bit-form'),
-
-    'Template name cann\'t be empty' => __('Template name cann\'t be empty', 'bit-form'),
-
-    'Redirection url name cann\'t be empty' => __('Redirection url name cann\'t be empty', 'bit-form'),
 
     'Update Sendinblue' => __('Update Sendinblue', 'bit-form'),
 
@@ -1147,8 +1047,6 @@ $bitforms_i18n_strings = array(
 
     'Select Fields' => __('Select Fields', 'bit-form'),
 
-    'Authorize New Zoho Analytics App' => __('Authorize New Zoho Analytics App', 'bit-form'),
-
     'Share Table' => __('Share Table', 'bit-form'),
 
     'Share Table with users pushed to Zoho Analytics.' => __('Share Table with users pushed to Zoho Analytics.', 'bit-form'),
@@ -1209,8 +1107,6 @@ $bitforms_i18n_strings = array(
 
     'Zoho Fields' => __('Zoho Fields', 'bit-form'),
 
-    'Authorize New Zoho Bigin App' => __('Authorize New Zoho Bigin App', 'bit-form'),
-
     'Workflow' => __('Workflow', 'bit-form'),
 
     'Trigger workflows in Zoho Bigin.' => __('Trigger workflows in Zoho Bigin.', 'bit-form'),
@@ -1264,6 +1160,8 @@ $bitforms_i18n_strings = array(
 
     'New Record' => __('New Record', 'bit-form'),
 
+    'Map Fields' => __('Map Fields', 'bit-form'),
+
     'Map Attachments' => __('Map Attachments', 'bit-form'),
 
     'Related List:' => __('Related List:', 'bit-form'),
@@ -1271,8 +1169,6 @@ $bitforms_i18n_strings = array(
     'Select Related Module' => __('Select Related Module', 'bit-form'),
 
     'Refresh Bigin Related Lists' => __('Refresh Bigin Related Lists', 'bit-form'),
-
-    'Authorize New Zoho Campaigns App' => __('Authorize New Zoho Campaigns App', 'bit-form'),
 
     'Lists refreshed' => __('Lists refreshed', 'bit-form'),
 
@@ -1291,8 +1187,6 @@ $bitforms_i18n_strings = array(
     'Refresh Campaigns Lists' => __('Refresh Campaigns Lists', 'bit-form'),
 
     'Refresh Campaigns Contact Fields' => __('Refresh Campaigns Contact Fields', 'bit-form'),
-
-    'Authorize New Zoho Creator App' => __('Authorize New Zoho Creator App', 'bit-form'),
 
     'Update Record' => __('Update Record', 'bit-form'),
 
@@ -1335,8 +1229,6 @@ $bitforms_i18n_strings = array(
     'Select Form' => __('Select Form', 'bit-form'),
 
     'Refresh Creator Fields' => __('Refresh Creator Fields', 'bit-form'),
-
-    'Authorize New Zoho CRM App' => __('Authorize New Zoho CRM App', 'bit-form'),
 
     'Trigger CRM workflows' => __('Trigger CRM workflows', 'bit-form'),
 
@@ -1419,13 +1311,11 @@ $bitforms_i18n_strings = array(
 
     'Refresh CRM Layouts' => __('Refresh CRM Layouts', 'bit-form'),
 
+    'Field Map' => __('Field Map', 'bit-form'),
+
     'Refresh CRM Related Lists' => __('Refresh CRM Related Lists', 'bit-form'),
 
     'File Upload Field Map' => __('File Upload Field Map', 'bit-form'),
-
-    'Please select a ticket owner' => __('Please select a ticket owner', 'bit-form'),
-
-    'Authorize New Zoho Desk App' => __('Authorize New Zoho Desk App', 'bit-form'),
 
     'Ticket Owner' => __('Ticket Owner', 'bit-form'),
 
@@ -1817,6 +1707,8 @@ $bitforms_i18n_strings = array(
     /* translators: %s: dynamic value. */
     'RelatedLists refresh failed Cause: %s. please try again' => __('RelatedLists refresh failed Cause: %s. please try again', 'bit-form'),
 
+    'Please map mandatory fields' => __('Please map mandatory fields', 'bit-form'),
+
     'Share Workbook' => __('Share Workbook', 'bit-form'),
 
     'Share workbook with users pushed to Zoho Sheet.' => __('Share workbook with users pushed to Zoho Sheet.', 'bit-form'),
@@ -1996,7 +1888,9 @@ $bitforms_i18n_strings = array(
 
     'Changelog' => __('Changelog', 'bit-form'),
 
-    'What\'s New?' => __('What\'s New?', 'bit-form'),
+    'Full changelog' => __('Full changelog', 'bit-form'),
+
+    'Got it' => __('Got it', 'bit-form'),
 
     'Capture' => __('Capture', 'bit-form'),
 
@@ -3190,6 +3084,8 @@ $bitforms_i18n_strings = array(
 
     'Failed to update CPT' => __('Failed to update CPT', 'bit-form'),
 
+    'Post Type' => __('Post Type', 'bit-form'),
+
     'Select Type *' => __('Select Type *', 'bit-form'),
 
     'Menu Icon *' => __('Menu Icon *', 'bit-form'),
@@ -3526,45 +3422,13 @@ $bitforms_i18n_strings = array(
 
     'Unique User' => __('Unique User', 'bit-form'),
 
-    'App delete successfully.' => __('App delete successfully.', 'bit-form'),
+    'Connected accounts' => __('Connected accounts', 'bit-form'),
 
-    'App deletion failed Cause' => __('App deletion failed Cause', 'bit-form'),
+    'Authorize a service once and reuse it in every form. How to setup Integrations:' => __('Authorize a service once and reuse it in every form. How to setup Integrations:', 'bit-form'),
 
-    'App deletion failed. please try again' => __('App deletion failed. please try again', 'bit-form'),
-
-    'Are you sure to delete this App configuration?' => __('Are you sure to delete this App configuration?', 'bit-form'),
-
-    'Integrations' => __('Integrations', 'bit-form'),
-
-    'How to setup Integrations:' => __('How to setup Integrations:', 'bit-form'),
-
-    'Connected/Authorized Platforms' => __('Connected/Authorized Platforms', 'bit-form'),
-
-    'Search Available Integrations...' => __('Search Available Integrations...', 'bit-form'),
-
-    'Available Integrations' => __('Available Integrations', 'bit-form'),
+    'Account details' => __('Account details', 'bit-form'),
 
     'Submit button cannot be removed' => __('Submit button cannot be removed', 'bit-form'),
-
-    'Integration deletion failed Cause' => __('Integration deletion failed Cause', 'bit-form'),
-
-    'Integration deletion failed. please try again' => __('Integration deletion failed. please try again', 'bit-form'),
-
-    'Failed to update integration status' => __('Failed to update integration status', 'bit-form'),
-
-    'Are you sure to delete this integration?' => __('Are you sure to delete this integration?', 'bit-form'),
-
-    'Are you sure to clone this integration?' => __('Are you sure to clone this integration?', 'bit-form'),
-
-    'Integration clone failed Cause' => __('Integration clone failed Cause', 'bit-form'),
-
-    'Integration clone failed.' => __('Integration clone failed.', 'bit-form'),
-
-    'Integrate your form with your favorite apps and services.' => __('Integrate your form with your favorite apps and services.', 'bit-form'),
-
-    'Enabled' => __('Enabled', 'bit-form'),
-
-    'By default, all enabled Integrations execute automatically. Add conditional logic only to run a specific integration based on submitted values.' => __('By default, all enabled Integrations execute automatically. Add conditional logic only to run a specific integration based on submitted values.', 'bit-form'),
 
     'Migration Issue Detected' => __('Migration Issue Detected', 'bit-form'),
 
@@ -3677,6 +3541,12 @@ $bitforms_i18n_strings = array(
     'Bit form Razorpay Payment Gateway documentation' => __('Bit form Razorpay Payment Gateway documentation', 'bit-form'),
 
     'Razorpay Integrations Video' => __('Razorpay Integrations Video', 'bit-form'),
+
+    'Integration deletion failed Cause' => __('Integration deletion failed Cause', 'bit-form'),
+
+    'Integration deletion failed. please try again' => __('Integration deletion failed. please try again', 'bit-form'),
+
+    'Are you sure to delete this integration?' => __('Are you sure to delete this integration?', 'bit-form'),
 
     'Available Payment Gateways' => __('Available Payment Gateways', 'bit-form'),
 
@@ -4560,6 +4430,306 @@ $bitforms_i18n_strings = array(
 
     'Don\'t Send' => __('Don\'t Send', 'bit-form'),
 
+    'This account no longer exists.' => __('This account no longer exists.', 'bit-form'),
+
+    'Account name' => __('Account name', 'bit-form'),
+
+    'Service' => __('Service', 'bit-form'),
+
+    'Authorization' => __('Authorization', 'bit-form'),
+
+    'None required' => __('None required', 'bit-form'),
+
+    'Account email' => __('Account email', 'bit-form'),
+
+    'Data center' => __('Data center', 'bit-form'),
+
+    'Authorized' => __('Authorized', 'bit-form'),
+
+    'Tokens and secrets stay on your server and are never displayed here. Integrations using this account keep their own copy of its credentials.' => __('Tokens and secrets stay on your server and are never displayed here. Integrations using this account keep their own copy of its credentials.', 'bit-form'),
+
+    'Account' => __('Account', 'bit-form'),
+
+    'Select an account...' => __('Select an account...', 'bit-form'),
+
+    'No account connected yet' => __('No account connected yet', 'bit-form'),
+
+    'Connect a new account' => __('Connect a new account', 'bit-form'),
+
+    'Authorize this service once and reuse the account in any form — pick "Connect a new account" above.' => __('Authorize this service once and reuse the account in any form — pick "Connect a new account" above.', 'bit-form'),
+
+    'Accounts are reusable across forms.' => __('Accounts are reusable across forms.', 'bit-form'),
+
+    'No confident matches found — map these fields manually.' => __('No confident matches found — map these fields manually.', 'bit-form'),
+
+    'field mapped' => __('field mapped', 'bit-form'),
+
+    'fields mapped' => __('fields mapped', 'bit-form'),
+
+    'Load the destination fields first' => __('Load the destination fields first', 'bit-form'),
+
+    'Match form fields to integration fields automatically' => __('Match form fields to integration fields automatically', 'bit-form'),
+
+    'Auto Map' => __('Auto Map', 'bit-form'),
+
+    'Post Type cann\'t be empty' => __('Post Type cann\'t be empty', 'bit-form'),
+
+    'Post Status cann\'t be empty' => __('Post Status cann\'t be empty', 'bit-form'),
+
+    'Name this integration' => __('Name this integration', 'bit-form'),
+
+    'Post settings' => __('Post settings', 'bit-form'),
+
+    'Where the submission is stored in WordPress.' => __('Where the submission is stored in WordPress.', 'bit-form'),
+
+    'Select one of the defined WordPress post types Or custom post types for the post.' => __('Select one of the defined WordPress post types Or custom post types for the post.', 'bit-form'),
+
+    'Select Post Type' => __('Select Post Type', 'bit-form'),
+
+    'Refresh Post Types' => __('Refresh Post Types', 'bit-form'),
+
+    'Post Status' => __('Post Status', 'bit-form'),
+
+    'Select the status for the post. If published status is selected and the post date is in the future, it will automatically be changed to scheduled' => __('Select the status for the post. If published status is selected and the post date is in the future, it will automatically be changed to scheduled', 'bit-form'),
+
+    'Select Status' => __('Select Status', 'bit-form'),
+
+    'Author' => __('Author', 'bit-form'),
+
+    'Select the user to be assigned to the post.' => __('Select the user to be assigned to the post.', 'bit-form'),
+
+    'Select Author' => __('Select Author', 'bit-form'),
+
+    'Comment Status' => __('Comment Status', 'bit-form'),
+
+    'Field mapping' => __('Field mapping', 'bit-form'),
+
+    'Post Fields' => __('Post Fields', 'bit-form'),
+
+    'ACF fields mapping' => __('ACF fields mapping', 'bit-form'),
+
+    'Refresh ACF fields' => __('Refresh ACF fields', 'bit-form'),
+
+    'ACF Fields' => __('ACF Fields', 'bit-form'),
+
+    'ACF file upload fields map' => __('ACF file upload fields map', 'bit-form'),
+
+    'Choose the destination and match form fields to it.' => __('Choose the destination and match form fields to it.', 'bit-form'),
+
+    'Authorize this service to continue.' => __('Authorize this service to continue.', 'bit-form'),
+
+    'Please map all required fields to continue.' => __('Please map all required fields to continue.', 'bit-form'),
+
+    'Please map fields to continue.' => __('Please map fields to continue.', 'bit-form'),
+
+    'Match your form fields to the post and MetaBox fields.' => __('Match your form fields to the post and MetaBox fields.', 'bit-form'),
+
+    'MetaBox Fields Mapping' => __('MetaBox Fields Mapping', 'bit-form'),
+
+    'Refresh MetaBox List' => __('Refresh MetaBox List', 'bit-form'),
+
+    'Metabox Fields' => __('Metabox Fields', 'bit-form'),
+
+    'Metabox File Upload Fields Map' => __('Metabox File Upload Fields Map', 'bit-form'),
+
+    'Metaxbox Fields' => __('Metaxbox Fields', 'bit-form'),
+
+    'Pod cann\'t be empty' => __('Pod cann\'t be empty', 'bit-form'),
+
+    'Pod settings' => __('Pod settings', 'bit-form'),
+
+    'Pod' => __('Pod', 'bit-form'),
+
+    'Match your form fields to the pod and post fields.' => __('Match your form fields to the pod and post fields.', 'bit-form'),
+
+    'Pod Fields' => __('Pod Fields', 'bit-form'),
+
+    'Template name cann\'t be empty' => __('Template name cann\'t be empty', 'bit-form'),
+
+    'Redirection url name cann\'t be empty' => __('Redirection url name cann\'t be empty', 'bit-form'),
+
+    'Webhook' => __('Webhook', 'bit-form'),
+
+    'Where to send each submission.' => __('Where to send each submission.', 'bit-form'),
+
+    'Please select a ticket owner' => __('Please select a ticket owner', 'bit-form'),
+
+    'Connect account' => __('Connect account', 'bit-form'),
+
+    'You can reuse this account in any future integration.' => __('You can reuse this account in any future integration.', 'bit-form'),
+
+    'Used in' => __('Used in', 'bit-form'),
+
+    'integration' => __('integration', 'bit-form'),
+
+    'integrations' => __('integrations', 'bit-form'),
+
+    'in this form' => __('in this form', 'bit-form'),
+
+    'Reconnect' => __('Reconnect', 'bit-form'),
+
+    'Reconnect account' => __('Reconnect account', 'bit-form'),
+
+    'Rename account' => __('Rename account', 'bit-form'),
+
+    'Delete account' => __('Delete account', 'bit-form'),
+
+    'Account name cannot be empty.' => __('Account name cannot be empty.', 'bit-form'),
+
+    'Account renamed' => __('Account renamed', 'bit-form'),
+
+    'Rename failed. Please try again.' => __('Rename failed. Please try again.', 'bit-form'),
+
+    'Configured integrations keep their own copy of this account’s credentials and will keep running. You just won’t be able to select this account for new integrations.' => __('Configured integrations keep their own copy of this account’s credentials and will keep running. You just won’t be able to select this account for new integrations.', 'bit-form'),
+
+    'Deleting account...' => __('Deleting account...', 'bit-form'),
+
+    'Account deleted' => __('Account deleted', 'bit-form'),
+
+    'Failed to delete the account. Please try again.' => __('Failed to delete the account. Please try again.', 'bit-form'),
+
+    'Only the label changes — integrations using it keep working.' => __('Only the label changes — integrations using it keep working.', 'bit-form'),
+
+    'Account name...' => __('Account name...', 'bit-form'),
+
+    'Save name' => __('Save name', 'bit-form'),
+
+    'Reusable accounts shared across all your forms.' => __('Reusable accounts shared across all your forms.', 'bit-form'),
+
+    'Connect this form to your tools' => __('Connect this form to your tools', 'bit-form'),
+
+    'Send each submission to a spreadsheet, CRM, email tool or webhook — automatically.' => __('Send each submission to a spreadsheet, CRM, email tool or webhook — automatically.', 'bit-form'),
+
+    'Add your first integration' => __('Add your first integration', 'bit-form'),
+
+    'Popular with form builders' => __('Popular with form builders', 'bit-form'),
+
+    'See all →' => __('See all →', 'bit-form'),
+
+    'No accounts connected yet' => __('No accounts connected yet', 'bit-form'),
+
+    'An account is a one-time authorization — connect a service once and reuse it in every integration and form.' => __('An account is a one-time authorization — connect a service once and reuse it in every integration and form.', 'bit-form'),
+
+    'Connect an account' => __('Connect an account', 'bit-form'),
+
+    'Popular to connect' => __('Popular to connect', 'bit-form'),
+
+    'Account connected' => __('Account connected', 'bit-form'),
+
+    'Could not save draft — browser storage is full.' => __('Could not save draft — browser storage is full.', 'bit-form'),
+
+    'Could not save draft — browser storage is unavailable.' => __('Could not save draft — browser storage is unavailable.', 'bit-form'),
+
+    'Draft saved' => __('Draft saved', 'bit-form'),
+
+    'Discard draft' => __('Discard draft', 'bit-form'),
+
+    'Are you sure to discard this draft? Unsaved configuration will be lost.' => __('Are you sure to discard this draft? Unsaved configuration will be lost.', 'bit-form'),
+
+    'Nothing to save yet.' => __('Nothing to save yet.', 'bit-form'),
+
+    'Unsaved changes' => __('Unsaved changes', 'bit-form'),
+
+    'Draft saved for this session' => __('Draft saved for this session', 'bit-form'),
+
+    'No changes yet.' => __('No changes yet.', 'bit-form'),
+
+    'Save draft' => __('Save draft', 'bit-form'),
+
+    'Update integration' => __('Update integration', 'bit-form'),
+
+    'Save integration' => __('Save integration', 'bit-form'),
+
+    'Back to integrations' => __('Back to integrations', 'bit-form'),
+
+    'New integration' => __('New integration', 'bit-form'),
+
+    'Edit integration' => __('Edit integration', 'bit-form'),
+
+    'Unknown integration type.' => __('Unknown integration type.', 'bit-form'),
+
+    'Execute' => __('Execute', 'bit-form'),
+
+    'Don\'t Execute' => __('Don\'t Execute', 'bit-form'),
+
+    'Add an integration' => __('Add an integration', 'bit-form'),
+
+    'Choose the service you want to authorize. You can reuse it in any integration later.' => __('Choose the service you want to authorize. You can reuse it in any integration later.', 'bit-form'),
+
+    'Pick the service you want to send this form\'s submissions to.' => __('Pick the service you want to send this form\'s submissions to.', 'bit-form'),
+
+    'Search integrations' => __('Search integrations', 'bit-form'),
+
+    'Integration categories' => __('Integration categories', 'bit-form'),
+
+    'No integrations match your search.' => __('No integrations match your search.', 'bit-form'),
+
+    'No auth' => __('No auth', 'bit-form'),
+
+    'Failed to update integration status' => __('Failed to update integration status', 'bit-form'),
+
+    'Cause' => __('Cause', 'bit-form'),
+
+    'Integration deletion failed.' => __('Integration deletion failed.', 'bit-form'),
+
+    'Integration clone failed Cause' => __('Integration clone failed Cause', 'bit-form'),
+
+    'Integration clone failed.' => __('Integration clone failed.', 'bit-form'),
+
+    'Integration cloning is available in Bit Form Pro.' => __('Integration cloning is available in Bit Form Pro.', 'bit-form'),
+
+    'Are you sure to clone this integration?' => __('Are you sure to clone this integration?', 'bit-form'),
+
+    'Discard all drafts' => __('Discard all drafts', 'bit-form'),
+
+    'Discard this unfinished draft? The configuration it holds will be lost.' => __('Discard this unfinished draft? The configuration it holds will be lost.', 'bit-form'),
+
+    'Discard all' => __('Discard all', 'bit-form'),
+
+    'unfinished drafts? The configuration they hold will be lost.' => __('unfinished drafts? The configuration they hold will be lost.', 'bit-form'),
+
+    'Drafts discarded' => __('Drafts discarded', 'bit-form'),
+
+    'Integrations' => __('Integrations', 'bit-form'),
+
+    'Connections' => __('Connections', 'bit-form'),
+
+    'unfinished integration saved as a draft.' => __('unfinished integration saved as a draft.', 'bit-form'),
+
+    'unfinished integrations saved as drafts.' => __('unfinished integrations saved as drafts.', 'bit-form'),
+
+    'Continue' => __('Continue', 'bit-form'),
+
+    'Discard' => __('Discard', 'bit-form'),
+
+    'By default, all enabled Integrations execute automatically. Add conditional logic only to run a specific integration based on submitted values.' => __('By default, all enabled Integrations execute automatically. Add conditional logic only to run a specific integration based on submitted values.', 'bit-form'),
+
+    'just now' => __('just now', 'bit-form'),
+
+    'ago' => __('ago', 'bit-form'),
+
+    '— no account needed —' => __('— no account needed —', 'bit-form'),
+
+    'Integration' => __('Integration', 'bit-form'),
+
+    'Draft' => __('Draft', 'bit-form'),
+
+    'Conditions' => __('Conditions', 'bit-form'),
+
+    'Last run' => __('Last run', 'bit-form'),
+
+    'Not run yet' => __('Not run yet', 'bit-form'),
+
+    'Sent' => __('Sent', 'bit-form'),
+
+    'Failed' => __('Failed', 'bit-form'),
+
+    'Integration actions' => __('Integration actions', 'bit-form'),
+
+    'Add integration' => __('Add integration', 'bit-form'),
+
+    'Search integrations...' => __('Search integrations...', 'bit-form'),
+
     'Theme Quick Tweaks' => __('Theme Quick Tweaks', 'bit-form'),
 
     'Global Elements' => __('Global Elements', 'bit-form'),
@@ -4969,8 +5139,6 @@ $bitforms_i18n_strings = array(
     'Select PDF Templates' => __('Select PDF Templates', 'bit-form'),
 
     'Field Actions' => __('Field Actions', 'bit-form'),
-
-    'Integration' => __('Integration', 'bit-form'),
 
     'Select Integation' => __('Select Integation', 'bit-form'),
 

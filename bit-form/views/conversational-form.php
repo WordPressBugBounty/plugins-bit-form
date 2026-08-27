@@ -83,6 +83,11 @@ if (isset($bfGlobals) && '' !== $bfGlobals) {
 </head>
 
 <body class="bit-conversational-form">
+  <?php
+  // Fallback config for when an optimizer defers or drops the inline script.
+  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built by buildFormConfigTag(), JSON_HEX_* escaped.
+  echo isset($configTag) ? $configTag : '';
+  ?>
   <?php echo wp_kses($formHTML, EscapingHelper::getFormAllowedHtml(isset($formContent) ? $formContent : null)); ?>
   <?php if (!empty($isPreview)) : ?>
   <style>.bc-live-hidden { display: none !important; }</style>

@@ -203,6 +203,57 @@ final class FieldValueHandler
     return false;
   }
 
+  /**
+   * Values a field kept on an entry edit, posted as `<fieldKey>_old` instead of resubmitted.
+   *
+   * @param mixed  $postData submitted data, keyed by field key
+   * @param string $fieldKey
+   *
+   * @return array retained values, empty when the field kept nothing
+   */
+  public static function retainedOldValues($postData, $fieldKey)
+  {
+    if (!is_array($postData) || !isset($postData[$fieldKey . '_old'])) {
+      return [];
+    }
+    return self::flattenOldValues($postData[$fieldKey . '_old']);
+  }
+
+  private static function flattenOldValues($value)
+  {
+    if (is_object($value)) {
+      $value = (array) $value;
+    }
+    if (!is_array($value)) {
+      if (!is_string($value) && !is_numeric($value)) {
+        return [];
+      }
+      $value = trim((string) $value);
+      if ('' === $value) {
+        return [];
+      }
+      // A repeater posts one JSON list per row, so a list can arrive nested.
+      $decoded = json_decode($value, true);
+      if (!is_array($decoded)) {
+        $retained = [];
+        foreach (explode(',', $value) as $item) {
+          $item = trim($item);
+          if ('' !== $item) {
+            $retained[] = $item;
+          }
+        }
+        return $retained;
+      }
+      $value = $decoded;
+    }
+
+    $retained = [];
+    foreach ($value as $item) {
+      $retained = array_merge($retained, self::flattenOldValues($item));
+    }
+    return $retained;
+  }
+
   public static function formatFieldValueForMail($fields, $fieldValues = [])
   {
     $formattedFldValues = $fieldValues;
@@ -374,11 +425,14 @@ final class FieldValueHandler
   public static function sortValueBasedOnLayout($formId, $fieldValues)
   {
     $formManager = FormManager::getInstance($formId);
-    $layout = $formManager->getFormLayout();
     $formLayout = $formManager->getFlatenFormLayout();  // returns all layouts (lg, md, sm)
-    $fieldKeyOrderbasedOnLayout = array_map(function ($fld) {
-      return $fld->i;
-    }, $formLayout->lg);
+    // A form saved without a layout (or a minimal/legacy form_content) has no ->lg
+    $lgLayout = isset($formLayout->lg) ? (array) $formLayout->lg : [];
+    $fieldKeyOrderbasedOnLayout = array_filter(array_map(function ($fld) {
+      return isset($fld->i) ? $fld->i : null;
+    }, $lgLayout), function ($key) {
+      return !is_null($key);
+    });
     $ordered = [];
 
     foreach ($fieldKeyOrderbasedOnLayout as $key) {
@@ -410,13 +464,13 @@ final class FieldValueHandler
         switch ($match) {
           case '${bf_all_data}':
             $fieldValues = self::bindFormData($orderedFormFields, $fieldValues, $formId);
-            $table = self::generateTable($fieldValues, $orderedFormFields);
+            $table = self::generateTable($fieldValues, $orderedFormFields, $formId);
             $stringToReplaceField = str_replace('${bf_all_data}', $table, $stringToReplaceField);
             break;
 
           case '${bf_all_data.onlyValues}':
             $fieldValues = self::bindFormData($orderedFormFields, $fieldValues, $formId, true);
-            $table = self::generateTable($fieldValues, $orderedFormFields);
+            $table = self::generateTable($fieldValues, $orderedFormFields, $formId);
             $stringToReplaceField = str_replace('${bf_all_data.onlyValues}', $table, $stringToReplaceField);
             break;
           default:
@@ -560,7 +614,7 @@ final class FieldValueHandler
     }, []);
   }
 
-  private static function generateTable($fieldValues, $formFields)
+  private static function generateTable($fieldValues, $formFields, $formId = null)
   {
     if (empty($fieldValues)) {
       Log::debug_log([
@@ -588,16 +642,24 @@ final class FieldValueHandler
         if ('repeater' === $fieldType) {
           $table .= "<table style='width: 100%; border-collapse: collapse;'>";
 
+          $subKeys = self::repeaterColumnKeys($value, $fk, $formId);
+
           $table .= '<tr>';
-          foreach (array_keys($value[0]) as $subKey) {
+          foreach ($subKeys as $subKey) {
             $subLabel = self::getLabel($formFields, $subKey) ?? $subKey;
             $table .= "<th style='border: 1px solid #dddddd; padding: 8px; background-color: #f2f2f2;'>" . $subLabel . '</th>';
           }
           $table .= '</tr>';
 
           foreach ($value as $row) {
+            if (!is_array($row)) {
+              continue;
+            }
             $table .= '<tr>';
-            foreach ($row as $subKey => $subValue) {
+            // Walk the shared column list so a row missing a conditionally hidden
+            // sub-field still lines up with the header.
+            foreach ($subKeys as $subKey) {
+              $subValue = array_key_exists($subKey, $row) ? $row[$subKey] : '';
               $subFieldType = self::getFldType($subKey, $formFields);
               if (is_array($subValue)) {
                 if (self::isCompositeFieldType($subFieldType)) {
@@ -674,12 +736,28 @@ final class FieldValueHandler
 
   private static function imgMarkup($filename)
   {
-    return "<img src='{$filename}' alt='{$filename}' width='250'/>";
+    if (!is_scalar($filename)) {
+      return '';
+    }
+    $filename = (string) $filename;
+
+    return "<img src='" . self::escFileHref($filename) . "' alt='" . esc_attr($filename) . "' width='250'/>";
   }
 
   private static function anchorMarkup($filename)
   {
-    return "<a  href='{$filename}' rel='noopener noreferrer' target='_blank' style='color:blue'>{$filename}</a>";
+    if (!is_scalar($filename)) {
+      return '';
+    }
+    $filename = (string) $filename;
+
+    return "<a  href='" . self::escFileHref($filename) . "' rel='noopener noreferrer' target='_blank' style='color:blue'>" . esc_html($filename) . '</a>';
+  }
+
+  /** Escape a file reference for an href/src. Not esc_url(): it rewrites a bare file name to `http://<name>`. */
+  private static function escFileHref($value)
+  {
+    return esc_attr(wp_kses_bad_protocol($value, wp_allowed_protocols()));
   }
 
   public static function replaceRepeaterFieldValue($stringToReplaceField, $fieldValues, $formID)
@@ -705,7 +783,7 @@ final class FieldValueHandler
       $repeaterFieldKey = $fk;
       $fieldType = isset($formFields[$repeaterFieldKey]['type']) && !empty($formFields[$repeaterFieldKey]['type']) ? $formFields[$repeaterFieldKey]['type'] : null;
       if ('repeater' === $fieldType) {
-        $repeaterMarkup = self::repeaterFieldTable($fieldValues[$repeaterFieldKey] ?? [], $formFields, $repeaterFieldKey);
+        $repeaterMarkup = self::repeaterFieldTable($fieldValues[$repeaterFieldKey] ?? [], $formFields, $repeaterFieldKey, $formID);
         $stringToReplaceField = str_replace('${' . $fk . '}', $repeaterMarkup, $stringToReplaceField);
       } else {
         if ('signature' === $fieldType) {
@@ -1009,7 +1087,51 @@ final class FieldValueHandler
     }
   }
 
-  private static function repeaterFieldTable($repeaterFieldData, $formFields, $repeaterFieldKey)
+  /**
+   * Collect the column keys of a repeater table as the union of every row's keys,
+   * not just the first row's. Conditional logic can hide a sub-field in one row and
+   * show it in the next; keying off row 0 alone drops that column's header and
+   * shifts every later row's cells. Ordering follows the repeater's own nested
+   * layout when the form id is known, with any leftover keys appended.
+   *
+   * @param array $rows
+   * @param string $repeaterFieldKey
+   * @param int|string|null $formId
+   * @return array
+   */
+  private static function repeaterColumnKeys($rows, $repeaterFieldKey, $formId = null)
+  {
+    $present = [];
+    foreach ($rows as $row) {
+      if (!is_array($row)) {
+        continue;
+      }
+      foreach (array_keys($row) as $subKey) {
+        $present[$subKey] = true;
+      }
+    }
+
+    if (empty($present)) {
+      return [];
+    }
+
+    $ordered = [];
+    if ($formId) {
+      $nestedLayout = FormManager::getInstance($formId)->getFormNestedLayout();
+      $repeaterLayout = isset($nestedLayout->{$repeaterFieldKey}->lg) ? $nestedLayout->{$repeaterFieldKey}->lg : [];
+      foreach ((array) $repeaterLayout as $fld) {
+        $subKey = isset($fld->i) ? $fld->i : null;
+        if ($subKey && isset($present[$subKey])) {
+          $ordered[] = $subKey;
+          unset($present[$subKey]);
+        }
+      }
+    }
+
+    return array_merge($ordered, array_keys($present));
+  }
+
+  private static function repeaterFieldTable($repeaterFieldData, $formFields, $repeaterFieldKey, $formId = null)
   {
     $repeaterFieldData = self::decodeIfJson($repeaterFieldData);
 
@@ -1023,7 +1145,7 @@ final class FieldValueHandler
     // $table .= '<td style="border: 1px solid #dddddd; text-align: left; padding: 8px;">';
     // $table .= '<table style="width: 100%; border-collapse: collapse;">';
 
-    $headers = array_keys($repeaterFieldData[0]);
+    $headers = self::repeaterColumnKeys($repeaterFieldData, $repeaterFieldKey, $formId);
     $table .= '<tr>';  // open tr (for column header)
     foreach ($headers as $fk) {
       $table .= '<th style="border: 1px solid #dddddd; padding: 8px; ">' . self::getLabel($formFields, $fk) . '</th>';
@@ -1031,8 +1153,15 @@ final class FieldValueHandler
     $table .= '</tr>';  // close tr (for column header)
 
     foreach ($repeaterFieldData as $row) {
+      if (!is_array($row)) {
+        continue;
+      }
       $table .= '<tr>';  // open tr (for table data row)
-      foreach ($row as $k=>$value) {
+      // Walk the column list, not the row's own keys, so a sub-field hidden by
+      // conditional logic in this row renders an empty cell instead of shifting
+      // every following cell one column to the left.
+      foreach ($headers as $k) {
+        $value = array_key_exists($k, $row) ? $row[$k] : '';
         $fldTyp = self::getFldType($k, $formFields);
         if (is_array($value)) {
           if (in_array($fldTyp, ['advanced-file-up', 'file-up'])) {

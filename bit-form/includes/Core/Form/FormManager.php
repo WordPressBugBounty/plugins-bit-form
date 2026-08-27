@@ -23,6 +23,7 @@ use BitCode\BitForm\Core\Util\FileHandler;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\Core\Util\IpTool;
 use BitCode\BitForm\Core\Util\Log;
+use BitCode\BitForm\Core\Util\Translation\FormContentTranslator;
 use BitCode\BitForm\Core\Util\Utilities;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
 use BitCode\BitForm\Core\WorkFlow\WorkFlowHandler;
@@ -34,7 +35,24 @@ class FormManager
 {
   // Cache for instances of FormManager by form_id
   private static $formManagerCache = [];
-  protected static $form;
+
+  /**
+   * Object-cache group for translated form_content.
+   */
+  public const TRANSLATION_CACHE_GROUP = 'bitform_translation';
+
+  /**
+   * Request-scoped memo of translated form_content JSON, keyed "formId|lang".
+   * Static on purpose, unlike $form: the key carries the form id and the
+   * language, so an entry cannot be read back for the wrong form.
+   *
+   * @var array<string,string>
+   */
+  private static $translatedContentCache = [];
+
+  // Per-instance, never static: a static is shared with every subclass and overwritten by the
+  // last-constructed manager, so cached instances would read another form's row.
+  protected $form;
   protected $formModel;
   protected $form_id;
   private $_has_upload;
@@ -51,7 +69,7 @@ class FormManager
     $this->form_id = $form_id;
     $this->formModel = new FormModel();
 
-    static::$form = $this->formModel->get(
+    $this->form = $this->formModel->get(
       [
         'id',
         'form_content',
@@ -68,8 +86,9 @@ class FormManager
         'id' => $form_id,
       ]
     );
-    if (!is_wp_error(static::$form)) {
-      $this->_atomic_class_map = json_decode(static::$form[0]->atomic_class_map);
+    if (!is_wp_error($this->form)) {
+      $atomicClassMap = isset($this->form[0]->atomic_class_map) ? $this->form[0]->atomic_class_map : '';
+      $this->_atomic_class_map = json_decode((string) $atomicClassMap);
       $bfMultipleFormsExists = FrontendHelpers::hasMultipleForms();
       if ($bfMultipleFormsExists && isset($this->_atomic_class_map->atomic_class_map_with_form_id)) {
         $this->_atomic_class_map = $this->_atomic_class_map->atomic_class_map_with_form_id;
@@ -78,8 +97,16 @@ class FormManager
       }
     } else {
       // Log the error if needed
-      Log::debug_log('Error fetching form: ' . "Form Id = ($form_id)" . static::$form->get_error_message());
+      Log::debug_log('Error fetching form: ' . "Form Id = ($form_id)" . $this->form->get_error_message());
     }
+  }
+
+  /**
+   * Test hook: clears the request memo of translated form_content.
+   */
+  public static function resetTranslationMemoForTesting()
+  {
+    self::$translatedContentCache = [];
   }
 
   // Static method to get the instance of FormManager
@@ -97,17 +124,79 @@ class FormManager
 
   public function isExist()
   {
-    return (!static::$form || is_wp_error(static::$form)) ? false : true;
+    return (!$this->form || is_wp_error($this->form)) ? false : true;
   }
 
   public function checkStatus()
   {
-    return '1' === static::$form[0]->status ? true : false;
+    // Fail closed for a missing form: $this->form is a WP_Error when the lookup
+    // found nothing, and the unauthenticated submit endpoints call this before
+    // isExist() — indexing it there fatals on any unknown form id.
+    if (!$this->isExist()) {
+      return false;
+    }
+    return '1' === $this->form[0]->status ? true : false;
   }
 
   public function getFieldsContent()
   {
-    return self::$form[0]->form_content;
+    // Raw on purpose: FormFieldValidator's allowed-option lookup must compare
+    // against the source-language config whatever the request language is.
+    return $this->form[0]->form_content;
+  }
+
+  /**
+   * form_content JSON with display strings passed through
+   * `bitform_translate_form_string`; the raw string when nothing is hooked.
+   * Never persisted back to the row — stored form_content stays source-language.
+   * AdminFormManager overrides this to always return raw.
+   *
+   * @return string
+   */
+  protected function getEffectiveFormContentJson()
+  {
+    // $this->form is a WP_Error when the form was not found; indexing it here
+    // fataled for callers that pass an unknown or empty form id
+    $raw = $this->isExist() ? ($this->form[0]->form_content ?? '') : '';
+    $raw = is_string($raw) ? $raw : '';
+    if ('' === $raw || !has_filter('bitform_translate_form_string')) {
+      return $raw;
+    }
+
+    $rowId = isset($this->form[0]->id) ? (int) $this->form[0]->id : (int) $this->form_id;
+    $lang = (string) apply_filters('bitform_current_language', '', $rowId);
+    $memoKey = $rowId . '|' . $lang;
+    if (isset(self::$translatedContentCache[$memoKey])) {
+      return self::$translatedContentCache[$memoKey];
+    }
+
+    // Content-addressed, so a form save can never serve a stale entry. Edits on
+    // the translation side do not change the hash — the TTL bounds those.
+    $ttl = (int) apply_filters('bitform_translation_cache_ttl', HOUR_IN_SECONDS, $rowId, $lang);
+    $cacheKey = $ttl > 0 ? "form-{$rowId}-{$lang}-" . md5($raw) : '';
+
+    if ('' !== $cacheKey) {
+      $cached = wp_cache_get($cacheKey, self::TRANSLATION_CACHE_GROUP);
+      if (is_string($cached) && '' !== $cached) {
+        self::$translatedContentCache[$memoKey] = $cached;
+        return $cached;
+      }
+    }
+
+    $translated = $raw;
+    $decoded = Utilities::jsonObj($raw);
+    if ($decoded instanceof stdClass) {
+      FormContentTranslator::translate($decoded, $rowId);
+      $encoded = wp_json_encode($decoded);
+      $translated = is_string($encoded) ? $encoded : $raw;
+    }
+
+    if ('' !== $cacheKey) {
+      wp_cache_set($cacheKey, $translated, self::TRANSLATION_CACHE_GROUP, $ttl);
+    }
+    self::$translatedContentCache[$memoKey] = $translated;
+
+    return $translated;
   }
 
   public function getFont()
@@ -119,7 +208,7 @@ class FormManager
 
   public function getStyle()
   {
-    $builerState = Utilities::jsonObj(static::$form[0]->builder_helper_state ?? '');
+    $builerState = Utilities::jsonObj($this->isExist() ? ($this->form[0]->builder_helper_state ?? '') : '');
     $style = '';
     $themeVars = $builerState->themeVars ?? null;
     $themeColors = $builerState->themeColors ?? null;
@@ -167,7 +256,7 @@ class FormManager
 
   public function getFormContentWithValue($defaultValues = [])
   {
-    $form_content = Utilities::jsonObj(static::$form[0]->form_content ?? '');
+    $form_content = Utilities::jsonObj($this->getEffectiveFormContentJson());
     // this filter just use private purpose
     if (isset($form_content->fields)) {
       $form_content->fields = apply_filters('bitform_dynamic_field_filter', $form_content->fields);
@@ -195,17 +284,53 @@ class FormManager
           $fieldDetails->val = sanitize_text_field($defaultValue);
         }
       } elseif (!is_null($defaultValue)) {
-        $fieldDetails->val = is_string($defaultValue) ?
-            sanitize_text_field($defaultValue) :
-            sanitize_text_field($defaultValue[count($defaultValue) - 1]);
+        $fieldDetails->val = self::sanitizeDefaultValue($defaultValue);
       }
     }
     return $form_content;
   }
 
+  /**
+   * Normalize a prefill value into the scalar `val` a field can hold.
+   *
+   * Composite fields (address, name, …) arrive as associative arrays, which a
+   * numeric last-index lookup cannot read.
+   *
+   * @param mixed $defaultValue
+   *
+   * @return string
+   */
+  private static function sanitizeDefaultValue($defaultValue)
+  {
+    if (is_string($defaultValue)) {
+      return sanitize_text_field($defaultValue);
+    }
+
+    if (is_scalar($defaultValue)) {
+      return sanitize_text_field((string) $defaultValue);
+    }
+
+    if (is_object($defaultValue)) {
+      $defaultValue = (array) $defaultValue;
+    }
+
+    if (!is_array($defaultValue) || 0 === count($defaultValue)) {
+      return '';
+    }
+
+    // A plain list is a repeated query param — keep the historic "last one wins".
+    if (array_keys($defaultValue) === range(0, count($defaultValue) - 1)) {
+      $last = end($defaultValue);
+      return is_scalar($last) ? sanitize_text_field((string) $last) : (string) wp_json_encode($last);
+    }
+
+    // Keyed (composite) value: keep the whole shape, same as the `mul` branch above.
+    return (string) wp_json_encode(map_deep($defaultValue, 'sanitize_text_field'));
+  }
+
   public function getFormContent()
   {
-    $formContent = Utilities::jsonObj(static::$form[0]->form_content ?? '');
+    $formContent = Utilities::jsonObj($this->getEffectiveFormContentJson());
     $types = ['check', 'radio', 'select'];
     $filter = false;
     foreach (($formContent->fields ?? []) as $field) {
@@ -223,21 +348,21 @@ class FormManager
 
   public function getFormInfo()
   {
-    $formContent = json_decode(static::$form[0]->form_content);
+    $formContent = json_decode($this->getEffectiveFormContentJson());
     $formInfo = isset($formContent->formInfo) ? $formContent->formInfo : null;
     return $formInfo;
   }
 
   public function getFormPermission()
   {
-    $formContent = json_decode(static::$form[0]->form_content);
+    $formContent = json_decode($this->form[0]->form_content);
     $formPermission = isset($formContent->formPermissions) ? $formContent->formPermissions : null;
     return $formPermission;
   }
 
   public function getFormHelperStates()
   {
-    $formHelperStates = json_decode(static::$form[0]->builder_helper_state);
+    $formHelperStates = json_decode($this->form[0]->builder_helper_state);
     return $formHelperStates;
   }
 
@@ -258,7 +383,7 @@ class FormManager
       return null;
     }
 
-    $form = static::$form[0];
+    $form = $this->form[0];
     if (!isset($form->{$columnName})) {
       return null;
     }
@@ -273,26 +398,26 @@ class FormManager
 
   public function getFormName()
   {
-    return static::$form[0]->form_name;
+    return $this->form[0]->form_name;
   }
 
   public function getFormLayout()
   {
     $formContent = $this->getFormContent();
-    return $formContent->layout;
+    return isset($formContent->layout) ? $formContent->layout : new stdClass();
   }
 
   public function getFormNestedLayout()
   {
     $formContent = $this->getFormContent();
-    return $formContent->nestedLayout;
+    return isset($formContent->nestedLayout) ? $formContent->nestedLayout : new stdClass();
   }
 
   private function mergeNestedLayout(&$layout, $nestedLayout)
   {
     foreach ($nestedLayout as $key => $brkpnts) {
       foreach ($brkpnts as $brkpnt=>$nLayout) {
-        $layout->{$brkpnt} = array_merge($layout->{$brkpnt}, $nLayout);
+        $layout->{$brkpnt} = array_merge(isset($layout->{$brkpnt}) ? (array) $layout->{$brkpnt} : [], (array) $nLayout);
       }
     }
   }
@@ -672,7 +797,7 @@ class FormManager
     if (!is_null($this->_fields)) {
       return $this->_fields;
     }
-    $form_content = \json_decode(static::$form[0]->form_content);
+    $form_content = \json_decode($this->form[0]->form_content);
     $layout = $form_content->layout;
     $fields = $form_content->fields;
     $field_details = [];
@@ -750,7 +875,7 @@ class FormManager
 
   public function getFieldsKey()
   {
-    $form_content = \json_decode(static::$form[0]->form_content);
+    $form_content = \json_decode($this->form[0]->form_content);
     $fields = $form_content->fields;
     $field_details = [];
     foreach ($fields as $key => $field) {
@@ -771,7 +896,7 @@ class FormManager
     if (!is_null($this->_field_label)) {
       return $this->_field_label;
     }
-    $form_content = \json_decode(static::$form[0]->form_content);
+    $form_content = \json_decode($this->form[0]->form_content);
     $fields = $form_content->fields;
     $field_details = [];
     $fieldCounter = 0;
@@ -882,7 +1007,9 @@ class FormManager
       'log_type'      => 'entry',
       'ip'            => $user_details['ip'],
       'form_entry_id' => $entry_id,
-      'content'       => ['user_device' => $user_details['device']],
+      // encoded: wpdb cannot bind an array, so an array here silently stored an
+      // empty string and every submission lost its device info
+      'content'       => wp_json_encode(['user_device' => $user_details['device']]),
       'form_id'       => $this->form_id,
       'created_at'    => $user_details['time'],
     ];
@@ -1110,7 +1237,7 @@ class FormManager
     // CSRF verified upstream via FrontendFormManager::verifySubmissionNonce() before this method is invoked.
     $submitted_data = $this->formatSubmittedData($submitted_data);
     $submitted_data = apply_filters('bitform_filter_save_form_entry', $submitted_data, $this->form_id);
-    $form_content = \json_decode(static::$form[0]->form_content);
+    $form_content = \json_decode($this->form[0]->form_content);
     do_action('bitform_save_entry', $this, $submitted_data, $this->form_id);
     $key = null;
     $ipTool = new IpTool();
@@ -1242,6 +1369,27 @@ class FormManager
     }
   }
 
+  /**
+   * The signature file name an entry currently points at, '' when it has none.
+   */
+  private function getStoredSignatureFile($entryMeta, $entryID, $fieldKey)
+  {
+    $stored = $entryMeta->get(
+      'meta_value',
+      [
+        'bitforms_form_entry_id' => $entryID,
+        'meta_key'               => $fieldKey,
+      ]
+    );
+    if (is_wp_error($stored) || 0 === count($stored)) {
+      return '';
+    }
+    $fileName = trim((string) $stored[0]->meta_value);
+
+    // signature-failed.png is a shared placeholder, not this entry's own file.
+    return 'signature-failed.png' === $fileName ? '' : $fileName;
+  }
+
   private function setSignatureFilePathInRepeater($repeaterData, $repeaterFieldKey, $formFields, $entry_id, &$submitted_data)
   {
     foreach ($repeaterData as $rptr_entry_index => $rptr_entries) {
@@ -1350,7 +1498,8 @@ class FormManager
         }
       }
     }
-    $geResult = $formEntryModel->get('status', ['id' => $entryID]);
+
+    $geResult = $formEntryModel->get('status', ['form_id' => $formID, 'id' => $entryID]);
     if (is_wp_error($geResult) || empty($geResult)) {
       return new WP_Error('empty_form', __('provided form entries does not exists', 'bit-form'));
     }
@@ -1365,14 +1514,12 @@ class FormManager
         'id'      => $entryID,
       ]
     );
-    $log_id = null;
-    if ($formEntry) {
-      $log_id = $this->submisionLog($user_details, $entryID, 'update');
+
+    if (is_wp_error($formEntry) && 'result_empty' !== $formEntry->get_error_code()) {
+      return new WP_Error('entry_update_failed', __('Sorry, error occurred in updating form entry', 'bit-form'));
     }
 
-    if (is_wp_error($formEntry) || !$formEntry) {
-      return new WP_Error('empty_form', __('provided form entries does not exists', 'bit-form'));
-    }
+    $log_id = $this->submisionLog($user_details, $entryID, 'update');
     $formFields = $this->getFields();
     $updatedValue = FileHandler::tempDirToUploadDir($updatedValue, $formFields, $this->form_id, $entryID);
     $file_fields = $this->getUploadFields();
@@ -1523,17 +1670,36 @@ class FormManager
         $toUpdateValues[$field['key']] = $updatedValue[$field['key']];
       }
     }
-    $form_content = \json_decode(static::$form[0]->form_content);
+    $form_content = \json_decode($this->form[0]->form_content);
+
+    $replacedSignatureFiles = [];
 
     foreach ($form_content->fields as $key => $field) {
       if ('signature' === $field->typ) {
-        $fld_data = $updatedValue[$key];
-        $img_type = $field->config->imgTyp;
-        $toUpdateValues[$key] = $this->getSignatureFilePath($fld_data, $this->form_id, $key, $entryID, $img_type);
+        $fld_data = isset($updatedValue[$key]) ? $updatedValue[$key] : '';
+        $img_type = isset($field->config->imgTyp) ? $field->config->imgTyp : 'image/png';
+        $storedSignature = $this->getStoredSignatureFile($entryMeta, $entryID, $key);
+        if (is_string($fld_data) && 0 === strpos($fld_data, 'data:')) {
+          $toUpdateValues[$key] = $this->getSignatureFilePath($fld_data, $this->form_id, $key, $entryID, $img_type);
+          if ('' !== $storedSignature && $storedSignature !== $toUpdateValues[$key]) {
+            $replacedSignatureFiles[] = $storedSignature;
+          }
+        } elseif (isset($updatedValue[$key . '_old'])) {
+          // Nothing drawn: `_old` only confirms the stored file was kept, so write that back.
+          $retained = FieldValueHandler::retainedOldValues($updatedValue, $key);
+          $keepsStored = '' !== $storedSignature && in_array($storedSignature, $retained, true);
+          $toUpdateValues[$key] = $keepsStored ? $storedSignature : '';
+          if (!$keepsStored && '' !== $storedSignature) {
+            $replacedSignatureFiles[] = $storedSignature;
+          }
+        } else {
+          // No signature and no `_old` marker: leave what is stored alone.
+          unset($toUpdateValues[$key]);
+        }
       }
 
       //  for Signature field inside reepater
-      if ('repeater' === $field->typ) {
+      if ('repeater' === $field->typ && isset($updatedValue[$key]) && is_array($updatedValue[$key])) {
         $rptr_data = $updatedValue[$key];
         $formFields = $form_content->fields;
         $this->setSignatureFilePathInRepeater($rptr_data, $key, $formFields, $entryID, $toUpdateValues);
@@ -1562,6 +1728,10 @@ class FormManager
     if (is_wp_error($formEntryMetaUpdateStatus) || isset($newFileInsertStatus) && is_wp_error($newFileInsertStatus)) {
       do_action('bitform_update_entry_error', $this, $toUpdateValues, $formEntryMetaUpdateStatus, $this->form_id);
       return $formEntryMetaUpdateStatus;
+    }
+    // Deleted only now the entry points elsewhere, so a failed update strands nothing.
+    if (!empty($replacedSignatureFiles)) {
+      (new FileHandler())->deleteFiles($formID, $entryID, $replacedSignatureFiles);
     }
     $toUpdateValues = array_merge($formEntryMetaUpdateStatus, ['entry_id' => $entryID]);
     do_action('bitform_after_update_entry_success', $this, $toUpdateValues, $formID, $entryID);
@@ -1632,7 +1802,7 @@ class FormManager
       return $this->_repeaterFields;
     }
     $repeaterFields = [];
-    $form_content = \json_decode(static::$form[0]->form_content);
+    $form_content = \json_decode($this->form[0]->form_content);
     $fields = $form_content->fields;
     $nestedLayouts = !empty($form_content->nestedLayout) ? $form_content->nestedLayout : [];
     foreach ($nestedLayouts as $fieldKey => $repeatLayout) {
@@ -1760,7 +1930,7 @@ class FormManager
   {
     $update_status = $this->formModel->update(
       [
-        'entries' => intval(static::$form[0]->entries) + $countStep,
+        'entries' => intval($this->form[0]->entries) + $countStep,
       ],
       [
         'id' => $this->form_id,

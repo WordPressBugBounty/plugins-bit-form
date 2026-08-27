@@ -111,6 +111,22 @@ class FormEntryLogModel extends Model
     return $this->execute($sql, [$now, absint($minAgeMinutes), $now, absint($maxAgeHours), absint($limit)])->getResult();
   }
 
+  /**
+   * Latest execution per integration of a form: last run time plus the
+   * response_type of that newest log row. integration_id 0 (workflow queue) excluded.
+   */
+  public function getIntegrationLastRuns($formId)
+  {
+    $sql = "SELECT ld.integration_id,
+        MAX(ld.created_at) AS lastRun,
+        SUBSTRING_INDEX(GROUP_CONCAT(ld.response_type ORDER BY ld.created_at DESC, ld.id DESC), ',', 1) AS lastStatus
+      FROM `{$this->app_db->prefix}bitforms_form_log_details` ld
+      JOIN `{$this->app_db->prefix}bitforms_form_entry_log` el ON el.id = ld.log_id
+      WHERE el.form_id = %d AND ld.integration_id > 0
+      GROUP BY ld.integration_id";
+    return $this->execute($sql, [absint($formId)])->getResult();
+  }
+
   public function logUpdate($updateValue, $logID)
   {
     if (empty($logID)) {

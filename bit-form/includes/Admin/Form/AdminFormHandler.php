@@ -525,6 +525,10 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
       }
       $updated_data['message'] = __('Form Saved successfully', 'bit-form');
 
+      // Form and dependent rows are persisted; multilingual providers register
+      // the form's translatable strings here.
+      do_action('bitform_form_saved', $save_status);
+
       return $updated_data;
     }
   }
@@ -798,6 +802,9 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     $form_content = array_merge($form_content, ['workFlowExist' => $workFlowExist]);
     //wrokFlows [end]
     //reports [start] */
+    // read unconditionally after the reports block; a save without currentReport
+    // must not trip an undefined-variable warning
+    $reportIsDefault = null;
     if (!empty($reports)) {
       $reportsModel = new ReportsModel();
       $fieldNames = [];
@@ -934,6 +941,10 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
       if (2 === $newData['reports']) {
         $errorIN .= empty($errorIN) ? 'reports' : ', reports';
       }
+      // See createNewForm(). Fired before the partial-failure return: the rows
+      // that did save are already persisted, so their strings still need registering.
+      do_action('bitform_form_saved', $formId);
+
       if (!empty($errorIN)) {
         /* translators: %s: comma-separated list of areas where error occurred */
         $updated_data['message'] = sprintf(__('Error Occured in saving %s', 'bit-form'), $errorIN);
@@ -943,6 +954,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
         $updated_data['form_content']['is_default'] = $reportIsDefault;
       }
       $updated_data['message'] = __('Form updated successfully.', 'bit-form');
+
       return $updated_data;
     }
   }

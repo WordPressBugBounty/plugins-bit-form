@@ -203,7 +203,7 @@ class RecordApiHelper
             // so reduce each to the stored file name before resolving against the entry directory.
             if (is_array($uplaodFiles)) {
               foreach ($uplaodFiles as $singleFile) {
-                $singleFile = basename(parse_url($singleFile, PHP_URL_PATH) ?: $singleFile);
+                $singleFile = basename(wp_parse_url($singleFile, PHP_URL_PATH) ?: $singleFile);
                 $url = $basepath . $singleFile;
                 $attach_id = $this->attach_product_attachments($product_id, $flag, $url, $singleFile);
                 if (1 === $flag && $attach_id) {
@@ -211,7 +211,7 @@ class RecordApiHelper
                 }
               }
             } else {
-              $filename = basename(parse_url($uplaodFiles, PHP_URL_PATH) ?: $uplaodFiles);
+              $filename = basename(wp_parse_url($uplaodFiles, PHP_URL_PATH) ?: $uplaodFiles);
               $url = $basepath . $filename;
               $this->attach_product_attachments($product_id, $flag, $url, $filename);
             }
@@ -229,21 +229,12 @@ class RecordApiHelper
   {
     require_once ABSPATH . 'wp-admin/includes/image.php';
 
-    $response = wp_remote_get($url);
-    if (is_wp_error($response)) {
-      return null;
-    }
-    $response_code = wp_remote_retrieve_response_code($response);
-    if (200 !== $response_code) {
-      return null;
-    }
-    $image_data = wp_remote_retrieve_body($response);
+    $image_data = self::readImageData($url);
     if (empty($image_data)) {
       return null;
     }
 
-    $url_array = explode('/', $url);
-    $image_name = $url_array[count($url_array) - 1];
+    $image_name = basename(wp_parse_url($url, PHP_URL_PATH) ?: $url);
 
     $upload_dir = wp_upload_dir();
     $unique_file_name = wp_unique_filename($upload_dir['path'], $image_name);
@@ -272,6 +263,172 @@ class RecordApiHelper
     wp_update_attachment_metadata($attach_id, $attach_data);
 
     return $attach_id;
+  }
+
+  /**
+   * Read a mapped image, preferring the local file over any network request.
+   *
+   * The mapped value is an absolute path inside the entry's upload directory, so
+   * an HTTP fetch never resolved it: both wp_remote_get() and wp_safe_remote_get()
+   * reject a schemeless URL.
+   *
+   * @param string $url Absolute path, uploads URL, or external URL
+   *
+   * @return string|null Raw image bytes, or null when it can't be read
+   */
+  private static function readImageData($url)
+  {
+    $localPath = self::resolveLocalUploadPath($url);
+
+    if (!is_null($localPath)) {
+      $contents = file_get_contents($localPath);
+      return false === $contents ? null : $contents;
+    }
+
+    if (!self::isSafeRemoteUrl($url)) {
+      return null;
+    }
+
+    $response = wp_safe_remote_get($url);
+    if (is_wp_error($response) || 200 !== wp_remote_retrieve_response_code($response)) {
+      return null;
+    }
+
+    $body = wp_remote_retrieve_body($response);
+
+    return '' === $body ? null : $body;
+  }
+
+  /**
+   * Whether a remote URL is safe to fetch from a submitted value.
+   *
+   * The ranges wp_safe_remote_get() rejects depend on the WordPress version —
+   * link-local 169.254.0.0/16 (cloud metadata) reached core's list long after
+   * 6.5, which the plugin still supports. Checked here for one behaviour on
+   * every version; wp_safe_remote_get() still runs afterwards.
+   *
+   * DNS rebinding stays open: pinning the request to the resolved address is
+   * not something the WP HTTP API exposes.
+   *
+   * @param string $url
+   *
+   * @return bool
+   */
+  private static function isSafeRemoteUrl($url)
+  {
+    $parts = wp_parse_url($url);
+
+    if (empty($parts['host']) || empty($parts['scheme'])) {
+      return false;
+    }
+    if (!\in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
+      return false;
+    }
+    if (isset($parts['user']) || isset($parts['pass'])) {
+      return false;
+    }
+    if (isset($parts['port']) && !\in_array((int) $parts['port'], [80, 443, 8080], true)) {
+      return false;
+    }
+
+    $host = trim($parts['host'], '[].');
+
+    if (filter_var($host, FILTER_VALIDATE_IP)) {
+      $ip = $host;
+    } else {
+      $ip = gethostbyname($host);
+      // gethostbyname() returns the host unchanged when it cannot resolve
+      if ($ip === $host) {
+        return false;
+      }
+    }
+
+    // NO_PRIV covers 10/8, 172.16/12, 192.168/16, fc00::/7;
+    // NO_RES covers 0/8, 127/8, 169.254/16, 240/4, ::1, fe80::/10.
+    if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+      return false;
+    }
+
+    // 100.64.0.0/10 (CGNAT) and 224.0.0.0/4 (multicast): missed by both flags.
+    $octets = array_map('intval', explode('.', $ip));
+    if (4 === \count($octets)) {
+      if ((100 === $octets[0] && 64 <= $octets[1] && 127 >= $octets[1])
+        || (224 <= $octets[0] && 239 >= $octets[0])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Resolve a mapped value to a readable file inside this site's uploads directory.
+   *
+   * Takes an absolute filesystem path (what the field mapping passes) or a URL
+   * under the uploads base. Anything escaping the uploads directory returns null
+   * and is treated as remote.
+   *
+   * @param mixed $url Mapped submission value; not guaranteed to be a string
+   *
+   * @return string|null Absolute readable path, or null
+   */
+  private static function resolveLocalUploadPath($url)
+  {
+    if (!is_string($url) || '' === $url) {
+      return null;
+    }
+
+    $uploads = wp_upload_dir();
+    if (!empty($uploads['error']) || empty($uploads['basedir'])) {
+      return null;
+    }
+
+    $baseDir = realpath($uploads['basedir']);
+    if (false === $baseDir) {
+      return null;
+    }
+    $baseDir = wp_normalize_path($baseDir);
+
+    $scheme = wp_parse_url($url, PHP_URL_SCHEME);
+    $candidate = null;
+
+    if (empty($scheme)) {
+      // how the mapped value actually arrives
+      $candidate = $url;
+    } elseif (!empty($uploads['baseurl'])) {
+      // defensive: a caller passing the file's public URL instead
+      $basePath = wp_parse_url($uploads['baseurl'], PHP_URL_PATH);
+      $urlPath = wp_parse_url($url, PHP_URL_PATH);
+      $baseHost = wp_parse_url($uploads['baseurl'], PHP_URL_HOST);
+      $host = wp_parse_url($url, PHP_URL_HOST);
+
+      if (
+        !empty($basePath) && !empty($urlPath) && !empty($host)
+        && strtolower($host) === strtolower((string) $baseHost)
+      ) {
+        $basePath = rtrim($basePath, '/') . '/';
+        if (0 === strpos($urlPath, $basePath)) {
+          $candidate = $uploads['basedir'] . DIRECTORY_SEPARATOR . rawurldecode(substr($urlPath, \strlen($basePath)));
+        }
+      }
+    }
+
+    if (is_null($candidate)) {
+      return null;
+    }
+
+    $resolved = realpath($candidate);
+    if (false === $resolved) {
+      return null;
+    }
+    $resolved = wp_normalize_path($resolved);
+
+    // realpath() collapsed any traversal; confirm it stayed inside
+    if (0 !== strpos($resolved, rtrim($baseDir, '/') . '/')) {
+      return null;
+    }
+
+    return is_file($resolved) && is_readable($resolved) ? $resolved : null;
   }
 
   public function attach_product_attachments($product_id, $flag, $url, $filename)

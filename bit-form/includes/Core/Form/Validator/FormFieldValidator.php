@@ -2,6 +2,7 @@
 
 namespace BitCode\BitForm\Core\Form\Validator;
 
+use BitCode\BitForm\Core\Database\FormEntryMetaModel;
 use BitCode\BitForm\Core\Form\FormManager;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
@@ -12,12 +13,18 @@ final class FormFieldValidator
   private $_submitted_fields = null;
   private $_submitted_files = null;
   private $_messages = [];
+  private $_entryID = null;
+  private $_storedValues = [];
 
-  public function __construct($form_fields, $submitted_fields, $submitted_files)
+  /**
+   * @param int|string|null $entryID the entry being edited, null on a new submission
+   */
+  public function __construct($form_fields, $submitted_fields, $submitted_files, $entryID = null)
   {
     $this->_form_fields = $form_fields;
     $this->_submitted_fields = $submitted_fields;
     $this->_submitted_files = $submitted_files;
+    $this->_entryID = empty($entryID) ? null : $entryID;
     $this->removeUnnecessaryField();
   }
 
@@ -27,7 +34,8 @@ final class FormFieldValidator
     if (!isset($_POST)) {
       return;
     }
-    unset($_POST['bitforms_token'], $_POST['bitforms_id']);
+    // bf_lang is a transport key, not a field; anything left here becomes entry meta.
+    unset($_POST['bitforms_token'], $_POST['bitforms_id'], $_POST['bf_lang']);
   }
 
   public function validate($workFlowRun, $formID)
@@ -93,7 +101,8 @@ final class FormFieldValidator
             && $field_data['valid']['req']
             && 'file-up' !== $field_data['type']
             && 'advanced-file-up' !== $field_data['type']
-            && empty($this->_submitted_fields[$field_name]))
+            && empty($this->_submitted_fields[$field_name])
+            && !$this->keptStoredValue($field_name, $field_data))
             && !is_numeric($this->_submitted_fields[$field_name])
       ) {
         if (false !== strpos($hidden_fields, $field_name)) {
@@ -116,6 +125,9 @@ final class FormFieldValidator
           continue;
         }
         if ('advanced-file-up' === $field_data['type'] && !empty($this->_submitted_fields[$field_name])) {
+          continue;
+        }
+        if ($this->keptStoredValue($field_name, $field_data)) {
           continue;
         }
         if (empty($this->_submitted_files[$field_name]['name'])) {
@@ -223,6 +235,64 @@ final class FormFieldValidator
     }
   }
 
+  /** Whether an edit kept this field's stored file/signature — `_old` is believed only where it matches the entry. */
+  private function keptStoredValue($field_name, $field_data, $rowIndex = null)
+  {
+    if (null === $this->_entryID) {
+      return false;
+    }
+    $type = isset($field_data['type']) ? $field_data['type'] : '';
+    if (!in_array($type, ['file-up', 'advanced-file-up', 'signature'], true)) {
+      return false;
+    }
+    $oldKey = $field_name . '_old';
+    if (!isset($this->_submitted_fields[$oldKey])) {
+      return false;
+    }
+    $submitted = $this->_submitted_fields;
+    if (null !== $rowIndex) {
+      if (!is_array($submitted[$oldKey]) || !isset($submitted[$oldKey][$rowIndex])) {
+        return false;
+      }
+      $submitted = [$oldKey => $submitted[$oldKey][$rowIndex]];
+    }
+    $retained = FieldValueHandler::retainedOldValues($submitted, $field_name);
+    if (empty($retained)) {
+      return false;
+    }
+
+    return !empty(array_intersect($retained, $this->getStoredValues($field_name)));
+  }
+
+  /**
+   * The values this entry holds for a field, flattened to a list of file names.
+   */
+  private function getStoredValues($field_name)
+  {
+    if (array_key_exists($field_name, $this->_storedValues)) {
+      return $this->_storedValues[$field_name];
+    }
+    $this->_storedValues[$field_name] = [];
+
+    $entryMeta = new FormEntryMetaModel();
+    $stored = $entryMeta->get(
+      'meta_value',
+      [
+        'bitforms_form_entry_id' => $this->_entryID,
+        'meta_key'               => $field_name,
+      ]
+    );
+    if (!is_wp_error($stored) && count($stored) > 0) {
+      // Stored the same shapes `_old` arrives in: JSON list, comma list, bare name.
+      $this->_storedValues[$field_name] = FieldValueHandler::retainedOldValues(
+        [$field_name . '_old' => $stored[0]->meta_value],
+        $field_name
+      );
+    }
+
+    return $this->_storedValues[$field_name];
+  }
+
   public function validateRepeatedField($field_name, $field_data, $hidden_fields, $rowIndex, $formID)
   {
     // Repeated composite child fields are stored per row under the parent key
@@ -253,7 +323,8 @@ final class FormFieldValidator
           && $field_data['valid']['req']
           && 'file-up' !== $field_data['type']
           && 'advanced-file-up' !== $field_data['type']
-          && empty($this->_submitted_fields[$field_name][$rowIndex]))
+          && empty($this->_submitted_fields[$field_name][$rowIndex])
+          && !$this->keptStoredValue($field_name, $field_data, $rowIndex))
     ) {
       if (false !== strpos($hidden_fields, $field_name)) {
         return true;
@@ -272,6 +343,9 @@ final class FormFieldValidator
       )
     ) {
       if (false !== strpos($hidden_fields, $field_name)) {
+        return true;
+      }
+      if ($this->keptStoredValue($field_name, $field_data, $rowIndex)) {
         return true;
       }
       if (empty($this->_submitted_files[$field_name]['name'][$rowIndex])) {
@@ -625,7 +699,8 @@ final class FormFieldValidator
 
   private function normalizeOptionValueForComparison($value)
   {
-    $value = html_entity_decode((string) $value, ENT_QUOTES, 'UTF-8');
+    $value = sanitize_text_field((string) $value);
+    $value = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
     $value = preg_replace('/\s+/u', ' ', $value);
 
     return trim((string) $value);
