@@ -7,6 +7,14 @@ use BitCode\BitForm\Core\Form\FormManager;
 
 final class FieldValueHandler
 {
+  /**
+   * @param mixed $stringToReplaceField
+   * @param mixed $fieldValues
+   * @param mixed $formID
+   * @param bool  $stripShortcodesFromValues
+   *
+   * @return string
+   */
   public static function replaceFieldWithValue($stringToReplaceField, $fieldValues, $formID = null, $stripShortcodesFromValues = false)
   {
     if (empty($stringToReplaceField)) {
@@ -16,6 +24,10 @@ final class FieldValueHandler
       $stringToReplaceField = wp_json_encode($stringToReplaceField);
     }
     $fieldValues = $formID ? self::sortValueBasedOnLayout($formID, $fieldValues) : $fieldValues;
+
+    // Must run on the raw template: after substitution an empty field and an empty template
+    // are the same empty string.
+    $stringToReplaceField = self::resolveConditionalBlocks($stringToReplaceField, $fieldValues, $formID);
 
     if ($formID) {
       $stringToReplaceField = self::replaceValueOfBf_all_data($stringToReplaceField, $fieldValues, $formID);
@@ -201,6 +213,265 @@ final class FieldValueHandler
       return true;
     }
     return false;
+  }
+
+  /**
+   * Whether a resolved value renders as nothing.
+   *
+   * Stricter than isEmpty(): whitespace-only is blank (some smart-tag resolvers return a
+   * single space), so is an all-blank array. `0` / `'0'` never are.
+   *
+   * @param mixed $val
+   *
+   * @return bool
+   */
+  public static function isBlank($val)
+  {
+    if (null === $val || false === $val) {
+      return true;
+    }
+    if (is_object($val)) {
+      $val = (array) $val;
+    }
+    if (is_array($val)) {
+      foreach ($val as $key => $item) {
+        // Composite meta sub-values (_latitude, …) never render on their own.
+        if (is_string($key) && 0 === strpos($key, '_')) {
+          continue;
+        }
+        if (!self::isBlank($item)) {
+          return false;
+        }
+      }
+      return true;
+    }
+    if (!is_scalar($val)) {
+      return true;
+    }
+
+    return '' === trim(str_replace("\xc2\xa0", '', (string) $val));
+  }
+
+  /**
+   * Resolve `${bf_if:…}` … `${bf_endif}` template blocks.
+   *
+   * Syntax, operators and traps: docs/template-conditional-blocks.md.
+   *
+   * @param string $content
+   * @param array  $fieldValues
+   * @param mixed  $formID     needed to reach repeater rows; without it a child key reads blank
+   *
+   * @return string
+   */
+  private static function resolveConditionalBlocks($content, $fieldValues, $formID = null)
+  {
+    if (false === strpos($content, '${bf_if') && false === strpos($content, '${bf_unless')) {
+      return self::stripConditionalBlockTags($content);
+    }
+
+    $conditionValues = $fieldValues;
+    if ($formID) {
+      $formManager = FormManager::getInstance($formID);
+      // Repeater children have no top-level key; flatten the rows in, real values still win.
+      $conditionValues = array_merge(self::restructureRepeaterData($fieldValues, $formManager), $fieldValues);
+    }
+
+    // Matches a block whose body holds no further opener, i.e. the innermost one.
+    $innerMost = '/\$\{bf_(if|if_any|if_all|unless):([^{}$]*)\}((?:(?!\$\{bf_(?:if|if_any|if_all|unless):)[\s\S])*?)\$\{bf_endif\}/';
+
+    // Bounded so a malformed template can never spin here.
+    for ($pass = 0; $pass < 200; $pass++) {
+      $resolved = preg_replace_callback($innerMost, function ($matches) use ($conditionValues) {
+        $branches = preg_split('/\$\{bf_else\}/', $matches[3], 2);
+        $truthy = isset($branches[0]) ? $branches[0] : '';
+        $falsy = isset($branches[1]) ? $branches[1] : '';
+
+        return self::evaluateBlockCondition($matches[1], $matches[2], $conditionValues) ? $truthy : $falsy;
+      }, $content, -1, $replacedCount);
+
+      if (null === $resolved) {
+        break;  // preg failure (e.g. backtrack limit): leave the content untouched
+      }
+      $content = $resolved;
+      if (!$replacedCount) {
+        break;
+      }
+    }
+
+    return self::stripConditionalBlockTags($content);
+  }
+
+  /**
+   * @param string $type       if|if_any|if_all|unless
+   * @param string $rawKeys    comma separated conditions
+   * @param array  $fieldValues
+   *
+   * @return bool
+   */
+  private static function evaluateBlockCondition($type, $rawKeys, $fieldValues)
+  {
+    $conditions = array_filter(array_map('trim', explode(',', (string) $rawKeys)), function ($condition) {
+      return '' !== $condition;
+    });
+    if (empty($conditions)) {
+      return false;
+    }
+
+    $results = [];
+    foreach ($conditions as $condition) {
+      $results[] = self::conditionHolds($condition, $fieldValues);
+    }
+
+    if ('if_all' === $type) {
+      return !in_array(false, $results, true);
+    }
+    if ('unless' === $type) {
+      return !in_array(true, $results, true);
+    }
+
+    return in_array(true, $results, true);
+  }
+
+  /**
+   * `key`, or `key operator value`.
+   *
+   * @param string $condition
+   * @param array  $fieldValues
+   *
+   * @return bool
+   */
+  private static function conditionHolds($condition, $fieldValues)
+  {
+    $operators = self::blockOperators();
+    // Longest name first, or `not_equal` reads as `equal`. Field keys never contain a space.
+    $pattern = '/^(\S+)\s+(' . implode('|', $operators) . ')(?:\s+([\s\S]*))?$/';
+
+    if (!preg_match($pattern, trim($condition), $parts)) {
+      return !self::isBlank(self::conditionValue(trim($condition), $fieldValues));
+    }
+
+    $value = self::conditionValue($parts[1], $fieldValues);
+    $operator = $parts[2];
+    $expected = isset($parts[3]) ? trim($parts[3]) : '';
+
+    if ('null' === $operator) {
+      return self::isBlank($value);
+    }
+    if ('not_null' === $operator) {
+      return !self::isBlank($value);
+    }
+
+    // Multi-value fields and repeater children arrive as a list.
+    $candidates = is_array($value) || is_object($value) ? self::stripMetaSubfields((array) $value) : [$value];
+    $negated = in_array($operator, ['not_equal', 'not_contain'], true);
+    foreach ($candidates as $candidate) {
+      if (is_array($candidate) || is_object($candidate)) {
+        continue;
+      }
+      // compareValue answers the positive form, so one match settles either case: it satisfies
+      // `contain` and rules out `not_contain`.
+      if (self::compareValue($operator, (string) $candidate, $expected)) {
+        return !$negated;
+      }
+    }
+
+    return $negated;
+  }
+
+  /**
+   * @return string[] operator names, longest first
+   */
+  private static function blockOperators()
+  {
+    return [
+      'greater_or_equal',
+      'less_or_equal',
+      'not_contain',
+      'start_with',
+      'not_equal',
+      'not_null',
+      'end_with',
+      'contain',
+      'greater',
+      'equal',
+      'less',
+      'null',
+    ];
+  }
+
+  /**
+   * @param string $key         field key, or a `_bf_*` smart tag
+   * @param array  $fieldValues
+   *
+   * @return mixed
+   */
+  private static function conditionValue($key, $fieldValues)
+  {
+    if (0 === strpos($key, '_')) {
+      return SmartTags::getSmartTagValue($key, false, '');
+    }
+    $value = isset($fieldValues[$key]) ? $fieldValues[$key] : null;
+    if (is_array($value) && isset($value['value'])) {
+      $value = $value['value'];
+    }
+
+    return $value;
+  }
+
+  /**
+   * @param string $operator
+   * @param string $value    the submitted value
+   * @param string $expected the value written in the template
+   *
+   * @return bool
+   */
+  private static function compareValue($operator, $value, $expected)
+  {
+    switch ($operator) {
+      case 'equal':
+      case 'not_equal':
+        return 0 === strcasecmp(trim($value), $expected);
+      case 'contain':
+      case 'not_contain':
+        return '' !== $expected && false !== stripos($value, $expected);
+      case 'start_with':
+        return '' !== $expected && 0 === stripos($value, $expected);
+      case 'end_with':
+        return '' !== $expected && 0 === strcasecmp($expected, (string) substr($value, -strlen($expected)));
+      case 'greater':
+        return self::isNumericPair($value, $expected) && (float) $value > (float) $expected;
+      case 'less':
+        return self::isNumericPair($value, $expected) && (float) $value < (float) $expected;
+      case 'greater_or_equal':
+        return self::isNumericPair($value, $expected) && (float) $value >= (float) $expected;
+      case 'less_or_equal':
+        return self::isNumericPair($value, $expected) && (float) $value <= (float) $expected;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * @param string $value
+   * @param string $expected
+   *
+   * @return bool both sides compare as numbers
+   */
+  private static function isNumericPair($value, $expected)
+  {
+    return is_numeric(trim($value)) && is_numeric($expected);
+  }
+
+  /**
+   * Drop leftover block tags so an unbalanced template never leaks them into the output.
+   *
+   * @param string $content
+   *
+   * @return string
+   */
+  private static function stripConditionalBlockTags($content)
+  {
+    return preg_replace('/\$\{bf_(?:if|if_any|if_all|unless):[^{}$]*\}|\$\{bf_(?:else|endif)\}/', '', $content);
   }
 
   /**
@@ -461,16 +732,18 @@ final class FieldValueHandler
       $formFields = $formManager->getFields();
       $orderedFormFields = $formManager->getFieldsBasedOnLayout();  // ordered form fields based on layout(lg) order
       foreach ($matchesArray as $match) {
+        // Each tag binds from the untouched submitted values: reusing a filtered result would
+        // let the first tag in a template starve the second.
         switch ($match) {
           case '${bf_all_data}':
-            $fieldValues = self::bindFormData($orderedFormFields, $fieldValues, $formId);
-            $table = self::generateTable($fieldValues, $orderedFormFields, $formId);
+            $boundValues = self::bindFormData($orderedFormFields, $fieldValues, $formId);
+            $table = self::generateTable($boundValues, $orderedFormFields, $formId);
             $stringToReplaceField = str_replace('${bf_all_data}', $table, $stringToReplaceField);
             break;
 
           case '${bf_all_data.onlyValues}':
-            $fieldValues = self::bindFormData($orderedFormFields, $fieldValues, $formId, true);
-            $table = self::generateTable($fieldValues, $orderedFormFields, $formId);
+            $boundValues = self::bindFormData($orderedFormFields, $fieldValues, $formId, true);
+            $table = self::generateTable($boundValues, $orderedFormFields, $formId);
             $stringToReplaceField = str_replace('${bf_all_data.onlyValues}', $table, $stringToReplaceField);
             break;
           default:
@@ -575,8 +848,9 @@ final class FieldValueHandler
 
       // Skip processing for hidden or empty fields only when $isOnlyValues is true
       if ($isOnlyValues) {
-        // Check if the value is strictly an empty string or null, but allow 0
-        if (!isset($formData[$key]) || '' === $formData[$key] || null === $formData[$key]) {
+        // Blank means empty string, null, or an array with nothing in it (unchecked
+        // checkbox group, file field with no upload). 0 is a real value.
+        if (!isset($formData[$key]) || self::isBlank($formData[$key])) {
           return $fieldNewData;
         }
 
@@ -706,10 +980,11 @@ final class FieldValueHandler
         } elseif (self::isCompositeFieldType($fieldType)) {
           $table .= self::joinCompositeFieldValue($value, $fieldType);
         } elseif ('signature' === $fieldType) {
-          if ('signature-failed.png' === $subValue) {
-            $table .= '';
-          } else {
-            $table .= self::imgMarkup($value);
+          // A signature arrives here wrapped in a one-item list; the failed-capture
+          // placeholder renders nothing.
+          $signature = reset($value);
+          if (false !== $signature && 'signature-failed.png' !== $signature) {
+            $table .= self::imgMarkup($signature);
           }
         }
       } else {

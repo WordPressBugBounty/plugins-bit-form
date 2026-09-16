@@ -5,6 +5,7 @@ namespace BitCode\BitForm\Core\Form\Validator;
 use BitCode\BitForm\Core\Database\FormEntryMetaModel;
 use BitCode\BitForm\Core\Form\FormManager;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
+use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
 
 final class FormFieldValidator
@@ -43,7 +44,7 @@ final class FormFieldValidator
     if (empty($this->_form_fields)) {
       return;
     }
-    $hidden_fields = isset($this->_submitted_fields['hidden_fields']) ? $this->_submitted_fields['hidden_fields'] : '';
+    $hidden_fields = FrontendHelpers::parseHiddenFieldKeys(isset($this->_submitted_fields['hidden_fields']) ? $this->_submitted_fields['hidden_fields'] : '');
     unset($this->_submitted_fields['hidden_fields'], $this->_submitted_fields['workflow']);
     foreach ($this->_form_fields as $field_name => $field_data) {
       // Composite child fields (name/address) submit nested under the parent key
@@ -105,7 +106,7 @@ final class FormFieldValidator
             && !$this->keptStoredValue($field_name, $field_data))
             && !is_numeric($this->_submitted_fields[$field_name])
       ) {
-        if (false !== strpos($hidden_fields, $field_name)) {
+        if (FrontendHelpers::isFieldHidden($hidden_fields, $field_name)) {
           continue;
         }
         $this->_messages[$field_name] =
@@ -121,7 +122,7 @@ final class FormFieldValidator
           || 'advanced-file-up' === $field_data['type']
         )
       ) {
-        if (false !== strpos($hidden_fields, $field_name)) {
+        if (FrontendHelpers::isFieldHidden($hidden_fields, $field_name)) {
           continue;
         }
         if ('advanced-file-up' === $field_data['type'] && !empty($this->_submitted_fields[$field_name])) {
@@ -326,7 +327,7 @@ final class FormFieldValidator
           && empty($this->_submitted_fields[$field_name][$rowIndex])
           && !$this->keptStoredValue($field_name, $field_data, $rowIndex))
     ) {
-      if (false !== strpos($hidden_fields, $field_name)) {
+      if (FrontendHelpers::isFieldHidden($hidden_fields, $field_name)) {
         return true;
       }
       $this->_messages[$messageKey] =
@@ -342,7 +343,7 @@ final class FormFieldValidator
         || 'advanced-file-up' === $field_data['type']
       )
     ) {
-      if (false !== strpos($hidden_fields, $field_name)) {
+      if (FrontendHelpers::isFieldHidden($hidden_fields, $field_name)) {
         return true;
       }
       if ($this->keptStoredValue($field_name, $field_data, $rowIndex)) {

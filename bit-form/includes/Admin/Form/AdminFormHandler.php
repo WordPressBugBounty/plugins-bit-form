@@ -1164,7 +1164,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
               'sub'    => $emailTemplatevalue->sub,
               'body'   => $emailTemplatevalue->body,
               'status' => isset($emailTemplatevalue->status) ? (int) $emailTemplatevalue->status : 1,
-              'config' => !empty($emailTemplatevalue->config) ? json_decode($emailTemplatevalue->config) : (object) [],
+              'config' => EmailTemplateHandler::normalizeConfig($emailTemplatevalue->config ?? null),
             ];
         }
       }
@@ -1461,7 +1461,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
               'sub'    => $emailTemplatevalue->sub,
               'body'   => $emailTemplatevalue->body,
               'status' => isset($emailTemplatevalue->status) ? (int) $emailTemplatevalue->status : 1,
-              'config' => !empty($emailTemplatevalue->config) ? json_decode($emailTemplatevalue->config) : (object) [],
+              'config' => EmailTemplateHandler::normalizeConfig($emailTemplatevalue->config ?? null),
             ];
         }
       }

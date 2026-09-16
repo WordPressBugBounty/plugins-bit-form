@@ -18,7 +18,9 @@ use BitCode\BitForm\Core\Form\Validator\FormFieldValidator;
 use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Messages\SuccessMessageHandler;
 use BitCode\BitForm\Core\Util\ApiResponse as UtilApiResponse;
+use BitCode\BitForm\Core\Util\EscapingHelper;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
+use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\Core\Util\HttpHelper;
 use BitCode\BitForm\Core\Util\IpTool;
 use BitCode\BitForm\Core\Util\Utilities;
@@ -229,6 +231,72 @@ final class FrontendFormManager extends FormManager
     return $post;
   }
 
+  /**
+   * WP auth errors carry markup and the confirmation box paints them with innerHTML,
+   * so esc_html() would show the tags as text. kses keeps only the safe markup.
+   *
+   * @param mixed $message
+   *
+   * @return string
+   */
+  private static function authErrorMessage($message)
+  {
+    return wp_kses(is_string($message) ? $message : '', EscapingHelper::getAllowedHtmlTags());
+  }
+
+  /**
+   * A confirm-enabled email/password field posts as one composite and the validator collapses it
+   * to the primary value, so the confirm child's own field key never reaches $_POST. WP auth
+   * integrations map fields by key, so fill those child keys on a copy for the auth filter.
+   *
+   * @param mixed $postData
+   *
+   * @return mixed
+   */
+  private function resolveConfirmChildValues($postData)
+  {
+    if (!is_array($postData)) {
+      return $postData;
+    }
+    $fields = $this->getFields();
+    foreach ($fields as $fieldKey => $fieldData) {
+      if (
+        empty($fieldData['childFields'])
+        || !isset($fieldData['type'])
+        || !in_array($fieldData['type'], ['email', 'password'], true)
+        || !empty($fieldData['repeated'])
+        || !isset($postData[$fieldKey])
+      ) {
+        continue;
+      }
+      $parentValue = $postData[$fieldKey];
+      foreach ((array) $fieldData['childFields'] as $childFieldRef) {
+        $childKey = is_object($childFieldRef) && isset($childFieldRef->fldKey) ? $childFieldRef->fldKey : '';
+        if (
+          empty($childKey)
+          || !isset($fields[$childKey])
+          || !empty($fields[$childKey]['isDeactive'])
+          || isset($postData[$childKey])
+        ) {
+          continue;
+        }
+        if (is_array($parentValue)) {
+          if (array_key_exists('confirm', $parentValue)) {
+            $postData[$childKey] = $parentValue['confirm'];
+          }
+          continue;
+        }
+        // Validation matched primary against confirm before collapsing, so this is that value.
+        $postData[$childKey] = $parentValue;
+      }
+      if (is_array($parentValue) && array_key_exists('primary', $parentValue)) {
+        $postData[$fieldKey] = $parentValue['primary'];
+      }
+    }
+
+    return $postData;
+  }
+
   public function handleSubmission()
   {
     // CSRF verified via verifySubmissionNonce() before this method is called. All $_POST reads below occur after that verification.
@@ -240,7 +308,7 @@ final class FrontendFormManager extends FormManager
 
     if (true === $validated) {
       do_action('bitform_validation_success', $this->_form_id);
-      unset($_POST['hidden_fields']);
+      $this->discardHiddenFieldValues();
 
       $redirectPage = '';
       $regSuccMsg = '';
@@ -252,22 +320,23 @@ final class FrontendFormManager extends FormManager
         $existAuthFilter = has_filter('bitform_wp_user_auth');
 
         if (true === $existAuthFilter) {
-          $result = apply_filters('bitform_wp_user_auth', $existAuth[0], $unslashed_post, $parameter);
+          $authPostData = $this->resolveConfirmChildValues($unslashed_post);
+          $result = apply_filters('bitform_wp_user_auth', $existAuth[0], $authPostData, $parameter);
 
-          $result = apply_filters('bitform_filter_wp_user_auth_response', $result, $this->_form_id, $unslashed_post, $parameter);
+          $result = apply_filters('bitform_filter_wp_user_auth_response', $result, $this->_form_id, $authPostData, $parameter);
 
-          do_action('bitform_wp_user_auth_response', $result, $this->_form_id, $unslashed_post, $parameter);
+          do_action('bitform_wp_user_auth_response', $result, $this->_form_id, $authPostData, $parameter);
 
           if (isset($result['auth_type']) && 'register' === $result['auth_type']) {
             if (!$result['success']) {
-              return new WP_Error('errors', esc_html($result['message']));
+              return new WP_Error('errors', self::authErrorMessage($result['message']));
             } elseif (isset($result['success'])) {
               $redirectPage = $result['redirectPage'];
               $regSuccMsg = $result['message'];
             }
           } else {
             if (!$result['success']) {
-              return new WP_Error('errors', esc_html($result['message']));
+              return new WP_Error('errors', self::authErrorMessage($result['message']));
             } else {
               return $result;
             }
@@ -351,7 +420,8 @@ final class FrontendFormManager extends FormManager
     }
     if (true === $validated) {
       do_action('bitform_validation_success', $this->_form_id);
-      unset($_POST['hidden_fields'], $_POST['entryID']);
+      $this->discardHiddenFieldValues();
+      unset($_POST['entryID']);
 
       $redirectPage = '';
       $regSuccMsg = '';
@@ -363,18 +433,19 @@ final class FrontendFormManager extends FormManager
         $existAuthFilter = has_filter('bitform_wp_user_auth');
 
         if (true === $existAuthFilter) {
-          $result = apply_filters('bitform_wp_user_auth', $existAuth[0], $postData, $parameter);
+          $authPostData = $this->resolveConfirmChildValues($postData);
+          $result = apply_filters('bitform_wp_user_auth', $existAuth[0], $authPostData, $parameter);
 
           if (isset($result['auth_type']) && 'register' === $result['auth_type']) {
             if (!$result['success']) {
-              return new WP_Error('errors', esc_html($result['message']));
+              return new WP_Error('errors', self::authErrorMessage($result['message']));
             } elseif (isset($result['success'])) {
               $redirectPage = $result['redirectPage'];
               $regSuccMsg = $result['message'];
             }
           } else {
             if (!$result['success']) {
-              return new WP_Error('errors', esc_html($result['message']));
+              return new WP_Error('errors', self::authErrorMessage($result['message']));
             } else {
               return $result;
             }
@@ -445,9 +516,94 @@ final class FrontendFormManager extends FormManager
     return $validated;
   }
 
+  /**
+   * Drop the posted `hidden_fields` transport key and, when the form opts in, the values of
+   * the fields it names.
+   *
+   * A hidden field keeps its typed value in the DOM, so the browser still submits it. Runs
+   * here because it is the last point before entry, notifications and integrations are built
+   * from $_POST.
+   *
+   * @return void
+   */
+  private function discardHiddenFieldValues()
+  {
+    // CSRF verified upstream via verifySubmissionNonce(); $_POST is only being narrowed here.
+    $rawHiddenFields = isset($_POST['hidden_fields']) ? wp_unslash($_POST['hidden_fields']) : '';
+    unset($_POST['hidden_fields']);
+
+    if (!$this->shouldDiscardHiddenFieldValues()) {
+      return;
+    }
+    $hiddenFieldKeys = FrontendHelpers::parseHiddenFieldKeys($rawHiddenFields);
+    if (empty($hiddenFieldKeys)) {
+      return;
+    }
+
+    $formFields = $this->getFields();
+    foreach ($hiddenFieldKeys as $fieldKey) {
+      if (!isset($formFields[$fieldKey])) {
+        continue;
+      }
+      $field = $formFields[$fieldKey];
+      // The posted list also names builder-hidden and hidden-type fields, which carry a value
+      // on purpose. Only what conditional logic hid is discarded.
+      if ('hidden' === $field['type'] || !empty($field['valid']['hide'])) {
+        continue;
+      }
+      // Hiding flags a repeater child once, not per row, so discarding would wipe the column
+      // in every row.
+      if (!empty($field['repeated'])) {
+        continue;
+      }
+      // Calculation and tracking fields opt out.
+      if (!empty($field['valid']['keepValueWhenHidden'])) {
+        continue;
+      }
+      // A composite child (name/address/confirm) posts nested under its parent key.
+      if (!empty($field['parentFieldKey'])) {
+        $this->discardCompositeChildValue($formFields, $field, $fieldKey);
+        continue;
+      }
+      unset($_POST[$fieldKey], $_FILES[$fieldKey]);
+    }
+  }
+
+  /**
+   * @param array  $formFields
+   * @param array  $field    the child field's config
+   * @param string $fieldKey the child field's key
+   *
+   * @return void
+   */
+  private function discardCompositeChildValue($formFields, $field, $fieldKey)
+  {
+    $parentKey = $field['parentFieldKey'];
+    if (!isset($_POST[$parentKey]) || !is_array($_POST[$parentKey])) {
+      return;
+    }
+    $parentName = isset($formFields[$parentKey]['name']) ? $formFields[$parentKey]['name'] : '';
+    $childName = FieldValueHandler::deriveChildName(isset($field['name']) ? $field['name'] : '', $parentName);
+    unset($_POST[$parentKey][$childName], $_POST[$parentKey][$fieldKey]);
+  }
+
+  /**
+   * @return bool
+   */
+  private function shouldDiscardHiddenFieldValues()
+  {
+    $formInfo = $this->getFormInfo();
+    if (!is_object($formInfo) || !isset($formInfo->submissionSettings)) {
+      return false;
+    }
+    $submissionSettings = (object) $formInfo->submissionSettings;
+
+    return !empty($submissionSettings->discardHiddenFieldValues);
+  }
+
   public function validateFormSubmission($submitted_data)
   {
-    $hidden_fields = isset($submitted_data['hidden_fields']) ? $submitted_data['hidden_fields'] : '';
+    $hidden_fields = FrontendHelpers::parseHiddenFieldKeys(isset($submitted_data['hidden_fields']) ? $submitted_data['hidden_fields'] : '');
     $submitted_fields = $this->getSubmittedFields($submitted_data);
     $form_fields = $this->getFields();
     $form_fields_names = array_keys($form_fields);
@@ -455,7 +611,7 @@ final class FrontendFormManager extends FormManager
       array_push($form_fields_names, 'GCLID');
     }
     foreach ($submitted_fields as $field) {
-      if ('hidden_fields' !== $field && !in_array($field, $form_fields_names) || false !== strpos($hidden_fields, $field)) {
+      if ('hidden_fields' !== $field && !in_array($field, $form_fields_names) || FrontendHelpers::isFieldHidden($hidden_fields, $field)) {
         unset($submitted_data[$field]);
       }
     }

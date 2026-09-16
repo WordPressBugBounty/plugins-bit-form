@@ -6,6 +6,7 @@ use BitCode\BitForm\Core\Cryptography\Cryptography;
 use BitCode\BitForm\Core\Database\FormEntryModel;
 use BitCode\BitForm\Core\Util\FileHandler;
 use BitCode\BitForm\Core\Util\Log;
+use BitCode\BitForm\Core\WorkFlow\WorkflowExecutor;
 use Exception;
 use WP_Error;
 
@@ -418,8 +419,15 @@ class Helpers
     // Validate trigger token from transient
     $transientData = get_transient("bitform_trigger_transient_{$entryID}");
 
+    // Object caches (W3TC, SG Optimizer, Redis) can drop the transient before the
+    // browser trigger arrives; the queue log row holds the same payload durably.
     if (empty($transientData)) {
-      Log::debug_log('Trigger token transient missing for entryID=' . $entryID . ', logID=' . $logID);
+      $queueLogId = isset($request->cronNotOk[2]) && is_numeric($request->cronNotOk[2]) ? absint($request->cronNotOk[2]) : 0;
+      $transientData = WorkflowExecutor::loadTriggerDataFromLog($queueLogId);
+      Log::debug_log('Trigger token transient missing for entryID=' . $entryID . ', logID=' . $logID . '; durable copy ' . (empty($transientData) ? 'not found' : 'used'));
+    }
+
+    if (empty($transientData)) {
       return [
         'valid'         => false,
         'error'         => 'Trigger token expired or missing',
@@ -428,10 +436,10 @@ class Helpers
       ];
     }
 
-    $triggerData = is_string($transientData) ? json_decode($transientData) : $transientData;
+    $triggerData = is_string($transientData) ? json_decode($transientData, true) : (array) $transientData;
     // Verify token matches and belongs to this entry/log
     if (
-      !isset($triggerData['trigger_token'])
+      !isset($triggerData['trigger_token'], $triggerData['entryID'], $triggerData['logID'])
       || !hash_equals($triggerData['trigger_token'], $submittedToken)
       || (int)$triggerData['entryID'] !== $entryID
       || (int)$triggerData['logID'] !== $logID

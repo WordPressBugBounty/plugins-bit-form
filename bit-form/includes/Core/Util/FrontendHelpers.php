@@ -281,6 +281,46 @@ final class FrontendHelpers
     return $bfMultipleFormsExists;
   }
 
+  /**
+   * Field keys the browser reported as hidden at submit time.
+   *
+   * Comma joined, and must be compared key by key: a substring test lets a hidden `b1-175`
+   * also match `b1-17`.
+   *
+   * @param mixed $rawHiddenFields the posted `hidden_fields` value (string or array)
+   *
+   * @return string[]
+   */
+  public static function parseHiddenFieldKeys($rawHiddenFields)
+  {
+    if (is_array($rawHiddenFields)) {
+      $keys = $rawHiddenFields;
+    } elseif (is_string($rawHiddenFields)) {
+      $keys = explode(',', $rawHiddenFields);
+    } else {
+      return [];
+    }
+
+    $keys = array_map(function ($key) {
+      return is_string($key) || is_numeric($key) ? trim((string) $key) : '';
+    }, $keys);
+
+    return array_values(array_unique(array_filter($keys, function ($key) {
+      return '' !== $key;
+    })));
+  }
+
+  /**
+   * @param mixed  $hiddenFieldKeys parsed key list; anything else is treated as "nothing hidden"
+   * @param string $fieldKey
+   *
+   * @return bool
+   */
+  public static function isFieldHidden($hiddenFieldKeys, $fieldKey)
+  {
+    return is_array($hiddenFieldKeys) && in_array($fieldKey, $hiddenFieldKeys, true);
+  }
+
   public static function getFormPermissions($formId)
   {
     if (!isset(self::$formsPermissions[$formId])) {

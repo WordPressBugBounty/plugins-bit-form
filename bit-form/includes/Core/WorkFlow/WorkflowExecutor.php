@@ -83,18 +83,35 @@ final class WorkflowExecutor
       return (array) $transientData;
     }
 
-    if (!empty($queueLogId)) {
-      $entryLog = new FormEntryLogModel();
-      $rows = $entryLog->get('response_obj', ['id' => absint($queueLogId)]);
-      if (!is_wp_error($rows) && !empty($rows[0]->response_obj)) {
-        $rowObj = json_decode($rows[0]->response_obj, true);
-        if (!empty($rowObj['trigger'])) {
-          return self::restoreTriggerTypes($rowObj['trigger']);
-        }
-      }
+    $durable = self::loadTriggerDataFromLog($queueLogId);
+    if (!empty($durable)) {
+      return $durable;
     }
 
     return self::rebuildTriggerData($entryID, $formID, $logID);
+  }
+
+  /**
+   * Durable copy of the trigger payload, stored on the queue log row when the
+   * workflow was queued. Survives transient expiry and object-cache eviction.
+   *
+   * @return array|null triggerData with array top-level keys, or null
+   */
+  public static function loadTriggerDataFromLog($queueLogId)
+  {
+    if (empty($queueLogId)) {
+      return null;
+    }
+    $entryLog = new FormEntryLogModel();
+    $rows = $entryLog->get('response_obj', ['id' => absint($queueLogId)]);
+    if (is_wp_error($rows) || empty($rows[0]->response_obj)) {
+      return null;
+    }
+    $rowObj = json_decode($rows[0]->response_obj, true);
+    if (empty($rowObj['trigger'])) {
+      return null;
+    }
+    return self::restoreTriggerTypes($rowObj['trigger']);
   }
 
   /**

@@ -112,6 +112,41 @@ class FormEntryLogModel extends Model
   }
 
   /**
+   * Newest still-queued workflow row of an entry, for callers that hold the
+   * entry id but not the queue log id (the payment endpoints).
+   *
+   * @return object|null row with id and response_obj
+   */
+  public function latestQueuedWorkflowByEntry($entryID)
+  {
+    $sql = "SELECT ld.id, ld.response_obj
+      FROM `{$this->app_db->prefix}bitforms_form_log_details` ld
+      JOIN `{$this->app_db->prefix}bitforms_form_entry_log` el ON el.id = ld.log_id
+      WHERE el.form_entry_id = %d
+        AND ld.integration_id = 0
+        AND ld.response_type = 'queued'
+      ORDER BY ld.id DESC
+      LIMIT 1";
+    $rows = $this->execute($sql, [absint($entryID)])->getResult();
+
+    return is_wp_error($rows) || empty($rows) ? null : $rows[0];
+  }
+
+  /**
+   * Patch a queued row's payload. The 'queued' condition keeps it off rows a
+   * trigger or the reclaim cron has already claimed.
+   *
+   * @return mixed rows affected, or WP_Error
+   */
+  public function updateQueuedWorkflowResponse($queueLogId, array $responseObj)
+  {
+    return $this->update(
+      ['response_obj' => wp_json_encode($responseObj)],
+      ['id' => absint($queueLogId), 'response_type' => 'queued']
+    );
+  }
+
+  /**
    * Latest execution per integration of a form: last run time plus the
    * response_type of that newest log row. integration_id 0 (workflow queue) excluded.
    */

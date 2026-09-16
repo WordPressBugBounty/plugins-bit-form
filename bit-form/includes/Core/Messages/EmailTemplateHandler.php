@@ -17,6 +17,29 @@ final class EmailTemplateHandler
     $this->_user_details = $user_details;
   }
 
+  /**
+   * Decode a stored template `config` column into the object shape the admin editor expects.
+   *
+   * Older versions could persist an empty config as `[]`; decoded, that reaches the React editor
+   * as a JS array and setting a key on it throws inside the immutable-draft library. Anything that
+   * is not a non-empty object collapses to `{}`.
+   *
+   * @param mixed $config raw column value (JSON string, already-decoded value, or null)
+   *
+   * @return object
+   */
+  public static function normalizeConfig($config)
+  {
+    if (is_string($config)) {
+      $config = json_decode($config);
+    }
+    if (is_array($config)) {
+      $config = (object) $config;
+    }
+
+    return is_object($config) ? $config : (object) [];
+  }
+
   public function getAllTemplate($templateID = null, $userID = null)
   {
     $condition = [

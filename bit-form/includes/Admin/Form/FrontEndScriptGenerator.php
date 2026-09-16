@@ -43,15 +43,13 @@ class FrontEndScriptGenerator
           if(!window.bf_globals[contentId]){
             window.bf_globals[contentId] = {inits: {}, contentId: contentId};
           }else{
-            window.bf_globals[contentId].inits = {};
+            if(!window.bf_globals[contentId].inits) window.bf_globals[contentId].inits = {};
             window.bf_globals[contentId].contentId = contentId;
           }
         });
       };
-      // Wait for DOM ready: optimizers can run this before the form markup is
-      // parsed, and the not-found branch would then delete arrived config.
       if(document.readyState === "loading"){
-        document.addEventListener("DOMContentLoaded", bfSetupGlobals);
+        document.addEventListener("DOMContentLoaded", bfSetupGlobals, { once: true });
       } else {
         bfSetupGlobals();
       }

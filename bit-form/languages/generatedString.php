@@ -2006,6 +2006,10 @@ $bitforms_i18n_strings = array(
 
     'Hidden' => __('Hidden', 'bit-form'),
 
+    'Keep this field\'s value even when conditional logic hides it. Use it for calculation and tracking fields.' => __('Keep this field\'s value even when conditional logic hides it. Use it for calculation and tracking fields.', 'bit-form'),
+
+    'Keep value when hidden' => __('Keep value when hidden', 'bit-form'),
+
     'Label' => __('Label', 'bit-form'),
 
     'Duplicate field name' => __('Duplicate field name', 'bit-form'),
@@ -2322,9 +2326,17 @@ $bitforms_i18n_strings = array(
 
     'Import & Edit' => __('Import & Edit', 'bit-form'),
 
+    'Keeps the current options and stops syncing them from the data source' => __('Keeps the current options and stops syncing them from the data source', 'bit-form'),
+
+    'Remove Data Source' => __('Remove Data Source', 'bit-form'),
+
     'Loading ACF fields...' => __('Loading ACF fields...', 'bit-form'),
 
     'Loading Posts...' => __('Loading Posts...', 'bit-form'),
+
+    'Could not load posts for this term. Please update Bit Form Pro to the latest version.' => __('Could not load posts for this term. Please update Bit Form Pro to the latest version.', 'bit-form'),
+
+    'All' => __('All', 'bit-form'),
 
     'Loading Terms...' => __('Loading Terms...', 'bit-form'),
 
@@ -3792,6 +3804,10 @@ $bitforms_i18n_strings = array(
 
     'Prevent empty form submission' => __('Prevent empty form submission', 'bit-form'),
 
+    'Discard values of hidden fields' => __('Discard values of hidden fields', 'bit-form'),
+
+    'When on, a value typed into a field that is later hidden is dropped from the entry, emails, PDFs and integrations. When off, it is submitted as normal. To always keep one field\'s value, use "Keep value when hidden" in its settings.' => __('When on, a value typed into a field that is later hidden is dropped from the entry, emails, PDFs and integrations. When off, it is submitted as normal. To always keep one field\'s value, use "Keep value when hidden" in its settings.', 'bit-form'),
+
     'Disable entry storing in WordPress database' => __('Disable entry storing in WordPress database', 'bit-form'),
 
     'Enable ReCaptcha V3' => __('Enable ReCaptcha V3', 'bit-form'),
@@ -5058,6 +5074,10 @@ $bitforms_i18n_strings = array(
 
     'Please add a submit button' => __('Please add a submit button', 'bit-form'),
 
+    'These fields share the name attribute' => __('These fields share the name attribute', 'bit-form'),
+
+    'Give each one its own name in Field Settings → Advanced → Name Attribute.' => __('Give each one its own name in Field Settings → Advanced → Name Attribute.', 'bit-form'),
+
     'Could not sync layouts before save. Form will be saved with current layout state' => __('Could not sync layouts before save. Form will be saved with current layout state', 'bit-form'),
 
     'Form creation failed' => __('Form creation failed', 'bit-form'),
@@ -5532,9 +5552,9 @@ $bitforms_i18n_strings = array(
 
     'Not Equal' => __('Not Equal', 'bit-form'),
 
-    'Is Null' => __('Is Null', 'bit-form'),
+    'Is Empty' => __('Is Empty', 'bit-form'),
 
-    'Is Not Null' => __('Is Not Null', 'bit-form'),
+    'Is Not Empty' => __('Is Not Empty', 'bit-form'),
 
     'Contain' => __('Contain', 'bit-form'),
 

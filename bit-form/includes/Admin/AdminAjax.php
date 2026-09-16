@@ -18,6 +18,7 @@ use BitCode\BitForm\Core\Integration\Integrations;
 use BitCode\BitForm\Core\Util\IpTool;
 use BitCode\BitForm\Core\Util\MailConfig;
 use BitCode\BitForm\Core\Util\MetaBoxService;
+use BitCode\BitForm\Core\Util\Utilities;
 use BitCode\BitForm\Frontend\Form\FrontendFormManager;
 use BitCode\BitForm\GlobalHelper;
 use WP_Error;
@@ -634,7 +635,7 @@ class AdminAjax
 
   public function getEmailConfig()
   {
-    \ignore_user_abort();
+    Utilities::ignoreUserAbort();
 
     if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $this->verifyAdminPermission();
@@ -663,7 +664,7 @@ class AdminAjax
 
   public function saveEmailConfig()
   {
-    \ignore_user_abort();
+    Utilities::ignoreUserAbort();
     if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
@@ -901,7 +902,7 @@ class AdminAjax
    */
   public function updateForm()
   {
-    \ignore_user_abort();
+    Utilities::ignoreUserAbort();
     if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
@@ -1156,7 +1157,7 @@ class AdminAjax
 
   public function duplicateAForm()
   {
-    \ignore_user_abort();
+    Utilities::ignoreUserAbort();
     if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
@@ -1188,7 +1189,7 @@ class AdminAjax
 
   public function importAForm()
   {
-    \ignore_user_abort();
+    Utilities::ignoreUserAbort();
     if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $this->verifyAdminPermission();
       GlobalHelper::requirePostMethod();
@@ -1469,7 +1470,7 @@ class AdminAjax
 
   public function updateFormEntry()
   {
-    \ignore_user_abort();
+    Utilities::ignoreUserAbort();
     if (isset($_REQUEST['_ajax_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_ajax_nonce'])), 'bitforms_save')) {
       $this->verifyAdminPermission();
       $formHandler = FormHandler::getInstance();

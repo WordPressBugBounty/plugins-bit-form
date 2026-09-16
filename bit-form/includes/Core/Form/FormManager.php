@@ -858,6 +858,9 @@ class FormManager
         if (isset($field->valid->hide)) {
           $field_details[$key]['valid']['hide'] = $field->valid->hide;
         }
+        if (isset($field->valid->keepValueWhenHidden)) {
+          $field_details[$key]['valid']['keepValueWhenHidden'] = $field->valid->keepValueWhenHidden;
+        }
       }
       if ($this->isRepeatedField($key)) {
         $field_details[$key]['repeated'] = true;
@@ -1853,6 +1856,7 @@ class FormManager
   {
     // CSRF verified upstream before this method is called; $_POST/$_FILES are being normalized (field key remapping), not reading new user input.
     $fields = $this->getFields();
+    $consumedNames = [];
     foreach ($fields as $fieldKey => $fieldData) {
       if (array_key_exists('name', $fieldData)) {
         $fldName = $fieldData['name'];
@@ -1862,6 +1866,16 @@ class FormManager
         $fldName = preg_replace($catchChildFldNamePattern, '', $fldName);
         $fldName = str_replace(['.', ' '], '_', $fldName);
         if (!empty($fldName)) {
+          // The second field silently saves nothing; nothing else reports it.
+          if (isset($consumedNames[$fldName]) && !isset($fieldData['parentFieldKey'])) {
+            Log::debug_log([
+              'status'  => 'error',
+              'code'    => 'duplicate_field_name',
+              'message' => "Field {$fieldKey} shares the name attribute \"{$fldName}\" with {$consumedNames[$fldName]}; its submitted value is dropped.",
+              'form_id' => $this->form_id,
+            ]);
+          }
+          $consumedNames[$fldName] = $fieldKey;
           if (array_key_exists($fldName, $_POST)) {
             $temp = $this->sanitize_text_recursive($_POST[$fldName]);
             unset($_POST[$fldName]);

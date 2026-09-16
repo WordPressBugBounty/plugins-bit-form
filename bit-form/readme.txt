@@ -1,7 +1,7 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.3.0
-Stable tag: 3.3.0
+Version: 3.3.1
+Stable tag: 3.3.1
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin
@@ -478,6 +478,29 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.3.1 =
+* Release Date: 24 Sem, 2026
+
+* New:
+    1. **Conditional Blocks in Email and PDF Templates:** Wrap part of a template in `${bf_if:field}` … `${bf_endif}` and it is sent only when that field has a value — so optional blocks, like a list of attendees, stop emailing empty rows. The editor's new Conditional Block menu inserts a block for any field, or wraps your selection.
+    2. **Conditions Can Compare Values:** A block can test the answer, not just whether there is one: `${bf_if:b1-3 contain @gmail.com}`, `${bf_if:b1-9 equal Poland}`, `${bf_if:b1-4 greater 100}`. Operators match conditional logic — equal, not_equal, null, not_null, contain, not_contain, start_with, end_with, greater, less, greater_or_equal, less_or_equal. Combine them with `${bf_if_any:…}`, `${bf_if_all:…}` or `${bf_unless:…}`, add an `${bf_else}` branch, and nest blocks.
+    3. **Discard Values of Hidden Fields:** A new form setting drops the value of a field hidden by conditional logic, so it never reaches the entry, emails, PDFs or integrations. Calculated and tracked values are unaffected, and "Keep value when hidden" in a field's own settings overrides the form setting.
+    4. **Filter Imported Posts by Taxonomy and Term:** A field filled from your posts can now be narrowed to one taxonomy and term, so a post type with several categories no longer pulls in every post. A "Remove Data Source" button detaches the live sync while keeping the synced options. Live sync needs Bit Form Pro 3.3.1; an older Pro shows an update notice.
+
+* Improvements:
+    1. **Webhooks Say Why a URL Was Rejected:** A URL WordPress refuses — an internal host, a host that does not resolve, a port other than 80, 443 or 8080 — now reports the real reason and the filter that allows it, instead of "webhook url is empty" on a URL that was filled in correctly.
+    2. **Documentation Links:** Every "Learn more" link returned a 404. They now open the current Bit Form documentation, and Pro installs get the Pro changelog instead of the Free one.
+
+* Fixes:
+    1. Hiding a field no longer skips validation for another field whose key starts the same, so a form with both `b1-17` and `b1-175` keeps validating and saving both.
+    2. A "Set value" rule no longer writes into a different field whose name attribute merely starts the same.
+    3. Two fields sharing one name attribute are now reported when you save the form, instead of one of them silently saving nothing.
+    4. `${bf_all_data.onlyValues}` now also skips a field left as an empty list, such as a checkbox group with nothing ticked, and two all-data tags in one template no longer interfere.
+    5. Forms no longer break with a fatal "Call to undefined function ignore_user_abort" on hardened hosts such as RunCloud, where that PHP function is disabled. Every Bit Form admin and submission request is affected on PHP 8.
+    6. A reCAPTCHA, hCaptcha or Turnstile widget is now reset after a failed submission, so retrying after a validation error no longer returns "timeout-or-duplicate" instead of the real error. On a page with more than one form, only that form's widget is reset.
+    7. Forms now survive page-speed optimizers that move or re-run scripts, such as Cloudflare Rocket Loader. The form's configuration was wiped on the second run, which left phone number and other custom fields unvalidated.
+    8. WPML no longer re-registers a form's strings on every page load; they are registered once and again only when the form actually changes.
+
 = 3.3.0 =
 * Release Date: 24 August, 2026
 * Heads up:

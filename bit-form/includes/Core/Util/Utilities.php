@@ -160,6 +160,19 @@ final class Utilities
     return is_object($decoded) ? $decoded : null;
   }
 
+  /**
+   * Hardened hosts disable ignore_user_abort in php.ini; PHP 8 fatals on the call instead of warning.
+   *
+   * @param  bool $ignore
+   * @return void
+   */
+  public static function ignoreUserAbort($ignore = true)
+  {
+    if (\function_exists('ignore_user_abort')) {
+      \ignore_user_abort($ignore);
+    }
+  }
+
   public static function duplicateDbTable($oldTableName, $newTableName)
   {
     global $wpdb;

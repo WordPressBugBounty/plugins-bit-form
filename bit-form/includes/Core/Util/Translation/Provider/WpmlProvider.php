@@ -70,11 +70,13 @@ final class WpmlProvider extends AbstractStringRegistrationProvider
   {
     $formId = (int) $formId;
     $strings = RegistrationCollector::collectAllStrings($formId);
-    $this->registerStrings($formId, $strings);
 
-    $hashes = self::hashes();
-    $hashes[$formId] = self::hashStrings($strings);
-    update_option(self::HASH_OPTION, $hashes, false);
+    if ($this->shouldRegisterForm($formId, $strings)) {
+      $this->registerStrings($formId, $strings);
+      $this->afterFormRegistered($formId, $strings);
+    }
+
+    $this->afterRegistrationPass();
   }
 
   /**

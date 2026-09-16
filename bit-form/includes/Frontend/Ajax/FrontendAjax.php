@@ -54,7 +54,7 @@ final class FrontendAjax
 
   public function submit_form()
   {
-    \ignore_user_abort();
+    Utilities::ignoreUserAbort();
     // CSRF verified inside FrontendFormManager::handleSubmission() via verifySubmissionNonce() using HMAC-SHA256 token (Helpers::csrfDecrypted).
     $form_id = isset($_POST['bitforms_id']) ? str_replace('bitforms_', '', sanitize_text_field(wp_unslash($_POST['bitforms_id']))) : '';
     $FrontendFormManager = FrontendFormManager::getInstance($form_id);
@@ -76,7 +76,7 @@ final class FrontendAjax
 
   public function update_entry()
   {
-    \ignore_user_abort();
+    Utilities::ignoreUserAbort();
     // Entry token validated via Helpers::validateEntryTokenAndUser() or capability check; CSRF covered by HMAC-SHA256 token (Helpers::csrfDecrypted).
     $form_id = isset($_POST['bitforms_id']) ? str_replace('bitforms_', '', sanitize_text_field(wp_unslash($_POST['bitforms_id']))) : '';
     if (empty($form_id)) {
@@ -143,7 +143,7 @@ final class FrontendAjax
 
   public function addHiddenFieldAndProperty()
   {
-    \ignore_user_abort();
+    Utilities::ignoreUserAbort();
     $rawInput = file_get_contents('php://input');
     if ($rawInput) {
       $request = is_string($rawInput) ? sanitize_text_field($rawInput) : $rawInput;
@@ -165,7 +165,7 @@ final class FrontendAjax
 
   public function triggerWorkFlow()
   {
-    \ignore_user_abort(true);
+    Utilities::ignoreUserAbort();
 
     $rawInput = file_get_contents('php://input');
 
