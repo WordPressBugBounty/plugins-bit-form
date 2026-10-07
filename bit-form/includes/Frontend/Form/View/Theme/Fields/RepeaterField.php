@@ -147,7 +147,7 @@ class RepeaterField
       $field->removeBtn->btnTyp,
       $field->fieldName,
       $removeBtnPreIcn,
-      $fieldHelpers->renderHTMR($field->removeBtn->txt),
+      $fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->removeBtn->txt)),
       $removeBtnSufIcn
     );
 
@@ -173,7 +173,7 @@ class RepeaterField
           <input
             type="text"
             class="d-none"
-            title="Rpeater Index Hidden Input"
+            title="Repeater Index Hidden Input"
             name="%11$s"
             value=""
             aria-hidden="true"

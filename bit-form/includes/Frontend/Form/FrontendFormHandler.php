@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 use BitCode\BitForm\Admin\Form\AdminFormHandler;
 use BitCode\BitForm\Admin\Form\FrontEndScriptGenerator;
 use BitCode\BitForm\Admin\Form\Helpers;
+use BitCode\BitForm\Core\Cryptography\Cryptography;
 use BitCode\BitForm\Core\Database\FormEntryMetaModel;
 use BitCode\BitForm\Core\Database\FormModel;
 use BitCode\BitForm\Core\Form\FormManager;
@@ -41,24 +42,30 @@ final class FrontendFormHandler
     add_action('wp_footer', [$this, 'generateJS'], 15);
   }
 
-  private function validPassowordResetToken($token, $userID, $formId)
+  /**
+   * A reset form opened from a used or expired link cannot succeed, so show why instead of
+   * the form. Returns the notice markup, or '' when the link is fine or the form is not a
+   * reset form. Rendered in place of the form (the old exit() cut the page off mid-theme).
+   *
+   * @param string $token  key from the reset link
+   * @param string $userID user ID from the reset link
+   * @param int    $formId form being rendered
+   *
+   * @return string
+   */
+  private function invalidPasswordResetNotice($token, $userID, $formId)
   {
     $existResetInteg = (new IntegrationHandler($formId))->getAllIntegration('wp_user_auth', 'wp_auth', 1);
-    if (!is_wp_error($existResetInteg) && count($existResetInteg) > 0) {
-      if ('reset' === $existResetInteg[0]->integration_name) {
-        $user = get_userdata($userID);
-        if ($user) {
-          $validKey = check_password_reset_key($token, $user->user_login);
-          if (is_wp_error($validKey)) {
-            echo "<div id='bf-resp' style='display:grid;justify-content:center;color:#860000;'>This password reset token is invalid.</div>";
-            exit();
-          }
-        } else {
-          echo "<div id='bf-resp' style='display:grid;justify-content:center;color:#860000;'>Invalid User!!</div>";
-          exit();
-        }
-      }
+    if (is_wp_error($existResetInteg) || empty($existResetInteg) || 'reset' !== $existResetInteg[0]->integration_name) {
+      return '';
     }
+    $user = get_userdata((int) $userID);
+    if ($user && !is_wp_error(check_password_reset_key($token, $user->user_login))) {
+      return '';
+    }
+    return "<div id='bf-resp' role='alert' style='display:grid;justify-content:center;color:#860000;'>"
+      . esc_html__('This password reset link is invalid or has expired. Please request a new one.', 'bit-form')
+      . '</div>';
   }
 
   private function getJSFileSrc($postId)
@@ -411,8 +418,11 @@ final class FrontendFormHandler
       return sprintf(__('#%s no. Form doesn\'t exists', 'bit-form'), $formID);
     }
 
-    // Add-ons may detect whether the current visitor is resuming an abandoned entry.
-    $isAbandoned = (bool) apply_filters('bitform_is_abandoned_entry', false, $formID, $entryId, $atts);
+    // Add-ons return the id of the abandoned entry this visitor can resume. A bare
+    // true (older Pro) carries no id, so nothing is restored rather than entry #1.
+    $abandonedEntryId = apply_filters('bitform_is_abandoned_entry', false, $formID, $entryId, $atts);
+    $abandonedEntryId = (!is_bool($abandonedEntryId) && is_numeric($abandonedEntryId)) ? (int) $abandonedEntryId : 0;
+    $isAbandoned = $abandonedEntryId > 0;
 
     FrontendHelpers::setBfFrontendFormIds($formID);
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
@@ -434,7 +444,11 @@ final class FrontendFormHandler
 
     // Read-only: password reset token from URL for display-time validation. No state written until form is submitted.
     if (!empty($_GET['token']) && !empty($_GET['id'])) {
-      $this->validPassowordResetToken(sanitize_text_field(wp_unslash($_GET['token'])), sanitize_text_field(wp_unslash($_GET['id'])), $formID);
+      $resetNotice = $this->invalidPasswordResetNotice(sanitize_text_field(wp_unslash($_GET['token'])), sanitize_text_field(wp_unslash($_GET['id'])), $formID);
+      if ('' !== $resetNotice) {
+        ob_end_clean();
+        return $resetNotice;
+      }
     }
 
     $previousValue = $this->getValuesFromQueryParams();
@@ -617,12 +631,17 @@ final class FrontendFormHandler
       $bitFormFrontArr['validateFocusLost'] = true;
     }
 
-    if (!empty($isAbandoned)) {
+    if ($isAbandoned) {
       // One visitor's typed values, so this response must not be page-cached.
-      $bitFormFrontArr['oldValues'] = $this->getFieldsValue($formID, $isAbandoned);
+      $bitFormFrontArr['oldValues'] = $this->getFieldsValue($formID, $abandonedEntryId);
       self::markResponseUncacheable();
       if (empty($entryId)) {
-        $bitFormFrontArr['entryId'] = $entryId;
+        // Later draft saves must update this entry, not start a new one each time.
+        $bitFormFrontArr['entryId'] = $abandonedEntryId;
+        $entryToken = Cryptography::encrypt($abandonedEntryId, Helpers::getBitformSalt());
+        if (is_string($entryToken)) {
+          $bitFormFrontArr['entryToken'] = $entryToken;
+        }
       }
     }
 
@@ -891,6 +910,10 @@ final class FrontendFormHandler
             $metaVal = implode(BITFORMS_BF_SEPARATOR, $metaVal);
           }
         }
+        // A restored draft never gets the password back; the visitor types it again.
+        if (isset($formFields[$metaKey]['type']) && 'password' === $formFields[$metaKey]['type']) {
+          continue;
+        }
         if (!isset($fldsData->{$metaKey})) {
           $fldsData->{$metaKey} = '';
         }
@@ -944,6 +967,14 @@ final class FrontendFormHandler
           } else {
             $metaVal = implode(BITFORMS_BF_SEPARATOR, $metaVal);
           }
+        }
+        if (property_exists($fields, $metaKey) && 'password' === $fields->{$metaKey}->typ) {
+          // Never hand a stored password back to the browser; blank keeps it on update.
+          $fields->{$metaKey}->val = '';
+          if ('' !== (string) $metaValue->meta_value && isset($fields->{$metaKey}->valid) && is_object($fields->{$metaKey}->valid)) {
+            $fields->{$metaKey}->valid->req = false;
+          }
+          continue;
         }
         if (property_exists($fields, $metaKey)) {
           $fields->{$metaKey}->val = $metaVal;
@@ -1028,7 +1059,7 @@ final class FrontendFormHandler
       if (!wp_style_is('bitform-style-' . $newFormId) && is_readable(BITFORMS_CONTENT_DIR . '/form-styles/bitform-' . $newFormId . '.css')) {
         wp_enqueue_style(
           'bitform-style-' . $newFormId,
-          BITFORMS_UPLOAD_BASE_URL . "/form-styles/bitform-{$newFormId}.css",
+          FrontendHelpers::styleSrc("form-styles/bitform-{$newFormId}.css"),
           [],
           $formUpdateVersion
         );
@@ -1040,7 +1071,7 @@ final class FrontendFormHandler
       if (!wp_style_is('bitform-style-custom-' . $formID) && is_readable(BITFORMS_CONTENT_DIR . '/form-styles/bitform-custom-' . $formID . '.css')) {
         wp_enqueue_style(
           'bitform-style-custom-' . $formID,
-          BITFORMS_UPLOAD_BASE_URL . "/form-styles/bitform-custom-{$formID}.css",
+          FrontendHelpers::styleSrc("form-styles/bitform-custom-{$formID}.css"),
           [],
           $formUpdateVersion
         );
@@ -1055,7 +1086,7 @@ final class FrontendFormHandler
         is_readable(BITFORMS_CONTENT_DIR . "/form-styles/bitform-conversational-{$formID}.css")) {
           wp_enqueue_style(
             'bitform-conversational-style',
-            BITFORMS_UPLOAD_BASE_URL . "/form-styles/bitform-conversational-{$formID}.css",
+            FrontendHelpers::styleSrc("form-styles/bitform-conversational-{$formID}.css"),
             [],
             $formUpdateVersion
           );

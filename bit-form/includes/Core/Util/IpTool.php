@@ -15,55 +15,90 @@ final class IpTool
    */
 
   /**
+   * Stored form of an IP: IPv4 as unsigned number (existing rows), IPv6 as text (numeric form was lossy).
    *
-  ipaddress converted to number digit
-  */
-  private static function ip2Number($ipAdr)
+   * @param mixed $ip IP address
+   *
+   * @return string '' when $ip is not a valid address
+   */
+  public static function storageValue($ip)
   {
-    $ipTobytes = @inet_pton($ipAdr);
-
-    if (!$ipTobytes) {
-      return false;
+    if (!is_string($ip) || false === filter_var($ip, FILTER_VALIDATE_IP)) {
+      return '';
     }
-
-    $number = '';
-    foreach (unpack('C*', $ipTobytes) as $byte) {
-      $number .= str_pad(decbin($byte), 8, '0', STR_PAD_LEFT);
+    if (false !== filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+      return sprintf('%u', ip2long($ip));
     }
+    $packed = inet_pton($ip);
 
-    return base_convert(ltrim($number, '0'), 2, 10);
+    return false === $packed ? '' : (string) inet_ntop($packed);
   }
 
-  private static function validateIpAddress($ip)
+  /**
+   * Readable IP for a stored user_ip value.
+   *
+   * @param mixed $stored Value from user_ip
+   *
+   * @return string IP address, or '' for empty/lossy pre-3.3.2 IPv6 values
+   */
+  public static function displayValue($stored)
   {
-    $ipv4Pattern = '/(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}/';
-    $ipv6Pattern = '/([A-Fa-f0-9]{1,4})\:([A-Fa-f0-9]{1,4})\:([A-Fa-f0-9]{1,4})\:([A-Fa-f0-9]{1,4})\:([A-Fa-f0-9]{1,4})\:([A-Fa-f0-9]{1,4})\:([A-Fa-f0-9]{1,4})\:([A-Fa-f0-9]{1,4})/';
-
-    if (preg_match($ipv4Pattern, $ip, $patternMatchIp)) {
-      $ip = $patternMatchIp[0];
-    } elseif (preg_match($ipv6Pattern, $ip, $patternMatchIp)) {
-      $ip = $patternMatchIp[0];
+    $stored = trim((string) $stored);
+    if ('' === $stored) {
+      return '';
+    }
+    if (ctype_digit($stored)) {
+      return (strlen($stored) <= 10 && (float) $stored <= 4294967295) ? long2ip((int) $stored) : '';
     }
 
-    return $ip;
+    return false === filter_var($stored, FILTER_VALIDATE_IP) ? '' : $stored;
+  }
+
+  /**
+   * First valid IP in a client-controlled header value; anything else is rejected (injection guard).
+   *
+   * @param mixed $value Raw header value
+   *
+   * @return string IP address, or ''
+   */
+  public static function extractValidIp($value)
+  {
+    if (!is_string($value) || '' === $value) {
+      return '';
+    }
+
+    $ipv4Pattern = '/(?<![\d.])(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}(?![\d.])/';
+
+    foreach (preg_split('/[\s,;]+/', $value) as $part) {
+      $part = trim(preg_replace('/^for=/i', '', $part), "\"'");
+      if (preg_match('/^\[([^\]]+)\]/', $part, $bracketed)) {
+        $part = $bracketed[1];
+      }
+
+      if (false !== filter_var($part, FILTER_VALIDATE_IP)) {
+        return $part;
+      }
+
+      // IPv4 with port, e.g. "203.0.113.7:8080"
+      if (preg_match($ipv4Pattern, $part, $match) && false !== filter_var($match[0], FILTER_VALIDATE_IP)) {
+        return $match[0];
+      }
+    }
+
+    return '';
   }
 
   private static function _checkIP()
   {
-    if (getenv('HTTP_CLIENT_IP')) {
-      $ip = getenv('HTTP_CLIENT_IP');
-    } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
-      $ip = getenv('HTTP_X_FORWARDED_FOR');
-    } elseif (getenv('HTTP_X_FORWARDED')) {
-      $ip = getenv('HTTP_X_FORWARDED');
-    } elseif (getenv('HTTP_FORWARDED_FOR')) {
-      $ip = getenv('HTTP_FORWARDED_FOR');
-    } elseif (getenv('HTTP_FORWARDED')) {
-      $ip = getenv('HTTP_FORWARDED');
-    } else {
-      $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '';
+    $headers = ['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED'];
+    foreach ($headers as $header) {
+      $ip = IpTool::extractValidIp(getenv($header));
+      if ('' !== $ip) {
+        return $ip;
+      }
     }
-    return IpTool::validateIpAddress($ip);
+
+    return IpTool::extractValidIp(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '');
   }
 
   /**
@@ -308,7 +343,7 @@ final class IpTool
   private static function _setUserDetail()
   {
     $referer = wp_get_referer();
-    $user_details['ip'] = IpTool::ip2Number(IpTool::_checkIP());
+    $user_details['ip'] = IpTool::storageValue(IpTool::_checkIP());
     $user_details['device'] = IpTool::_checkDevice();
     $user_details['id'] = get_current_user_id();
     $user_details['page'] = $referer ? $referer : '';
@@ -330,7 +365,7 @@ final class IpTool
   /**
    * Provide user IP address
    *
-   * @return ip
+   * @return string IP address, or ''
    */
   public static function getIP()
   {

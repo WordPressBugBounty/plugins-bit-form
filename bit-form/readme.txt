@@ -1,7 +1,7 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.3.1
-Stable tag: 3.3.1
+Version: 3.3.2
+Stable tag: 3.3.2
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin
@@ -16,17 +16,17 @@ Contact Form Builder for WordPress with payment forms, multistep forms, conversa
 
 == Description ==
 
-Bit Form WordPress form builder makes form building easy for beginners and flexible for advanced users.
+Bit Form is a advance, feature-rich contact form builder makes form building easy for beginners and flexible for advanced users.
 
-Build mobile-responsive forms with a **no-code drag-and-drop builder**, powerful features, and **highly customizable** design controls for any use cases.
+Build mobile-responsive form with a **no-code drag-and-drop builder**, powerful features, and **highly customizable** design controls for any use cases.
 
 You can use Bit Form to build a contact form, support form, lead generation form, registration form, file upload form, order form, booking form, survey form, payment form, calculator form, conversational form, and multistep form from one clean interface.
 
-### Bit Form keeps forms lightweight and only loads 20KB JS & CSS for simple contact forms.
+### lightweight contact form builder (loads only 20KB JS & CSS*).
 
-Bit Form is built for both beginners and advanced WordPress users. If you need a simple contact form, you can create one quickly.
+Bit Form is lightweight form builder, loads 20KB JS & CSS for normal contact form. If you need a simple contact form, you can create one quickly.
 
-If you need a complex form with **conditional logic, calculations, payment fields, file upload, PDF attachments, email notifications, integrations, and entry management,** Bit Form gives you the tools to build it with minimum effort.
+If you need a advance form with **conditional logic, calculations, payment fields, file upload, PDF attachments, email notifications, integrations, and entry management,** Bit Form gives you the tools to build it with easily.
 
 [youtube https://youtu.be/BUX6-BIPfSA]
 
@@ -37,8 +37,6 @@ If you need a complex form with **conditional logic, calculations, payment field
 
 
 ### Features of Bit Form Free Version
-
-Bit Form Free includes:
 
 - Unlimited forms
 - Unlimited form submissions
@@ -52,7 +50,7 @@ Bit Form Free includes:
 - SMTP support
 - Form integrations and webhooks
 - Essential Form styling
-- Responsive forms
+- Responsive form
 - reCAPTCHA v3
 - reCAPTCHA v2 field
 - hCaptcha field
@@ -75,9 +73,9 @@ It also adds WordPress **multisite support, email OTP verification**, responsive
 
 For design, V3 improves the style editor with **custom theme management, export/import options, organized style layers, and hover/focus styling**.
 
-### 51 Form Fields Available in Bit Form
+### 51 Form Fields make it powerful contact form builder
 
-Bit Form includes a wide range of form fields for simple and advanced form creation. You can build a basic contact form, detailed application form, payment form, file upload form, multistep form, support form, order form, booking form, and more.
+Bit Form includes a wide range of form fields that help create simple and advanced contact form. You can build a basic contact form, detailed application form, payment form, file upload form, multistep form, support form, order form, booking form, and more.
 
 == Free Form Fields ==
 
@@ -173,11 +171,9 @@ These fields help you create many types of WordPress forms without depending on 
 * Draft button field
 * **Advanced date-time field**
 
-Note: Bit Form Pro is distributed separately from this plugin. The free version of Bit Form is fully functional with its own feature set.
-
 ### What You Can Build With Bit Form
 
-Bit Form is more than a basic contact form plugin. You can create many types of WordPress forms for different business, marketing, support, and payment needs. Use Bit Form to create:
+Bit Form is more than a basic contact form builder. You can create any types of WordPress forms for different business, marketing, support, and payment needs.
 
 * **Contact form** for websites, blogs, landing pages, and business sites
 * **Lead generation form** for collecting prospects and customer details
@@ -199,7 +195,7 @@ Whether you need one simple form or many advanced forms, Bit Form gives you a fl
 
 ### Free Form Integrations
 
-This WordPress form builder plugin includes [**50+ free integrations**](https://bit-form.com/integrations/) with many platforms. These integrations help you send form data to CRM tools, email marketing tools, spreadsheets, automation platforms, file storage services, messaging apps, WordPress plugins, and webhook-based workflows.
+You can integrate [**50+ (free)**](https://bit-form.com/integrations/) platforms with contact form. It helps you send form data to CRM tools, email marketing tools, spreadsheets, automation platforms, WordPress plugins, and webhook-based workflows.
 
 1. AutomatorWP
 2. FlowMattic
@@ -269,7 +265,7 @@ For simple contact forms, Bit Form loads only **20KB JS & CSS**. The exact load 
 
 Bit Form still handles advanced forms in a well-optimized way. It gives you both: simple form creation for beginners and **advanced form control for power users**.
 
-### Form Settings for Better Control
+### Form Settings
 
 Bit Form gives you detailed form settings so you can control how your forms behave. Available form settings include:
 - Allow single entry for each IP address
@@ -321,7 +317,7 @@ By using payment fields, you can collect payments through a form easily. You can
 
 ### Multistep Forms and Conversational Forms
 
-Long forms can feel hard to complete when everything appears on one screen. Bit Form supports multistep forms, so you can divide longer forms into smaller sections.
+Long contact form can feel hard to complete when everything appears on one screen. Bit Form supports multistep forms, so you can divide longer contact form into smaller sections.
 
 Bit Form also supports conversational forms. A conversational form shows questions in a step-by-step flow, which can work well for lead generation, feedback, applications, and guided form experiences.
 
@@ -478,8 +474,55 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.3.2 =
+* Release Date: 7 October, 2026
+
+* Heads up:
+    1. **Captchas Need Their Keys:** Forms using reCAPTCHA, hCaptcha or Turnstile now reject submissions if the secret key is missing in App Settings. Re-add the keys or remove the captcha.
+    2. **reCAPTCHA v3 Tolerance:** A blank Tolerance Level now uses the default 0.6 instead of accepting every score.
+    3. **Password Values Are No Longer Stored:** Every Password field is now saved as "**** (encrypted)", and integrations receive that masked value. WooCommerce gives new customers a random password they can reset. Developers can turn this off with the `bitform_mask_password_values` filter.
+    4. **Address Autocomplete Uses Places API (New):** Enable "Places API (New)" and "Maps JavaScript API" for your Google key, or autocomplete and the map stop working.
+
+* Security:
+    1. **Visitor IP Address:** Only valid IP addresses are accepted from proxy headers, and the "IP blocked" message is escaped.
+    2. **reCAPTCHA v3:** A score of 0.0 is now rejected.
+    3. **Password Fields:** Passwords are never shown in edit forms or restored drafts. Leaving the field blank keeps the stored password, and the edit log only records that it changed.
+    4. **Field Values in Form Markup:** The Checked Value of Decision Box and GDPR Agreement fields and the reCAPTCHA v2 and hCaptcha theme and size are now escaped.
+    5. **Submitted Choices Checked on the Server:** Image Select only accepts its own options (one, unless multiple choice is on). Repeater row limits (Pro), Advanced File Upload Max Files and Min File Size (Pro) and unreadable signatures (Pro) are now rejected by the server too.
+    6. **Captcha Secret Keys:** App Settings now hide the reCAPTCHA, hCaptcha and Turnstile secret key behind a show/hide toggle.
+
+* New:
+    1. **Live Smart Tags in HTML Elements:** Field Smart Tags such as `${b1-3}` in an HTML element now fill in as the visitor types.
+
+* Improvements:
+    1. **Caching and Optimization Plugins:** Forms keep their styling on sites that combine, minify or remove unused CSS (WP Rocket, LiteSpeed Cache, Autoptimize, SiteGround Optimizer, Jetpack Boost, Hummingbird, W3 Total Cache, FlyingPress, Perfmatters and others). Developers can adjust the exclusions with the `bitform_cache_style_exclusion_patterns` filter.
+    2. **Translatable Theme Settings:** The theme gallery, the Create and Import theme windows, the label alignment menu and all theme messages can now be translated.
+    3. **More Form Settings Are Free:** "Allow single entry for each IP address", "Prevent empty form submission" and "Disable entry storing in WordPress database" no longer need Bit Form Pro. New blank forms now prevent empty submissions by default.
+    4. **Address Autocomplete:** Suggestions now come from Google Places API (New) and can be picked with the keyboard. Setup problems are reported in the browser console.
+    5. **Builder Text:** Typos and brand names are corrected across the form builder and settings ("Checkbox", "Placeholder", "PayPal", "reCAPTCHA", "Indian Rupee", "Label Position"), and the remaining English-only labels can now be translated.
+
+* Fixes:
+    1. **Payment Fields (Pro):** If the form fails to submit after a successful payment, clicking the payment button again resubmits the form instead of charging the customer a second time. The Fixed amount type in Stripe, Mollie and PayPal now charges the fixed amount instead of the dynamic amount field.
+    2. **Form Styling:** A form no longer shows unstyled after you save it on sites whose CDN or cache kept the old stylesheet, and forms on pages with no `<!DOCTYPE html>` no longer pick up styles from look-alike class names (open the form in the builder and click Update to apply).
+    3. **Name, Address and Confirm Fields:** Renaming a Name or Address field (or importing a form with old names) no longer saves its value empty, and renaming an Email or Password field that has a confirm field no longer fails every submission with "The entered values do not match." Their Smart Tags show the joined parts ("Jordan Lee"). Existing forms are repaired when you update.
+    4. **Dropbox and OneDrive:** With "Delete File From WordPress" on, a file is removed from your site only after it reaches Dropbox or OneDrive, so a failed upload no longer loses it.
+    5. **Save Draft (Pro):** Logged-in visitors get their own draft back instead of entry #1's answers, a guest's draft keeps every later change, and a saved draft no longer lets a visitor bypass Single Entry Per IP.
+    6. **IPv6 Visitors:** Single entry per IP and the per-user IP limit now work for IPv6, and IPv6 addresses are stored and exported correctly (new entries only).
+    7. **Access Rules (Pro):** A hidden, earlier Custom Date range no longer closes the form, turning off one blocked address no longer switches on Allowed IP, and the Allowed IP message shows over the form like other rules (open the form in the builder and click Update to apply).
+    8. **Captcha:** The reCAPTCHA v3 token is verified once and the log shows the real result, the Tolerance Level box shows its full value, and Turnstile tokens are no longer saved as entry data or shown in exports.
+    9. **Field Validation:** Number and URL fields show their Invalid Error Message for text such as "12abc". Currency checks the real amount (not "1" for "$1,500.00") and Symbol Position works. Phone Number selects the default country, applies a custom RegEx pattern and replaces the dial code when the country changes.
+    10. **Date Fields:** Date, time, week, month and Date Time (Advanced, Pro) conditions give the same result in the browser and on submit, the picked time is kept, and range messages show readable dates.
+    11. **Slider Field:** A slider whose default is not a number no longer breaks the form on PHP 8, and Min equal to Max no longer errors.
+    12. **Repeater Field:** Row limits (Pro) are compared as numbers ("10" is no longer less than "2"), and a Maximum Row of 0 means no limit.
+    13. **Advanced File Upload and Signature (Pro):** Cropped or resized images upload as edited, Max Files and server upload errors are shown, `image/*` type rules work, and Readonly and Disabled apply. The Signature Clear icon settings and Pen Width range are fixed.
+    14. **Choice Fields:** Editing options as text keeps their Checked, Required, Disabled and image settings, and a multiple-choice Image Select matches every chosen option in conditional logic.
+    15. **Text Kept as Typed:** Multiline Text keeps line breaks in the saved entry, and the Title element keeps its spaces and line breaks.
+    16. **Themes:** The Theme button shows the applied theme after a reload, new and duplicated themes start from the base theme you pick (Pro), theme cards show every color, and PRO badges open the upgrade window.
+    17. **Form Builder:** Button Type choices (Submit, Reset, Step buttons, Save Draft style) work again, an empty Image Width or Height means auto, Size & Position works inside a Section or Repeater, and Pro-only settings saved earlier no longer show without Pro.
+    18. **User Registration and Password Reset (Pro):** Name and Address parts mapped to user fields are saved to the profile, Redirect Page mode in the activation settings is kept, and a used or expired reset link shows its notice inside the page.
+
 = 3.3.1 =
-* Release Date: 24 Sem, 2026
+* Release Date: 16 September, 2026
 
 * New:
     1. **Conditional Blocks in Email and PDF Templates:** Wrap part of a template in `${bf_if:field}` … `${bf_endif}` and it is sent only when that field has a value — so optional blocks, like a list of attendees, stop emailing empty rows. The editor's new Conditional Block menu inserts a block for any field, or wraps your selection.

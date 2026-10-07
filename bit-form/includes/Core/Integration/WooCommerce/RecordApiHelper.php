@@ -8,6 +8,7 @@
 namespace BitCode\BitForm\Core\Integration\WooCommerce;
 
 use BitCode\BitForm\Core\Database\FormEntryLogModel;
+use BitCode\BitForm\Core\Form\FormManager;
 use BitCode\BitForm\Core\Util\ApiResponse as UtilApiResponse;
 use BitCode\BitForm\Core\Util\FileHandler;
 use WC_Product_Download;
@@ -156,6 +157,14 @@ class RecordApiHelper
 
       if (isset($id)) {
         $fieldData['ID'] = $id;
+      }
+      // Passwords reach integrations masked, never as typed. Keep an existing customer's
+      // password; give a new customer a random one (they can reset it).
+      if (!isset($fieldData['user_pass']) || '' === $fieldData['user_pass'] || FormManager::PASSWORD_MASK === $fieldData['user_pass']) {
+        unset($fieldData['user_pass']);
+        if (!isset($id)) {
+          $fieldData['user_pass'] = wp_generate_password(24);
+        }
       }
 
       $user_id = wp_insert_user($fieldData);

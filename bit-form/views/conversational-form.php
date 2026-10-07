@@ -3,6 +3,7 @@
 // This file is included via Render::view() using extract(); all variables below are in the calling method's local scope, not global namespace.
 
 use BitCode\BitForm\Core\Util\EscapingHelper;
+use BitCode\BitForm\Core\Util\FrontendHelpers;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -19,18 +20,18 @@ $baseConversationalCSSPath = "/form-styles/bitform-conversational-{$formID}.css"
 $customCSSPath = "/form-styles/bitform-custom-{$formID}.css";
 $standaloneCSSPath = "/form-styles/bitform-standalone-{$formID}.css";
 
-wp_register_style('bitform-conversational-base-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $baseCSSPath, [], $formUpdateVersion);
-wp_register_style('bitform-conversational-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $baseConversationalCSSPath, [], $formUpdateVersion);
+wp_register_style('bitform-conversational-base-' . $formIdSafe, FrontendHelpers::styleSrc($baseCSSPath), [], $formUpdateVersion);
+wp_register_style('bitform-conversational-' . $formIdSafe, FrontendHelpers::styleSrc($baseConversationalCSSPath), [], $formUpdateVersion);
 wp_enqueue_style('bitform-conversational-base-' . $formIdSafe);
 wp_enqueue_style('bitform-conversational-' . $formIdSafe);
 
 if (file_exists(BITFORMS_CONTENT_DIR . $customCSSPath)) {
-  wp_register_style('bitform-conversational-custom-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $customCSSPath, [], $formUpdateVersion);
+  wp_register_style('bitform-conversational-custom-' . $formIdSafe, FrontendHelpers::styleSrc($customCSSPath), [], $formUpdateVersion);
   wp_enqueue_style('bitform-conversational-custom-' . $formIdSafe);
 }
 
 if (file_exists(BITFORMS_CONTENT_DIR . $standaloneCSSPath)) {
-  wp_register_style('bitform-conversational-standalone-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $standaloneCSSPath, [], $formUpdateVersion);
+  wp_register_style('bitform-conversational-standalone-' . $formIdSafe, FrontendHelpers::styleSrc($standaloneCSSPath), [], $formUpdateVersion);
   wp_enqueue_style('bitform-conversational-standalone-' . $formIdSafe);
 }
 

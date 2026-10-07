@@ -5,6 +5,7 @@ namespace BitCode\BitForm\Core\Form\Validator;
 use BitCode\BitForm\Core\Database\FormEntryMetaModel;
 use BitCode\BitForm\Core\Form\FormManager;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
+use BitCode\BitForm\Core\Util\FileHandler;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
 
@@ -70,6 +71,9 @@ final class FormFieldValidator
           }
         }
       }
+      if ('repeater' === $field_data['type']) {
+        $this->validateRepeaterRowCount($field_name, $field_data, $hidden_fields, $formID);
+      }
       $submittedFieldData = isset($this->_submitted_fields[$field_name]) ? $this->_submitted_fields[$field_name] : null;
 
       if (('file-up' === $field_data['type'] || 'advanced-file-up' === $field_data['type']) && isset($this->_submitted_files[$field_name]['name'])) {
@@ -95,6 +99,20 @@ final class FormFieldValidator
       if (isset($this->_submitted_fields[$field_name])) {
         $values = $this->_submitted_fields[$field_name];
         $this->_form_fields[$field_name]['value'] = FieldValueHandler::isEmpty($values) ? null : $values;
+      }
+
+      // Files uploaded on select never reach FileHandler::validation() again, so count them here.
+      if ('advanced-file-up' === $field_data['type'] && !FrontendHelpers::isFieldHidden($hidden_fields, $field_name)) {
+        $maxFilesError = FileHandler::getMaxFilesErrorForField(
+          $formID,
+          $field_name,
+          isset($this->_submitted_fields[$field_name]) ? $this->_submitted_fields[$field_name] : null,
+          isset($this->_submitted_files[$field_name]['name']) ? $this->_submitted_files[$field_name]['name'] : null
+        );
+        if ('' !== $maxFilesError) {
+          $this->_messages[$field_name] = $maxFilesError;
+          continue;
+        }
       }
 
       if (
@@ -154,7 +172,26 @@ final class FormFieldValidator
             $this->validateConfirmField($field_name, $field_data);
             break;
           }
+          case 'image-select': {
+            if (!$this->isAllowedImageSelectValue($this->_submitted_fields[$field_name], $field_data)) {
+              $this->_messages[$field_name]
+                  = !empty($field_data['valid']['typMsg']) ?
+                  $field_data['valid']['typMsg'] :
+                  sprintf(
+                    /* translators: %s: field label */
+                    __('%s has an option that is not available. Please choose again.', 'bit-form'),
+                    $field_data['label']
+                  );
+            }
+            break;
+          }
           case 'address': {
+            break;
+          }
+          case 'signature': {
+            if (!$this->validateSignature($this->_submitted_fields[$field_name], $field_name, $formID)) {
+              $this->_messages[$field_name] = $field_data['label'] . __(' could not be read. Please clear the signature and sign again.', 'bit-form');
+            }
             break;
           }
           case 'time': {
@@ -177,19 +214,13 @@ final class FormFieldValidator
           }
           case 'number': {
             if (!$this->validateNumber($this->_submitted_fields[$field_name])) {
-              $this->_messages[$field_name]
-                  = !empty($field_data['valid']['typMsg']) ?
-                  $field_data['valid']['typMsg'] :
-                  $field_data['label'] . __(' should be a number', 'bit-form');
+              $this->_messages[$field_name] = $this->invalidMessage($field_data, $field_data['label'] . __(' should be a number', 'bit-form'));
             }
             break;
           }
           case 'url': {
             if (!$this->validateURL($this->_submitted_fields[$field_name])) {
-              $this->_messages[$field_name]
-                  = !empty($field_data['valid']['typMsg']) ?
-                  $field_data['valid']['typMsg'] :
-                  $field_data['label'] . __(' should be an URL', 'bit-form');
+              $this->_messages[$field_name] = $this->invalidMessage($field_data, $field_data['label'] . __(' should be an URL', 'bit-form'));
             }
             break;
           }
@@ -243,6 +274,10 @@ final class FormFieldValidator
       return false;
     }
     $type = isset($field_data['type']) ? $field_data['type'] : '';
+    if ('password' === $type) {
+      // Edit forms are not prefilled with the password; left blank, the stored one is kept.
+      return null === $rowIndex && $this->hasStoredValue($field_name);
+    }
     if (!in_array($type, ['file-up', 'advanced-file-up', 'signature'], true)) {
       return false;
     }
@@ -263,6 +298,54 @@ final class FormFieldValidator
     }
 
     return !empty(array_intersect($retained, $this->getStoredValues($field_name)));
+  }
+
+  /**
+   * Image Select choices must be options of the field: the browser cannot be trusted to
+   * send only rendered values, and a single-choice field accepts one value.
+   *
+   * @param mixed $value      Submitted value (string, or list for multiple choice)
+   * @param array $field_data Field from getFields()
+   * @return bool
+   */
+  private function isAllowedImageSelectValue($value, $field_data)
+  {
+    if (empty($field_data['options']) || !is_array($field_data['options'])) {
+      return true;
+    }
+    $values = is_array($value) ? $value : explode(BITFORMS_BF_SEPARATOR, (string) $value);
+    $values = array_values(array_filter(array_map('strval', $values), function ($item) {
+      return '' !== $item;
+    }));
+    if (empty($field_data['multiple']) && count($values) > 1) {
+      return false;
+    }
+    foreach ($values as $item) {
+      if (!in_array($item, $field_data['options'], true)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Whether the edited entry holds a non-empty value for a field.
+   *
+   * @param string $field_name
+   * @return bool
+   */
+  private function hasStoredValue($field_name)
+  {
+    $entryMeta = new FormEntryMetaModel();
+    $stored = $entryMeta->get(
+      'meta_value',
+      [
+        'bitforms_form_entry_id' => $this->_entryID,
+        'meta_key'               => $field_name,
+      ]
+    );
+
+    return !is_wp_error($stored) && is_array($stored) && count($stored) > 0 && '' !== (string) $stored[0]->meta_value;
   }
 
   /**
@@ -372,6 +455,12 @@ final class FormFieldValidator
           $this->validateConfirmFieldRow($field_name, $field_data, $rowIndex);
           break;
         }
+        case 'signature': {
+          if (!$this->validateSignature($this->_submitted_fields[$field_name][$rowIndex], $field_name, $formID)) {
+            $this->_messages[$messageKey] = $field_data['label'] . __(' could not be read. Please clear the signature and sign again.', 'bit-form');
+          }
+          break;
+        }
         case 'time': {
           if (!$this->validateTime($this->_submitted_fields[$field_name][$rowIndex])) {
             $this->_messages[$messageKey]
@@ -433,6 +522,95 @@ final class FormFieldValidator
           break;
       }
     }
+  }
+
+  /**
+   * Rejects a repeater whose row count is outside the Minimum/Maximum Row set in the builder.
+   * The browser's Add/Remove buttons stop at those limits; a crafted request does not.
+   *
+   * @param string     $field_name
+   * @param array      $field_data
+   * @param array      $hidden_fields
+   * @param int|string $formID
+   * @return void
+   */
+  private function validateRepeaterRowCount($field_name, $field_data, $hidden_fields, $formID)
+  {
+    // Row limits are a Pro setting; without Pro the browser does not apply them either, so
+    // enforcing stale saved limits here would reject forms the visitor could not correct.
+    if (!defined('BITFORMPRO_PLUGIN_DIR_PATH') || empty($field_data['name'])) {
+      return;
+    }
+    $indexKey = $field_data['name'] . '-repeat-index';
+    if (!isset($this->_submitted_fields[$indexKey]) || !is_scalar($this->_submitted_fields[$indexKey])) {
+      return;
+    }
+    if (FrontendHelpers::isFieldHidden($hidden_fields, $field_name)) {
+      return;
+    }
+    $fieldDetails = $this->getFieldDetails($field_name, $formID);
+    if (!is_object($fieldDetails)) {
+      return;
+    }
+    $minRow = isset($fieldDetails->minRow) && is_numeric($fieldDetails->minRow) ? (int) $fieldDetails->minRow : 0;
+    $maxRow = isset($fieldDetails->maxRow) && is_numeric($fieldDetails->maxRow) ? (int) $fieldDetails->maxRow : 0;
+
+    $rowIndexes = array_filter(explode(',', (string) $this->_submitted_fields[$indexKey]), static function ($index) {
+      return '' !== trim($index);
+    });
+    $errKey = self::rowCountErrorKey(count($rowIndexes), $minRow, $maxRow);
+    if ('minRow' === $errKey) {
+      /* translators: %d: minimum number of repeater rows */
+      $this->_messages[$field_name] = $this->rowCountMessage($fieldDetails, 'minRow', sprintf(__('Minimum Repeatable Row is %d', 'bit-form'), $maxRow > 0 ? min($minRow, $maxRow) : $minRow));
+    } elseif ('maxRow' === $errKey) {
+      /* translators: %d: maximum number of repeater rows */
+      $this->_messages[$field_name] = $this->rowCountMessage($fieldDetails, 'maxRow', sprintf(__('Maximum Repeatable Row is %d', 'bit-form'), $maxRow));
+    }
+  }
+
+  /**
+   * Which row limit a count breaks. A limit below 1 is unset, and a maximum below the
+   * minimum wins, as in the browser.
+   *
+   * @param int $rowCount
+   * @param int $minRow
+   * @param int $maxRow
+   * @return string 'minRow', 'maxRow', or '' when within limits
+   */
+  private static function rowCountErrorKey($rowCount, $minRow, $maxRow)
+  {
+    if ($maxRow > 0 && $minRow > $maxRow) {
+      $minRow = $maxRow;
+    }
+    if ($minRow > 0 && $rowCount < $minRow) {
+      return 'minRow';
+    }
+    if ($maxRow > 0 && $rowCount > $maxRow) {
+      return 'maxRow';
+    }
+    return '';
+  }
+
+  /**
+   * The repeater's own Min/Max Error Message (custom first, then its default), else the fallback.
+   *
+   * @param object $fieldDetails
+   * @param string $errKey
+   * @param string $fallback
+   * @return string
+   */
+  private function rowCountMessage($fieldDetails, $errKey, $fallback)
+  {
+    $err = isset($fieldDetails->err->{$errKey}) ? $fieldDetails->err->{$errKey} : null;
+    if (is_object($err)) {
+      if (!empty($err->custom) && !empty($err->msg)) {
+        return $err->msg;
+      }
+      if (!empty($err->dflt)) {
+        return $err->dflt;
+      }
+    }
+    return $fallback;
   }
 
   public function getMessage()
@@ -509,6 +687,27 @@ final class FormFieldValidator
     }
   }
 
+  /**
+   * Whether a posted signature decodes to a storable image. Checked here because the file is
+   * written after the entry and its integrations run, too late to tell the visitor.
+   *
+   * @param mixed      $value
+   * @param string     $fieldKey
+   * @param int|string $formID
+   * @return bool
+   */
+  private function validateSignature($value, $fieldKey, $formID)
+  {
+    $fieldDetails = $this->getFieldDetails($fieldKey, $formID);
+    $imgType = isset($fieldDetails->config->imgTyp) ? $fieldDetails->config->imgTyp : 'image/png';
+    try {
+      FormManager::decodeSignatureData($value, $imgType);
+    } catch (\Throwable $e) {
+      return false;
+    }
+    return true;
+  }
+
   private function validateEmail($value)
   {
     if (is_array($value)) {
@@ -531,6 +730,24 @@ final class FormFieldValidator
   private function validateTime($value)
   {
     return preg_match('/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/', $value);
+  }
+
+  /**
+   * Legacy typMsg first, then the field's "Invalid Error Message" setting, then the generic text.
+   *
+   * @param array  $field_data
+   * @param string $fallback
+   * @return string
+   */
+  private function invalidMessage($field_data, $fallback)
+  {
+    if (!empty($field_data['valid']['typMsg'])) {
+      return $field_data['valid']['typMsg'];
+    }
+    if (!empty($field_data['valid']['invalidMsg'])) {
+      return $field_data['valid']['invalidMsg'];
+    }
+    return $fallback;
   }
 
   private function validatePhone($value)

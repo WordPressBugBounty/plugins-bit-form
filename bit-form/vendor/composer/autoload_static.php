@@ -260,6 +260,7 @@ class ComposerStaticInit835a75bca87391345e39b3cfab692dde
         'BitCode\\BitForm\\Core\\Util\\WpFileHandler' => __DIR__ . '/../..' . '/includes/Core/Util/WpFileHandler.php',
         'BitCode\\BitForm\\Core\\WorkFlow\\Actions' => __DIR__ . '/../..' . '/includes/Core/WorkFlow/Actions.php',
         'BitCode\\BitForm\\Core\\WorkFlow\\ConditionalLogic' => __DIR__ . '/../..' . '/includes/Core/WorkFlow/ConditionalLogic.php',
+        'BitCode\\BitForm\\Core\\WorkFlow\\DateConditionComparator' => __DIR__ . '/../..' . '/includes/Core/WorkFlow/DateConditionComparator.php',
         'BitCode\\BitForm\\Core\\WorkFlow\\Helper' => __DIR__ . '/../..' . '/includes/Core/WorkFlow/Helper.php',
         'BitCode\\BitForm\\Core\\WorkFlow\\WorkFlow' => __DIR__ . '/../..' . '/includes/Core/WorkFlow/WorkFlow.php',
         'BitCode\\BitForm\\Core\\WorkFlow\\WorkFlowHandler' => __DIR__ . '/../..' . '/includes/Core/WorkFlow/WorkFlowHandler.php',

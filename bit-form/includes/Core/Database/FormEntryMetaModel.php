@@ -7,6 +7,7 @@
 namespace BitCode\BitForm\Core\Database;
 
 use BitCode\BitForm\Core\Util\FileHandler;
+use BitCode\BitForm\Core\Util\IpTool;
 
 /**
  * Manages entry meta (per-field values) for each form submission.
@@ -572,7 +573,7 @@ class FormEntryMetaModel extends Model
         if ('__user_id' === $formFieldName && intval($value->$formFieldName) > 0) {
           $allData[$key][$formFieldName] = $userNames[$value->$formFieldName] ?? '';
         } elseif ('__user_ip' === $formFieldName) {
-          $allData[$key][$formFieldName] = long2ip((int) $value->$formFieldName);
+          $allData[$key][$formFieldName] = IpTool::displayValue($value->$formFieldName);
         } elseif ('__entry_status' === $formFieldName) {
           $allData[$key][$formFieldName] = $entryStatus[$value->{$formFieldName}] ?? '';
         } else {

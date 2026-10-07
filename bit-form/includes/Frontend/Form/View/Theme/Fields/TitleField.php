@@ -22,10 +22,12 @@ class TitleField
       $tag = 'h2';
     }
 
+    // the title is a flex container, so loose text and inline tags would each become a flex
+    // item and lose the spaces between them; one span keeps the text a single flex item
     return sprintf(
       '      <%1$s class="%2$s %3$s">
       %4$s
-      %5$s
+      <span class="%7$s">%5$s</span>
       %6$s
       </%1$s>',
       $tag,
@@ -33,7 +35,8 @@ class TitleField
       $fieldHelpers->getCustomClasses($cls),
       $preIcn,
       $fieldHelpers->kses_post($text),
-      $sufIcn
+      $sufIcn,
+      $fieldHelpers->getAtomicCls("{$cls}-txt")
     );
   }
 

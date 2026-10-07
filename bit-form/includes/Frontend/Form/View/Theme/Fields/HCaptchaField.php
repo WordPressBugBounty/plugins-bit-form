@@ -44,8 +44,8 @@ class HCaptchaField
       $fieldHelpers->getAtomicCls('fld-wrp'),
       $fieldHelpers->getCustomClasses('fld-wrp'),
       $rowID,
-      $theme,
-      $size,
+      $fieldHelpers->esc_attr($theme),
+      $fieldHelpers->esc_attr($size),
       $fieldHelpers->esc_attr($siteKey)
     );
   }

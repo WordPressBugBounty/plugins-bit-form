@@ -30,7 +30,7 @@ class DecisionBoxField
     $bfFrontendFormIds = FrontendHelpers::$bfFrontendFormIds;
     $contentCount = count($bfFrontendFormIds);
     if ($fieldHelpers->property_exists_nested($field, 'msg->checked')) {
-      $value = "value='{$field->msg->checked}'";
+      $value = "value='" . $fieldHelpers->esc_attr($field->msg->checked) . "'";
     }
     $checked = '';
 

@@ -22,6 +22,10 @@ final class Helper
         'value' => $value,
         'type'  => $fieldDetail->typ,
       ];
+      if ('advanced-datetime' === $fieldData[$fieldKey]['type']) {
+        // Date conditions must parse the posted value in the field's own format.
+        $fieldData[$fieldKey]['dateFormat'] = DateConditionComparator::advancedValueFormat(isset($fieldDetail->config) ? $fieldDetail->config : null);
+      }
       if (isset($fieldDetail->mul)) {
         $fieldData[$fieldKey] =
             array_merge(
@@ -30,6 +34,11 @@ final class Helper
                 'mul' => $fieldDetail->mul,
               ]
             );
+      }
+      // A multiple-choice Image Select holds a list, like a checkbox; compared as one string
+      // only its last choice counted.
+      if ('image-select' === $fieldDetail->typ && isset($fieldDetail->inpType) && 'checkbox' === $fieldDetail->inpType) {
+        $fieldData[$fieldKey]['mul'] = true;
       }
     }
     return $fieldData;

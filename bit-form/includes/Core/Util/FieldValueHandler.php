@@ -48,7 +48,11 @@ final class FieldValueHandler
       $fieldValue = null;
       if (isset($fieldValues[$fieldName])) {
         $targetFieldValue = isset($fieldValues[$fieldName]['value']) ? $fieldValues[$fieldName]['value'] : $fieldValues[$fieldName];
-        if ('array' === gettype($targetFieldValue) || 'object' === gettype($targetFieldValue)) {
+        $targetFieldType = self::fieldTypeForSmartTag($fieldValues[$fieldName], $fieldName, $formID);
+        if (self::isCompositeFieldType($targetFieldType) && ('array' === gettype($targetFieldValue) || 'object' === gettype($targetFieldValue))) {
+          // Name/Address parts are words of one value: never summed, joined like everywhere else.
+          $fieldValue = self::joinCompositeFieldValue((array) $targetFieldValue, $targetFieldType);
+        } elseif ('array' === gettype($targetFieldValue) || 'object' === gettype($targetFieldValue)) {
           foreach (self::stripMetaSubfields((array) $targetFieldValue) as $singleTargetVal) {
             if (isset($fieldValue)) {
               if (is_numeric($fieldValue) && is_numeric($singleTargetVal)) {
@@ -1275,6 +1279,27 @@ final class FieldValueHandler
     }
   }
 
+  /**
+   * The type of the field a Smart Tag points at: from the value itself when it carries
+   * one, otherwise from the form.
+   *
+   * @param mixed      $fieldValue Entry of $fieldValues for this field
+   * @param string     $fieldKey
+   * @param int|null   $formID
+   * @return string|null
+   */
+  private static function fieldTypeForSmartTag($fieldValue, $fieldKey, $formID)
+  {
+    if (is_array($fieldValue) && isset($fieldValue['type']) && is_string($fieldValue['type'])) {
+      return $fieldValue['type'];
+    }
+    if (!$formID) {
+      return null;
+    }
+    $formFields = FormManager::getInstance($formID)->getFields();
+    return is_array($formFields) && isset($formFields[$fieldKey]['type']) ? $formFields[$fieldKey]['type'] : null;
+  }
+
   private static function isCompositeFieldType($fieldType)
   {
     return in_array($fieldType, ['name', 'address'], true);
@@ -1488,6 +1513,27 @@ final class FieldValueHandler
     }
 
     return str_replace(['[', ']', (string) $parentFieldName], '', $childFieldName);
+  }
+
+  /**
+   * The HTML name a composite child (Name/Address) renders with: the parent's current name plus
+   * the child's own suffix. The child stores a full "parent[suffix]" copy that goes stale when the
+   * parent is renamed, and a stale prefix posts the value away from the parent.
+   *
+   * @param string $childFieldName  stored child name, e.g. "address-1[city]"
+   * @param string $parentFieldName parent's current name, e.g. "home_address"
+   *
+   * @return string e.g. "home_address[city]"; the stored name when it has no suffix or the parent has no name
+   */
+  public static function rebaseChildFieldName($childFieldName, $parentFieldName)
+  {
+    $childFieldName = (string) $childFieldName;
+    $parentFieldName = (string) $parentFieldName;
+    if ('' === $parentFieldName || !preg_match('/\[([^\]]+)\]$/', $childFieldName, $matches)) {
+      return $childFieldName;
+    }
+
+    return $parentFieldName . '[' . $matches[1] . ']';
   }
 
   /**

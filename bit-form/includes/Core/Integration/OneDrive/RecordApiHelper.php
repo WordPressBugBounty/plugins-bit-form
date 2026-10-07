@@ -74,26 +74,38 @@ class RecordApiHelper
           if ('' === $singleFilePath) {
             continue;
           }
-          $response = $this->uploadFile($folder, $singleFilePath, $folderId, $parentId);
-          $this->storeInState($response);
-          $this->deleteFile($singleFilePath, $actions);
+          $this->uploadAndCleanup($folder, $singleFilePath, $actions, $folderId, $parentId);
         }
       } else {
-        $response = $this->uploadFile($folder, $filePath, $folderId, $parentId);
-        $this->storeInState($response);
-        $this->deleteFile($filePath, $actions);
+        $this->uploadAndCleanup($folder, $filePath, $actions, $folderId, $parentId);
       }
     }
   }
 
+  /**
+   * The local copy is the only copy until OneDrive confirms the upload, so a failed
+   * upload (expired token, API error, unreadable file) must keep it on disk.
+   */
+  private function uploadAndCleanup($folder, $filePath, $actions, $folderId, $parentId)
+  {
+    $response = $this->uploadFile($folder, $filePath, $folderId, $parentId);
+    if ($this->storeInState($response)) {
+      $this->deleteFile($filePath, $actions);
+    }
+  }
+
+  /**
+   * @return bool true when OneDrive returned the uploaded item's metadata
+   */
   protected function storeInState($response)
   {
     $response = is_string($response) ? json_decode($response) : $response;
     if (isset($response->id)) {
       $this->successApiResponse[] = $response;
-    } else {
-      $this->errorApiResponse[] = $response;
+      return true;
     }
+    $this->errorApiResponse[] = $response;
+    return false;
   }
 
   public function deleteFile($filePath, $actions)

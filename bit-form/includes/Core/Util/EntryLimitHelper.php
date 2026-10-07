@@ -140,7 +140,7 @@ class EntryLimitHelper
 
     // Add user condition
     if ('per_user_ip' === $userType) {
-      $condition['user_ip'] = ip2long($userValue);
+      $condition['user_ip'] = IpTool::storageValue($userValue);
     } elseif ('per_user_id' === $userType) {
       $condition['user_id'] = $userValue;
     } else {
@@ -167,7 +167,7 @@ class EntryLimitHelper
 
     $condition = [
       'form_id' => $this->formId,
-      'user_ip' => ip2long($ipAddress)
+      'user_ip' => IpTool::storageValue($ipAddress)
     ];
 
     // Burst timeframes use different intervals

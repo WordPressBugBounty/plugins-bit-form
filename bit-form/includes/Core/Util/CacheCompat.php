@@ -9,6 +9,11 @@
  * script patterns with each optimizer's exclusion filter, and stamps generic
  * no-optimize attributes as a fallback for those that honor them.
  *
+ * Stylesheets need the same protection for a different reason: a form's styles
+ * are atomic single-property classes generated per form, so a combiner that
+ * reorders them against theme CSS, or an unused-CSS pass that drops the classes
+ * it cannot see in the markup, leaves the form unstyled.
+ *
  * @since 3.2.2
  */
 
@@ -38,6 +43,26 @@ final class CacheCompat
     'bitform-show-picker-bridge',
     'bitforms_recaptcha',
   ];
+
+  /**
+   * Frontend style handle prefixes. Covers the generated per-form sheets
+   * (bitform-style-15, bitform-style-15-formid, bitform-style-custom-15), the
+   * Pro data views (bitform-style-view-3), the page builder widgets and the
+   * standalone, conversational and preview views.
+   */
+  private const STYLE_HANDLE_PREFIXES = [
+    'bf-inline-style',
+    'bitform-bricks-',
+    'bitform-conversational-',
+    'bitform-elementor-style',
+    'bitform-entry-edit-',
+    'bitform-preview-',
+    'bitform-standalone-',
+    'bitform-style',
+  ];
+
+  /** Attributes the optimizers that read markup instead of filters honor. */
+  private const NO_OPTIMIZE_ATTRIBUTES = 'data-no-optimize="1" data-no-defer="1" data-no-minify="1" data-cfasync="false" data-jetpack-boost="ignore" nowprocket nitro-exclude ';
 
   public static function register()
   {
@@ -75,18 +100,54 @@ final class CacheCompat
     // W3 Total Cache (matches the tag and file path; this filter has no handle)
     add_filter('w3tc_minify_js_do_tag_minification', [self::class, 'denyTagMinification'], 10, 3);
 
-    // Hummingbird, at 20 so it runs after Hummingbird's own settings filters at 10
-    add_filter('wphb_minify_resource', [self::class, 'denyForBitformHandle'], 20, 2);
-    add_filter('wphb_combine_resource', [self::class, 'denyForBitformHandle'], 20, 2);
-    add_filter('wphb_defer_resource', [self::class, 'denyForBitformHandle'], 20, 2);
-    add_filter('wphb_inline_resource', [self::class, 'denyForBitformHandle'], 20, 2);
+    // Hummingbird, at 20 so it runs after Hummingbird's own settings filters at 10.
+    // These four carry styles as well as scripts, so they test both handle lists.
+    add_filter('wphb_minify_resource', [self::class, 'denyForBitformAsset'], 20, 2);
+    add_filter('wphb_combine_resource', [self::class, 'denyForBitformAsset'], 20, 2);
+    add_filter('wphb_defer_resource', [self::class, 'denyForBitformAsset'], 20, 2);
+    add_filter('wphb_inline_resource', [self::class, 'denyForBitformAsset'], 20, 2);
 
-    // Jetpack Boost, Page Optimize and WordPress.com script concatenation
+    // Jetpack Boost, Page Optimize and WordPress.com asset concatenation
     add_filter('js_do_concat', [self::class, 'denyForBitformHandle'], 20, 2);
+    add_filter('css_do_concat', [self::class, 'denyForBitformStyleHandle'], 20, 2);
+
+    self::registerStyleFilters();
 
     // Generic no-optimize attributes on our own script tags
     add_filter('script_loader_tag', [self::class, 'addNoOptimizeAttributes'], 10, 2);
     add_filter('wp_inline_script_attributes', [self::class, 'addInlineNoOptimizeAttributes'], 10, 2);
+    add_filter('style_loader_tag', [self::class, 'addStyleNoOptimizeAttributes'], 10, 2);
+  }
+
+  /** Stylesheet counterparts of the script exclusion filters above. */
+  private static function registerStyleFilters()
+  {
+    // WP Rocket, including the Remove Unused CSS safelist
+    add_filter('rocket_exclude_css', [self::class, 'appendStyleExclusionsArray']);
+    add_filter('rocket_exclude_defer_css', [self::class, 'appendStyleExclusionsArray']);
+    add_filter('rocket_rucss_safelist', [self::class, 'appendStyleExclusionsArray']);
+
+    // LiteSpeed Cache, including the Unique CSS pass
+    add_filter('litespeed_optimize_css_excludes', [self::class, 'appendStyleExclusionsArray']);
+    add_filter('litespeed_optm_css_defer_exc', [self::class, 'appendStyleExclusionsArray']);
+    add_filter('litespeed_optm_ucss_exc', [self::class, 'appendStyleExclusionsArray']);
+
+    // Perfmatters Used CSS
+    add_filter('perfmatters_used_css_excluded_stylesheets', [self::class, 'appendStyleExclusionsArray']);
+
+    // Autoptimize (comma-separated string)
+    add_filter('autoptimize_filter_css_exclude', [self::class, 'appendStyleExclusionsString']);
+
+    // SiteGround Optimizer (style handles)
+    add_filter('sgo_css_minify_exclude', [self::class, 'appendStyleHandles']);
+    add_filter('sgo_css_combine_exclude', [self::class, 'appendStyleHandles']);
+
+    // FlyingPress
+    add_filter('flying_press_exclude_from_minify:css', [self::class, 'appendStyleExclusionsArray']);
+    add_filter('flying_press_exclude_from_used_css', [self::class, 'appendStyleExclusionsArray']);
+
+    // W3 Total Cache (matches the tag and file path; this filter has no handle)
+    add_filter('w3tc_minify_css_do_tag_minification', [self::class, 'denyStyleTagMinification'], 10, 3);
   }
 
   /** Register the cache purge that runs after a form changes. */
@@ -446,8 +507,23 @@ final class CacheCompat
   }
 
   /**
-   * Append patterns to an array-based optimizer filter. Typed loosely because
-   * optimizers pass mixed shapes through these filters.
+   * Substrings optimizers match against a stylesheet's URL or tag.
+   *
+   * @return array
+   */
+  public static function styleExclusionPatterns()
+  {
+    $patterns = [
+      'bitform',              // handles + generated file names (bitform-15-formid.css)
+      'bitforms/form-styles', // uploads path of the generated stylesheets
+    ];
+    $filtered = apply_filters('bitform_cache_style_exclusion_patterns', $patterns);
+    return is_array($filtered) ? $filtered : $patterns;
+  }
+
+  /**
+   * Append script patterns to an array-based optimizer filter. Typed loosely
+   * because optimizers pass mixed shapes through these filters.
    *
    * @param mixed $exclusions
    *
@@ -455,14 +531,23 @@ final class CacheCompat
    */
   public static function appendExclusionsArray($exclusions)
   {
-    if (!is_array($exclusions)) {
-      return $exclusions;
-    }
-    return array_values(array_unique(array_merge($exclusions, self::exclusionPatterns())));
+    return self::mergePatternsIntoArray($exclusions, self::exclusionPatterns());
   }
 
   /**
-   * Append exclusion patterns to a comma-separated string filter (Autoptimize).
+   * Append style patterns to an array-based optimizer filter.
+   *
+   * @param mixed $exclusions
+   *
+   * @return mixed
+   */
+  public static function appendStyleExclusionsArray($exclusions)
+  {
+    return self::mergePatternsIntoArray($exclusions, self::styleExclusionPatterns());
+  }
+
+  /**
+   * Append script patterns to a comma-separated string filter (Autoptimize).
    *
    * @param mixed $exclusions
    *
@@ -470,11 +555,48 @@ final class CacheCompat
    */
   public static function appendExclusionsString($exclusions)
   {
+    return self::mergePatternsIntoString($exclusions, self::exclusionPatterns());
+  }
+
+  /**
+   * Append style patterns to a comma-separated string filter (Autoptimize).
+   *
+   * @param mixed $exclusions
+   *
+   * @return mixed
+   */
+  public static function appendStyleExclusionsString($exclusions)
+  {
+    return self::mergePatternsIntoString($exclusions, self::styleExclusionPatterns());
+  }
+
+  /**
+   * @param mixed $exclusions
+   * @param array $patterns
+   *
+   * @return mixed
+   */
+  private static function mergePatternsIntoArray($exclusions, $patterns)
+  {
+    if (!is_array($exclusions)) {
+      return $exclusions;
+    }
+    return array_values(array_unique(array_merge($exclusions, $patterns)));
+  }
+
+  /**
+   * @param mixed $exclusions
+   * @param array $patterns
+   *
+   * @return mixed
+   */
+  private static function mergePatternsIntoString($exclusions, $patterns)
+  {
     if (!is_string($exclusions)) {
       return $exclusions;
     }
     $parts = array_filter(array_map('trim', explode(',', $exclusions)));
-    $parts = array_unique(array_merge($parts, self::exclusionPatterns()));
+    $parts = array_unique(array_merge($parts, $patterns));
     return implode(',', $parts);
   }
 
@@ -491,14 +613,37 @@ final class CacheCompat
    */
   public static function appendHandles($handles)
   {
+    return self::mergeRegisteredHandles($handles, self::HANDLE_PREFIXES, wp_scripts());
+  }
+
+  /**
+   * Append style handles to a handle-based filter (SiteGround).
+   *
+   * @param mixed $handles
+   *
+   * @return mixed
+   */
+  public static function appendStyleHandles($handles)
+  {
+    return self::mergeRegisteredHandles($handles, self::STYLE_HANDLE_PREFIXES, wp_styles());
+  }
+
+  /**
+   * @param mixed $handles
+   * @param array $prefixes
+   * @param mixed $registry  a WP_Scripts or WP_Styles instance
+   *
+   * @return mixed
+   */
+  private static function mergeRegisteredHandles($handles, $prefixes, $registry)
+  {
     if (!is_array($handles)) {
       return $handles;
     }
-    $bitformHandles = self::HANDLE_PREFIXES;
-    $wpScripts = wp_scripts();
-    if (!empty($wpScripts->registered)) {
-      foreach (array_keys($wpScripts->registered) as $registeredHandle) {
-        if (self::isBitformHandle($registeredHandle)) {
+    $bitformHandles = $prefixes;
+    if (is_object($registry) && !empty($registry->registered)) {
+      foreach (array_keys($registry->registered) as $registeredHandle) {
+        if (self::hasPrefix($registeredHandle, $prefixes)) {
           $bitformHandles[] = $registeredHandle;
         }
       }
@@ -515,10 +660,33 @@ final class CacheCompat
    */
   private static function isBitformHandle($handle)
   {
+    return self::hasPrefix($handle, self::HANDLE_PREFIXES);
+  }
+
+  /**
+   * Whether a style handle belongs to a Bit Form stylesheet.
+   *
+   * @param mixed $handle
+   *
+   * @return bool
+   */
+  private static function isBitformStyleHandle($handle)
+  {
+    return self::hasPrefix($handle, self::STYLE_HANDLE_PREFIXES);
+  }
+
+  /**
+   * @param mixed $handle
+   * @param array $prefixes
+   *
+   * @return bool
+   */
+  private static function hasPrefix($handle, $prefixes)
+  {
     if (!is_string($handle) || '' === $handle) {
       return false;
     }
-    foreach (self::HANDLE_PREFIXES as $prefix) {
+    foreach ($prefixes as $prefix) {
       if (0 === strpos($handle, $prefix)) {
         return true;
       }
@@ -527,18 +695,19 @@ final class CacheCompat
   }
 
   /**
-   * Whether a tag or file path carries one of the exclusion patterns.
+   * Whether a tag or file path carries one of the given exclusion patterns.
    *
    * @param mixed $value
+   * @param array $patterns
    *
    * @return bool
    */
-  private static function matchesExclusionPattern($value)
+  private static function matchesAnyPattern($value, $patterns)
   {
     if (!is_string($value) || '' === $value) {
       return false;
     }
-    foreach (self::exclusionPatterns() as $pattern) {
+    foreach ($patterns as $pattern) {
       if (is_string($pattern) && '' !== $pattern && false !== strpos($value, $pattern)) {
         return true;
       }
@@ -547,8 +716,8 @@ final class CacheCompat
   }
 
   /**
-   * Return false for Bit Form handles on boolean, handle-keyed optimizer
-   * filters (Hummingbird's minify/combine/defer/inline, js_do_concat).
+   * Return false for Bit Form script handles on boolean, handle-keyed optimizer
+   * filters (js_do_concat).
    *
    * @param mixed $value
    * @param mixed $handle
@@ -558,6 +727,33 @@ final class CacheCompat
   public static function denyForBitformHandle($value, $handle = '')
   {
     return self::isBitformHandle($handle) ? false : $value;
+  }
+
+  /**
+   * Same, for style handles (css_do_concat).
+   *
+   * @param mixed $value
+   * @param mixed $handle
+   *
+   * @return mixed
+   */
+  public static function denyForBitformStyleHandle($value, $handle = '')
+  {
+    return self::isBitformStyleHandle($handle) ? false : $value;
+  }
+
+  /**
+   * Same, for filters that carry scripts and styles through one hook
+   * (Hummingbird's minify/combine/defer/inline).
+   *
+   * @param mixed $value
+   * @param mixed $handle
+   *
+   * @return mixed
+   */
+  public static function denyForBitformAsset($value, $handle = '')
+  {
+    return self::isBitformHandle($handle) || self::isBitformStyleHandle($handle) ? false : $value;
   }
 
   /**
@@ -571,7 +767,26 @@ final class CacheCompat
    */
   public static function denyTagMinification($doMinification, $scriptTag = '', $file = '')
   {
-    if (self::matchesExclusionPattern($scriptTag) || self::matchesExclusionPattern($file)) {
+    if (self::matchesAnyPattern($scriptTag, self::exclusionPatterns())
+      || self::matchesAnyPattern($file, self::exclusionPatterns())) {
+      return false;
+    }
+    return $doMinification;
+  }
+
+  /**
+   * Deny W3 Total Cache tag minification for Bit Form stylesheets.
+   *
+   * @param mixed $doMinification
+   * @param mixed $styleTag
+   * @param mixed $file
+   *
+   * @return mixed
+   */
+  public static function denyStyleTagMinification($doMinification, $styleTag = '', $file = '')
+  {
+    if (self::matchesAnyPattern($styleTag, self::styleExclusionPatterns())
+      || self::matchesAnyPattern($file, self::styleExclusionPatterns())) {
       return false;
     }
     return $doMinification;
@@ -595,11 +810,29 @@ final class CacheCompat
     if (false !== strpos($tag, 'data-no-optimize')) {
       return $tag;
     }
-    return str_replace(
-      '<script ',
-      '<script data-no-optimize="1" data-no-defer="1" data-no-minify="1" data-cfasync="false" data-jetpack-boost="ignore" nowprocket nitro-exclude ',
-      $tag
-    );
+    return str_replace('<script ', '<script ' . self::NO_OPTIMIZE_ATTRIBUTES, $tag);
+  }
+
+  /**
+   * Stamp the same attributes on Bit Form stylesheet tags. Covers both the
+   * <link> a registered sheet prints and the <style> an inline-only handle
+   * prints, since optimizers read either one.
+   *
+   * @param mixed $tag
+   * @param mixed $handle
+   *
+   * @return mixed
+   */
+  public static function addStyleNoOptimizeAttributes($tag, $handle)
+  {
+    if (!is_string($tag) || !self::isBitformStyleHandle($handle)) {
+      return $tag;
+    }
+    if (false !== strpos($tag, 'data-no-optimize')) {
+      return $tag;
+    }
+    $tag = str_replace('<link ', '<link ' . self::NO_OPTIMIZE_ATTRIBUTES, $tag);
+    return str_replace('<style ', '<style ' . self::NO_OPTIMIZE_ATTRIBUTES, $tag);
   }
 
   /**

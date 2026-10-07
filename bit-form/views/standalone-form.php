@@ -3,6 +3,7 @@
 // This file is included via Render::view() using extract(); all variables below are in the calling method's local scope, not global namespace.
 
 use BitCode\BitForm\Core\Util\EscapingHelper;
+use BitCode\BitForm\Core\Util\FrontendHelpers;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -19,16 +20,16 @@ $customCSSPath = "/form-styles/bitform-custom-{$formID}.css";
 $standaloneCSSPath = "/form-styles/bitform-standalone-{$formID}.css";
 
 // Use the same handles as FrontendFormHandler::loadAssets() so WP dedups instead of printing the file twice.
-wp_register_style('bitform-style-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $baseCSSPath, [], $formUpdateVersion);
+wp_register_style('bitform-style-' . $formIdSafe, FrontendHelpers::styleSrc($baseCSSPath), [], $formUpdateVersion);
 wp_enqueue_style('bitform-style-' . $formIdSafe);
 
 if (file_exists(BITFORMS_CONTENT_DIR . $customCSSPath)) {
-  wp_register_style('bitform-style-custom-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $customCSSPath, [], $formUpdateVersion);
+  wp_register_style('bitform-style-custom-' . $formIdSafe, FrontendHelpers::styleSrc($customCSSPath), [], $formUpdateVersion);
   wp_enqueue_style('bitform-style-custom-' . $formIdSafe);
 }
 
 if (file_exists(BITFORMS_CONTENT_DIR . $standaloneCSSPath)) {
-  wp_register_style('bitform-standalone-extra-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $standaloneCSSPath, [], $formUpdateVersion);
+  wp_register_style('bitform-standalone-extra-' . $formIdSafe, FrontendHelpers::styleSrc($standaloneCSSPath), [], $formUpdateVersion);
   wp_enqueue_style('bitform-standalone-extra-' . $formIdSafe);
 }
 

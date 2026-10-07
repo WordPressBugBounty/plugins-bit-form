@@ -39,3 +39,4 @@ FallBack::add('3.1.4', 'SchemaFallback@ensureWorkflowCategoryColumn');
 FallBack::add('3.1.4', 'WorkFlow@normalizeCategory');
 FallBack::add('3.1.4', 'SubmitActionFallback@deactivateOrphanActions');
 FallBack::add('3.2.2', 'SchemaFallback@ensureWorkflowSchema');
+FallBack::add('3.3.1', 'FormFallback@syncCompositeChildNames');

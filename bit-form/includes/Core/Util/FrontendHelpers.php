@@ -272,6 +272,32 @@ final class FrontendHelpers
     return array_unique(self::getAllFormIdsInPage());
   }
 
+  /**
+   * URL of a generated stylesheet, carrying the form update version in the src.
+   *
+   * WP's own $ver argument is stripped by "remove query strings from static
+   * resources" hardening (WP Ghost, optimizer snippets), which leaves a
+   * regenerated stylesheet behind a CDN under its unchanged URL - the markup
+   * then carries class names the cached CSS has never heard of. bfv rides
+   * inside the src the way the generated JS bundle already does, so those
+   * filters leave it alone. Falls back to the plugin version so the URL always
+   * changes on upgrade, even where the option was never written.
+   *
+   * @param string $relativePath path under the bitforms upload dir, e.g. form-styles/bitform-15.css
+   *
+   * @return string
+   */
+  public static function styleSrc($relativePath)
+  {
+    $version = get_option('bitform_form_update_version');
+    if (!$version) {
+      $version = BITFORMS_VERSION;
+    }
+    $src = BITFORMS_UPLOAD_BASE_URL . '/' . ltrim((string) $relativePath, '/');
+
+    return add_query_arg('bfv', rawurlencode((string) $version), $src);
+  }
+
   public static function hasMultipleForms()
   {
     $bfUniqFormIds = self::getAllFormIdsInPage();

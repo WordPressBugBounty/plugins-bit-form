@@ -318,21 +318,141 @@ final class FileHandler
     }
   }
 
-  private function getByteSizeByUnit($sizeString)
+  private function getByteSizeByUnit($sizeString, $base = 1024)
   {
     // split 2MB into 2 and MB
-    $size = preg_replace('/[^0-9\.]/', '', $sizeString);
-    $unit = preg_replace('/[^a-zA-Z]/', '', $sizeString);
+    $size = (float) preg_replace('/[^0-9\.]/', '', (string) $sizeString);
+    $unit = preg_replace('/[^a-zA-Z]/', '', (string) $sizeString);
     $unit = strtolower($unit);
     if ('kb' === $unit) {
-      return $size * 1024;
+      return $size * $base;
     } elseif ('mb' === $unit) {
-      return $size * 1024 * 1024;
+      return $size * $base * $base;
     } elseif ('gb' === $unit) {
-      return $size * 1024 * 1024 * 1024;
+      return $size * $base * $base * $base;
     } else {
       return $size;
     }
+  }
+
+  /**
+   * How many files an Advanced File Upload field takes per submission, mirroring FilePond: a
+   * single-file field holds one, and maxFiles only applies once multiple files are allowed.
+   *
+   * @param object|null $config field config
+   *
+   * @return int|null null when there is no limit
+   */
+  public static function getMaxFilesLimit($config)
+  {
+    if (!is_object($config)) {
+      return null;
+    }
+    if (empty($config->allowMultiple)) {
+      return 1;
+    }
+    $max = isset($config->maxFiles) && is_numeric($config->maxFiles) ? (int) $config->maxFiles : 0;
+
+    return $max > 0 ? $max : null;
+  }
+
+  /**
+   * Files submitted for one field: names already uploaded on select (comma list or array) plus
+   * the files sent with the form.
+   *
+   * @param mixed $uploadedNames   posted value of the field
+   * @param mixed $postedFileNames $_FILES[field]['name']
+   *
+   * @return int
+   */
+  public static function countSubmittedFiles($uploadedNames, $postedFileNames)
+  {
+    $count = 0;
+    foreach ([$uploadedNames, $postedFileNames] as $source) {
+      $names = is_array($source) ? $source : (is_scalar($source) ? explode(',', (string) $source) : []);
+      foreach ($names as $name) {
+        if (is_scalar($name) && '' !== trim((string) $name)) {
+          $count++;
+        }
+      }
+    }
+
+    return $count;
+  }
+
+  /**
+   * The browser drops files past the limit, so more can only arrive from a crafted request.
+   *
+   * @param object|null $config          field config
+   * @param mixed       $uploadedNames   posted value of the field
+   * @param mixed       $postedFileNames $_FILES[field]['name']
+   *
+   * @return string error message, '' when within the limit
+   */
+  public static function getMaxFilesError($config, $uploadedNames, $postedFileNames)
+  {
+    $limit = self::getMaxFilesLimit($config);
+    if (null === $limit || self::countSubmittedFiles($uploadedNames, $postedFileNames) <= $limit) {
+      return '';
+    }
+
+    return sprintf(
+      /* translators: %d: maximum number of files */
+      _n('You can upload only %d file.', 'You can upload up to %d files.', $limit, 'bit-form'),
+      $limit
+    );
+  }
+
+  /**
+   * getMaxFilesError() for a field of a stored form.
+   *
+   * @param int|string $formId
+   * @param string     $fieldKey
+   * @param mixed      $uploadedNames   posted value of the field
+   * @param mixed      $postedFileNames $_FILES[field]['name']
+   *
+   * @return string
+   */
+  public static function getMaxFilesErrorForField($formId, $fieldKey, $uploadedNames, $postedFileNames)
+  {
+    $formContent = FormManager::getInstance($formId)->getFormContent();
+    $field = is_object($formContent) && isset($formContent->fields->{$fieldKey}) ? $formContent->fields->{$fieldKey} : null;
+    if (!is_object($field) || !isset($field->typ) || 'advanced-file-up' !== $field->typ) {
+      return '';
+    }
+
+    return self::getMaxFilesError(isset($field->config) ? $field->config : null, $uploadedNames, $postedFileNames);
+  }
+
+  /**
+   * Whether a MIME matches a `type/*` entry of the allow list, as FilePond accepts it. Markup and
+   * script types never match a wildcard: they must be listed explicitly.
+   *
+   * @param mixed  $mime       detected MIME, lowercase
+   * @param array  $allowMimes allow-listed MIME entries, lowercase
+   *
+   * @return bool
+   */
+  public static function matchesWildcardMime($mime, $allowMimes)
+  {
+    $neverByWildcard = [
+      'text/html',
+      'application/xhtml+xml',
+      'text/javascript',
+      'application/javascript',
+      'application/x-javascript',
+      'application/ecmascript',
+      'text/ecmascript',
+    ];
+    if (!is_string($mime) || in_array($mime, $neverByWildcard, true)) {
+      return false;
+    }
+    $slash = strpos($mime, '/');
+    if (false === $slash || 0 === $slash) {
+      return false;
+    }
+
+    return in_array(substr($mime, 0, $slash) . '/*', (array) $allowMimes, true);
   }
 
   public function validation($field_key, $file_details, $form_id)
@@ -349,6 +469,8 @@ final class FileHandler
     $maxSizeDetails = [];
     $allowFileTypes = [];
     $maxSize = null;
+    $minSize = null;
+    $fieldConfig = isset($fieldDetail->config) && is_object($fieldDetail->config) ? $fieldDetail->config : null;
     if ('file-up' === $fieldType) {
       $allowFileTypes = !empty($fieldDetail->config->allowedFileType) ? $fieldDetail->config->allowedFileType : [];
       if (!empty($fieldDetail->config->allowMaxSize)) {
@@ -371,6 +493,12 @@ final class FileHandler
         if (!empty($fieldDetail->config->maxTotalFileSize)) {
           $maxSizeDetails['maxTotalFileSize'] = $fieldDetail->config->maxTotalFileSize;
         }
+        // A client transform re-encodes images, so the uploaded copy can legitimately come out
+        // smaller than the original the browser checked.
+        if (!empty($fieldDetail->config->minFileSize) && empty($fieldDetail->config->allowImageTransform)) {
+          // FilePond counts 1KB as 1000 bytes; a 1024 base would reject files the browser accepted.
+          $minSize = $this->getByteSizeByUnit($fieldDetail->config->minFileSize, 1000);
+        }
       }
     }
     if (!empty($maxSizeDetails['maxSize'])) {
@@ -391,19 +519,44 @@ final class FileHandler
             'error'    => $file_details['error'][$rowIndex],
             'size'     => $file_details['size'][$rowIndex],
           ];
-          $validateState = $this->validateFileInfo($fieldType, $fileDetails, $allowFileTypes, $maxSize, $maxTotalFileSize);
+          $countState = $this->maxFilesState($fieldType, $fieldConfig, $file);
+          if (!empty($countState)) {
+            return $countState;
+          }
+          $validateState = $this->validateFileInfo($fieldType, $fileDetails, $allowFileTypes, $maxSize, $maxTotalFileSize, $minSize);
           if (!empty($validateState) && !empty($validateState['message'])) {
             return $validateState;
           }
         }
       }
     } else {
-      return $this->validateFileInfo($fieldType, $file_details, $allowFileTypes, $maxSize, $maxTotalFileSize);
+      $countState = $this->maxFilesState($fieldType, $fieldConfig, isset($file_details['name']) ? $file_details['name'] : null);
+      if (!empty($countState)) {
+        return $countState;
+      }
+      return $this->validateFileInfo($fieldType, $file_details, $allowFileTypes, $maxSize, $maxTotalFileSize, $minSize);
     }
     return [];
   }
 
-  private function validateFileInfo($fieldType, $file_details, $allowFileTypes, $maxSize, $maxTotalFileSize)
+  /**
+   * @param string      $fieldType
+   * @param object|null $fieldConfig
+   * @param mixed       $postedFileNames $_FILES[field]['name'] (or one repeater row of it)
+   *
+   * @return array validation state, empty when within the limit
+   */
+  private function maxFilesState($fieldType, $fieldConfig, $postedFileNames)
+  {
+    if ('advanced-file-up' !== $fieldType) {
+      return [];
+    }
+    $message = self::getMaxFilesError($fieldConfig, null, $postedFileNames);
+
+    return '' === $message ? [] : ['message' => $message, 'error_type' => 'file_count_error'];
+  }
+
+  private function validateFileInfo($fieldType, $file_details, $allowFileTypes, $maxSize, $maxTotalFileSize, $minSize = null)
   {
     $errorMessage = [
       'message'    => '',
@@ -421,7 +574,7 @@ final class FileHandler
             'size'     => $file_details['size'][$key],
           ];
           $totalSize += $fileInfo['size'];
-          $validateState = $this->validateSingleFile($fieldType, $fileInfo, $allowFileTypes, $maxSize);
+          $validateState = $this->validateSingleFile($fieldType, $fileInfo, $allowFileTypes, $maxSize, $minSize);
           if (!empty($validateState)) {
             return $validateState;
           }
@@ -433,7 +586,7 @@ final class FileHandler
         return $errorMessage;
       }
     } else {
-      $validateState = $this->validateSingleFile($fieldType, $file_details, $allowFileTypes, $maxSize);
+      $validateState = $this->validateSingleFile($fieldType, $file_details, $allowFileTypes, $maxSize, $minSize);
       if (!empty($validateState)) {
         return $validateState;
       }
@@ -442,7 +595,7 @@ final class FileHandler
     return $errorMessage;
   }
 
-  private function validateSingleFile($fieldType, &$file, $allowTypes, $maxSize = null)
+  private function validateSingleFile($fieldType, &$file, $allowTypes, $maxSize = null, $minSize = null)
   {
     // 0) Basic sanity & transport integrity
     if (!is_array($file) || empty($file['tmp_name'])) {
@@ -471,6 +624,9 @@ final class FileHandler
     }
     if (!empty($maxSize) && $onDiskSize > $maxSize) {
       return ['message' => __('File size is too large', 'bit-form'), 'error_type' => 'file_size_error'];
+    }
+    if (!empty($minSize) && $onDiskSize < $minSize) {
+      return ['message' => __('File size is too small', 'bit-form'), 'error_type' => 'file_size_error'];
     }
 
     // 2) Determine ext + MIME using WP + finfo
@@ -534,7 +690,7 @@ final class FileHandler
 
     $hasAllowlist = (!empty($allowExts) || !empty($allowMimes));
     $extMatch = in_array($fileExtension, $allowExts, true);
-    $mimeMatch = in_array($detectedMime, $allowMimes, true);
+    $mimeMatch = in_array($detectedMime, $allowMimes, true) || self::matchesWildcardMime($detectedMime, $allowMimes);
 
     // 5) Require BOTH a legit WP mapping AND a match to the allowlist
     $wpOk = ('' !== $wpExt && '' !== $wpType);

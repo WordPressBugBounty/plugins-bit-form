@@ -22,6 +22,8 @@ final class ConditionalLogic
       if (is_string($fieldValue)) {
         if ('[' === $fieldValue[0] && ']' === $fieldValue[strlen($fieldValue) - 1]) {
           $fieldValue = json_decode($fieldValue);
+        } elseif (false !== strpos($fieldValue, BITFORMS_BF_SEPARATOR)) {
+          $fieldValue = explode(BITFORMS_BF_SEPARATOR, $fieldValue);
         } else {
           $fieldValue = explode(',', $fieldValue);
         }
@@ -297,7 +299,9 @@ final class ConditionalLogic
       }
       return (bool) $conditionStatus;
     } else {
-      $this->_workflow_condition->val = Helper::replaceFieldWithValue($this->_workflow_condition->val, $this->_data);
+      // A month value (2026-01) passes the math evaluator's checks and would come back as 2025.
+      $evalMathExpr = null === $this->dateFieldType();
+      $this->_workflow_condition->val = Helper::replaceFieldWithValue($this->_workflow_condition->val, $this->_data, $evalMathExpr);
 
       return $this->isLogicMatch($this->_workflow_condition->logic);
     }
@@ -312,6 +316,22 @@ final class ConditionalLogic
     if (!isset($this->_data[$this->_workflow_condition->field])) {
       return false;
     }
+
+    $dateType = $this->dateFieldType();
+    if (null !== $dateType) {
+      $fieldEntry = $this->_data[$this->_workflow_condition->field];
+      $dateResult = DateConditionComparator::compare(
+        $logic,
+        isset($fieldEntry['value']) ? $fieldEntry['value'] : '',
+        isset($this->_workflow_condition->val) ? $this->_workflow_condition->val : '',
+        $dateType,
+        isset($fieldEntry['dateFormat']) ? $fieldEntry['dateFormat'] : ''
+      );
+      if (null !== $dateResult) {
+        return $dateResult;
+      }
+    }
+
     switch (strtolower($logic)) {
       case 'equal':
         return self::isEqual();
@@ -358,5 +378,18 @@ final class ConditionalLogic
       default:
         return false;
     }
+  }
+
+  /**
+   * @return string|null the condition field's type when it is date-like
+   */
+  private function dateFieldType()
+  {
+    $field = isset($this->_workflow_condition->field) ? $this->_workflow_condition->field : null;
+    if (!is_string($field) || !isset($this->_data[$field]['type'])) {
+      return null;
+    }
+    $type = $this->_data[$field]['type'];
+    return DateConditionComparator::isDateType($type) ? $type : null;
   }
 }

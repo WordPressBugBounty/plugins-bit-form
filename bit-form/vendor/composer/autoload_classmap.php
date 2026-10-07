@@ -211,6 +211,7 @@ return array(
     'BitCode\\BitForm\\Core\\Util\\WpFileHandler' => $baseDir . '/includes/Core/Util/WpFileHandler.php',
     'BitCode\\BitForm\\Core\\WorkFlow\\Actions' => $baseDir . '/includes/Core/WorkFlow/Actions.php',
     'BitCode\\BitForm\\Core\\WorkFlow\\ConditionalLogic' => $baseDir . '/includes/Core/WorkFlow/ConditionalLogic.php',
+    'BitCode\\BitForm\\Core\\WorkFlow\\DateConditionComparator' => $baseDir . '/includes/Core/WorkFlow/DateConditionComparator.php',
     'BitCode\\BitForm\\Core\\WorkFlow\\Helper' => $baseDir . '/includes/Core/WorkFlow/Helper.php',
     'BitCode\\BitForm\\Core\\WorkFlow\\WorkFlow' => $baseDir . '/includes/Core/WorkFlow/WorkFlow.php',
     'BitCode\\BitForm\\Core\\WorkFlow\\WorkFlowHandler' => $baseDir . '/includes/Core/WorkFlow/WorkFlowHandler.php',

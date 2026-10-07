@@ -16,7 +16,6 @@ use BitCode\BitForm\Core\Database\FormEntryLogModel;
 use BitCode\BitForm\Core\Database\FormEntryMetaModel;
 use BitCode\BitForm\Core\Database\FormEntryModel;
 use BitCode\BitForm\Core\Database\FormModel;
-use BitCode\BitForm\Core\Integration\IntegrationHandler;
 use BitCode\BitForm\Core\Messages\SuccessMessageHandler;
 use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\FileHandler;
@@ -40,6 +39,12 @@ class FormManager
    * Object-cache group for translated form_content.
    */
   public const TRANSLATION_CACHE_GROUP = 'bitform_translation';
+
+  /**
+   * Stored in place of a password value. Same text the WP User Auth mask always used,
+   * so entries masked before this change stay recognisable.
+   */
+  public const PASSWORD_MASK = '**** (encrypted)';
 
   /**
    * Request-scoped memo of translated form_content JSON, keyed "formId|lang".
@@ -344,6 +349,69 @@ class FormManager
       $formContent->fields = $updateFields;
     }
     return $formContent;
+  }
+
+  /**
+   * Rebase Name/Address and Email/Password confirm child names onto the parent's current name.
+   * Each child stores a full "parent[suffix]" copy, and forms renamed in older builders kept the
+   * old prefix: the child inputs posted under it and the parent's entry value saved empty (or,
+   * for a confirm pair, the confirm value never matched). Confirm parents keep "[primary]".
+   * Runs on save and once per form in FormFallback, not on load.
+   *
+   * @param mixed $fields form_content fields, child objects edited in place
+   *
+   * @return bool true when any child name changed
+   */
+  public static function syncCompositeChildNames($fields)
+  {
+    $changed = false;
+    if (!is_object($fields) && !is_array($fields)) {
+      return $changed;
+    }
+    foreach ($fields as $fieldKey => $field) {
+      if (
+        !is_object($field)
+        || !isset($field->typ, $field->fieldName, $field->childFields)
+        || !is_iterable($field->childFields)
+      ) {
+        continue;
+      }
+      $isComposite = in_array($field->typ, ['name', 'address'], true);
+      // A confirm-enabled Email/Password posts as "<base>[primary]" + "<base>[confirm]"; a renamed
+      // parent left the confirm child under the old base, so the pair never matched on submit.
+      $isConfirmPair = in_array($field->typ, ['email', 'password'], true) && !empty($field->confirm);
+      if (!$isComposite && !$isConfirmPair) {
+        continue;
+      }
+      $parentBase = (string) $field->fieldName;
+      if ($isConfirmPair) {
+        $parentBase = (string) preg_replace('/\[primary\]$/', '', $parentBase);
+        if ('' !== $parentBase && $field->fieldName !== $parentBase . '[primary]') {
+          $field->fieldName = $parentBase . '[primary]';
+          $changed = true;
+        }
+      }
+      foreach ($field->childFields as $childRef) {
+        $childKey = self::childFldKey($childRef);
+        if (!is_string($childKey) || '' === $childKey) {
+          continue;
+        }
+        $child = is_object($fields) ? ($fields->{$childKey} ?? null) : ($fields[$childKey] ?? null);
+        if (!is_object($child) || !isset($child->fieldName)) {
+          continue;
+        }
+        // A corrupted duplicate can list another parent's children; renaming them would break that parent.
+        if (isset($child->parentFieldKey) && (string) $child->parentFieldKey !== (string) $fieldKey) {
+          continue;
+        }
+        $rebased = FieldValueHandler::rebaseChildFieldName($child->fieldName, $parentBase);
+        if ($rebased !== $child->fieldName) {
+          $child->fieldName = $rebased;
+          $changed = true;
+        }
+      }
+    }
+    return $changed;
   }
 
   public function getFormInfo()
@@ -802,7 +870,7 @@ class FormManager
     $fields = $form_content->fields;
     $field_details = [];
     foreach ($fields as $key => $field) {
-      if ('recaptcha' === $field->typ || 'hcaptcha' === $field->typ) {
+      if ('recaptcha' === $field->typ || 'hcaptcha' === $field->typ || 'turnstile' === $field->typ) {
         continue;
       }
       // $field_name = empty($field->lbl) ? null : \preg_replace('/[\`\~\!\@\#\$\'\.\s\?\+\-\*\&\|\/\\\!]/', '_', $field->lbl);
@@ -836,6 +904,16 @@ class FormManager
       if (isset($field->mul)) {
         $field_details[$key]['mul'] = $field->mul;
       }
+      if ('image-select' === $field_type) {
+        // The validator checks submitted choices against these; the render posts val, or lbl without one.
+        $field_details[$key]['options'] = [];
+        foreach ((isset($field->opt) && is_array($field->opt) ? $field->opt : []) as $opt) {
+          if (is_object($opt) && (isset($opt->val) || isset($opt->lbl))) {
+            $field_details[$key]['options'][] = (string) (isset($opt->val) && '' !== $opt->val ? $opt->val : $opt->lbl);
+          }
+        }
+        $field_details[$key]['multiple'] = isset($field->inpType) && 'checkbox' === $field->inpType;
+      }
       if (in_array($field_type, ['name'])) {
         $field_details[$key]['label'] = $field->adminLbl ?? $field->lbl;
       }
@@ -862,6 +940,10 @@ class FormManager
           $field_details[$key]['valid']['keepValueWhenHidden'] = $field->valid->keepValueWhenHidden;
         }
       }
+      $invalidMsg = $this->getInvalidErrorMessage($field);
+      if ('' !== $invalidMsg) {
+        $field_details[$key]['valid']['invalidMsg'] = $invalidMsg;
+      }
       if ($this->isRepeatedField($key)) {
         $field_details[$key]['repeated'] = true;
       }
@@ -882,7 +964,7 @@ class FormManager
     $fields = $form_content->fields;
     $field_details = [];
     foreach ($fields as $key => $field) {
-      if ('recaptcha' === $field->typ || 'hcaptcha' === $field->typ) {
+      if ('recaptcha' === $field->typ || 'hcaptcha' === $field->typ || 'turnstile' === $field->typ) {
         continue;
       }
       // $field_name = empty($field->lbl) ? null : \preg_replace('/[\`\~\!\@\#\$\'\.\s\?\+\-\*\&\|\/\\\!]/', '_', $field->lbl);
@@ -943,44 +1025,68 @@ class FormManager
     return $upload_fields;
   }
 
+  /** Signature pad image types and the extension each is stored with. */
+  private const SIGNATURE_IMG_TYPES = [
+    'image/png'     => 'png',
+    'image/jpeg'    => 'jpg',
+    'image/svg+xml' => 'svg',
+  ];
+
+  /**
+   * Decodes a signature pad data URI into the bytes to store. Run at validation too, so the
+   * visitor gets an error instead of the entry silently pointing at a placeholder file.
+   *
+   * @param mixed  $blobLink data URI posted by the signature pad
+   * @param string $imgType  the field's config imgTyp
+   * @return string file contents; SVG comes back sanitized because it is served from the uploads dir
+   * @throws \InvalidArgumentException|\RuntimeException when the data is unusable
+   */
+  public static function decodeSignatureData($blobLink, $imgType)
+  {
+    if (!isset(self::SIGNATURE_IMG_TYPES[$imgType])) {
+      throw new \InvalidArgumentException('Unsupported signature image type');
+    }
+    $parts = is_string($blobLink) ? explode(',', $blobLink, 2) : [];
+    $decoded_image = 2 === count($parts) ? base64_decode($parts[1], true) : false;
+    if (false === $decoded_image || '' === $decoded_image) {
+      throw new \RuntimeException('Invalid or corrupt signature data URI');
+    }
+
+    // An attacker-controlled SVG signature is written to a web-served path, so a raw write is a
+    // stored-XSS sink. Sanitize with the same enshrined library the upload path uses (FileHandler).
+    if ('svg' === self::SIGNATURE_IMG_TYPES[$imgType]) {
+      $clean = (new Sanitizer())->sanitize($decoded_image);
+      if (false === $clean) {
+        throw new \RuntimeException('Invalid or unsafe SVG signature data');
+      }
+      return $clean;
+    }
+
+    if (false === @getimagesizefromstring($decoded_image)) {
+      throw new \RuntimeException('Signature data is not an image');
+    }
+    return $decoded_image;
+  }
+
   public function getSignatureFilePath($blobLink, $form_id, $fieldKey, $entry_id, $imgType)
   {
-    $imgTypes = [
-      'image/png'     => 'png',
-      'image/jpeg'    => 'jpg',
-      'image/svg+xml' => 'svg',
-    ];
     try {
-      if (!isset($imgTypes[$imgType])) {
-        throw new \InvalidArgumentException("Unsupported image type: $imgType");
-      }
-      $parts = explode(',', $blobLink, 2);
-      if (2 !== count($parts) || false === ($decoded_image = base64_decode($parts[1]))) {
-        throw new \RuntimeException('Invalid or corrupt signature data URI');
-      }
-
-      // An attacker-controlled SVG signature is written to a web-served path, so a raw write is a
-      // stored-XSS sink. Sanitize with the same enshrined library the upload path uses (FileHandler).
-      if ('svg' === $imgTypes[$imgType]) {
-        $clean = (new Sanitizer())->sanitize($decoded_image);
-        if (false === $clean) {
-          throw new \RuntimeException('Invalid or unsafe SVG signature data');
-        }
-        $decoded_image = $clean;
-      }
+      $decoded_image = self::decodeSignatureData($blobLink, $imgType);
 
       $_upload_dir = FileHandler::getEntriesFileUploadDir($form_id, $entry_id);
       FileHandler::createIndexFile($_upload_dir);
       $uniqueId = time() . '-' . bin2hex(\random_bytes(4));
-      $filename = "{$entry_id}-{$fieldKey}-{$uniqueId}.{$imgTypes[$imgType]}";
+      $filename = "{$entry_id}-{$fieldKey}-{$uniqueId}." . self::SIGNATURE_IMG_TYPES[$imgType];
       $fullPath = $_upload_dir . DIRECTORY_SEPARATOR . $filename;
       if (false === file_put_contents($fullPath, $decoded_image)) {
         throw new \RuntimeException("Failed to write image to $fullPath");
       }
       return $filename;
     } catch (\Throwable $e) {
+      // Data is checked at validation, so only a disk failure lands here; the entry and its
+      // integrations already exist, so keep the placeholder every reader already skips.
       Log::debug_log("[Signature Error] Form: $form_id, Entry: $entry_id, Field: $fieldKey - " . $e->getMessage());
-      return 'signature-failed.png'; // or a default filename if appropriate
+      return 'signature-failed.png';
     }
   }
 
@@ -1261,7 +1367,7 @@ class FormManager
     $user_details = apply_filters('bitform_filter_save_entry_user_details', $user_details, $this->form_id);
 
     $form_fields = $this->getFields();
-    $submitted_data = $this->passwordEncrypted($submitted_data, $form_fields);
+    $submitted_data = $this->maskPasswordValues($submitted_data, $form_fields);
     $submitted_data = $this->formatRepeateFieldData($submitted_data, $form_fields);
     global $wpdb;
     // Direct transaction control; no user input involved.
@@ -1411,18 +1517,92 @@ class FormManager
     }
   }
 
+  /**
+   * Kept for callers outside this class; masks every password field now, not only on
+   * forms with a WP User Auth integration.
+   *
+   * @param array $updatedValue
+   * @param array $form_fields
+   * @return array
+   */
   public function passwordEncrypted($updatedValue, $form_fields)
   {
-    $integrationHandler = new IntegrationHandler($this->form_id);
-    $formIntegrations = $integrationHandler->getAllIntegration('wp_user_auth', 'wp_auth', 1);
-    if (!isset($formIntegrations->errors['result_empty'])) {
-      foreach ($form_fields as $field) {
-        if (array_key_exists($field['key'], $updatedValue) && 'password' === $field['type']) {
-          $updatedValue[$field['key']] = '**** (encrypted)';
-        }
+    return $this->maskPasswordValues($updatedValue, $form_fields);
+  }
+
+  /**
+   * Replaces password values with PASSWORD_MASK before anything is stored, logged or
+   * handed to deferred workflows, emails and integrations. Consumers that need the real
+   * password (bitform_wp_user_auth, bitform_save_entry) run earlier in the request.
+   * Runs before formatRepeateFieldData, so repeated rows and an unvalidated
+   * {primary, confirm} draft value are masked leaf by leaf, keeping their shape.
+   *
+   * @param mixed $data        Submitted values keyed by field key
+   * @param mixed $form_fields Fields from getFields()
+   * @return mixed $data, masked when it is an array
+   */
+  public function maskPasswordValues($data, $form_fields)
+  {
+    if (!is_array($data) || !is_array($form_fields)) {
+      return $data;
+    }
+    if (!apply_filters('bitform_mask_password_values', true, $this->form_id)) {
+      return $data;
+    }
+    foreach ($this->getPasswordFieldKeys($form_fields) as $fieldKey) {
+      if (array_key_exists($fieldKey, $data)) {
+        $data[$fieldKey] = self::maskPasswordValue($data[$fieldKey]);
       }
     }
-    return $updatedValue;
+    return $data;
+  }
+
+  /**
+   * @param array $form_fields Fields from getFields()
+   * @return string[]
+   */
+  public function getPasswordFieldKeys($form_fields)
+  {
+    $keys = [];
+    foreach ((array) $form_fields as $field) {
+      if (isset($field['type'], $field['key']) && 'password' === $field['type']) {
+        $keys[] = $field['key'];
+      }
+    }
+    return $keys;
+  }
+
+  /**
+   * Password fields that received a new value: not empty and not the mask a prefilled
+   * form sent back.
+   *
+   * @param array    $data         Submitted values, before masking
+   * @param string[] $passwordKeys
+   * @return string[]
+   */
+  private static function changedPasswordKeys($data, $passwordKeys)
+  {
+    $changed = [];
+    foreach ($passwordKeys as $fieldKey) {
+      $value = isset($data[$fieldKey]) ? $data[$fieldKey] : '';
+      if (is_array($value)) {
+        $value = isset($value['primary']) ? $value['primary'] : implode('', array_filter($value, 'is_string'));
+      }
+      if (is_string($value) && '' !== $value && self::PASSWORD_MASK !== $value) {
+        $changed[] = $fieldKey;
+      }
+    }
+    return $changed;
+  }
+
+  private static function maskPasswordValue($value)
+  {
+    if (is_array($value)) {
+      return array_map(static function ($item) {
+        return self::maskPasswordValue($item);
+      }, $value);
+    }
+    return (null === $value || '' === $value) ? $value : self::PASSWORD_MASK;
   }
 
   private function normalizeOldFileValues($stored_files, $old_values)
@@ -1491,7 +1671,9 @@ class FormManager
 
     $form_fields = $this->getFields();
 
-    $updatedValue = $this->passwordEncrypted($updatedValue, $form_fields);
+    $passwordKeys = $this->getPasswordFieldKeys($form_fields);
+    $changedPasswordKeys = self::changedPasswordKeys($updatedValue, $passwordKeys);
+    $updatedValue = $this->maskPasswordValues($updatedValue, $form_fields);
     $updatedValue = $this->formatRepeateFieldData($updatedValue, $form_fields);
     $field_map = [];
     foreach ($formOldData as $index => $data) {
@@ -1673,6 +1855,10 @@ class FormManager
         $toUpdateValues[$field['key']] = $updatedValue[$field['key']];
       }
     }
+    // A blank or still-masked password means "keep it": edit forms are never prefilled with it.
+    foreach (array_diff($passwordKeys, $changedPasswordKeys) as $passwordKey) {
+      unset($toUpdateValues[$passwordKey]);
+    }
     $form_content = \json_decode($this->form[0]->form_content);
 
     $replacedSignatureFiles = [];
@@ -1767,6 +1953,11 @@ class FormManager
           $key[$i] = '${' . $formOldData[$i]->meta_key . '} file was Updated  To ' . sanitize_file_name(wp_unslash($_FILES[$formOldData[$i]->meta_key]['name']));
         }
         unset($toUpdateValues[$formOldData[$i]->meta_key]);
+      } elseif (in_array($formOldData[$i]->meta_key, $passwordKeys, true)) {
+        // Log that a password changed, never the old or new value.
+        if (in_array($formOldData[$i]->meta_key, $changedPasswordKeys, true)) {
+          $key[$i] = '${' . $formOldData[$i]->meta_key . '} was Updated';
+        }
       } elseif (isset($toUpdateValues[$formOldData[$i]->meta_key])) {
         if (is_array($toUpdateValues[$formOldData[$i]->meta_key])) {
           if (json_decode($formOldData[$i]->meta_value) !== $toUpdateValues[$formOldData[$i]->meta_key]) {
@@ -1783,7 +1974,9 @@ class FormManager
 
     $newField = array_keys(array_diff_key($formEntryMetaUpdateStatus, $field_map));
     for ($i = 0; $i < count($newField); $i++) {
-      if (is_array($toUpdateValues[$newField[$i]]) && !empty($toUpdateValues[$newField[$i]])) {
+      if (in_array($newField[$i], $passwordKeys, true)) {
+        $key[$counter + $i] = '${' . $newField[$i] . '} Updated';
+      } elseif (is_array($toUpdateValues[$newField[$i]]) && !empty($toUpdateValues[$newField[$i]])) {
         $key[$counter + $i] = '${' . $newField[$i] . '} Updated To ' . implode(',', $toUpdateValues[$newField[$i]]);
       } elseif (is_string($newField[$i]) && !FieldValueHandler::isEmpty($toUpdateValues[$newField[$i]])) {
         $key[$counter + $i] = '${' . $newField[$i] . '} Updated To ' . $toUpdateValues[$newField[$i]];
@@ -1876,12 +2069,14 @@ class FormManager
             ]);
           }
           $consumedNames[$fldName] = $fieldKey;
+          // Multiline Text answers must keep their line breaks; sanitize_text_field() would collapse them to spaces.
+          $multiline = isset($fieldData['type']) && 'textarea' === $fieldData['type'];
           if (array_key_exists($fldName, $_POST)) {
-            $temp = $this->sanitize_text_recursive($_POST[$fldName]);
+            $temp = $this->sanitize_text_recursive($_POST[$fldName], true, $multiline);
             unset($_POST[$fldName]);
             $_POST[$fieldKey] = $temp;
           } elseif (array_key_exists($fieldKey, $_POST)) {
-            $_POST[$fieldKey] = $this->sanitize_text_recursive($_POST[$fieldKey]);
+            $_POST[$fieldKey] = $this->sanitize_text_recursive($_POST[$fieldKey], true, $multiline);
           } elseif (array_key_exists($fldName, $_FILES)) {
             $temp = $this->sanitize_text_recursive($_FILES[$fldName], false);
             unset($_FILES[$fldName]);
@@ -1900,13 +2095,36 @@ class FormManager
     }
   }
 
-  private function sanitize_text_recursive($input, $unslash = true)
+  /**
+   * The message the field's "Invalid Error Message" setting shows, so the server check says what the browser check says.
+   *
+   * @param object $field field config from form_content
+   * @return string plain text, or '' when the field has no invalid message
+   */
+  private function getInvalidErrorMessage($field)
+  {
+    if (!isset($field->err->invalid) || !is_object($field->err->invalid)) {
+      return '';
+    }
+    $invalid = $field->err->invalid;
+    $message = (!empty($invalid->custom) && !empty($invalid->msg)) ? $invalid->msg : ($invalid->dflt ?? '');
+    return is_string($message) ? trim(wp_strip_all_tags($message)) : '';
+  }
+
+  /**
+   * @param mixed $input
+   * @param bool  $unslash
+   * @param bool  $multiline keep line breaks (Multiline Text); tags are still stripped
+   * @return mixed
+   */
+  private function sanitize_text_recursive($input, $unslash = true, $multiline = false)
   {
     if (is_array($input)) {
-      return array_map(fn ($item) => $this->sanitize_text_recursive($item, $unslash), $input);
+      return array_map(fn ($item) => $this->sanitize_text_recursive($item, $unslash, $multiline), $input);
     }
 
-    return sanitize_text_field($unslash ? wp_unslash($input) : $input);
+    $value = $unslash ? wp_unslash($input) : $input;
+    return $multiline ? sanitize_textarea_field($value) : sanitize_text_field($value);
   }
 
   private function normalizeRepeatedCompositeFieldInput($value)

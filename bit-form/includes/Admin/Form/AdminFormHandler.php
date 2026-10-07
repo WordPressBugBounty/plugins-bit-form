@@ -245,6 +245,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     // render nothing yet their validation rules block submission. Covers old
     // clients and hand-edited imports (importAForm funnels through here).
     $this->pruneOrphanFields($fields, $nestedLayout, $layout, null, $post);
+    FormManager::syncCompositeChildNames($fields);
     $form_content = [
       'fields'       => $fields,
       'layout'       => $layout,
@@ -589,6 +590,7 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
 
     // Guard: never persist orphan fields (see createNewForm). Fail closed.
     $this->pruneOrphanFields($fields, $nestedLayout, $layout, $formID, $post);
+    FormManager::syncCompositeChildNames($fields);
 
     $form_content = [
       'fields'       => $fields,
@@ -2490,8 +2492,13 @@ grid-template-columns: repeat( 6 , minmax( 30px , 1fr ));
     foreach ($form_fields as $key => $value) {
       // $field_name = preg_replace('/[\`\~\!\@\#\$\'\.\s\?\+\-\*\&\|\/\\!]/', '_', $value->lbl);
       if (isset($entries[$key])) {
-        $form_fields->{$key}->val = $entries[$key];
+        $isPassword = isset($value->typ) && 'password' === $value->typ;
+        // Never hand a stored password back to the browser; blank keeps it on update.
+        $form_fields->{$key}->val = $isPassword ? '' : $entries[$key];
         $form_fields->{$key}->name = $key;
+        if ($isPassword && '' !== (string) $entries[$key] && isset($value->valid) && is_object($value->valid)) {
+          $form_fields->{$key}->valid->req = false;
+        }
       }
     }
     $workFlowRunHelper = new WorkFlow($formID);

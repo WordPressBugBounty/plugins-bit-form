@@ -19,7 +19,7 @@ class BitForm_Public
     $db = new ApiModel();
     $formData = $db->getField($formId);
     if (!empty($formData)) {
-      $unset_types = ['paypal', 'razorpay', 'stripe', 'recaptcha', 'hcaptcha'];
+      $unset_types = ['paypal', 'razorpay', 'stripe', 'recaptcha', 'hcaptcha', 'turnstile'];
       $formRow = Utilities::firstRow($formData);
       $formContent = Utilities::jsonObj($formRow->form_content ?? '');
       if (!$formContent || !isset($formContent->fields)) {

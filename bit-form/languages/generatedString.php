@@ -26,13 +26,17 @@ $bitforms_i18n_strings = array(
 
     'Maps JavaScript API' => __('Maps JavaScript API', 'bit-form'),
 
-    'Geocoding API' => __('Geocoding API', 'bit-form'),
-
     'and' => __('and', 'bit-form'),
 
-    'Places API' => __('Places API', 'bit-form'),
+    'Places API (New)' => __('Places API (New)', 'bit-form'),
 
-    'for your project.' => __('for your project.', 'bit-form'),
+    'for your project. The legacy "Places API" is not enough — new Google Cloud projects can only use Places API (New).' => __('for your project. The legacy "Places API" is not enough — new Google Cloud projects can only use Places API (New).', 'bit-form'),
+
+    'Also enable the' => __('Also enable the', 'bit-form'),
+
+    'Geocoding API' => __('Geocoding API', 'bit-form'),
+
+    'if you use Auto Locate or the Interactive map, which turn a location into an address.' => __('if you use Auto Locate or the Interactive map, which turn a location into an address.', 'bit-form'),
 
     'Click' => __('Click', 'bit-form'),
 
@@ -90,7 +94,7 @@ $bitforms_i18n_strings = array(
 
     'Add this domain when restricting your API keys.' => __('Add this domain when restricting your API keys.', 'bit-form'),
 
-    'Required for Google Places autocomplete and Show Map features.' => __('Required for Google Places autocomplete and Show Map features.', 'bit-form'),
+    'Required for Google Places autocomplete and Show Map features. Enable "Maps JavaScript API" and "Places API (New)" for this key.' => __('Required for Google Places autocomplete and Show Map features. Enable "Maps JavaScript API" and "Places API (New)" for this key.', 'bit-form'),
 
     'Get a key in Google Cloud Console' => __('Get a key in Google Cloud Console', 'bit-form'),
 
@@ -150,7 +154,7 @@ $bitforms_i18n_strings = array(
 
     'Choose the type of reCaptcha V3 (reCaptcha V3).' => __('Choose the type of reCaptcha V3 (reCaptcha V3).', 'bit-form'),
 
-    'Now, Please go to your form and add a Google reCaptcha V3 field.' => __('Now, Please go to your form and add a Google reCaptcha V3 field.', 'bit-form'),
+    'Now, open your form\'s Settings and turn on "Enable ReCaptcha V3". reCAPTCHA v3 is a form setting, not a field.' => __('Now, open your form\'s Settings and turn on "Enable ReCaptcha V3". reCAPTCHA v3 is a form setting, not a field.', 'bit-form'),
 
     'Bit form Google reCaptcha V3 documentation' => __('Bit form Google reCaptcha V3 documentation', 'bit-form'),
 
@@ -188,6 +192,12 @@ $bitforms_i18n_strings = array(
 
     'Please click on the available Captcha option for configuration.' => __('Please click on the available Captcha option for configuration.', 'bit-form'),
 
+    'Site Key:' => __('Site Key:', 'bit-form'),
+
+    'Secret Key:' => __('Secret Key:', 'bit-form'),
+
+    'Not Configured' => __('Not Configured', 'bit-form'),
+
     'Edit' => __('Edit', 'bit-form'),
 
     'Captcha Settings Updated' => __('Captcha Settings Updated', 'bit-form'),
@@ -198,7 +208,7 @@ $bitforms_i18n_strings = array(
 
     'Learn More' => __('Learn More', 'bit-form'),
 
-    'To get Site Key and SECRET , Please Visit' => __('To get Site Key and SECRET , Please Visit', 'bit-form'),
+    'To get the Site Key and Secret Key, visit' => __('To get the Site Key and Secret Key, visit', 'bit-form'),
 
     'Google reCAPTCHA Admin' => __('Google reCAPTCHA Admin', 'bit-form'),
 
@@ -208,15 +218,13 @@ $bitforms_i18n_strings = array(
 
     'hCaptcha is a free service that protects your website from spam and abuse.' => __('hCaptcha is a free service that protects your website from spam and abuse.', 'bit-form'),
 
-    'To get Site Key and Secret, Please Visit' => __('To get Site Key and Secret, Please Visit', 'bit-form'),
-
     'hCaptcha Admin Dashboard' => __('hCaptcha Admin Dashboard', 'bit-form'),
 
     'Cloudflare Turnstile CAPTCHA' => __('Cloudflare Turnstile CAPTCHA', 'bit-form'),
 
     'Turnstile is a free service that protects your website from spam and abuse.' => __('Turnstile is a free service that protects your website from spam and abuse.', 'bit-form'),
 
-    'Cloudflare Turnstile reCAPTCHA Admin' => __('Cloudflare Turnstile reCAPTCHA Admin', 'bit-form'),
+    'Cloudflare Turnstile dashboard' => __('Cloudflare Turnstile dashboard', 'bit-form'),
 
     'How to set up' => __('How to set up', 'bit-form'),
 
@@ -1840,7 +1848,13 @@ $bitforms_i18n_strings = array(
 
     'You have been successfully logged in.' => __('You have been successfully logged in.', 'bit-form'),
 
-    'We have e-mailed your password reset link!' => __('We have e-mailed your password reset link!', 'bit-form'),
+    'If an account exists for that username or email, we\'ve emailed a reset link.' => __('If an account exists for that username or email, we\'ve emailed a reset link.', 'bit-form'),
+
+    'Reset your password' => __('Reset your password', 'bit-form'),
+
+    'Your password has been reset. You can now log in with your new password.' => __('Your password has been reset. You can now log in with your new password.', 'bit-form'),
+
+    'Please map the required fields.' => __('Please map the required fields.', 'bit-form'),
 
     'Saved successfully.' => __('Saved successfully.', 'bit-form'),
 
@@ -1894,15 +1908,21 @@ $bitforms_i18n_strings = array(
 
     'Capture' => __('Capture', 'bit-form'),
 
+    'Off' => __('Off', 'bit-form'),
+
+    'On - rear camera' => __('On - rear camera', 'bit-form'),
+
+    'On - front camera' => __('On - front camera', 'bit-form'),
+
     'Basic' => __('Basic', 'bit-form'),
 
     'Multiple file upload' => __('Multiple file upload', 'bit-form'),
 
     'Allow File Browse' => __('Allow File Browse', 'bit-form'),
 
-    'Drag n Drop' => __('Drag n Drop', 'bit-form'),
+    'Drag and drop' => __('Drag and drop', 'bit-form'),
 
-    'Allow copy to Pasting of files' => __('Allow copy to Pasting of files', 'bit-form'),
+    'Allow pasting files' => __('Allow pasting files', 'bit-form'),
 
     'Allow reorder files' => __('Allow reorder files', 'bit-form'),
 
@@ -1910,7 +1930,19 @@ $bitforms_i18n_strings = array(
 
     'Full page droppable' => __('Full page droppable', 'bit-form'),
 
+    'Accept files dropped anywhere on the page' => __('Accept files dropped anywhere on the page', 'bit-form'),
+
     'Labels Customization' => __('Labels Customization', 'bit-form'),
+
+    'Placeholder / Label / Title edit' => __('Placeholder / Label / Title edit', 'bit-form'),
+
+    'Maximum File' => __('Maximum File', 'bit-form'),
+
+    'Maximum number of files' => __('Maximum number of files', 'bit-form'),
+
+    'Maximum Parallel Upload' => __('Maximum Parallel Upload', 'bit-form'),
+
+    'Maximum number of parallel uploads' => __('Maximum number of parallel uploads', 'bit-form'),
 
     'File size validation' => __('File size validation', 'bit-form'),
 
@@ -1920,9 +1952,11 @@ $bitforms_i18n_strings = array(
 
     'Select File Type' => __('Select File Type', 'bit-form'),
 
+    'File is of invalid type' => __('File is of invalid type', 'bit-form'),
+
     'Image Preview' => __('Image Preview', 'bit-form'),
 
-    'Video/Pdf Preview' => __('Video/Pdf Preview', 'bit-form'),
+    'Video/Audio/PDF Preview' => __('Video/Audio/PDF Preview', 'bit-form'),
 
     'Image Crop' => __('Image Crop', 'bit-form'),
 
@@ -1930,25 +1964,189 @@ $bitforms_i18n_strings = array(
 
     'Image Transform' => __('Image Transform', 'bit-form'),
 
-    'Image validate size' => __('Image validate size', 'bit-form'),
+    'Image Validate Size' => __('Image Validate Size', 'bit-form'),
 
     'Edit Options' => __('Edit Options', 'bit-form'),
 
+    'Image Validate Customization' => __('Image Validate Customization', 'bit-form'),
+
+    'Placeholder' => __('Placeholder', 'bit-form'),
+
+    'Default label shown to indicate this is a drop area' => __('Default label shown to indicate this is a drop area', 'bit-form'),
+
+    'File Loading' => __('File Loading', 'bit-form'),
+
+    'Label used while loading a file' => __('Label used while loading a file', 'bit-form'),
+
+    'Invalid Field' => __('Invalid Field', 'bit-form'),
+
+    'Label shown when the field contains invalid files and is validated by the parent form' => __('Label shown when the field contains invalid files and is validated by the parent form', 'bit-form'),
+
+    'File Waiting For Size' => __('File Waiting For Size', 'bit-form'),
+
+    'Label used while waiting for file size information' => __('Label used while waiting for file size information', 'bit-form'),
+
+    'FileSize Not Available' => __('FileSize Not Available', 'bit-form'),
+
+    'Label used when no file size information was received' => __('Label used when no file size information was received', 'bit-form'),
+
+    'File Load Error' => __('File Load Error', 'bit-form'),
+
+    'Label used when file load failed' => __('Label used when file load failed', 'bit-form'),
+
+    'File Processing' => __('File Processing', 'bit-form'),
+
+    'Label used when uploading a file' => __('Label used when uploading a file', 'bit-form'),
+
+    'File Processing Complete' => __('File Processing Complete', 'bit-form'),
+
+    'Label used when file upload has completed' => __('Label used when file upload has completed', 'bit-form'),
+
+    'File Processing Aborted' => __('File Processing Aborted', 'bit-form'),
+
+    'Label used when upload was cancelled' => __('Label used when upload was cancelled', 'bit-form'),
+
+    'File Processing Error' => __('File Processing Error', 'bit-form'),
+
+    'Label used when something went wrong during file upload. Leave empty to show the reason returned by the server.' => __('Label used when something went wrong during file upload. Leave empty to show the reason returned by the server.', 'bit-form'),
+
+    'Max Files Exceeded' => __('Max Files Exceeded', 'bit-form'),
+
+    'Message shown when more files are added than Maximum File allows. {max} is replaced with the limit.' => __('Message shown when more files are added than Maximum File allows. {max} is replaced with the limit.', 'bit-form'),
+
+    'File Processing Revert Error' => __('File Processing Revert Error', 'bit-form'),
+
+    'Label used when something went wrong during reverting the file upload' => __('Label used when something went wrong during reverting the file upload', 'bit-form'),
+
+    'File Remove Error' => __('File Remove Error', 'bit-form'),
+
+    'Label used to indicate something went wrong when removing the file' => __('Label used to indicate something went wrong when removing the file', 'bit-form'),
+
+    'Tap To Cancel' => __('Tap To Cancel', 'bit-form'),
+
+    'Label used to indicate to the user that an action can be cancelled.' => __('Label used to indicate to the user that an action can be cancelled.', 'bit-form'),
+
+    'Tap To Retry' => __('Tap To Retry', 'bit-form'),
+
+    'Label used to indicate to the user that an action can be retried.' => __('Label used to indicate to the user that an action can be retried.', 'bit-form'),
+
+    'Tap To Undo' => __('Tap To Undo', 'bit-form'),
+
+    'Label used to indicate to the user that an action can be undone.' => __('Label used to indicate to the user that an action can be undone.', 'bit-form'),
+
+    'Button Remove Item' => __('Button Remove Item', 'bit-form'),
+
+    'Label used for remove button' => __('Label used for remove button', 'bit-form'),
+
+    'Button Abort Item Load' => __('Button Abort Item Load', 'bit-form'),
+
+    'Label used for abort load button' => __('Label used for abort load button', 'bit-form'),
+
+    'Button Retry Item Load' => __('Button Retry Item Load', 'bit-form'),
+
+    'Label used for retry load button' => __('Label used for retry load button', 'bit-form'),
+
+    'Button Abort Item Processing' => __('Button Abort Item Processing', 'bit-form'),
+
+    'Label used for abort upload button' => __('Label used for abort upload button', 'bit-form'),
+
+    'Button Undo Item Processing' => __('Button Undo Item Processing', 'bit-form'),
+
+    'Label used for undo upload button' => __('Label used for undo upload button', 'bit-form'),
+
+    'Button Retry Item Processing' => __('Button Retry Item Processing', 'bit-form'),
+
+    'Label used for retry upload button' => __('Label used for retry upload button', 'bit-form'),
+
+    'Button Process Item' => __('Button Process Item', 'bit-form'),
+
+    'Label used for upload button' => __('Label used for upload button', 'bit-form'),
+
     'Panel Layout' => __('Panel Layout', 'bit-form'),
+
+    'File Upload Panel Layout' => __('File Upload Panel Layout', 'bit-form'),
 
     'Remove Button' => __('Remove Button', 'bit-form'),
 
+    'The position of the remove item button' => __('The position of the remove item button', 'bit-form'),
+
     'Process Button' => __('Process Button', 'bit-form'),
+
+    'The position of the process item button' => __('The position of the process item button', 'bit-form'),
 
     'Load Indicator' => __('Load Indicator', 'bit-form'),
 
+    'The position of the load indicator' => __('The position of the load indicator', 'bit-form'),
+
     'Progress Indicator' => __('Progress Indicator', 'bit-form'),
+
+    'The position of the progress indicator' => __('The position of the progress indicator', 'bit-form'),
 
     'Min File Size' => __('Min File Size', 'bit-form'),
 
     'Max File Size' => __('Max File Size', 'bit-form'),
 
     'Max Total File Size' => __('Max Total File Size', 'bit-form'),
+
+    'The minimum image width' => __('The minimum image width', 'bit-form'),
+
+    'Min Width' => __('Min Width', 'bit-form'),
+
+    'The maximum image width' => __('The maximum image width', 'bit-form'),
+
+    'Max Width' => __('Max Width', 'bit-form'),
+
+    'The minimum image height' => __('The minimum image height', 'bit-form'),
+
+    'Min Height' => __('Min Height', 'bit-form'),
+
+    'The maximum image height' => __('The maximum image height', 'bit-form'),
+
+    'Max Height' => __('Max Height', 'bit-form'),
+
+    'The message shown when the image is not supported by the browser.' => __('The message shown when the image is not supported by the browser.', 'bit-form'),
+
+    'Label Format Error Message' => __('Label Format Error Message', 'bit-form'),
+
+    'The message shown when the image is too small' => __('The message shown when the image is too small', 'bit-form'),
+
+    'Too Small Error Message' => __('Too Small Error Message', 'bit-form'),
+
+    'The message shown when the image is too big' => __('The message shown when the image is too big', 'bit-form'),
+
+    'Too Big Error Message' => __('Too Big Error Message', 'bit-form'),
+
+    'Message shown to indicate the minimum image size' => __('Message shown to indicate the minimum image size', 'bit-form'),
+
+    'Min Size Error Message' => __('Min Size Error Message', 'bit-form'),
+
+    'Message shown to indicate the maximum image size' => __('Message shown to indicate the maximum image size', 'bit-form'),
+
+    'Max Size Error Message' => __('Max Size Error Message', 'bit-form'),
+
+    'The minimum image resolution' => __('The minimum image resolution', 'bit-form'),
+
+    'Min Size Resolution' => __('Min Size Resolution', 'bit-form'),
+
+    'The maximum image resolution' => __('The maximum image resolution', 'bit-form'),
+
+    'Max Size Resolution' => __('Max Size Resolution', 'bit-form'),
+
+    'The message shown when the image resolution is too low' => __('The message shown when the image resolution is too low', 'bit-form'),
+
+    'Resolution too low Error Message' => __('Resolution too low Error Message', 'bit-form'),
+
+    'The message shown when the image resolution is too high' => __('The message shown when the image resolution is too high', 'bit-form'),
+
+    'Resolution too high Error Message' => __('Resolution too high Error Message', 'bit-form'),
+
+    'Message shown to indicate the minimum image resolution' => __('Message shown to indicate the minimum image resolution', 'bit-form'),
+
+    'Min Resolution Error Message' => __('Min Resolution Error Message', 'bit-form'),
+
+    'Message shown to indicate the maximum image resolution' => __('Message shown to indicate the maximum image resolution', 'bit-form'),
+
+    'Max Resolution Error Message' => __('Max Resolution Error Message', 'bit-form'),
 
     'Close' => __('Close', 'bit-form'),
 
@@ -2036,7 +2234,11 @@ $bitforms_i18n_strings = array(
 
     'Allow Other Option' => __('Allow Other Option', 'bit-form'),
 
-    'Placeholder' => __('Placeholder', 'bit-form'),
+    'This button adds a new row below the current one. You can show or hide it with this toggle.' => __('This button adds a new row below the current one. You can show or hide it with this toggle.', 'bit-form'),
+
+    'This button removes a row. It is always shown so visitors can delete rows.' => __('This button removes a row. It is always shown so visitors can delete rows.', 'bit-form'),
+
+    'This button adds a new row at the end of the repeater. You can show or hide it with this toggle.' => __('This button adds a new row at the end of the repeater. You can show or hide it with this toggle.', 'bit-form'),
 
     'Button Alignment:' => __('Button Alignment:', 'bit-form'),
 
@@ -2174,6 +2376,16 @@ $bitforms_i18n_strings = array(
 
     'Add Options List' => __('Add Options List', 'bit-form'),
 
+    'Check by Default' => __('Check by Default', 'bit-form'),
+
+    'Image' => __('Image', 'bit-form'),
+
+    'Check' => __('Check', 'bit-form'),
+
+    'Require' => __('Require', 'bit-form'),
+
+    'Disable' => __('Disable', 'bit-form'),
+
     'Add More' => __('Add More', 'bit-form'),
 
     'Add Group' => __('Add Group', 'bit-form'),
@@ -2190,6 +2402,8 @@ $bitforms_i18n_strings = array(
 
     'Basic Configuration' => __('Basic Configuration', 'bit-form'),
 
+    'Calendar Mode' => __('Calendar Mode', 'bit-form'),
+
     'Single' => __('Single', 'bit-form'),
 
     'Range' => __('Range', 'bit-form'),
@@ -2200,13 +2414,21 @@ $bitforms_i18n_strings = array(
 
     'Show the user a readable date (as per altFormat), but return something totally different to the server. <a href="https://flatpickr.js.org/options/#:~:text=Description-,altFormat,-String" target="_blank">Learn more</>' => __('Show the user a readable date (as per altFormat), but return something totally different to the server. <a href="https://flatpickr.js.org/options/#:~:text=Description-,altFormat,-String" target="_blank">Learn more</>', 'bit-form'),
 
+    'Select One' => __('Select One', 'bit-form'),
+
     'Value Format' => __('Value Format', 'bit-form'),
 
     'A string of characters which are used to define how the date will be displayed in the input box. The supported characters are defined in the <a href="https://flatpickr.js.org/formatting/" target="_blank">documentation.</a>' => __('A string of characters which are used to define how the date will be displayed in the input box. The supported characters are defined in the <a href="https://flatpickr.js.org/formatting/" target="_blank">documentation.</a>', 'bit-form'),
 
+    'Default Date' => __('Default Date', 'bit-form'),
+
     'Relative to Today (± Days)' => __('Relative to Today (± Days)', 'bit-form'),
 
+    'Minimum Date' => __('Minimum Date', 'bit-form'),
+
     'Days before today' => __('Days before today', 'bit-form'),
+
+    'Maximum Date' => __('Maximum Date', 'bit-form'),
 
     'Days after today' => __('Days after today', 'bit-form'),
 
@@ -2222,7 +2444,7 @@ $bitforms_i18n_strings = array(
 
     'Enables 24-hour format for time. By default, 12-hour format is used. If you want to use 24-hour format, you need to enable this.' => __('Enables 24-hour format for time. By default, 12-hour format is used. If you want to use 24-hour format, you need to enable this.', 'bit-form'),
 
-    'Hide Calender' => __('Hide Calender', 'bit-form'),
+    'Hide Calendar' => __('Hide Calendar', 'bit-form'),
 
     'Hides the calendar. By default, calendar is shown. If you want to hide the calendar, you need to enable this.' => __('Hides the calendar. By default, calendar is shown. If you want to hide the calendar, you need to enable this.', 'bit-form'),
 
@@ -2420,7 +2642,7 @@ $bitforms_i18n_strings = array(
 
     'Disable Card' => __('Disable Card', 'bit-form'),
 
-    'Shipping Amount' => __('Shipping Amount', 'bit-form'),
+    'Shipping Amount Type' => __('Shipping Amount Type', 'bit-form'),
 
     'Shipping Cost' => __('Shipping Cost', 'bit-form'),
 
@@ -2429,6 +2651,8 @@ $bitforms_i18n_strings = array(
     'Tax Amount Type' => __('Tax Amount Type', 'bit-form'),
 
     'Tax (%)' => __('Tax (%)', 'bit-form'),
+
+    'Select Tax Field' => __('Select Tax Field', 'bit-form'),
 
     'Select Description Field' => __('Select Description Field', 'bit-form'),
 
@@ -2458,11 +2682,11 @@ $bitforms_i18n_strings = array(
 
     'Add/Edit Rating Options' => __('Add/Edit Rating Options', 'bit-form'),
 
-    'Show Rating Message On hover' => __('Show Rating Message On hover', 'bit-form'),
+    'Show rating message on hover' => __('Show rating message on hover', 'bit-form'),
 
     'Show Rating Message On Selected' => __('Show Rating Message On Selected', 'bit-form'),
 
-    'Razorpay Dyanmic Amount Field is not Selected' => __('Razorpay Dyanmic Amount Field is not Selected', 'bit-form'),
+    'Razorpay Dynamic Amount Field is not Selected' => __('Razorpay Dynamic Amount Field is not Selected', 'bit-form'),
 
     'Razorpay Fixed Amount is not valid' => __('Razorpay Fixed Amount is not valid', 'bit-form'),
 
@@ -2496,11 +2720,27 @@ $bitforms_i18n_strings = array(
 
     'Value :' => __('Value :', 'bit-form'),
 
+    /* translators: %s: dynamic value. */
+    'Minimum Repeatable Row is %s' => __('Minimum Repeatable Row is %s', 'bit-form'),
+
+    /* translators: %s: dynamic value. */
+    'Maximum Repeatable Row is %s' => __('Maximum Repeatable Row is %s', 'bit-form'),
+
+    'Button Layout and Position:' => __('Button Layout and Position:', 'bit-form'),
+
     'Button View:' => __('Button View:', 'bit-form'),
+
+    'Add Button' => __('Add Button', 'bit-form'),
+
+    'Add To End Button' => __('Add To End Button', 'bit-form'),
+
+    'Repeatable Row Count(Min/Max):' => __('Repeatable Row Count(Min/Max):', 'bit-form'),
 
     'Default Row:' => __('Default Row:', 'bit-form'),
 
     'Minimum Row:' => __('Minimum Row:', 'bit-form'),
+
+    'A repeater always keeps at least one row, so the lowest Minimum Row is 1.' => __('A repeater always keeps at least one row, so the lowest Minimum Row is 1.', 'bit-form'),
 
     'Maximum Row:' => __('Maximum Row:', 'bit-form'),
 
@@ -2524,17 +2764,25 @@ $bitforms_i18n_strings = array(
 
     'Enter the shortcode in this Input.' => __('Enter the shortcode in this Input.', 'bit-form'),
 
+    'Shortcode content for this field' => __('Shortcode content for this field', 'bit-form'),
+
+    'Reverses the order of the Clear, Undo and Redo buttons.' => __('Reverses the order of the Clear, Undo and Redo buttons.', 'bit-form'),
+
     'Button Reverse' => __('Button Reverse', 'bit-form'),
 
     'Clear' => __('Clear', 'bit-form'),
 
     'Clear Button' => __('Clear Button', 'bit-form'),
 
+    'You can add or remove the Clear button from the Signature field with this toggle.' => __('You can add or remove the Clear button from the Signature field with this toggle.', 'bit-form'),
+
     'Space Between' => __('Space Between', 'bit-form'),
 
     'Redo' => __('Redo', 'bit-form'),
 
     'Redo Button' => __('Redo Button', 'bit-form'),
+
+    'You can add or remove the Redo button from the Signature field with this toggle.' => __('You can add or remove the Redo button from the Signature field with this toggle.', 'bit-form'),
 
     'Pen Color' => __('Pen Color', 'bit-form'),
 
@@ -2549,6 +2797,8 @@ $bitforms_i18n_strings = array(
     'Undo' => __('Undo', 'bit-form'),
 
     'Undo Button' => __('Undo Button', 'bit-form'),
+
+    'You can add or remove the Undo button from the Signature field with this toggle.' => __('You can add or remove the Undo button from the Signature field with this toggle.', 'bit-form'),
 
     'Add/Edit Suggestions' => __('Add/Edit Suggestions', 'bit-form'),
 
@@ -2573,8 +2823,6 @@ $bitforms_i18n_strings = array(
     'Stripe Dynamic Amount Field is not Selected' => __('Stripe Dynamic Amount Field is not Selected', 'bit-form'),
 
     'Select a valid currency for the selected payment method types' => __('Select a valid currency for the selected payment method types', 'bit-form'),
-
-    'Stripe Dyanmic Amount Field is not Selected' => __('Stripe Dyanmic Amount Field is not Selected', 'bit-form'),
 
     'Stripe Fixed Amount is not valid' => __('Stripe Fixed Amount is not valid', 'bit-form'),
 
@@ -2831,6 +3079,8 @@ $bitforms_i18n_strings = array(
     'Shadow Style' => __('Shadow Style', 'bit-form'),
 
     'Pattern not matched' => __('Pattern not matched', 'bit-form'),
+
+    'Value Range (Min/Max)' => __('Value Range (Min/Max)', 'bit-form'),
 
     'Input mode' => __('Input mode', 'bit-form'),
 
@@ -3286,6 +3536,8 @@ $bitforms_i18n_strings = array(
 
     'Drag and drop fields here' => __('Drag and drop fields here', 'bit-form'),
 
+    'Value:' => __('Value:', 'bit-form'),
+
     'Stripe publishable key is missing' => __('Stripe publishable key is missing', 'bit-form'),
 
     'History Empty' => __('History Empty', 'bit-form'),
@@ -3300,7 +3552,7 @@ $bitforms_i18n_strings = array(
 
     'How to add Custom CSS/JS:' => __('How to add Custom CSS/JS:', 'bit-form'),
 
-    'You can write your custom CSS/JS her. This CSS/JS will be applied in this form only.' => __('You can write your custom CSS/JS her. This CSS/JS will be applied in this form only.', 'bit-form'),
+    'You can write your custom CSS/JS here. This CSS/JS will be applied in this form only.' => __('You can write your custom CSS/JS here. This CSS/JS will be applied in this form only.', 'bit-form'),
 
     'In order to repopulate form fields, it is necessary to store the submitted data in the database. Please make sure to turn off the "disable storing form submission data" option in the form settings.' => __('In order to repopulate form fields, it is necessary to store the submitted data in the database. Please make sure to turn off the "disable storing form submission data" option in the form settings.', 'bit-form'),
 
@@ -3574,6 +3826,10 @@ $bitforms_i18n_strings = array(
 
     'Transaction Mode:' => __('Transaction Mode:', 'bit-form'),
 
+    'Sandbox' => __('Sandbox', 'bit-form'),
+
+    'Live' => __('Live', 'bit-form'),
+
     'Client ID:' => __('Client ID:', 'bit-form'),
 
     'Client Secret:' => __('Client Secret:', 'bit-form'),
@@ -3618,8 +3874,6 @@ $bitforms_i18n_strings = array(
 
     'Text' => __('Text', 'bit-form'),
 
-    'Image' => __('Image', 'bit-form'),
-
     'Watermark Text' => __('Watermark Text', 'bit-form'),
 
     'Watermark Image' => __('Watermark Image', 'bit-form'),
@@ -3651,6 +3905,14 @@ $bitforms_i18n_strings = array(
     'To get API Key & Secret, Please Visit' => __('To get API Key & Secret, Please Visit', 'bit-form'),
 
     'Razorpay Dashboard' => __('Razorpay Dashboard', 'bit-form'),
+
+    'Please add the following webhook to your Razorpay account settings. Copy this webhook URL:' => __('Please add the following webhook to your Razorpay account settings. Copy this webhook URL:', 'bit-form'),
+
+    'and paste it in your Razorpay account. To add this,' => __('and paste it in your Razorpay account. To add this,', 'bit-form'),
+
+    'go to Razorpay Webhooks Settings' => __('go to Razorpay Webhooks Settings', 'bit-form'),
+
+    'and configure it with the following event:' => __('and configure it with the following event:', 'bit-form'),
 
     'Are you sure to delete this URL ?' => __('Are you sure to delete this URL ?', 'bit-form'),
 
@@ -3786,6 +4048,10 @@ $bitforms_i18n_strings = array(
 
     'AND' => __('AND', 'bit-form'),
 
+    'To use reCAPTCHA v3, you must set the Site Key and Secret Key from' => __('To use reCAPTCHA v3, you must set the Site Key and Secret Key from', 'bit-form'),
+
+    'You can use either reCAPTCHA v2 or reCAPTCHA v3 in a form. To use reCAPTCHA v3, remove the reCAPTCHA v2 field from the form builder.' => __('You can use either reCAPTCHA v2 or reCAPTCHA v3 in a form. To use reCAPTCHA v3, remove the reCAPTCHA v2 field from the form builder.', 'bit-form'),
+
     'ReCaptcha validation failed.' => __('ReCaptcha validation failed.', 'bit-form'),
 
     'The form has reached its maximum number of submissions.' => __('The form has reached its maximum number of submissions.', 'bit-form'),
@@ -3815,6 +4081,14 @@ $bitforms_i18n_strings = array(
     'Enable / Disable' => __('Enable / Disable', 'bit-form'),
 
     'Hide ReCaptcha Badge' => __('Hide ReCaptcha Badge', 'bit-form'),
+
+    'Show Advanced Settings' => __('Show Advanced Settings', 'bit-form'),
+
+    'Hide Advanced Settings' => __('Hide Advanced Settings', 'bit-form'),
+
+    'Tolerance Level' => __('Tolerance Level', 'bit-form'),
+
+    'Low Score Message' => __('Low Score Message', 'bit-form'),
 
     'Honeypot trap for bot' => __('Honeypot trap for bot', 'bit-form'),
 
@@ -3914,8 +4188,6 @@ $bitforms_i18n_strings = array(
 
     'Publishable key:' => __('Publishable key:', 'bit-form'),
 
-    'Secret Key:' => __('Secret Key:', 'bit-form'),
-
     'To get Publishable key & Secret key, Please Visit' => __('To get Publishable key & Secret key, Please Visit', 'bit-form'),
 
     'Stripe Developer Dashboard' => __('Stripe Developer Dashboard', 'bit-form'),
@@ -3925,6 +4197,26 @@ $bitforms_i18n_strings = array(
     'Add Property' => __('Add Property', 'bit-form'),
 
     'Override theme and common styles' => __('Override theme and common styles', 'bit-form'),
+
+    'Label Wrapper Width' => __('Label Wrapper Width', 'bit-form'),
+
+    'Label Position' => __('Label Position', 'bit-form'),
+
+    'Top' => __('Top', 'bit-form'),
+
+    'Inline reverse' => __('Inline reverse', 'bit-form'),
+
+    'Label Position Vertical' => __('Label Position Vertical', 'bit-form'),
+
+    'Middle' => __('Middle', 'bit-form'),
+
+    'Bottom' => __('Bottom', 'bit-form'),
+
+    'Label Alignment' => __('Label Alignment', 'bit-form'),
+
+    'Subtitle Alignment' => __('Subtitle Alignment', 'bit-form'),
+
+    'Helper Text Alignment' => __('Helper Text Alignment', 'bit-form'),
 
     'Multi Step Quick Tweaks' => __('Multi Step Quick Tweaks', 'bit-form'),
 
@@ -3972,9 +4264,23 @@ $bitforms_i18n_strings = array(
 
     'Multi step quick tweaks is not available. this feature will coming soon.' => __('Multi step quick tweaks is not available. this feature will coming soon.', 'bit-form'),
 
+    'Button Theme' => __('Button Theme', 'bit-form'),
+
+    'Razorpay Button Theme' => __('Razorpay Button Theme', 'bit-form'),
+
+    'Razorpay Dark' => __('Razorpay Dark', 'bit-form'),
+
+    'Razorpay Light' => __('Razorpay Light', 'bit-form'),
+
+    'Razorpay Outline' => __('Razorpay Outline', 'bit-form'),
+
+    'Brand Color' => __('Brand Color', 'bit-form'),
+
     'Transparent' => __('Transparent', 'bit-form'),
 
     'Go to Theme Gallery Settings' => __('Go to Theme Gallery Settings', 'bit-form'),
+
+    'Untitled Theme' => __('Untitled Theme', 'bit-form'),
 
     'Add important rule to all styles to override the conflicting styles in frontend.' => __('Add important rule to all styles to override the conflicting styles in frontend.', 'bit-form'),
 
@@ -4046,13 +4352,113 @@ $bitforms_i18n_strings = array(
 
     'Custom ZIP regex pattern' => __('Custom ZIP regex pattern', 'bit-form'),
 
+    'Opens the camera instead of the file picker. Works on mobile devices only.' => __('Opens the camera instead of the file picker. Works on mobile devices only.', 'bit-form'),
+
+    'File Style' => __('File Style', 'bit-form'),
+
+    'Note: If you enable this option, the File size validation features will work' => __('Note: If you enable this option, the File size validation features will work', 'bit-form'),
+
+    'Note: If you enable this option, the Image Preview features will work' => __('Note: If you enable this option, the Image Preview features will work', 'bit-form'),
+
+    'Image Preview Min Height' => __('Image Preview Min Height', 'bit-form'),
+
+    'Minimum image preview height' => __('Minimum image preview height', 'bit-form'),
+
+    'Image Preview Max Height' => __('Image Preview Max Height', 'bit-form'),
+
+    'Maximum image preview height' => __('Maximum image preview height', 'bit-form'),
+
+    'Preview Height' => __('Preview Height', 'bit-form'),
+
+    'Fixed image preview height, overrides min and max preview height' => __('Fixed image preview height, overrides min and max preview height', 'bit-form'),
+
+    'Enable or disable the preview of video, audio and PDF files' => __('Enable or disable the preview of video, audio and PDF files', 'bit-form'),
+
+    'Note: If you enable this option, the Image Crop features will work' => __('Note: If you enable this option, the Image Crop features will work', 'bit-form'),
+
+    'Crop Aspect Ratio' => __('Crop Aspect Ratio', 'bit-form'),
+
+    'The aspect ratio of the crop, for example 1:1 or 16:10' => __('The aspect ratio of the crop, for example 1:1 or 16:10', 'bit-form'),
+
+    'Note: If you enable this option, the Image Resize features will work' => __('Note: If you enable this option, the Image Resize features will work', 'bit-form'),
+
+    'Image Resize Width' => __('Image Resize Width', 'bit-form'),
+
+    'The output width in pixels. If left empty, the Image Resize Height is used.' => __('The output width in pixels. If left empty, the Image Resize Height is used.', 'bit-form'),
+
+    'Image Resize Height' => __('Image Resize Height', 'bit-form'),
+
+    'The output height in pixels. If left empty, the Image Resize Width is used.' => __('The output height in pixels. If left empty, the Image Resize Width is used.', 'bit-form'),
+
+    'Image Resize Mode' => __('Image Resize Mode', 'bit-form'),
+
+    'The method in which the images are resized.' => __('The method in which the images are resized.', 'bit-form'),
+
+    'Note: Required by Image Crop and Image Resize. Turning it off also turns them off.' => __('Note: Required by Image Crop and Image Resize. Turning it off also turns them off.', 'bit-form'),
+
+    'Image Output Type' => __('Image Output Type', 'bit-form'),
+
+    'The file type of the output image: JPEG or PNG.' => __('The file type of the output image: JPEG or PNG.', 'bit-form'),
+
+    'Transform Output Quality' => __('Transform Output Quality', 'bit-form'),
+
+    'The quality of the output image supplied as a value between 0 and 100.' => __('The quality of the output image supplied as a value between 0 and 100.', 'bit-form'),
+
+    'Client Transforms' => __('Client Transforms', 'bit-form'),
+
+    'Limit which transforms run in the browser. Leave empty to apply both resize and crop.' => __('Limit which transforms run in the browser. Leave empty to apply both resize and crop.', 'bit-form'),
+
+    'Check the width, height and resolution of uploaded images. Use Edit Options to set the limits and messages.' => __('Check the width, height and resolution of uploaded images. Use Edit Options to set the limits and messages.', 'bit-form'),
+
+    'Enable or disable adding multiple files' => __('Enable or disable adding multiple files', 'bit-form'),
+
+    'Enable or disable file browser' => __('Enable or disable file browser', 'bit-form'),
+
+    'Enable or disable drag and drop' => __('Enable or disable drag and drop', 'bit-form'),
+
+    'Enable or disable pasting of files' => __('Enable or disable pasting of files', 'bit-form'),
+
+    'Allow users to reorder files with drag and drop interaction' => __('Allow users to reorder files with drag and drop interaction', 'bit-form'),
+
+    'Immediately upload new files to the server' => __('Immediately upload new files to the server', 'bit-form'),
+
+    'Customize every label and message shown in the upload area' => __('Customize every label and message shown in the upload area', 'bit-form'),
+
+    'Note: File type checks are skipped while this is disabled' => __('Note: File type checks are skipped while this is disabled', 'bit-form'),
+
+    'Invalid File Message Error' => __('Invalid File Message Error', 'bit-form'),
+
+    'Message shown when an invalid file is added' => __('Message shown when an invalid file is added', 'bit-form'),
+
+    'File types Message Error' => __('File types Message Error', 'bit-form'),
+
+    'Message shown to indicate the allowed file types' => __('Message shown to indicate the allowed file types', 'bit-form'),
+
     'Prefix Icon' => __('Prefix Icon', 'bit-form'),
 
     'Suffix Icon' => __('Suffix Icon', 'bit-form'),
 
+    'Next Step' => __('Next Step', 'bit-form'),
+
+    'Previous Step' => __('Previous Step', 'bit-form'),
+
+    'Reset' => __('Reset', 'bit-form'),
+
+    'Button' => __('Button', 'bit-form'),
+
+    'Save Draft' => __('Save Draft', 'bit-form'),
+
+    'Submit' => __('Submit', 'bit-form'),
+
+    'Already have a reset button' => __('Already have a reset button', 'bit-form'),
+
+    'Step navigation buttons keep their type' => __('Step navigation buttons keep their type', 'bit-form'),
+
     'Always (default)' => __('Always (default)', 'bit-form'),
 
     'Interaction Only' => __('Interaction Only', 'bit-form'),
+
+    'Position Alignment' => __('Position Alignment', 'bit-form'),
 
     'Container Class' => __('Container Class', 'bit-form'),
 
@@ -4071,6 +4477,18 @@ $bitforms_i18n_strings = array(
     '1/4 (3)' => __('1/4 (3)', 'bit-form'),
 
     'Show Option Flag Image' => __('Show Option Flag Image', 'bit-form'),
+
+    'When enabled, the checkbox is already checked when the form loads. Users can still uncheck it.' => __('When enabled, the checkbox is already checked when the form loads. Users can still uncheck it.', 'bit-form'),
+
+    'Edit your GDPR agreement label by clicking on the edit icon' => __('Edit your GDPR agreement label by clicking on the edit icon', 'bit-form'),
+
+    'Edit your decision box label by clicking on the edit icon' => __('Edit your decision box label by clicking on the edit icon', 'bit-form'),
+
+    'Click to edit GDPR agreement label' => __('Click to edit GDPR agreement label', 'bit-form'),
+
+    'Click to edit decision box label' => __('Click to edit decision box label', 'bit-form'),
+
+    'Edit GDPR Agreement Label' => __('Edit GDPR Agreement Label', 'bit-form'),
 
     'Show Search Input' => __('Show Search Input', 'bit-form'),
 
@@ -4142,15 +4560,67 @@ $bitforms_i18n_strings = array(
 
     '-- Select Email Field --' => __('-- Select Email Field --', 'bit-form'),
 
+    'Field Key:' => __('Field Key:', 'bit-form'),
+
+    'Change' => __('Change', 'bit-form'),
+
+    'Browse' => __('Browse', 'bit-form'),
+
+    'Image URL' => __('Image URL', 'bit-form'),
+
+    'Image Width' => __('Image Width', 'bit-form'),
+
+    'auto' => __('auto', 'bit-form'),
+
+    'Image Height' => __('Image Height', 'bit-form'),
+
+    'Image alt text' => __('Image alt text', 'bit-form'),
+
+    'Alternative Text' => __('Alternative Text', 'bit-form'),
+
+    'Input Mask allows you to specify a pattern for the input field, helping users enter data in the correct format.' => __('Input Mask allows you to specify a pattern for the input field, helping users enter data in the correct format.', 'bit-form'),
+
+    'Learn more' => __('Learn more', 'bit-form'),
+
+    'This message is shown when the entered value does not complete the input mask.' => __('This message is shown when the entered value does not complete the input mask.', 'bit-form'),
+
     'Mollie Description is Required' => __('Mollie Description is Required', 'bit-form'),
+
+    /* translators: %s: dynamic value. */
+    '%s Accounts' => __('%s Accounts', 'bit-form'),
+
+    /* translators: %s: dynamic value. */
+    'Select %s Account' => __('Select %s Account', 'bit-form'),
 
     'Select Account' => __('Select Account', 'bit-form'),
 
-    'Razorpay Dynamic Amount Field is not Selected' => __('Razorpay Dynamic Amount Field is not Selected', 'bit-form'),
-
     'Rating Icon' => __('Rating Icon', 'bit-form'),
 
+    'Default Repeatable Row' => __('Default Repeatable Row', 'bit-form'),
+
+    'Type default row...' => __('Type default row...', 'bit-form'),
+
+    'Minimum Repeatable Row' => __('Minimum Repeatable Row', 'bit-form'),
+
+    'Type minimum row...' => __('Type minimum row...', 'bit-form'),
+
+    'Min Error Message' => __('Min Error Message', 'bit-form'),
+
+    /* translators: %s: dynamic value. */
+    'When enabled, visitors see this message if the form has fewer than %s rows.' => __('When enabled, visitors see this message if the form has fewer than %s rows.', 'bit-form'),
+
+    'Maximum Repeatable Row' => __('Maximum Repeatable Row', 'bit-form'),
+
+    'Type maximum row...' => __('Type maximum row...', 'bit-form'),
+
+    'Max Error Message' => __('Max Error Message', 'bit-form'),
+
+    /* translators: %s: dynamic value. */
+    'When enabled, visitors see this message if the form has more than %s rows.' => __('When enabled, visitors see this message if the form has more than %s rows.', 'bit-form'),
+
     'Rounded' => __('Rounded', 'bit-form'),
+
+    'Shortcode:' => __('Shortcode:', 'bit-form'),
 
     'Min/Max Text Length:' => __('Min/Max Text Length:', 'bit-form'),
 
@@ -4170,6 +4640,52 @@ $bitforms_i18n_strings = array(
 
     'By enabling this feature, user will see the error message when word count is greater than' => __('By enabling this feature, user will see the error message when word count is greater than', 'bit-form'),
 
+    'By disabling this option, the field title will be hidden' => __('By disabling this option, the field title will be hidden', 'bit-form'),
+
+    'Type title text here...' => __('Type title text here...', 'bit-form'),
+
+    'HTML Tag' => __('HTML Tag', 'bit-form'),
+
+    'By disabling this option, the field subtitle will be hidden' => __('By disabling this option, the field subtitle will be hidden', 'bit-form'),
+
+    'Type subtitle here...' => __('Type subtitle here...', 'bit-form'),
+
+    'Alignment' => __('Alignment', 'bit-form'),
+
+    'Logo/Icon' => __('Logo/Icon', 'bit-form'),
+
+    'Layout Direction' => __('Layout Direction', 'bit-form'),
+
+    'Vertical Reverse' => __('Vertical Reverse', 'bit-form'),
+
+    'Horizontal Reverse' => __('Horizontal Reverse', 'bit-form'),
+
+    'Minimum date is' => __('Minimum date is', 'bit-form'),
+
+    'Maximum date is' => __('Maximum date is', 'bit-form'),
+
+    'Minimum date and time is' => __('Minimum date and time is', 'bit-form'),
+
+    'Maximum date and time is' => __('Maximum date and time is', 'bit-form'),
+
+    'Minimum time is' => __('Minimum time is', 'bit-form'),
+
+    'Maximum time is' => __('Maximum time is', 'bit-form'),
+
+    'Minimum month is' => __('Minimum month is', 'bit-form'),
+
+    'Maximum month is' => __('Maximum month is', 'bit-form'),
+
+    'Minimum week is' => __('Minimum week is', 'bit-form'),
+
+    'Maximum week is' => __('Maximum week is', 'bit-form'),
+
+    'week' => __('week', 'bit-form'),
+
+    'Minimum number is' => __('Minimum number is', 'bit-form'),
+
+    'Maximum number is' => __('Maximum number is', 'bit-form'),
+
     'No fields available' => __('No fields available', 'bit-form'),
 
     'You haven’t added any fields to this form or step yet.' => __('You haven’t added any fields to this form or step yet.', 'bit-form'),
@@ -4188,9 +4704,19 @@ $bitforms_i18n_strings = array(
 
     'Select Your Theme' => __('Select Your Theme', 'bit-form'),
 
-    'Reset' => __('Reset', 'bit-form'),
+    'Breadcrumb' => __('Breadcrumb', 'bit-form'),
+
+    'Themes' => __('Themes', 'bit-form'),
+
+    'Confirm reset style?' => __('Confirm reset style?', 'bit-form'),
+
+    'Restore all saved style' => __('Restore all saved style', 'bit-form'),
+
+    'Reset Style as theme default' => __('Reset Style as theme default', 'bit-form'),
 
     'Import' => __('Import', 'bit-form'),
+
+    'More options' => __('More options', 'bit-form'),
 
     'Rename' => __('Rename', 'bit-form'),
 
@@ -4828,9 +5354,11 @@ $bitforms_i18n_strings = array(
 
     'Option 4' => __('Option 4', 'bit-form'),
 
-    'Button' => __('Button', 'bit-form'),
+    'Select an option...' => __('Select an option...', 'bit-form'),
 
     'Section' => __('Section', 'bit-form'),
+
+    'Your Title Here' => __('Your Title Here', 'bit-form'),
 
     'Divider' => __('Divider', 'bit-form'),
 
@@ -4839,8 +5367,6 @@ $bitforms_i18n_strings = array(
     'Radio' => __('Radio', 'bit-form'),
 
     'Checkbox' => __('Checkbox', 'bit-form'),
-
-    'Check Boxs' => __('Check Boxs', 'bit-form'),
 
     'Dropdown' => __('Dropdown', 'bit-form'),
 
@@ -4871,8 +5397,6 @@ $bitforms_i18n_strings = array(
     'Please Select a Date' => __('Please Select a Date', 'bit-form'),
 
     'Spacer' => __('Spacer', 'bit-form'),
-
-    'Advance File Upload' => __('Advance File Upload', 'bit-form'),
 
     'Advanced File Upload' => __('Advanced File Upload', 'bit-form'),
 
@@ -4907,12 +5431,6 @@ $bitforms_i18n_strings = array(
     'Shortcode' => __('Shortcode', 'bit-form'),
 
     'Draft Button' => __('Draft Button', 'bit-form'),
-
-    'Save Draft' => __('Save Draft', 'bit-form'),
-
-    'Next Step' => __('Next Step', 'bit-form'),
-
-    'Previous Step' => __('Previous Step', 'bit-form'),
 
     'Previous' => __('Previous', 'bit-form'),
 
@@ -5020,11 +5538,41 @@ $bitforms_i18n_strings = array(
 
     'Reading...' => __('Reading...', 'bit-form'),
 
+    'Please enter a theme name' => __('Please enter a theme name', 'bit-form'),
+
+    'Theme name must be at least 3 characters' => __('Theme name must be at least 3 characters', 'bit-form'),
+
     'Create New Theme' => __('Create New Theme', 'bit-form'),
+
+    'Theme Name' => __('Theme Name', 'bit-form'),
+
+    'e.g., My Custom Theme' => __('e.g., My Custom Theme', 'bit-form'),
+
+    'Base Theme' => __('Base Theme', 'bit-form'),
+
+    'Your new theme will start with the styles from the selected base theme. You can customize it after creation.' => __('Your new theme will start with the styles from the selected base theme. You can customize it after creation.', 'bit-form'),
+
+    'Create Theme' => __('Create Theme', 'bit-form'),
+
+    'Please select a valid JSON file' => __('Please select a valid JSON file', 'bit-form'),
+
+    'Please select a file to import' => __('Please select a file to import', 'bit-form'),
+
+    'Please select a form to import from' => __('Please select a form to import from', 'bit-form'),
+
+    '-- Select a form --' => __('-- Select a form --', 'bit-form'),
+
+    'ID:' => __('ID:', 'bit-form'),
+
+    'Import the theme styles from an existing form. This will create a new custom theme with the selected form\'s styling.' => __('Import the theme styles from an existing form. This will create a new custom theme with the selected form\'s styling.', 'bit-form'),
+
+    'Change File' => __('Change File', 'bit-form'),
 
     'Click to upload' => __('Click to upload', 'bit-form'),
 
     'or drag and drop' => __('or drag and drop', 'bit-form'),
+
+    'Bit Form theme JSON file (.json)' => __('Bit Form theme JSON file (.json)', 'bit-form'),
 
     'Import from Form' => __('Import from Form', 'bit-form'),
 
@@ -5032,9 +5580,91 @@ $bitforms_i18n_strings = array(
 
     'Import Theme (Style)' => __('Import Theme (Style)', 'bit-form'),
 
+    'Import Theme' => __('Import Theme', 'bit-form'),
+
+    'Form Background Color' => __('Form Background Color', 'bit-form'),
+
+    'Field Background Color' => __('Field Background Color', 'bit-form'),
+
+    'Field Border Color' => __('Field Border Color', 'bit-form'),
+
+    'Form Text Color' => __('Form Text Color', 'bit-form'),
+
+    'Inherit' => __('Inherit', 'bit-form'),
+
+    'Edit Form Styles' => __('Edit Form Styles', 'bit-form'),
+
     'Customize' => __('Customize', 'bit-form'),
 
+    'Apply theme' => __('Apply theme', 'bit-form'),
+
+    'Apply' => __('Apply', 'bit-form'),
+
+    'Preview theme' => __('Preview theme', 'bit-form'),
+
+    'Font Family:' => __('Font Family:', 'bit-form'),
+
+    'Failed to reload custom themes' => __('Failed to reload custom themes', 'bit-form'),
+
+    'Theme applied successfully!' => __('Theme applied successfully!', 'bit-form'),
+
+    'Custom theme created successfully!' => __('Custom theme created successfully!', 'bit-form'),
+
+    'Failed to create custom theme' => __('Failed to create custom theme', 'bit-form'),
+
+    '(Duplicate)' => __('(Duplicate)', 'bit-form'),
+
+    'Theme duplicated successfully!' => __('Theme duplicated successfully!', 'bit-form'),
+
+    'Failed to duplicate theme' => __('Failed to duplicate theme', 'bit-form'),
+
+    'Are you sure you want to delete this theme?' => __('Are you sure you want to delete this theme?', 'bit-form'),
+
+    'Theme deleted successfully!' => __('Theme deleted successfully!', 'bit-form'),
+
+    'Failed to delete theme' => __('Failed to delete theme', 'bit-form'),
+
+    'Theme exported successfully!' => __('Theme exported successfully!', 'bit-form'),
+
+    'Failed to export theme' => __('Failed to export theme', 'bit-form'),
+
+    'Default theme set successfully!' => __('Default theme set successfully!', 'bit-form'),
+
+    'Failed to set default theme' => __('Failed to set default theme', 'bit-form'),
+
+    'Enter new theme name:' => __('Enter new theme name:', 'bit-form'),
+
+    'Theme renamed successfully!' => __('Theme renamed successfully!', 'bit-form'),
+
+    'Failed to rename theme' => __('Failed to rename theme', 'bit-form'),
+
+    'Theme imported successfully!' => __('Theme imported successfully!', 'bit-form'),
+
+    'Failed to import theme' => __('Failed to import theme', 'bit-form'),
+
+    'Failed to read file' => __('Failed to read file', 'bit-form'),
+
+    'Failed to fetch form data' => __('Failed to fetch form data', 'bit-form'),
+
+    'Form data is missing' => __('Form data is missing', 'bit-form'),
+
+    'Invalid theme data format' => __('Invalid theme data format', 'bit-form'),
+
+    'Form does not have theme data to import' => __('Form does not have theme data to import', 'bit-form'),
+
+    'Imported Form' => __('Imported Form', 'bit-form'),
+
+    'Theme imported successfully from form!' => __('Theme imported successfully from form!', 'bit-form'),
+
+    'Failed to import theme from form' => __('Failed to import theme from form', 'bit-form'),
+
+    'Apply Theme' => __('Apply Theme', 'bit-form'),
+
     'Applied Styles' => __('Applied Styles', 'bit-form'),
+
+    'Current' => __('Current', 'bit-form'),
+
+    'Current Styles' => __('Current Styles', 'bit-form'),
 
     'Your customizations apply only to this form\'s styling. To preserve changes, create or update a custom theme from the Options menu.' => __('Your customizations apply only to this form\'s styling. To preserve changes, create or update a custom theme from the Options menu.', 'bit-form'),
 
@@ -5118,8 +5748,6 @@ $bitforms_i18n_strings = array(
 
     'item' => __('item', 'bit-form'),
 
-    'Disable' => __('Disable', 'bit-form'),
-
     'Do you want to change these' => __('Do you want to change these', 'bit-form'),
 
     'status' => __('status', 'bit-form'),
@@ -5137,8 +5765,6 @@ $bitforms_i18n_strings = array(
     'Are you sure to delete this web hook?' => __('Are you sure to delete this web hook?', 'bit-form'),
 
     'Add More Hook' => __('Add More Hook', 'bit-form'),
-
-    'Select One' => __('Select One', 'bit-form'),
 
     'Readonly' => __('Readonly', 'bit-form'),
 
@@ -5220,6 +5846,8 @@ $bitforms_i18n_strings = array(
 
     'Condition' => __('Condition', 'bit-form'),
 
+    'Forgot Password Field Mapping' => __('Forgot Password Field Mapping', 'bit-form'),
+
     'Forgot Password Fields' => __('Forgot Password Fields', 'bit-form'),
 
     'Redirect Page:' => __('Redirect Page:', 'bit-form'),
@@ -5228,7 +5856,11 @@ $bitforms_i18n_strings = array(
 
     'Success Message:' => __('Success Message:', 'bit-form'),
 
+    'Login Field Mapping' => __('Login Field Mapping', 'bit-form'),
+
     'Login Fields' => __('Login Fields', 'bit-form'),
+
+    'Message' => __('Message', 'bit-form'),
 
     'Success redirect Page:' => __('Success redirect Page:', 'bit-form'),
 
@@ -5248,7 +5880,7 @@ $bitforms_i18n_strings = array(
 
     'If the Username and Password fields are blank then the user will take the value of the email field as the field and the password will be auto-generated.' => __('If the Username and Password fields are blank then the user will take the value of the email field as the field and the password will be auto-generated.', 'bit-form'),
 
-    'Field Mappping' => __('Field Mappping', 'bit-form'),
+    'Field Mapping' => __('Field Mapping', 'bit-form'),
 
     'User Fields' => __('User Fields', 'bit-form'),
 
@@ -5260,7 +5892,7 @@ $bitforms_i18n_strings = array(
 
     'Success Messages' => __('Success Messages', 'bit-form'),
 
-    'User Approval  Method:' => __('User Approval  Method:', 'bit-form'),
+    'User Approval Method:' => __('User Approval Method:', 'bit-form'),
 
     'Select approval method' => __('Select approval method', 'bit-form'),
 
@@ -5270,9 +5902,13 @@ $bitforms_i18n_strings = array(
 
     'Edit verification Messages/Redirect URL' => __('Edit verification Messages/Redirect URL', 'bit-form'),
 
-    'User Meta Field Mappping' => __('User Meta Field Mappping', 'bit-form'),
+    'Select an email field.' => __('Select an email field.', 'bit-form'),
+
+    'User Meta Field Mapping' => __('User Meta Field Mapping', 'bit-form'),
 
     'Meta Value' => __('Meta Value', 'bit-form'),
+
+    'Reset Password Field Mapping' => __('Reset Password Field Mapping', 'bit-form'),
 
     'Reset Password Fields' => __('Reset Password Fields', 'bit-form'),
 
@@ -5285,6 +5921,28 @@ $bitforms_i18n_strings = array(
     'Bitform block settings' => __('Bitform block settings', 'bit-form'),
 
     'Form settings' => __('Form settings', 'bit-form'),
+
+    'This will reset all styles to the theme defaults. Continue?' => __('This will reset all styles to the theme defaults. Continue?', 'bit-form'),
+
+    'Theme styles reset successfully!' => __('Theme styles reset successfully!', 'bit-form'),
+
+    'Failed to reset theme' => __('Failed to reset theme', 'bit-form'),
+
+    'Only custom themes can be updated. Use "Save as New Theme" instead.' => __('Only custom themes can be updated. Use "Save as New Theme" instead.', 'bit-form'),
+
+    'This will update the current custom theme with your current style changes. Continue?' => __('This will update the current custom theme with your current style changes. Continue?', 'bit-form'),
+
+    'Theme updated successfully!' => __('Theme updated successfully!', 'bit-form'),
+
+    'Failed to update theme' => __('Failed to update theme', 'bit-form'),
+
+    'Enter theme name:' => __('Enter theme name:', 'bit-form'),
+
+    'Custom Theme' => __('Custom Theme', 'bit-form'),
+
+    'New theme created successfully!' => __('New theme created successfully!', 'bit-form'),
+
+    'Failed to create theme' => __('Failed to create theme', 'bit-form'),
 
     'Failed to change Form Status' => __('Failed to change Form Status', 'bit-form'),
 
@@ -5534,7 +6192,13 @@ $bitforms_i18n_strings = array(
 
     'Country Field available in Pro version of Bit Form.' => __('Country Field available in Pro version of Bit Form.', 'bit-form'),
 
-    'You can use either ReCaptcha-V2 or ReCaptcha-V3 in a form. to use ReCaptcha-V2 disable the ReCaptcha-V3 from the Form Settings.' => __('You can use either ReCaptcha-V2 or ReCaptcha-V3 in a form. to use ReCaptcha-V2 disable the ReCaptcha-V3 from the Form Settings.', 'bit-form'),
+    'You can use either reCAPTCHA v2 or reCAPTCHA v3 in a form. To use reCAPTCHA v2, disable reCAPTCHA v3 in the Form Settings.' => __('You can use either reCAPTCHA v2 or reCAPTCHA v3 in a form. To use reCAPTCHA v2, disable reCAPTCHA v3 in the Form Settings.', 'bit-form'),
+
+    /* translators: %s: dynamic value. */
+    '%s field is available in the Pro version!' => __('%s field is available in the Pro version!', 'bit-form'),
+
+    /* translators: %s: dynamic value. */
+    'You cannot add more than one %s field in the same form.' => __('You cannot add more than one %s field in the same form.', 'bit-form'),
 
     'You cannot add more than one' => __('You cannot add more than one', 'bit-form'),
 
@@ -5547,8 +6211,6 @@ $bitforms_i18n_strings = array(
     'Please enter a valid email address.' => __('Please enter a valid email address.', 'bit-form'),
 
     'Please enter a valid zip/postal code.' => __('Please enter a valid zip/postal code.', 'bit-form'),
-
-    'Change' => __('Change', 'bit-form'),
 
     'Not Equal' => __('Not Equal', 'bit-form'),
 
@@ -5573,6 +6235,8 @@ $bitforms_i18n_strings = array(
     'Stripe Payment Field' => __('Stripe Payment Field', 'bit-form'),
 
     'Mollie Payment Field' => __('Mollie Payment Field', 'bit-form'),
+
+    'Save Draft Button' => __('Save Draft Button', 'bit-form'),
 
     'Default Value' => __('Default Value', 'bit-form'),
 
@@ -5603,6 +6267,12 @@ $bitforms_i18n_strings = array(
     'Option Icon/Image' => __('Option Icon/Image', 'bit-form'),
 
     'Showing Icon/Image in option' => __('Showing Icon/Image in option', 'bit-form'),
+
+    'Showing flag image in options' => __('Showing flag image in options', 'bit-form'),
+
+    'Selected Flag Image' => __('Selected Flag Image', 'bit-form'),
+
+    'Showing flag image of the selected option' => __('Showing flag image of the selected option', 'bit-form'),
 
     'Minimum and Maximum Option' => __('Minimum and Maximum Option', 'bit-form'),
 
@@ -5708,7 +6378,9 @@ $bitforms_i18n_strings = array(
 
     'This allows browser to display an appropriate virtual keyboard if needed. <a target=\'_blank\' href=\'https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode\'>Learn more</a>' => __('This allows browser to display an appropriate virtual keyboard if needed. <a target=\'_blank\' href=\'https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode\'>Learn more</a>', 'bit-form'),
 
-    'Input Mask allows you to specify a pattern for the input field, helping users enter data in the correct format.<a target=\'_blank\' href=\'https://bit-form.com/wp-docs/form-fields/bit-form-input-mask/\'>Learn more</a>' => __('Input Mask allows you to specify a pattern for the input field, helping users enter data in the correct format.<a target=\'_blank\' href=\'https://bit-form.com/wp-docs/form-fields/bit-form-input-mask/\'>Learn more</a>', 'bit-form'),
+    'Input Mask allows you to specify a pattern for the input field, helping users enter data in the correct format.<a target=\'_blank\' href=\'https://bitapps.pro/docs/bit-form/form-fields/wp-docs-form-fields-input-mask-field/\'>Learn more</a>' => __('Input Mask allows you to specify a pattern for the input field, helping users enter data in the correct format.<a target=\'_blank\' href=\'https://bitapps.pro/docs/bit-form/form-fields/wp-docs-form-fields-input-mask-field/\'>Learn more</a>', 'bit-form'),
+
+    'The message shown when the value does not match the pattern.' => __('The message shown when the value does not match the pattern.', 'bit-form'),
 
     'Set a regular expression pattern that the input value should match for the field.' => __('Set a regular expression pattern that the input value should match for the field.', 'bit-form'),
 
@@ -5716,7 +6388,7 @@ $bitforms_i18n_strings = array(
 
     'The hide field feature allows you to hide the field from the user on the form. You can toggle this option to show or hide the field.' => __('The hide field feature allows you to hide the field from the user on the form. You can toggle this option to show or hide the field.', 'bit-form'),
 
-    'The reverse button feature allows to reverse the clear and undo button. You can toggle this option to reverse clear and undo button.' => __('The reverse button feature allows to reverse the clear and undo button. You can toggle this option to reverse clear and undo button.', 'bit-form'),
+    'Shows the Clear, Undo and Redo buttons in reverse order. You can toggle this option to reverse the button order.' => __('Shows the Clear, Undo and Redo buttons in reverse order. You can toggle this option to reverse the button order.', 'bit-form'),
 
     'Readonly feature allows you to set a field as read-only, meaning that users will not be able to edit the content of that field. You can toggle this option to enable or disable the setting.' => __('Readonly feature allows you to set a field as read-only, meaning that users will not be able to edit the content of that field. You can toggle this option to enable or disable the setting.', 'bit-form'),
 
@@ -5726,7 +6398,7 @@ $bitforms_i18n_strings = array(
 
     'Enabling this option will check from your WordPress user database whether its value is duplicate.' => __('Enabling this option will check from your WordPress user database whether its value is duplicate.', 'bit-form'),
 
-    'Stripe provide a variety of themes for the payment form. You can choose the theme that best suits theme your payment form. <a target="_blank" href="https://stripe.com/docs/elements/appearance-api">Learn more</a>' => __('Stripe provide a variety of themes for the payment form. You can choose the theme that best suits theme your payment form. <a target="_blank" href="https://stripe.com/docs/elements/appearance-api">Learn more</a>', 'bit-form'),
+    'Stripe provide a variety of themes for the payment form. You can choose the theme that best suits your payment form. <a target="_blank" href="https://stripe.com/docs/elements/appearance-api">Learn more</a>' => __('Stripe provide a variety of themes for the payment form. You can choose the theme that best suits your payment form. <a target="_blank" href="https://stripe.com/docs/elements/appearance-api">Learn more</a>', 'bit-form'),
 
     'Stripe provide minimum or maximum amount for different payment method type and currency. <a target=\'_blank\' href=\'https://stripe.com/docs/currencies#minimum-and-maximum-charge-amounts\'>learn more</a>' => __('Stripe provide minimum or maximum amount for different payment method type and currency. <a target=\'_blank\' href=\'https://stripe.com/docs/currencies#minimum-and-maximum-charge-amounts\'>learn more</a>', 'bit-form'),
 
@@ -5734,9 +6406,11 @@ $bitforms_i18n_strings = array(
 
     'Mollie provide a description for the payment. This option is required. <a target=\'_blank\' href=\'https://docs.mollie.com/reference/create-payment#:~:text=Body%20Params-,description,required,-The%20description%20of\'>learn more</a>. and also you add field value in this description. e.g: This Payment from Name: ${field_key}' => __('Mollie provide a description for the payment. This option is required. <a target=\'_blank\' href=\'https://docs.mollie.com/reference/create-payment#:~:text=Body%20Params-,description,required,-The%20description%20of\'>learn more</a>. and also you add field value in this description. e.g: This Payment from Name: ${field_key}', 'bit-form'),
 
-    'You can add or remove Undo button form Signature Field. You can toggle this option to add or remove the Undo button.' => __('You can add or remove Undo button form Signature Field. You can toggle this option to add or remove the Undo button.', 'bit-form'),
+    'You can add or remove the Undo button from the Signature field. You can toggle this option to add or remove the Undo button.' => __('You can add or remove the Undo button from the Signature field. You can toggle this option to add or remove the Undo button.', 'bit-form'),
 
-    'You can add or remove Clear button form Signature Field. You can toggle this option to add or remove the Clear button.' => __('You can add or remove Clear button form Signature Field. You can toggle this option to add or remove the Clear button.', 'bit-form'),
+    'You can add or remove the Redo button from the Signature field. You can toggle this option to add or remove the Redo button.' => __('You can add or remove the Redo button from the Signature field. You can toggle this option to add or remove the Redo button.', 'bit-form'),
+
+    'You can add or remove the Clear button from the Signature field. You can toggle this option to add or remove the Clear button.' => __('You can add or remove the Clear button from the Signature field. You can toggle this option to add or remove the Clear button.', 'bit-form'),
 
     'This allows to show the rating message on hover. You can toggle this option to show or hide the rating message on hover.' => __('This allows to show the rating message on hover. You can toggle this option to show or hide the rating message on hover.', 'bit-form'),
 

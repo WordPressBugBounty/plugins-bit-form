@@ -223,14 +223,7 @@ class FormViewer
     // }
 
     if (!empty($msg)) {
-      $restrictionMsg =
-        '
-      <div class="' . $this->_form->getAtomicCls("_frm-ovrly-b{$formID}") . '">
-      <p class="' . $this->_form->getAtomicCls("_frm-ovrly-msg-b{$formID}") . '">
-        ' . $msg . '
-      </p>
-      </div>
-      ';
+      $restrictionMsg = $this->restrictionOverlay($msg, $formID);
     }
     $formHTML =
       '
@@ -254,6 +247,25 @@ class FormViewer
 ';
 
     return $formHTML;
+  }
+
+  /**
+   * Restriction overlay; message may hold the visitor IP, so it is kses-filtered.
+   *
+   * @param string $msg    Restriction message
+   * @param int    $formID Form ID
+   *
+   * @return string Overlay markup
+   */
+  private function restrictionOverlay($msg, $formID)
+  {
+    return '
+      <div class="' . $this->_form->getAtomicCls("_frm-ovrly-b{$formID}") . '">
+      <p class="' . $this->_form->getAtomicCls("_frm-ovrly-msg-b{$formID}") . '">
+        ' . wp_kses_post($msg) . '
+      </p>
+      </div>
+';
   }
 
   private function setView($hasFile, $msg)
@@ -327,14 +339,7 @@ class FormViewer
     }
 
     if (!empty($msg)) {
-      $restrictionMsg =
-        '
-      <div class="' . $this->_form->getAtomicCls("_frm-ovrly-b{$formID}") . '">
-      <p class="' . $this->_form->getAtomicCls("_frm-ovrly-msg-b{$formID}") . '">
-        ' . $msg . '
-      </p>
-      </div>
-';
+      $restrictionMsg = $this->restrictionOverlay($msg, $formID);
     }
     $formHTML =
       '

@@ -2,6 +2,7 @@
 
 namespace BitCode\BitForm\Widgets;
 
+use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\GlobalHelper;
 use Elementor\Controls_Manager;
 use Elementor\Widget_Base;
@@ -93,7 +94,7 @@ class BitFormElementorWidget extends Widget_Base
       return;
     }
 
-    $css_path = BITFORMS_UPLOAD_BASE_URL . '/form-styles/bitform-' . $form_id . '-formid.css';
+    $css_path = FrontendHelpers::styleSrc('form-styles/bitform-' . $form_id . '-formid.css');
 
     wp_dequeue_style('bitform-style-css');
 

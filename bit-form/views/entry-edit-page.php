@@ -3,6 +3,7 @@
 // This file is included via Render::view() using extract(); all variables below are in the calling method's local scope, not global namespace.
 
 use BitCode\BitForm\Core\Util\EscapingHelper;
+use BitCode\BitForm\Core\Util\FrontendHelpers;
 
 if (!defined('ABSPATH')) {
   exit;
@@ -14,8 +15,8 @@ if (!defined('BITFORMS_ASSET_URI')) {
 $formUpdateVersion = get_option('bitform_form_update_version');
 $formIdSafe = sanitize_key((string) $formID);
 
-$bitformCssUrl = BITFORMS_UPLOAD_BASE_URL . '/form-styles/bitform-' . $formID . '.css';
-$bitformFormIdCssUrl = BITFORMS_UPLOAD_BASE_URL . '/form-styles/bitform-' . $formID . '-formid.css';
+$bitformCssUrl = FrontendHelpers::styleSrc('form-styles/bitform-' . $formID . '.css');
+$bitformFormIdCssUrl = FrontendHelpers::styleSrc('form-styles/bitform-' . $formID . '-formid.css');
 $customCssSubPath = "/form-styles/bitform-custom-{$formID}.css";
 
 wp_register_style('bitform-entry-edit-base-' . $formIdSafe, $bitformCssUrl, [], $formUpdateVersion);
@@ -24,7 +25,7 @@ wp_enqueue_style('bitform-entry-edit-base-' . $formIdSafe);
 wp_enqueue_style('bitform-entry-edit-formid-' . $formIdSafe);
 
 if (file_exists(BITFORMS_CONTENT_DIR . $customCssSubPath)) {
-  wp_register_style('bitform-entry-edit-custom-' . $formIdSafe, BITFORMS_UPLOAD_BASE_URL . $customCssSubPath, [], $formUpdateVersion);
+  wp_register_style('bitform-entry-edit-custom-' . $formIdSafe, FrontendHelpers::styleSrc($customCssSubPath), [], $formUpdateVersion);
   wp_enqueue_style('bitform-entry-edit-custom-' . $formIdSafe);
 }
 

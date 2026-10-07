@@ -2,6 +2,7 @@
 
 namespace BitCode\BitForm\Frontend\Form\View\Theme\Fields;
 
+use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
 
 class SliderField
@@ -63,17 +64,23 @@ class SliderField
       $inputMode = "inputMode='{$fieldHelpers->esc_attr($field->inputMode)}'";
     }
 
-    $minValue = property_exists($field, 'mn') ? $field->mn : 0;
-    $maxValue = property_exists($field, 'mx') ? $field->mx : 100;
+    $minValue = self::numericOr(property_exists($field, 'mn') ? $field->mn : null, 0);
+    $maxValue = self::numericOr(property_exists($field, 'mx') ? $field->mx : null, 100);
 
     $defaultVal = (($maxValue - $minValue) / 2) + $minValue;
+    // The builder used to seed Default value with the field label ("Slider"), so a stored value
+    // or default can be non-numeric; arithmetic on it fatals on PHP 8. Fall back to the minimum.
     if ($fieldHelpers->property_exists_nested($field, 'val', '', 1)) {
-      $defaultVal = $field->val;
+      $defaultVal = self::numericOr($field->val, $minValue);
+      $value = "value='{$fieldHelpers->esc_attr($defaultVal)}'";
     } elseif ($fieldHelpers->property_exists_nested($field, 'defaultValue', '', 1)) {
-      $defaultVal = $field->defaultValue;
+      $defaultVal = self::numericOr(FieldValueHandler::replaceSmartTagWithValue($field->defaultValue), $minValue);
+      $value = "value='{$fieldHelpers->esc_attr($defaultVal)}'";
     }
 
-    $lowerTrackPercentage = ($defaultVal - $minValue) / ($maxValue - $minValue) * 100;
+    // Min equal to max leaves no track to fill; avoid a division by zero.
+    $range = $maxValue - $minValue;
+    $lowerTrackPercentage = 0.0 !== (float) $range ? ($defaultVal - $minValue) / $range * 100 : 0;
 
     $wrpperStyle = "style='--bfv-fld-val: \"" . $fieldHelpers->esc_attr($defaultVal) . "\";'";
     $inputStyle = "style='--bfv-fill-lower-track: " . $fieldHelpers->esc_attr($lowerTrackPercentage) . "% !important;'";
@@ -106,8 +113,18 @@ class SliderField
       />
       ' . $prefixIcn . '
       ' . $suffixIcn . '
-      <span class="' . $fieldHelpers->getAtomicCls('slider-val') . '">Value : </span>
+      <span class="' . $fieldHelpers->getAtomicCls('slider-val') . '">' . esc_html__('Value:', 'bit-form') . ' </span>
     </div>
     ' . $sugg . "\n";
+  }
+
+  /**
+   * @param mixed $value
+   * @param int|float $fallback
+   * @return int|float
+   */
+  private static function numericOr($value, $fallback)
+  {
+    return is_numeric($value) ? $value + 0 : $fallback;
   }
 }

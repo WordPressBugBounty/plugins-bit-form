@@ -351,9 +351,9 @@ final class DefaultTheme extends ThemeBase
       $readonly,
       $isRequired,
       $isChecked,
-      $value,
+      esc_attr($value),
       $lbl,
-      $field_name
+      esc_attr($field_name)
     );
   }
 

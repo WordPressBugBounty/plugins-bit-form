@@ -74,25 +74,37 @@ class RecordApiHelper
           if ('' === $singleFilePath) {
             continue;
           }
-          $response = $this->uploadFile($folder, $singleFilePath);
-          $this->storeInState($response);
-          $this->deleteFile($singleFilePath, $actions);
+          $this->uploadAndCleanup($folder, $singleFilePath, $actions);
         }
       } else {
-        $response = $this->uploadFile($folder, $filePath);
-        $this->storeInState($response);
-        $this->deleteFile($filePath, $actions);
+        $this->uploadAndCleanup($folder, $filePath, $actions);
       }
     }
   }
 
+  /**
+   * The local copy is the only copy until Dropbox confirms the upload, so a failed
+   * upload (expired token, API error, unreadable file) must keep it on disk.
+   */
+  private function uploadAndCleanup($folder, $filePath, $actions)
+  {
+    $response = $this->uploadFile($folder, $filePath);
+    if ($this->storeInState($response)) {
+      $this->deleteFile($filePath, $actions);
+    }
+  }
+
+  /**
+   * @return bool true when Dropbox returned the uploaded file's metadata
+   */
   protected function storeInState($response)
   {
     if (isset($response->id)) {
       $this->successApiResponse[] = $response;
-    } else {
-      $this->errorApiResponse[] = $response;
+      return true;
     }
+    $this->errorApiResponse[] = $response;
+    return false;
   }
 
   public function deleteFile($filePath, $actions)

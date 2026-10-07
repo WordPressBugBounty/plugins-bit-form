@@ -223,11 +223,12 @@ class FrontEndScriptGenerator
           $this->addScriptInLoadedScriptsList($fileArr);
         }
         // for regex
-        if (Helpers::property_exists_nested($fldData, 'valid->regexr')) {
-          $patternFile = $this->_validationJsFilesNeeded['generateBackslashPattern'];
-          $rgx = $this->_validationJsFilesNeeded['regexPatternValidation'];
-          $this->addScriptInLoadedScriptsList($patternFile);
-          $this->addScriptInLoadedScriptsList($rgx);
+        // The RegEx scripts are registered by Pro; without it there is nothing to load.
+        if (Helpers::property_exists_nested($fldData, 'valid->regexr')
+          && !empty($this->_validationJsFilesNeeded['generateBackslashPattern'])
+          && !empty($this->_validationJsFilesNeeded['regexPatternValidation'])) {
+          $this->addScriptInLoadedScriptsList($this->_validationJsFilesNeeded['generateBackslashPattern']);
+          $this->addScriptInLoadedScriptsList($this->_validationJsFilesNeeded['regexPatternValidation']);
         }
 
         $validationScriptFileMapping = ScriptFilePriorityManager::validationScriptFileMapping($fldData->typ);

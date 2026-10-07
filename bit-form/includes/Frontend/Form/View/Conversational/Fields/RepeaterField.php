@@ -118,7 +118,7 @@ class RepeaterField
             aria-label="Remove this row"
           >
             <svg class="' . $fieldHelpers->getConversationalCls('rpt-rmv-btn-pre-i') . '" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"><path fill="currentColor" d="M19 12.998H5v-2h14z"/></svg>
-            ' . $fieldHelpers->renderHTMR($field->removeBtn->txt) . '
+            ' . $fieldHelpers->kses_post($fieldHelpers->renderHTMR($field->removeBtn->txt)) . '
             ' . $removeBtnSufIcn . '
           </button>
         </div>
@@ -145,7 +145,7 @@ class RepeaterField
           <input
             type="text"
             class="d-none"
-            title="Rpeater Index Hidden Input"
+            title="Repeater Index Hidden Input"
             name="%9$s"
             value=""
             aria-hidden="true"

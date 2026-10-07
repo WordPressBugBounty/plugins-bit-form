@@ -712,8 +712,8 @@ class Helpers
   {
     $shortcodes = [
       '${field.label}'          => isset($field->lbl) ? $field->lbl : '',
-      '${field.minimum}'        => isset($field->mn) ? $field->mn : '',
-      '${field.maximum}'        => isset($field->mx) ? $field->mx : '',
+      '${field.minimum}'        => isset($field->mn) ? self::readableRangeValue($field->mn, isset($field->typ) ? $field->typ : '') : '',
+      '${field.maximum}'        => isset($field->mx) ? self::readableRangeValue($field->mx, isset($field->typ) ? $field->typ : '') : '',
       '${field.minimum_file}'   => isset($field->config->minFile) ? $field->config->minFile : '',
       '${field.maximum_file}'   => isset($field->config->maxFile) ? $field->config->maxFile : '',
       '${field.maximum_size}'   => isset($field->config->maxSize) ? $field->config->maxSize : '',
@@ -722,6 +722,56 @@ class Helpers
     ];
     $msg = str_replace(array_keys($shortcodes), array_values($shortcodes), $msg);
     return $msg;
+  }
+
+  /**
+   * Date-like min/max are stored in the input's wire format (2026-10-01T09:00, 2026-W40); show
+   * them to visitors in the site's date/time format instead. Anything else is returned as is.
+   *
+   * @param mixed  $value field mn/mx
+   * @param string $type  field type
+   *
+   * @return mixed
+   */
+  public static function readableRangeValue($value, $type)
+  {
+    if (!is_string($value) || '' === $value) {
+      return $value;
+    }
+    $dateFormat = (string) get_option('date_format', 'F j, Y');
+    $timeFormat = (string) get_option('time_format', 'g:i a');
+    $utc = new \DateTimeZone('UTC');
+    $formatTimestamp = function ($format, $timestamp) use ($utc) {
+      return function_exists('wp_date') ? wp_date($format, $timestamp, $utc) : gmdate($format, $timestamp);
+    };
+
+    switch ($type) {
+      case 'date':
+        $date = \DateTime::createFromFormat('!Y-m-d', $value, $utc);
+        return $date ? $formatTimestamp($dateFormat, $date->getTimestamp()) : $value;
+
+      case 'datetime-local':
+        $date = \DateTime::createFromFormat('!Y-m-d\TH:i', substr($value, 0, 16), $utc);
+        return $date ? $formatTimestamp($dateFormat . ' ' . $timeFormat, $date->getTimestamp()) : $value;
+
+      case 'time':
+        $date = \DateTime::createFromFormat('!H:i', substr($value, 0, 5), $utc);
+        return $date ? $formatTimestamp($timeFormat, $date->getTimestamp()) : $value;
+
+      case 'month':
+        $date = \DateTime::createFromFormat('!Y-m', $value, $utc);
+        return $date ? $formatTimestamp('F Y', $date->getTimestamp()) : $value;
+
+      case 'week':
+        if (1 === preg_match('/^(\d{4})-W(\d{1,2})$/i', $value, $match)) {
+          // translators: 1: ISO week number, 2: year
+          return sprintf(__('week %1$d of %2$d', 'bit-form'), (int) $match[2], (int) $match[1]);
+        }
+        return $value;
+
+      default:
+        return $value;
+    }
   }
 
   public static function getDefaultGlobalMessages()

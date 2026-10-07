@@ -107,6 +107,10 @@ class ScriptFilePriorityManager
       'section' => [
         ['priority' => 101, 'filename' => 'hideChildFldHandle.min.js'],
       ],
+      // Fills field-value Smart Tags (e.g. ${b1-3}) in HTML elements as the visitor types
+      'html' => [
+        ['priority' => 301, 'filename' => 'bfHtmlFieldValueTags.min.js'],
+      ],
       'repeater' => [
         ['priority' => 101, 'filename' => 'hideChildFldHandle.min.js'],
         ['priority' => 102, 'filename' => 'bit-repeater-field.min.js'],
@@ -261,6 +265,8 @@ class ScriptFilePriorityManager
         'selectedCountryClearable'  => ['path' => 'config->selectedCountryClearable', 'val' => true],
         'searchClearable'           => ['path' => 'config->searchClearable', 'val' => true],
         'searchPlaceholder'         => ['path' => 'config->searchPlaceholder',       'val' => ''],
+        // v3 Edit Options saved the default country as config->defaultValue before it wrote defaultCountryKey.
+        'defaultCountryKey'         => ['path' => ['config->defaultCountryKey', 'config->defaultValue'], 'val' => ''],
       ],
       'file-up' => [
         'config'           => (object) [],  // sentinel: blocks raw fldData.config passthrough;
@@ -365,6 +371,7 @@ class ScriptFilePriorityManager
       'addressZipFldValidation'          => ['priority' => 702, 'filename' => 'addressZipFldValidation.min.js'],
       'generateBackslashPattern'         => ['priority' => 700, 'filename' => 'generateBackslashPattern.min.js'],
       // 'nmbrFldValidation'                => ['priority' => 702, 'filename' => 'nmbrFldValidation.min.js'],
+      'nmbrBadInputValidation'           => ['priority' => 702, 'filename' => 'nmbrBadInputValidation.min.js'],
       // 'regexPatternValidation'           => ['priority' => 701, 'filename' => 'regexPatternValidation.min.js'], // load before generateBackslashPattern file, then load  regexPatternValidation
       'inputMaskValidation'              => ['priority' => 701, 'filename' => 'inputMaskValidation.min.js'], // load before generateBackslashPattern file, then load  inputMaskValidation
       'bit-input-mask'                   => ['priority' => 701, 'filename' => 'bit-input-mask.min.js'], // load before generateBackslashPattern file, then load  bit-input-mask
@@ -454,6 +461,9 @@ class ScriptFilePriorityManager
         'number' => [
           'nmbrFldValidation' => [
             'paths' => ['mn', 'mx']
+          ],
+          'nmbrBadInputValidation' => [
+            'paths' => ['err->invalid->show']
           ]
         ],
         'range' => [

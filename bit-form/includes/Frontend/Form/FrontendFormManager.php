@@ -23,6 +23,7 @@ use BitCode\BitForm\Core\Util\FieldValueHandler;
 use BitCode\BitForm\Core\Util\FrontendHelpers;
 use BitCode\BitForm\Core\Util\HttpHelper;
 use BitCode\BitForm\Core\Util\IpTool;
+use BitCode\BitForm\Core\Util\Log;
 use BitCode\BitForm\Core\Util\Utilities;
 use BitCode\BitForm\Core\WorkFlow\WorkFlow;
 use BitCode\BitForm\Frontend\Form\View\FormViewer;
@@ -32,6 +33,9 @@ use WP_Error;
 final class FrontendFormManager extends FormManager
 {
   private $_form_identifier;
+
+  /** @var array|null reCAPTCHA v3 verdict, reused for the log */
+  private $recaptchaV3Verification;
   private $_form_token;
   private $_form_id;
   private $_conf_messages;
@@ -190,11 +194,8 @@ final class FrontendFormManager extends FormManager
     $url = wp_parse_url(wp_get_referer());
     $parameter = [];
     if (isset($url['query'])) {
-      $queries = explode('&', $url['query']);
-      foreach ($queries as $query) {
-        list($field, $value) = explode('=', $query);
-        $parameter[$field] = $value;
-      }
+      // a bare key (?preview) made the old explode() split warn; this also URL-decodes values
+      wp_parse_str($url['query'], $parameter);
     }
     return $parameter;
   }
@@ -259,6 +260,7 @@ final class FrontendFormManager extends FormManager
       return $postData;
     }
     $fields = $this->getFields();
+    $postData = $this->resolveCompositeChildValues($postData, $fields);
     foreach ($fields as $fieldKey => $fieldData) {
       if (
         empty($fieldData['childFields'])
@@ -291,6 +293,50 @@ final class FrontendFormManager extends FormManager
       }
       if (is_array($parentValue) && array_key_exists('primary', $parentValue)) {
         $postData[$fieldKey] = $parentValue['primary'];
+      }
+    }
+
+    return $postData;
+  }
+
+  /**
+   * Name/Address parts post as one array under the parent key ("parent[first_name]"), so a WP
+   * auth mapping that points at a part's own key (First Name, Last Name) found nothing. Copy each
+   * part's value to its key; the parent value is left as it was.
+   *
+   * @param array $postData
+   * @param array $fields   getFields() output
+   *
+   * @return array
+   */
+  private function resolveCompositeChildValues($postData, $fields)
+  {
+    foreach ($fields as $fieldKey => $fieldData) {
+      if (
+        empty($fieldData['childFields'])
+        || !isset($fieldData['type'])
+        || !in_array($fieldData['type'], ['name', 'address'], true)
+        || !empty($fieldData['repeated'])
+        || !isset($postData[$fieldKey])
+        || !is_array($postData[$fieldKey])
+      ) {
+        continue;
+      }
+      foreach ((array) $fieldData['childFields'] as $childFieldRef) {
+        $childKey = is_object($childFieldRef) && isset($childFieldRef->fldKey) ? $childFieldRef->fldKey : '';
+        if (
+          empty($childKey)
+          || !isset($fields[$childKey])
+          || !empty($fields[$childKey]['isDeactive'])
+          || isset($postData[$childKey])
+          || !preg_match('/\[([^\]]+)\]$/', (string) ($fields[$childKey]['name'] ?? ''), $matches)
+        ) {
+          continue;
+        }
+        $value = FieldValueHandler::extractChildValueFromParentValue($postData[$fieldKey], $matches[1], $childKey);
+        if (null !== $value) {
+          $postData[$childKey] = $value;
+        }
       }
     }
 
@@ -356,36 +402,7 @@ final class FrontendFormManager extends FormManager
       $filesData = GlobalHelper::sanitize_files_input($_FILES);
       do_action('bitform_submit_success', $this->_form_id, $entryID, $newPost, $filesData);
 
-      $captchaV3Settings = $this->getCaptchaV3Settings();
-      if ($captchaV3Settings) {
-        $token = isset($_POST['g-recaptcha-response']) ? sanitize_text_field(wp_unslash($_POST['g-recaptcha-response'])) : '';
-        $integrationHandler = new IntegrationHandler(0);
-        $allFormIntegrations = $integrationHandler->getAllIntegration('app', 'gReCaptchaV3');
-        if (!is_wp_error($allFormIntegrations)) {
-          foreach ($allFormIntegrations as $integration) {
-            if (!is_null($integration->integration_type) && 'gReCaptchaV3' === $integration->integration_type) {
-              $integrationDetails = Utilities::jsonObj($integration->integration_details);
-              if ($integrationDetails) {
-                $integrationDetails->id = $integration->id;
-                $reCAPTCHA = $integrationDetails;
-              }
-            }
-          }
-        }
-        if (!empty($reCAPTCHA->secretKey)) {
-          $gRecaptchaResponse = HttpHelper::post(
-            'https://www.google.com/recaptcha/api/siteverify',
-            ['secret' => $reCAPTCHA->secretKey, 'response' => $token]
-          );
-          if ($captchaV3Settings && !empty($saveResponse['triggerData'])) {
-            $logID = $saveResponse['triggerData']['logID'];
-            $integId = $reCAPTCHA->id;
-            $saveApiResponse = new UtilApiResponse();
-            $saveApiResponse->apiResponse($logID, $integId, ['type_name' => 'ReCaptcha', 'type' => 'v3'], 'success', $gRecaptchaResponse);
-          }
-        }
-        unset($_POST['g-recaptcha-response']);
-      }
+      $this->logRecaptchaV3Verification($saveResponse);
       if (!empty($redirectPage) && empty($saveResponse['redirectPage']) || null === $saveResponse['redirectPage']) {
         $saveResponse['redirectPage'] = $redirectPage;
       }
@@ -466,36 +483,7 @@ final class FrontendFormManager extends FormManager
       do_action('bitform_submit_success', $this->_form_id, $entryID, $newPost, $filesData);
       do_action('bitform_update_success', $this->_form_id, $entryID, $newPost, $filesData);
 
-      $captchaV3Settings = $this->getCaptchaV3Settings();
-      if ($captchaV3Settings) {
-        $token = isset($_POST['g-recaptcha-response']) ? sanitize_text_field(wp_unslash($_POST['g-recaptcha-response'])) : '';
-        $integrationHandler = new IntegrationHandler(0);
-        $allFormIntegrations = $integrationHandler->getAllIntegration('app', 'gReCaptchaV3');
-        if (!is_wp_error($allFormIntegrations)) {
-          foreach ($allFormIntegrations as $integration) {
-            if (!is_null($integration->integration_type) && 'gReCaptchaV3' === $integration->integration_type) {
-              $integrationDetails = Utilities::jsonObj($integration->integration_details);
-              if ($integrationDetails) {
-                $integrationDetails->id = $integration->id;
-                $reCAPTCHA = $integrationDetails;
-              }
-            }
-          }
-        }
-        if (!empty($reCAPTCHA->secretKey)) {
-          $gRecaptchaResponse = HttpHelper::post(
-            'https://www.google.com/recaptcha/api/siteverify',
-            ['secret' => $reCAPTCHA->secretKey, 'response' => $token]
-          );
-          if ($captchaV3Settings && !empty($updateResponse['triggerData'])) {
-            $logID = $updateResponse['triggerData']['logID'];
-            $integId = $reCAPTCHA->id;
-            $saveApiResponse = new UtilApiResponse();
-            $saveApiResponse->apiResponse($logID, $integId, ['type_name' => 'ReCaptcha', 'type' => 'v3'], 'success', $gRecaptchaResponse);
-          }
-        }
-        unset($_POST['g-recaptcha-response']);
-      }
+      $this->logRecaptchaV3Verification($updateResponse);
       if (!empty($redirectPage) && empty($updateResponse['redirectPage']) || null === $updateResponse['redirectPage']) {
         $updateResponse['redirectPage'] = $redirectPage;
       }
@@ -763,141 +751,233 @@ final class FrontendFormManager extends FormManager
     }
   }
 
+  /**
+   * Whether the IP already has a completed entry; drafts (status 9) don't count.
+   *
+   * @param string $ipAddress Visitor IP
+   *
+   * @return bool
+   */
+  private function hasCompletedEntryFromIp($ipAddress)
+  {
+    $storedIp = IpTool::storageValue($ipAddress);
+    if ('' === $storedIp) {
+      return false;
+    }
+
+    $entries = (new FormEntryModel())->get(
+      ['status'],
+      [
+        'form_id' => $this->form_id,
+        'user_ip' => $storedIp,
+      ]
+    );
+
+    if (is_wp_error($entries) || !is_array($entries)) {
+      return false;
+    }
+
+    foreach ($entries as $entry) {
+      if (9 !== (int) $entry->status) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private function verifyGRecaptcha()
   {
     $captchaSettings = $this->getCaptchaSettings();
     $captchaV3Settings = $this->getCaptchaV3Settings();
-    if ($captchaSettings || $captchaV3Settings) {
-      $token = isset($_POST['g-recaptcha-response']) ? sanitize_text_field(wp_unslash($_POST['g-recaptcha-response'])) : '';
-      if (!isset($_POST['g-recaptcha-response'])) {
-        return new WP_Error('spam_detection', __('Please recheck your reCaptcha Configuration', 'bit-form'));
-      }
-      $integrationHandler = new IntegrationHandler(0);
-      $allFormIntegrations = $integrationHandler->getAllIntegration('app', $captchaSettings ? 'gReCaptcha' : 'gReCaptchaV3');
-      if (!is_wp_error($allFormIntegrations)) {
-        foreach ($allFormIntegrations as $integration) {
-          if (!is_null($integration->integration_type) && $integration->integration_type === ($captchaSettings ? 'gReCaptcha' : 'gReCaptchaV3')) {
-            $integrationDetails = Utilities::jsonObj($integration->integration_details);
-            if ($integrationDetails) {
-              $integrationDetails->id = $integration->id;
-              $reCAPTCHA = $integrationDetails;
-            }
-          }
-        }
-      }
-      if (!empty($reCAPTCHA->secretKey)) {
-        $gRecaptchaResponse = HttpHelper::post(
-          'https://www.google.com/recaptcha/api/siteverify',
-          ['secret' => $reCAPTCHA->secretKey, 'response' => $token]
-        );
-        $isgReCaptchaVerified = false;
-        if (!is_wp_error($gRecaptchaResponse)) {
-          if (
-            $captchaV3Settings
-            && !empty($gRecaptchaResponse->score)
-            && ((float) $gRecaptchaResponse->score < (float) $captchaV3Settings->score)
-          ) {
-            wp_send_json_error(
-              sanitize_text_field((string) $captchaV3Settings->message)
-            );
-          }
+    if (!$captchaSettings && !$captchaV3Settings) {
+      return;
+    }
 
-          $isgReCaptchaVerified = $gRecaptchaResponse->success;
-        }
-        if (!$isgReCaptchaVerified) {
-          return new WP_Error('spam_detection', __('Please verify reCAPTCHA', 'bit-form'));
-        }
+    if (!isset($_POST['g-recaptcha-response'])) {
+      return new WP_Error('spam_detection', __('Please recheck your reCaptcha Configuration', 'bit-form'));
+    }
+    $token = sanitize_text_field(wp_unslash($_POST['g-recaptcha-response']));
+
+    $appType = $captchaSettings ? 'gReCaptcha' : 'gReCaptchaV3';
+    $reCAPTCHA = $this->getCaptchaApp($appType);
+
+    // Fail closed: no secret key must not skip verification.
+    if (empty($reCAPTCHA->secretKey)) {
+      Log::debug_log("reCAPTCHA ({$appType}) is enabled on form {$this->form_id}, but no secret key is set in App Settings.");
+      return new WP_Error('spam_detection', __('reCAPTCHA is not configured. Please contact the site administrator.', 'bit-form'));
+    }
+
+    $gRecaptchaResponse = HttpHelper::post(
+      'https://www.google.com/recaptcha/api/siteverify',
+      ['secret' => $reCAPTCHA->secretKey, 'response' => $token]
+    );
+    if (is_wp_error($gRecaptchaResponse)) {
+      return new WP_Error('spam_detection', __('Please verify reCAPTCHA', 'bit-form'));
+    }
+
+    // Tokens are single-use; keep this verdict for the log.
+    if ('gReCaptchaV3' === $appType) {
+      $this->recaptchaV3Verification = ['integId' => $reCAPTCHA->id, 'response' => $gRecaptchaResponse];
+    }
+
+    if ($captchaV3Settings && self::isRecaptchaScoreTooLow($gRecaptchaResponse, $captchaV3Settings)) {
+      wp_send_json_error(
+        sanitize_text_field((string) $captchaV3Settings->message)
+      );
+    }
+
+    if (!is_object($gRecaptchaResponse) || empty($gRecaptchaResponse->success)) {
+      return new WP_Error('spam_detection', __('Please verify reCAPTCHA', 'bit-form'));
+    }
+  }
+
+  /**
+   * Connected captcha app from App Settings, with its integration id.
+   *
+   * @param string $appType gReCaptcha, gReCaptchaV3, hcaptcha or turnstileCaptcha
+   *
+   * @return object|null
+   */
+  private function getCaptchaApp($appType)
+  {
+    $apps = (new IntegrationHandler(0))->getAllIntegration('app', $appType);
+    if (is_wp_error($apps) || !is_array($apps)) {
+      return null;
+    }
+
+    $reCAPTCHA = null;
+    foreach ($apps as $integration) {
+      if ($appType !== $integration->integration_type) {
+        continue;
+      }
+      $details = Utilities::jsonObj($integration->integration_details);
+      if (is_object($details)) {
+        $details->id = $integration->id;
+        $reCAPTCHA = $details;
       }
     }
+
+    return $reCAPTCHA;
+  }
+
+  /**
+   * Log the reCAPTCHA v3 verdict for this submission.
+   *
+   * @param array $saveResponse Entry save/update response
+   *
+   * @return void
+   */
+  private function logRecaptchaV3Verification($saveResponse)
+  {
+    if (!$this->getCaptchaV3Settings()) {
+      return;
+    }
+    unset($_POST['g-recaptcha-response']);
+
+    if (empty($this->recaptchaV3Verification) || empty($saveResponse['triggerData']['logID'])) {
+      return;
+    }
+
+    $response = $this->recaptchaV3Verification['response'];
+    $status = is_object($response) && !empty($response->success) ? 'success' : 'error';
+    (new UtilApiResponse())->apiResponse(
+      $saveResponse['triggerData']['logID'],
+      $this->recaptchaV3Verification['integId'],
+      ['type_name' => 'ReCaptcha', 'type' => 'v3'],
+      $status,
+      $response
+    );
+  }
+
+  /**
+   * Whether the v3 score is below tolerance; 0.0 counts, blank tolerance means 0.6.
+   *
+   * @param mixed $response Decoded siteverify response
+   * @param mixed $settings Form's recaptchav3 settings
+   *
+   * @return bool
+   */
+  private static function isRecaptchaScoreTooLow($response, $settings)
+  {
+    if (!is_object($response) || !isset($response->score) || !is_numeric($response->score)) {
+      return false;
+    }
+
+    $threshold = is_object($settings) && isset($settings->score) && is_numeric($settings->score)
+      ? (float) $settings->score
+      : 0.6;
+
+    return (float) $response->score < $threshold;
   }
 
   private function verifyHCaptcha()
   {
-    $hCaptchaExist = $this->isFieldTypeExist('hcaptcha'); // You can rename this to getHCaptchaSettings() if needed
-    if ($hCaptchaExist) {
-      if (!isset($_POST['h-captcha-response'])) {
-        return new WP_Error('spam_detection', __('Please verify hCaptcha', 'bit-form'));
-      }
+    if (!$this->isFieldTypeExist('hcaptcha')) {
+      return;
+    }
 
-      $token = sanitize_text_field(wp_unslash($_POST['h-captcha-response']));
+    if (!isset($_POST['h-captcha-response'])) {
+      return new WP_Error('spam_detection', __('Please verify hCaptcha', 'bit-form'));
+    }
+    $token = sanitize_text_field(wp_unslash($_POST['h-captcha-response']));
+    $hCaptcha = $this->getCaptchaApp('hcaptcha');
 
-      $integrationHandler = new IntegrationHandler(0);
-      $allFormIntegrations = $integrationHandler->getAllIntegration('app', 'hcaptcha');
+    // Fail closed: no secret key must not skip verification.
+    if (empty($hCaptcha->secretKey)) {
+      Log::debug_log("hCaptcha is enabled on form {$this->form_id}, but no secret key is set in App Settings.");
+      return new WP_Error('spam_detection', __('hCaptcha is not configured. Please contact the site administrator.', 'bit-form'));
+    }
 
-      if (!is_wp_error($allFormIntegrations)) {
-        foreach ($allFormIntegrations as $integration) {
-          if (!is_null($integration->integration_type) && 'hcaptcha' === $integration->integration_type) {
-            $integrationDetails = Utilities::jsonObj($integration->integration_details);
-            if ($integrationDetails) {
-              $integrationDetails->id = $integration->id;
-              $hCaptcha = $integrationDetails;
-            }
-          }
-        }
-      }
+    $hCaptchaResponse = HttpHelper::post(
+      'https://api.hcaptcha.com/siteverify',
+      [
+        'secret'   => $hCaptcha->secretKey,
+        'response' => $token,
+        'remoteip' => (isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '')
+      ]
+    );
 
-      if (!empty($hCaptcha->secretKey)) {
-        $hCaptchaResponse = HttpHelper::post(
-          'https://api.hcaptcha.com/siteverify',
-          [
-            'secret'   => $hCaptcha->secretKey,
-            'response' => $token,
-            'remoteip' => (isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : '')
-          ]
-        );
-
-        $isVerified = false;
-        if (!is_wp_error($hCaptchaResponse)) {
-          $isVerified = $hCaptchaResponse->success;
-        }
-
-        if (!$isVerified) {
-          return new WP_Error('spam_detection', __('hCaptcha verification failed', 'bit-form'));
-        }
-      }
+    if (is_wp_error($hCaptchaResponse) || !is_object($hCaptchaResponse) || empty($hCaptchaResponse->success)) {
+      return new WP_Error('spam_detection', __('hCaptcha verification failed', 'bit-form'));
     }
   }
 
   private function verifyTurnstileCaptcha()
   {
-    $turnstileExist = $this->isFieldTypeExist('turnstile');
-    if ($turnstileExist) {
-      if (!isset($_POST['cf-turnstile-response'])) {
-        return new WP_Error('spam_detection', __('Please verify Cloudflare Turnstile Captcha', 'bit-form'));
-      }
-      $token = sanitize_text_field(wp_unslash($_POST['cf-turnstile-response']));
-      $turnstileCaptcha = null;
-      $integrationHandler = new IntegrationHandler(0);
-      $turnstileIntegration = $integrationHandler->getAllIntegration('app', 'turnstileCaptcha')[0];
-      if (!is_wp_error($turnstileIntegration && !is_null($turnstileIntegration->integration_type))) {
-        $turnstileCaptcha = json_decode($turnstileIntegration->integration_details);
-        // $integrationDetails->id = $turnstileIntegration->id;
-        // $turnstileCaptcha = $integrationDetails;
-      }
-      if (!is_null($turnstileCaptcha)) {
-        $isTurnstileCaptchaVerified = false;
-        $turnstileRecaptchaResponse = HttpHelper::post(
-          'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-          ['secret' => $turnstileCaptcha->secretKey, 'response' => $token]
-        );
-        if (!is_wp_error($turnstileRecaptchaResponse)) {
-          if (!$turnstileRecaptchaResponse->success) {
-            $errorCodes = implode(', ', (array) ($turnstileRecaptchaResponse->{'error-codes'} ?? []));
-            wp_send_json_error(
-              sprintf(
-                /* translators: %s: dynamic value. */
-                __('Cloudflare Turnstile Validation Error: %s', 'bit-form'),
-                $errorCodes
-              )
-            );
-          }
+    if (!$this->isFieldTypeExist('turnstile')) {
+      return;
+    }
 
-          $isTurnstileCaptchaVerified = $turnstileRecaptchaResponse->success;
-        }
-        if (!$isTurnstileCaptchaVerified) {
-          return new WP_Error('spam_detection', __('Please verify Cloudflare Turnstile Captcha', 'bit-form'));
-        }
-      }
+    if (!isset($_POST['cf-turnstile-response'])) {
+      return new WP_Error('spam_detection', __('Please verify Cloudflare Turnstile Captcha', 'bit-form'));
+    }
+    $token = sanitize_text_field(wp_unslash($_POST['cf-turnstile-response']));
+    $turnstileCaptcha = $this->getCaptchaApp('turnstileCaptcha');
+
+    // Fail closed: no secret key must not skip verification.
+    if (empty($turnstileCaptcha->secretKey)) {
+      Log::debug_log("Turnstile is enabled on form {$this->form_id}, but no secret key is set in App Settings.");
+      return new WP_Error('spam_detection', __('Cloudflare Turnstile is not configured. Please contact the site administrator.', 'bit-form'));
+    }
+
+    $turnstileResponse = HttpHelper::post(
+      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+      ['secret' => $turnstileCaptcha->secretKey, 'response' => $token]
+    );
+    if (is_wp_error($turnstileResponse) || !is_object($turnstileResponse)) {
+      return new WP_Error('spam_detection', __('Please verify Cloudflare Turnstile Captcha', 'bit-form'));
+    }
+
+    if (empty($turnstileResponse->success)) {
+      $errorCodes = implode(', ', (array) ($turnstileResponse->{'error-codes'} ?? []));
+      wp_send_json_error(
+        sprintf(
+          /* translators: %s: dynamic value. */
+          __('Cloudflare Turnstile Validation Error: %s', 'bit-form'),
+          $errorCodes
+        )
+      );
     }
   }
 
@@ -984,31 +1064,7 @@ final class FrontendFormManager extends FormManager
         }
 
         if ('onePerIp' === $restrictionKey) {
-          $formEntry = new FormEntryModel();
-
-          $getResult = $formEntry->get(
-            ['user_ip', 'status'],
-            [
-              'form_id' => $this->form_id,
-              'user_ip' => (int) ip2long((string) $ipAddress)
-            ],
-          );
-
-          $count = 0;
-          $status = 0;
-
-          if (!is_wp_error($getResult) && count($getResult) > 0) {
-            $count = count($getResult);
-
-            foreach ($getResult as $row) {
-              if (9 === (int) $row->status) {
-                $status = 9;
-                break;
-              }
-            }
-          }
-
-          if ($count > 0 && 9 !== (int) $status) {
+          if ($this->hasCompletedEntryFromIp($ipAddress)) {
             $onePerIp = __('Sorry!! You have already submitted from this IP address', 'bit-form');
 
             $onePerIp = apply_filters(
