@@ -406,16 +406,24 @@ class Model
     // A condition column may be table-qualified and backtick-quoted — the multi-table JOIN DELETE
     // in FormEntryModel::bulkDelete() *must* pass `wp_bitforms_form_entries`.`id`, because a bare
     // `id` is ambiguous across the two joined tables. Validate each segment on its own.
+    //
+    // The table segment carries the site's $wpdb->prefix, and WordPress accepts any prefix made of
+    // letters, digits and underscores, including one that starts with a digit (`51_`, as a WP Ghost
+    // or Plesk random prefix can be). Requiring a leading letter there collapsed every entry delete
+    // on such sites to WHERE 1=0, so only the column segment keeps the leading-letter rule.
     $parts = explode('.', $identifier);
-    if (count($parts) > 2) {
+    $partCount = count($parts);
+    if ($partCount > 2) {
       return false;
     }
-    foreach ($parts as $part) {
+    foreach ($parts as $index => $part) {
       $part = trim($part);
       if (\strlen($part) > 1 && '`' === $part[0] && '`' === substr($part, -1)) {
         $part = substr($part, 1, -1);
       }
-      if (1 !== preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $part)) {
+      $isTableSegment = 2 === $partCount && 0 === $index;
+      $pattern = $isTableSegment ? '/^[A-Za-z0-9_]+$/' : '/^[A-Za-z_][A-Za-z0-9_]*$/';
+      if (1 !== preg_match($pattern, $part)) {
         return false;
       }
     }

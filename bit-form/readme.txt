@@ -1,11 +1,11 @@
 === Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder ===
 Plugin Name: Bit Form - Contact Form, Payment Forms, Multi Step Forms, Calculator & Custom Form Builder
-Version: 3.3.2
-Stable tag: 3.3.2
+Version: 3.3.3
+Stable tag: 3.3.3
 Author: Contact form builder by Bit form
 Author URI: https://www.bitapps.pro/
 Contributors: bitpressadmin
-Tags:  contact form, form, form builder, wp forms, form plugin
+Tags:  contact form, form, form builder, custom form, form plugin
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
@@ -474,6 +474,12 @@ Yes, you can export form submission data from Bit Form entries for reporting, ba
 8. Build conversational forms with one question per step
 
 == Changelog ==
+= 3.3.3 =
+* Release Date: 13 October, 2026
+
+* Fixes:
+    1. **Deleting Entries:** Entries can be deleted again on sites whose database table prefix starts with a digit (for example `51_`). Deleting them used to fail with "Form entry deletion failed."
+
 = 3.3.2 =
 * Release Date: 7 October, 2026
 

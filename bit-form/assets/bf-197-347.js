@@ -1,0 +1,1 @@
+const n=t=>{const r=typeof crypto!="undefined"&&crypto.randomUUID?crypto.randomUUID():`${Math.random().toString(36).slice(2,10)}-${Math.random().toString(36).slice(2,10)}`;return`${t}_${r}`};export{n as g};
